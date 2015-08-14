@@ -5,3 +5,15 @@ bind TkConsolePost <KeyPress>
  -> ::tkcon::TagProc
    -> EvalAttached [list info proc]
       -> EvalInSwank 
+
+
+Порядок инициализации
+tkcon::AtSource 
+  Init 
+    InputUI 
+      InitMenus 
+      Bindings
+    OuterAttachToSwank
+   
+::tkcon::MainInit - вызывается только в главном интерпрететаторе, не в рабах.
+
