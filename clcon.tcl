@@ -987,7 +987,7 @@ proc ::tkcon::EvalCmd {w cmd} {
     variable OPT
     variable PRIV
 
-    tr "evalCmd $cmd"
+    # tr "evalCmd $cmd"
 
     $w mark set output end
     if {$cmd ne ""} {
@@ -1069,7 +1069,7 @@ proc ::tkcon::EvalCmd {w cmd} {
 		    set res $res2
 		}
 	    }
-	    catch {EvalAttached [list set _ $res]}
+	    #budden catch {EvalAttached [list set _ $res]}
 	    set maxlen $OPT(maxlinelen)
 	    set trailer ""
 	    if {($maxlen > 0) && ([string length $res] > $maxlen)} {
@@ -1193,7 +1193,7 @@ proc ::tkcon::GenContinuationCounter {} {
 
 
 proc ::tkcon::FormatSwankRexEvalMessage {cmd} {
-    set ContinuationCounter GenContinuationCounter
+    set ContinuationCounter [GenContinuationCounter]
     set msgNoLen "(:emacs-rex-rt $cmd \"COMMON-LISP-USER\" nil :repl-thread $ContinuationCounter)"
     set strLenHex [format "%X" [string length $msgNoLen]]
     set msgAndLen [string cat $strLenHex $msgNoLen]
