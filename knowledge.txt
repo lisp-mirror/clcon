@@ -32,3 +32,11 @@ SWANK: read-loop - читает сообщения из сокета.
  dispatch-loop - пока не ясно, что делает, но ясно, что он достаёт сообщения из почтового ящика
 
 
+ decode-message - читает сообщение из потока
+   read-message - собственно читает
+     read-packet - читает сначала длину сообщения, затем содержимое
+
+
+sudo rm -f /s2/tcpdump.log && sudo tcpdump -w /s2/tcpdump.log -i lo
+
+(swank:create-server :port 4009 :dont-close t)

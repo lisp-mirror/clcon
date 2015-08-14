@@ -1195,14 +1195,17 @@ proc ::tkcon::GenContinuationCounter {} {
 proc ::tkcon::FormatSwankRexEvalMessage {cmd} {
     set ContinuationCounter [GenContinuationCounter]
     set msgNoLen "(:emacs-rex-rt $cmd \"COMMON-LISP-USER\" nil :repl-thread $ContinuationCounter)"
-    set strLenHex [format "%X" [string length $msgNoLen]]
+    set strLenHex [format "%06X" [string length $msgNoLen]]
     set msgAndLen [string cat $strLenHex $msgNoLen]
     return $msgAndLen
 }
 
-proc ::tkcon::EvalInSwank args {
+proc ::tkcon::EvalInSwank {args} {
     variable OPT
     variable PRIV
+    
+    #budden: something is wrong with my understaning of tcl
+    set args [lindex $args 0]
 
     if {$PRIV(deadapp)} {
 	if {![info exists PRIV(app)] || \
@@ -2382,9 +2385,7 @@ proc ::tkcon::AttachSwank {name} {
         #        ::tkcon::EvalSlave uplevel \#0
 
     interp alias {} ::tkcon::EvalAttached {} ::tkcon::EvalInSwank {} \#0
-    # flash every character - this is extermely slow, but useful for debugging
-    # TODO - set more efficient buffering when something begins to work
-    fconfigure $name -buffering none -blocking 0
+    fconfigure $name -buffering full -blocking 0
     
     # The file event will just puts whatever data is found
     # into the interpreter
