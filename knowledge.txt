@@ -1,4 +1,4 @@
--*- Coding: utf-8 ; -*-
+; -*- Coding: utf-8 ; mode : lisp ; -*-
 
 Когда набиваем, консоль сразу пытается понять, что мы набиваем. И делает она это так:
 bind TkConsolePost <KeyPress>
@@ -24,6 +24,7 @@ tkcon::AtSource
     EvalCmd - выполняем одну команду
 
 
+$PRIV(app) - канал связи
 ____________________________
 SWANK: read-loop - читает сообщения из сокета.
    далее он отправляет их управляющему потоку (в почтовый ящик)
@@ -40,3 +41,10 @@ SWANK: read-loop - читает сообщения из сокета.
 sudo rm -f /s2/tcpdump.log && sudo tcpdump -w /s2/tcpdump.log -i lo
 
 (swank:create-server :port 4009 :dont-close t)
+
+multithreaded-connection - здесь описаны треды
+
+
+thread в сообщении swank - сначала это t
+затем единица.
+Разбор этого значения - в ф-ии swank::thread-for-evaluation

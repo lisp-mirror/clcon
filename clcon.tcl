@@ -1181,8 +1181,8 @@ proc ::tkcon::EvalSend cmd {
 
 
 proc ::tkcon::GenContinuationCounter {} {
- global ContinuationCounter
- # must not be global but PRIV? 
+    # See also swank-protocol::connection-request-counter
+ variable ContinuationCounter
  if {![info exists ContinuationCounter]} {
     set ContinuationCounter 1
  } else {
@@ -1191,22 +1191,38 @@ proc ::tkcon::GenContinuationCounter {} {
  return $ContinuationCounter
 }
 
+## from swank-protocol::emacs-rex
+proc ::tkcon::CalculateThreadDesignatorForSwank {ItIsListenerEval} {
+    variable PRIV
+    if {$ItIsListenerEval == 1} {
+        return ":repl-thread"
+    } else {
+        return $PRIV(SwankThread)
+    }
+}
 
-proc ::tkcon::FormatSwankRexEvalMessage {cmd} {
+proc ::tkcon::FormatSwankRexEvalMessage {cmd ItIsListenerEval} {
     set ContinuationCounter [GenContinuationCounter]
-    set msgNoLen "(:emacs-rex-rt $cmd \"COMMON-LISP-USER\" nil :repl-thread $ContinuationCounter)"
+    set ThreadDesignator [CalculateThreadDesignatorForSwank $ItIsListenerEval]
+    set msgNoLen "(:emacs-rex-rt $cmd \"COMMON-LISP-USER\" nil $ThreadDesignator $ContinuationCounter)"
     set strLenHex [format "%06X" [string length $msgNoLen]]
     set msgAndLen [string cat $strLenHex $msgNoLen]
     return $msgAndLen
 }
 
-proc ::tkcon::EvalInSwank {args} {
+proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form ItIsListenerEval} {
+    if {$ItIsListenerEval == 1} {
+        return [string cat "(swank-repl:listener-eval " $form ")"]
+    } else {
+        return $form
+    }
+}
+
+## ItIsListenerEval must be 1 to wrap form into (swank-repl:listener-eval ...) or 0 otherwise
+proc ::tkcon::EvalInSwank {form {ItIsListenerEval 1}} {
     variable OPT
     variable PRIV
     
-    #budden: something is wrong with my understaning of tcl
-    set args [lindex $args 0]
-
     if {$PRIV(deadapp)} {
 	if {![info exists PRIV(app)] || \
 		[catch {eof $PRIV(app)} eof] || $eof} {
@@ -1217,21 +1233,54 @@ proc ::tkcon::EvalInSwank {args} {
 	    Prompt "\n\"$PRIV(app)\" alive\n" [CmdGet $PRIV(console)]
 	}
     }
+
+    # FIXME - we don't need that for lisp! Some other translation should occur!
     # Sockets get \'s interpreted, so that users can
     # send things like \n\r or explicit hex values
-    set cmd [subst -novariables -nocommands $args]
+    set cmd [subst -novariables -nocommands $form]
+
+    set cmd [SwankMaybeWrapFormIntoListenerEval $cmd $ItIsListenerEval]
+
     #puts [list $PRIV(app) $cmd]
     
-    set cmd [FormatSwankRexEvalMessage $cmd]
+    set cmd [FormatSwankRexEvalMessage $cmd $ItIsListenerEval]
 
-    tr "About to send $cmd to SWANK"
-    set code [catch {puts $PRIV(app) $cmd ; flush $PRIV(app)} result]
+    # tr "About to send $cmd to SWANK"
+    set code [catch {puts -nonewline $PRIV(app) $cmd ; flush $PRIV(app)} result]
     if {$code && [eof $PRIV(app)]} {
 	## Interpreter died or disappeared
 	puts "$code eof [eof $PRIV(app)]"
 	EvalSocketClosed $PRIV(app)
     }
     return -code $code $result
+}
+
+
+## ::tkcon::EmacsRex - from swank-protocol::emacs-rex
+##  Docstring from emacs-rex:
+##  (R)emote (E)xecute S-e(X)p.
+##
+##  Send an S-expression command to Swank to evaluate. The resulting response must
+##  be read with read-response.
+## ItIsListenerEval must be 1 if form is (swank-repl:listener-eval ...) or 0 otherwise
+proc ::tkcon::SwankEmacsRex {form {ItIsListenerEval 0}} {
+    EvalInSwank $form $ItIsListenerEval
+}
+
+## swank-protocol::request-swank-require
+proc ::tkcon::SwankRequestSwankRequire1 {requirement} {
+    ::tkcon::SwankEmacsRex "(swank:swank-require '$requirement)"
+}
+
+## swank-protocol::request-init-presentations
+proc ::tkcon::SwankRequestInitPresentations {} {
+    ::tkcon::SwankEmacsRex "(swank:init-presentations)"
+}
+
+proc ::tkcon::SwankRequestCreateRepl {} {
+    variable PRIV
+    ::tkcon::SwankEmacsRex "(swank-repl:create-repl nil :coding-system \"utf-8-unix\")"
+    set PRIV(SwankThread) 1
 }
 
 ## ::tkcon::EvalSocket - sends the string to an interpreter attached via
@@ -1289,6 +1338,18 @@ proc ::tkcon::EvalSocketEvent {sock} {
     }
     puts $line
 }
+
+## Temporary procedure to handle input from SWANK
+## does not have counterparts in swank-protocol!!
+proc ::tkcon::TempSwankChannelReadable {sock} {
+    set Message [SwankReadMessageString]
+
+    # just for debugging 
+    puts "message from socket: $Message"
+    
+    return $Message
+}
+
 
 ## ::tkcon::EvalSocketClosed - takes care of handling a closed eval socket
 ##
@@ -2341,9 +2402,101 @@ proc ::tkcon::Attach {{name <NONE>} {type slave} {ns {}}} {
     return [AttachId]
 }
 
+## from swank-protocol::decode-integer
+proc ::tkcon::SwankDecodeInteger {string} {
+    set num [scan $string "%X"]
+    return $num
+}
 
 
-## ::tkcon::AttachSwank - called to attach tkcon to an interpreter
+
+## from swank-protocol::read-message-from-stream
+proc ::tkcon::SwankReadMessageFromStream {stream} {
+    set LengthString [read $stream 6]
+
+    # eof checking by similarity with ::tkcon::EvalSocketEvent
+    if {[eof $stream]} {
+        EvalSocketClosed $stream
+        return
+    }
+
+    set Length [SwankDecodeInteger $LengthString]
+    set Buffer [read $stream $Length]
+
+    if {[eof $stream]} {
+        EvalSocketClosed $stream
+        return
+    }
+    
+    return $Buffer
+}
+
+## from swank-protocol::read-message-string
+proc ::tkcon::SwankReadMessageString {} {
+    variable PRIV
+    set channel $PRIV(app)
+    fconfigure $channel -blocking 1
+    set result [SwankReadMessageFromStream $channel]
+    fconfigure $channel -blocking 0
+    return $result
+}
+
+# from swank-protocol::read-message. Partially unimplemented
+proc ::tkcon::SwankReadMessage {} {
+    # with-swank-syntax
+    #  read-from-string
+    return [SwankReadMessageString]
+}
+
+
+## Modelled after defmethod lime::connect :after
+## some parts are not implemented yet
+proc ::tkcon::SetupSwankConnection {channel} {
+  #(swank-protocol:request-connection-info connection)
+  #;; Read the connection information message
+  #(let* ((info (swank-protocol:read-message connection))
+  #       (data (getf (getf info :return) :ok))
+  #       (impl (getf data :lisp-implementation))
+  #       (machine (getf data :machine)))
+  #  (setf (connection-pid connection)
+  #        (getf data :pid)
+  
+  #        (connection-implementation-name connection)
+  #        (getf impl :name)
+
+  #        (connection-implementation-version connection)
+  #        (getf impl :version)
+
+  #        (connection-machine-type connection)
+  #        (getf machine :type)
+
+  #        (connection-machine-version connection)
+  #        (getf machine :version)
+
+  #        (connection-swank-version connection)
+  #        (getf data :version)))
+    #;; Require some Swank modules
+    SwankRequestSwankRequire1 "swank-presentations"
+    SwankRequestSwankRequire1 "swank-repl"
+
+    # puts is for debugging here
+    puts [SwankReadMessage]
+
+    # Start it up
+    SwankRequestInitPresentations
+    SwankRequestCreateRepl
+
+    # Wait for startup
+    # puts is for debugging here
+    puts [SwankReadMessage]
+
+    #;; Read all the other messages, dumping them
+    #(swank-protocol:read-all-messages connection))
+    #
+}
+
+
+## ::tkcon::AttachSwank - called to setup SWANK connection
 # ARGS:	name	- socket identifier 
 # Results:	::tkcon::EvalAttached is recreated to send commands to socket
 ##
@@ -2370,7 +2523,9 @@ proc ::tkcon::AttachSwank {name} {
     set type swank
 
     if {![info exists app]} { set app $name }
-    array set PRIV [list app $app appname $name apptype $type deadapp 0]
+
+    # SwankThread is like swank-protocol::connection thread slot
+    array set PRIV [list app $app appname $name apptype $type deadapp 0 SwankThread t]
 
     ## ::tkcon::EvalAttached - evaluates the args in the attached interp
     ## args should be passed to this procedure as if they were being
@@ -2387,10 +2542,14 @@ proc ::tkcon::AttachSwank {name} {
     interp alias {} ::tkcon::EvalAttached {} ::tkcon::EvalInSwank {} \#0
     fconfigure $name -buffering full -blocking 0
     
+    # It is important we initialize connection before binding fileevent
+    SetupSwankConnection $name
+
     # The file event will just puts whatever data is found
     # into the interpreter
-    fileevent $name readable [list ::tkcon::EvalSocketEvent $name]
-
+    # fileevent $name readable [list ::tkcon::EvalSocketEvent $name]
+    fileevent $name readable [list ::tkcon::TempSwankChannelReadable $name]
+    
     return [AttachId]
 }
 
