@@ -1,0 +1,5 @@
+-*- Coding: utf-8 ; -*-
+bind TkConsolePost <KeyPress>
+ -> ::tkcon::TagProc
+   -> EvalAttached [list info proc]
+      -> EvalInSwank 
