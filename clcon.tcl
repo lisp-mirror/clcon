@@ -453,6 +453,7 @@ proc ::tkcon::Init {args} {
 	[expr {$OPT(maxlinelen)?$OPT(maxlinelen):{unlimited}}]"
 
     Prompt "$title console display active (Tcl$::tcl_patchLevel / Tk$::tk_patchLevel)\n"
+    OuterAttachToSwank
 }
 
 ## ::tkcon::InitSlave - inits the slave by placing key procs and aliases in it
@@ -1598,7 +1599,7 @@ proc ::tkcon::InitMenus {w title} {
 		    -command ::tkcon::XauthSecure
 	}
 	$m add separator
-        $m add command -label "1.Attach to SWANK" -underline 0 -command "::tkcon::NewSwank 127.0.0.1 4009"
+    $m add command -label "1.Attach to SWANK" -underline 0 -command "::tkcon::OuterAttachToSwank"
 	$m add cascade -label "Attach To ..." -underline 0 -menu $m.attach
 
 	## Attach Console Menu
@@ -2516,6 +2517,9 @@ proc ::tkcon::NewSocket {} {
 }
 
 
+proc ::tkcon::OuterAttachToSwank {} {
+    ::tkcon::NewSwank 127.0.0.1 4009
+}
 
 ## ::tkcon::NewSwank - called to create a socket to connect to
 # ARGS:	none
@@ -5336,20 +5340,26 @@ proc ::tkcon::PopupMenu {X Y} {
 ## too much CPU time...
 ##
 proc ::tkcon::TagProc w {
-    set exp "\[^\\\\\]\[\[ \t\n\r\;{}\"\$\]"
-    set i [$w search -backwards -regexp $exp insert-1c limit-1c]
-    if {[string compare {} $i]} {append i +2c} else {set i limit}
-    regsub -all "\[\[\\\\\\?\\*\]" [$w get $i "insert-1c wordend"] {\\\0} c
-    if {[llength [EvalAttached [list info commands $c]]]} {
-	$w tag add proc $i "insert-1c wordend"
-    } else {
-	$w tag remove proc $i "insert-1c wordend"
-    }
-    if {[llength [EvalAttached [list info vars $c]]]} {
-	$w tag add var $i "insert-1c wordend"
-    } else {
-	$w tag remove var $i "insert-1c wordend"
-    }
+    # budden: here we extract current identifier and ask attached interpreter what does the word mean
+    # in lisp, we would run modified side-effect-free reader instead. Now we disable the machinery as
+    # this is not of key importance to get working system. slime.el passes autodoc events in similar circumstances,
+    # e.g. thus it receives prompt of function argument list
+    
+    
+    #budden set exp "\[^\\\\\]\[\[ \t\n\r\;{}\"\$\]"
+    #budden set i [$w search -backwards -regexp $exp insert-1c limit-1c]
+    #budden if {[string compare {} $i]} {append i +2c} else {set i limit}
+    #budden regsub -all "\[\[\\\\\\?\\*\]" [$w get $i "insert-1c wordend"] {\\\0} c
+    #budden if {[llength [EvalAttached [list info commands $c]]]} {
+	#budden $w tag add proc $i "insert-1c wordend"
+    #budden } else {
+	#budden $w tag remove proc $i "insert-1c wordend"
+    #budden }
+    #budden if {[llength [EvalAttached [list info vars $c]]]} {
+	#budden $w tag add var $i "insert-1c wordend"
+    #budden } else {
+	#budden $w tag remove var $i "insert-1c wordend"
+    #budden }
 }
 
 ## ::tkcon::MatchPair - blinks a matching pair of characters

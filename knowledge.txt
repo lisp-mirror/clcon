@@ -1,4 +1,6 @@
 -*- Coding: utf-8 ; -*-
+
+Когда набиваем, консоль сразу пытается понять, что мы набиваем. И делает она это так:
 bind TkConsolePost <KeyPress>
  -> ::tkcon::TagProc
    -> EvalAttached [list info proc]
