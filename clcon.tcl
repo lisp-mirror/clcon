@@ -453,7 +453,7 @@ proc ::tkcon::Init {args} {
 	[expr {$OPT(maxlinelen)?$OPT(maxlinelen):{unlimited}}]"
 
     Prompt "$title console display active (Tcl$::tcl_patchLevel / Tk$::tk_patchLevel)\n"
-    OuterAttachToSwank
+    OuterNewSwank
 }
 
 ## ::tkcon::InitSlave - inits the slave by placing key procs and aliases in it
@@ -1599,7 +1599,7 @@ proc ::tkcon::InitMenus {w title} {
 		    -command ::tkcon::XauthSecure
 	}
 	$m add separator
-    $m add command -label "1.Attach to SWANK" -underline 0 -command "::tkcon::OuterAttachToSwank"
+    $m add command -label "1.Attach to SWANK" -underline 0 -command "::tkcon::OuterNewSwank"
 	$m add cascade -label "Attach To ..." -underline 0 -menu $m.attach
 
 	## Attach Console Menu
@@ -2341,15 +2341,10 @@ proc ::tkcon::Attach {{name <NONE>} {type slave} {ns {}}} {
 
 
 ## ::tkcon::AttachSwank - called to attach tkcon to an interpreter
-# ARGS:	name	- application name to which tkcon sends commands
-#		  This is either a slave interperter name or tk appname.
-#	type	- (slave|interp) type of interpreter we're attaching to
-#		  slave means it's a tkcon interpreter
-#		  interp means we'll need to 'send' to it.
-# Results:	::tkcon::EvalAttached is recreated to evaluate in the
-#		appropriate interpreter
+# ARGS:	name	- socket identifier 
+# Results:	::tkcon::EvalAttached is recreated to send commands to socket
 ##
-proc ::tkcon::AttachSwank {{name <SWANK>}} {
+proc ::tkcon::AttachSwank {name} {
     variable PRIV
     variable OPT
     variable ATTACH
@@ -2517,7 +2512,7 @@ proc ::tkcon::NewSocket {} {
 }
 
 
-proc ::tkcon::OuterAttachToSwank {} {
+proc ::tkcon::OuterNewSwank {} {
     ::tkcon::NewSwank 127.0.0.1 4009
 }
 
