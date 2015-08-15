@@ -2,23 +2,21 @@
 
 An attempt to adapt [tkcon](http://tkcon.sourceforge.net/) to Common Lisp (communication via SWANK)
 
-To test, 
-1. Start your lisp, load swank and do 
+To test, start your lisp, load swank and do 
 
 ```
 #!lisp
 (swank:create-server :port 4009 :dont-close t)
 ```
 
-2. Then set up path to :clcon-server system and load it
+Then set up path to :clcon-server system and load it
 ```
 (push "path/to/clcon-server/" asdf:*central-registry*)
 (asdf:load-system :clcon-server)
 ```
 
-3. Start clcon.tcl . It should connect automatically to swank. 
-
-4. Then you can type in expression like 
+Then start clcon.tcl . It should connect automatically to swank. 
+Then type in expression like 
 
 ```
 #!lisp
