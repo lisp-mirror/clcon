@@ -67,7 +67,7 @@ catch {unset pkg file name version}
 namespace eval ::tkcon {
     # when modifying this line, make sure that the auto-upgrade check
     # for version still works.
-    variable VERSION "2.7"
+    variable VERSION "0.0"
     # The OPT variable is an array containing most of the optional
     # info to configure.  COLOR has the color data.
     variable OPT
@@ -188,10 +188,10 @@ proc ::tkcon::Init {args} {
 	    tkcon_puts tkcon_gets observe observe_var unalias which what
 	}
 	RCS		{RCS: @(#) $Id: tkcon.tcl,v 1.120 2013/01/23 01:19:51 hobbs Exp $}
-	HEADURL		{http://tkcon.cvs.sourceforge.net/viewvc/tkcon/tkcon/tkcon.tcl}
+	HEADURL		{https://bitbucket.org/budden/clcon}
 
-	docs		"http://tkcon.sourceforge.net/"
-	email		{jeff(a)hobbs(.)org}
+	docs		"https://bitbucket.org/budden/clcon"
+	email		{}
 	root		.
 	uid		0
 	tabs		{}
@@ -703,7 +703,7 @@ proc ::tkcon::InitUI {title} {
     }
 
     if {!$PRIV(WWW)} {
-	wm title $root "tkcon $PRIV(version) $title"
+	wm title $root "clcon $PRIV(version) $title"
 	if {$PRIV(showOnStartup)} {
 	    # this may throw an error if toplevel is embedded
 	    catch {wm deiconify $root}
