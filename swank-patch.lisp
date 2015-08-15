@@ -1,6 +1,13 @@
 ; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*- 
 (in-package :clco)
 
+(defparameter *log-file* (make-pathname :name "swank-text-log" :type "log" :defaults *default-pathname-defaults*))
+
+(defun log-to-file (format &rest args)
+  (declare (ignorable format args))
+  (with-open-file (out *log-file* :direction :output :if-exists :append :if-does-not-exist :create)
+    (format out format args)))
+
 (defstruct (connection-extra-data (:conc-name ced-))
   tcl-connection-p
   )
@@ -27,7 +34,7 @@
 (defsetf tcl-connection-p set-tcl-connection-p)
 
 (defun note-this-is-tcl-connection ()
-  (swank/rpc::log-to-file (prin1-to-string swank::*emacs-connection*))
+  (log-to-file (prin1-to-string swank::*emacs-connection*))
   (assert swank::*emacs-connection*)
   (setf (tcl-connection-p swank::*emacs-connection*) t))
 
@@ -37,10 +44,10 @@
 
 (defun convert-object-to-tcl (object package)
   "If possible, convert object to tcl commands. FIXME: use target"
-  (swank/rpc::log-to-file "entered convert-object-to-tcl")
+  (log-to-file "entered convert-object-to-tcl")
   (swank::dcase object
     ((:write-string string &optional target)
-     (swank/rpc::log-to-file "processing write-string of ~S" string)
+     (log-to-file "processing write-string of ~S" string)
      (assert (keywordp target))
      (format nil "!puts target=~A;puts ~A"
              target
@@ -81,7 +88,7 @@
 
 (defun swank/rpc::prin1-to-string-for-emacs (object package)
   (when (eq (car object) :write-string)
-    (swank/rpc::log-to-file "entered prin1-to-string-for-emacs with ~S" swank::*emacs-connection*)
+    (log-to-file "entered prin1-to-string-for-emacs with ~S" swank::*emacs-connection*)
     )
   (cond
     ((tcl-connection-p swank::*emacs-connection*)

@@ -1204,7 +1204,9 @@ proc ::tkcon::CalculateThreadDesignatorForSwank {ItIsListenerEval} {
 proc ::tkcon::FormatSwankRexEvalMessage {cmd ItIsListenerEval} {
     set ContinuationCounter [GenContinuationCounter]
     set ThreadDesignator [CalculateThreadDesignatorForSwank $ItIsListenerEval]
-    set msgNoLen "(:emacs-rex-rt $cmd \"COMMON-LISP-USER\" nil $ThreadDesignator $ContinuationCounter)"
+    # commented out line is for my patched version which passes readtable
+    # set msgNoLen "(:emacs-rex-rt $cmd \"COMMON-LISP-USER\" nil $ThreadDesignator $ContinuationCounter)"
+    set msgNoLen "(:emacs-rex $cmd \"COMMON-LISP-USER\" $ThreadDesignator $ContinuationCounter)"
     set strLenHex [format "%06X" [string length $msgNoLen]]
     set msgAndLen [string cat $strLenHex $msgNoLen]
     return $msgAndLen
