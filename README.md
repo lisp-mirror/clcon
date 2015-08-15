@@ -16,6 +16,13 @@ Then start clcon.tcl . It should connect automatically to swank.
 Then you can type in expression like 
 
 ```
-"\\\"asdf\\\""
+#!lisp
+"asdf"
 ```
-at the console and press Return. Expression should be evaluated on lisp side correctly. 
+or
+```
+#!lisp
+(defun my-func (x) (map 'string 'identity (list #\\ #\" #\$)))
+```
+
+at the console and press Return. Expression should be evaluated on lisp side correctly.
