@@ -1284,7 +1284,12 @@ proc ::tkcon::SwankRequestSwankRequire1 {requirement} {
 
 ## swank-protocol::request-init-presentations
 proc ::tkcon::SwankRequestInitPresentations {} {
+    error "presentations are disabled in EMACS setup"
     ::tkcon::SwankEmacsRex "(swank:init-presentations)"
+}
+
+proc ::tkcon::SwankNoteTclConnection {} {
+    ::tkcon::SwankEmacsRex "(clco:note-this-is-tcl-connection)"
 }
 
 proc ::tkcon::SwankRequestCreateRepl {} {
@@ -1356,8 +1361,14 @@ proc ::tkcon::TempSwankChannelReadable {sock} {
 
     # just for debugging 
     puts "message from socket: $Message"
-    
-    return $Message
+
+    if { [string index $Message 0] eq "!" } {
+        set cmd [string range $Message 1 end]
+        eval $cmd
+        return
+    } else {
+        return $Message
+    }
 }
 
 
@@ -2487,14 +2498,18 @@ proc ::tkcon::SetupSwankConnection {channel} {
   #        (connection-swank-version connection)
   #        (getf data :version)))
     #;; Require some Swank modules
-    SwankRequestSwankRequire1 "swank-presentations"
+    #SwankRequestSwankRequire1 "swank-presentations"
     SwankRequestSwankRequire1 "swank-repl"
 
     # puts is for debugging here
     puts [SwankReadMessage]
 
     # Start it up
-    SwankRequestInitPresentations
+    # disabled at emacs SwankRequestInitPresentations
+
+    # this is not from lime!
+    SwankNoteTclConnection 
+
     SwankRequestCreateRepl
 
     # Wait for startup
