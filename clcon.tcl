@@ -1212,7 +1212,8 @@ proc ::tkcon::FormatSwankRexEvalMessage {cmd ItIsListenerEval} {
 
 proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form ItIsListenerEval} {
     if {$ItIsListenerEval == 1} {
-        return [string cat "(swank-repl:listener-eval " $form ")"]
+        set cmd [regsub -all {([\"\\])} $form {\\\0}]
+        return "(swank-repl:listener-eval \"$cmd\")"
     } else {
         return $form
     }
@@ -1222,7 +1223,8 @@ proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form ItIsListenerEval} {
 proc ::tkcon::EvalInSwank {form {ItIsListenerEval 1}} {
     variable OPT
     variable PRIV
-    
+
+  
     if {$PRIV(deadapp)} {
 	if {![info exists PRIV(app)] || \
 		[catch {eof $PRIV(app)} eof] || $eof} {
@@ -1237,21 +1239,29 @@ proc ::tkcon::EvalInSwank {form {ItIsListenerEval 1}} {
     # FIXME - we don't need that for lisp! Some other translation should occur!
     # Sockets get \'s interpreted, so that users can
     # send things like \n\r or explicit hex values
-    set cmd [subst -novariables -nocommands $form]
+    #set cmd [subst -novariables -nocommands $form]
+
+    set cmd $form
+    
+    puts "regsub result: $cmd"
 
     set cmd [SwankMaybeWrapFormIntoListenerEval $cmd $ItIsListenerEval]
 
+    puts "wrapped to listener eval: $cmd"
+    
     #puts [list $PRIV(app) $cmd]
     
     set cmd [FormatSwankRexEvalMessage $cmd $ItIsListenerEval]
+    puts "About to send to SWANK: $cmd"
 
     # tr "About to send $cmd to SWANK"
+
     set code [catch {puts -nonewline $PRIV(app) $cmd ; flush $PRIV(app)} result]
-    if {$code && [eof $PRIV(app)]} {
-	## Interpreter died or disappeared
-	puts "$code eof [eof $PRIV(app)]"
-	EvalSocketClosed $PRIV(app)
-    }
+        if {$code && [eof $PRIV(app)]} {
+            ## Interpreter died or disappeared
+            puts "$code eof [eof $PRIV(app)]"
+            EvalSocketClosed $PRIV(app)
+        }
     return -code $code $result
 }
 
@@ -1279,7 +1289,7 @@ proc ::tkcon::SwankRequestInitPresentations {} {
 
 proc ::tkcon::SwankRequestCreateRepl {} {
     variable PRIV
-    ::tkcon::SwankEmacsRex "(swank-repl:create-repl nil :coding-system \"utf-8-unix\")"
+    ::tkcon::SwankEmacsRex {(swank-repl:create-repl nil :coding-system "utf-8-unix")}
     set PRIV(SwankThread) 1
 }
 
@@ -2437,7 +2447,8 @@ proc ::tkcon::SwankReadMessageString {} {
     set channel $PRIV(app)
     fconfigure $channel -blocking 1
     set result [SwankReadMessageFromStream $channel]
-    fconfigure $channel -blocking 0
+    # channel might have been closed while executing
+    catch { fconfigure $channel -blocking 0 }
     return $result
 }
 

@@ -1,4 +1,6 @@
 ; -*- Coding: utf-8 ; mode : lisp ; -*-
+(in-package :swank)
+
 
 Когда набиваем, консоль сразу пытается понять, что мы набиваем. И делает она это так:
 bind TkConsolePost <KeyPress>
@@ -36,6 +38,7 @@ SWANK: read-loop - читает сообщения из сокета.
  decode-message - читает сообщение из потока
    read-message - собственно читает
      read-packet - читает сначала длину сообщения, затем содержимое
+     read-form - парсит сообщение
 
 
 sudo rm -f /s2/tcpdump.log && sudo tcpdump -w /s2/tcpdump.log -i lo
