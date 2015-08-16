@@ -1,6 +1,7 @@
 # README #
 
 An attempt to adapt [tkcon](http://tkcon.sourceforge.net/) to Common Lisp (communication via SWANK)
+MIT (or BSD) license (see tkcon's copyright)
 
 To test, start your lisp, load swank and do 
 
