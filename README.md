@@ -56,3 +56,6 @@ Manual is [here](http://tkcon.sourceforge.net/docs/index.html)
  
 ## What if I want to contribute
 Read issues
+
+## Roadmap
+Is in tracker
