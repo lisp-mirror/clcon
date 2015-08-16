@@ -40,12 +40,14 @@ cl-user package is assumed for all interaction. If you change package, consequen
 Use Console/"Attach to SWANK" menu item to reconnect
 
 ## Tcl escape
-Place dot (.) in the first position of line to execute tcl commands in main tcl interpreter
+Place dot (.) in the first position of line to send command to main tcl interpreter instead of SWANK server
 
 ## Hot swapping development of tcl side
 Well all we are lispers and we like incremental development. So you can use 
 
+```
 .::tkcon::SourceHere swank-io.tcl
+```
 
 to reload swank-io.tcl which contains swank communication routines. 
 
