@@ -48,6 +48,12 @@ proc ::tkcon::EvalInSwank {form {ItIsListenerEval 1}} {
     variable OPT
     variable PRIV
 
+    # tcl escape: if lisp command starts from . , we (temporarily?) consider it as tcl escape
+    if {[string index $form 0] eq "."} {
+        tkcon main [string range $form 1 end]
+        return
+    }
+    
     if {$PRIV(deadapp)} {
 	if {![info exists PRIV(app)] || \
 		[catch {eof $PRIV(app)} eof] || $eof} {
