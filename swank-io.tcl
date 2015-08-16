@@ -1,3 +1,7 @@
+## Copyright (c) 1995-2011 Jeffrey Hobbs, jeff(a)hobbs(.)org
+## Copyright (c) 2015 Denis Budyak
+## MIT License
+
 proc ::tkcon::GenContinuationCounter {} {
     # See also swank-protocol::connection-request-counter
  variable ContinuationCounter
