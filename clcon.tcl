@@ -81,10 +81,19 @@ namespace eval ::tkcon {
     set PRIV(ACC) [expr {$PRIV(AQUA) ? "Command-" : "Ctrl+"}]
 
     variable EXPECT 0
+    variable ScriptDirectory
+    set ScriptDirectory [file dirname [info script]]
 }
 
-set ScriptDirectory [file dirname [info script]]
-source [file join $ScriptDirectory swank-io.tcl]
+## ::tkcon::SourceHere - buddens command to load file from the same dir where
+# clcon itself is located. Be sure to load into main interpreter when you need it:
+# 
+proc ::tkcon::SourceHere {arg} {
+    variable ScriptDirectory
+    source [file join $::tkcon::ScriptDirectory $arg]
+}
+
+::tkcon::SourceHere swank-io.tcl
 
 ## ::tkcon::Init - inits tkcon
 #
