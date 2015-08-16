@@ -4742,8 +4742,8 @@ proc ::tkcon::Bindings {} {
 	<<TkCon_Main>>		<$PRIV(CTRL)Key-3>
 	<<TkCon_Expand>>	<Key-Tab>
 	<<TkCon_ExpandFile>>	<Key-Escape>
-	<<TkCon_ExpandProc>>	<Control-P>
-	<<TkCon_ExpandVar>>	<Control-V>
+	<<TkCon_ExpandProc>>	<Control-Alt-Key-u>
+	<<TkCon_ExpandVar>>	<Alt-v>
 	<<TkCon_Tab>>		<Control-i>
 	<<TkCon_Tab>>		<Alt-i>
 	<<TkCon_Newline>>	<Control-o>
