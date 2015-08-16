@@ -1546,11 +1546,6 @@ proc ::tkcon::InitMenus {w title} {
 		-command ::tkcon::Destroy
 	$m add command -label "Clear Console" -underline 1 -accel Ctrl-l \
 		-command { clear; ::tkcon::Prompt }
-	if {[tk windowingsystem] eq "x11"} {
-	    $m add separator
-	    $m add command -label "Make Xauth Secure" -und 5 \
-		    -command ::tkcon::XauthSecure
-	}
 	$m add separator
     $m add command -label "1.Attach to SWANK" -underline 0 -command "::tkcon::OuterNewSwank"
 	$m add cascade -label "Attach To ..." -underline 0 -menu $m.attach
@@ -2037,33 +2032,6 @@ proc ::tkcon::NamespacesList {names} {
 	::tkcon::RePrompt "\n" [::tkcon::CmdGet $::tkcon::PRIV(console)]
 	destroy [winfo toplevel %W]
     }
-}
-
-# ::tkcon::XauthSecure --
-#
-#   This removes all the names in the xhost list, and secures
-#   the display for Tk send commands.  Of course, this prevents
-#   what might have been otherwise allowable X connections
-#
-# Arguments:
-#   none
-# Results:
-#   Returns nothing
-#
-proc ::tkcon::XauthSecure {} {
-    global tcl_platform
-
-    if {[tk windowingsystem] ne "x11"} {
-	# This makes no sense outside of Unix
-	return
-    }
-    set hosts [exec xhost]
-    # the first line is info only
-    foreach host [lrange [split $hosts \n] 1 end] {
-	exec xhost -$host
-    }
-    exec xhost -
-    tk_messageBox -title "Xhost secured" -message "Xhost secured" -icon info
 }
 
 ## ::tkcon::FindBox - creates minimal dialog interface to ::tkcon::Find
