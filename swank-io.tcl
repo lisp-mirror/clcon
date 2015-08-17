@@ -57,6 +57,7 @@ proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form ItIsListenerEval} {
     }
 }
 
+# e.g. .puts [::tkcon::EvalInSwankSync {(swank:simple-completions "sw" '"COMMON-LISP-USER")}]
 
 # tries to evaluate code in sync mode and returns a result
 proc ::tkcon::EvalInSwankSync {lispcode} {
@@ -93,9 +94,16 @@ proc ::mprs::EvalInSwankSyncInner {lispcode} {
 
     # sit down while it is processing
     while {1 == 1} {
+
+        puts "EvalInSwankSyncInner goes vwait for SWANKEventQueue"
+
         vwait ::tkcon::SWANKEventQueue
 
-        set processed MaybeProcessSyncEventFromQueue
+        puts "EvalInSwankSyncInner woke up on vwait SWANKEventQueue"
+
+        set processed [MaybeProcessSyncEventFromQueue]
+
+        puts "MaybeProcessSyncEventFromQueue returned $processed"
         if { [lindex $processed 0] == 1} {
             set result [lindex $processed 1]
             return $result
@@ -248,6 +256,9 @@ proc ::mprs::ExtractSyncEventFromQueueIfExists {} {
     set i -1
     foreach Event $SWANKEventQueue {
         incr i
+
+        puts "Checking if $Event is sync = $SWANKSyncContinuation"
+        
         AssertEq [TypeTag $Event] l
         set EventAsList [Unleash $Event]
         set ContinuationId [ExtractContinuationId $EventAsList]
@@ -269,14 +280,14 @@ proc ::mprs::MaybeProcessSyncEventFromQueue {} {
     if {$SWANKIsInSyncMode == 0} {
         return
     }
-    set Event ExtractSyncEventFromQueueIfExists
+    set Event [ExtractSyncEventFromQueueIfExists]
     if { $Event eq {} } {
         return {0}
     }
     
-    puts "Imitating return of 'aaaa' from sync event $Event"
+    puts "Skipping check of event (it can be :abort) and returning it"
     
-    return {1 aaaa}
+    return [list 1 $Event]
 }
 
 # this is an async event. Process it. E.g. call a continuation
@@ -560,17 +571,22 @@ proc ::tkcon::ExpandLispSymbol str {
     # require at least a single character, otherwise continue
     if {$str eq ""} {return -code continue}
     
-    set LispCmd {(subseq (format nil "~{ ~A~}" (first (swank:simple-completions "a" "COMMON-LISP-USER"))) 1)}
+    # set LispCmd {(subseq (format nil "~{ ~A~}" (first (swank:simple-completions "a" "COMMON-LISP-USER"))) 1)}
+
+    # string quoting is a bullshit here!
+    puts "We must quote string $str better!"
+    set LispCmd "(swank:simple-completions \"$str\" '\"COMMON-LISP-USER\")"
+
     
     #проблема 1 - похоже, нас не понимает tcl - не видит, что это один аргумент.
     #проблема 2 - нужно выполнить синхронно и вернуть результат, обыыный \EvalAttached' - асинхронный
     
-    testProc $LispCmd 1
-    #puts "Ok"
-    #tr [alias]
-    set SwankReply [::tkcon::EvalInSwankSync "$LispCmd" 0]
-    tr "Passed EvalInSwank"
-
+    #testProc $LispCmd 1
+    ##puts "Ok"
+    ##tr [alias]
+    set SwankReply [::tkcon::EvalInSwankSync $LispCmd]
+    #tr "Passed EvalInSwank"
+  
     puts $SwankReply
     
     set match [list $SwankReply]
