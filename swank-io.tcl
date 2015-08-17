@@ -37,8 +37,10 @@ proc ::tkcon::FormatSwankRexEvalMessageInner {cmd ThreadDesignator ContinuationC
     return $msgAndLen
 }
 
-proc ::tkcon::FormatSwankRexEvalMessage {cmd ItIsListenerEval {ContinuationCounter {}}} {
-    set ThreadDesignator [CalculateThreadDesignatorForSwank $ItIsListenerEval]
+proc ::tkcon::FormatSwankRexEvalMessage {cmd ItIsListenerEval {ThreadDesignator {}} {ContinuationCounter {}}} {
+    if { $ThreadDesignator eq {} } {
+        set ThreadDesignator [CalculateThreadDesignatorForSwank $ItIsListenerEval]
+    }
     if { $ContinuationCounter eq {} } {
         set ContinuationCounter [GenContinuationCounter]
     }      
@@ -60,27 +62,53 @@ proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form ItIsListenerEval} {
 proc ::tkcon::EvalInSwankSync {lispcode} {
     #proc ::tkcon::FormatSwankRexEvalMessageInner {cmd ThreadDesignator ContinuationCounter} 
     variable SWANKIsInSyncMode
-    SWANKIsInSyncMode = 1
+    variable SWANKSyncContinuation
+    set SWANKIsInSyncMode 1
     try {
         return [::mprs::EvalInSwankSyncInner $lispcode]
     } finally {
         mprs::DeleteSyncEventsFromTheQueue
-        SWANKIsInSyncMode = 0
+        set SWANKSyncContinuation {}
+        set SWANKIsInSyncMode 0
     }
 }
+
+
+proc ::mprs::DeleteSyncEventsFromTheQueue {} {
+    while { [ExtractSyncEventFromQueueIfExists] ne {} } {
+    }
+}
+
 
 
 # evaluates lispcode synchonously and returns a result (inner)
 proc ::mprs::EvalInSwankSyncInner {lispcode} {
     variable ::tkcon::SWANKSyncContinuation
-    set ::tkcon::SWANKSyncContinuation [GenContinationCounter]
+    variable ::tkcon::SWANKEventQueue
+    set ContinuationCounter [::tkcon::GenContinuationCounter]
+    set ::tkcon::SWANKSyncContinuation $ContinuationCounter
 
+    # send command
+    ::tkcon::EvalInSwankAsync $lispcode 0 t $ContinuationCounter
+
+    # sit down while it is processing
+    while {1 == 1} {
+        vwait ::tkcon::SWANKEventQueue
+
+        set processed MaybeProcessSyncEventFromQueue
+        if { [lindex $processed 0] == 1} {
+            set result [lindex $processed 1]
+            return $result
+        } else {
+            # this was async event, it is now in the queue. Lets sleep further
+        }
+    }
 }
 
 
 ## ItIsListenerEval must be 1 to wrap form into (swank-repl:listener-eval ...) or 0 otherwise
 # If ContinuationCounter is not passed, it is calculated when needed
-proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ContinuationCounter {}}} {
+proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ThreadDesignator {}} {ContinuationCounter {}}} {
     variable OPT
     variable PRIV
 
@@ -118,7 +146,7 @@ proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ContinuationCounter {
     
     #puts [list $PRIV(app) $cmd]
     
-    set cmd [FormatSwankRexEvalMessage $cmd $ItIsListenerEval $ContinuationCounter]
+    set cmd [FormatSwankRexEvalMessage $cmd $ItIsListenerEval $ThreadDesignator $ContinuationCounter]
     puts "About to send to SWANK: $cmd"
 
     # tr "About to send $cmd to SWANK"
@@ -210,7 +238,29 @@ proc ::mprs::ExtractContinuationId {EventAsList} {
     }
 }
 
-proc ::mprs::MaybeProcessSyncEvent {ContId EventAsList} {
+# must be called when SWANKIsInSyncMode and when SWANKSyncContinuation is set
+proc ::mprs::ExtractSyncEventFromQueueIfExists {} {
+    variable ::tkcon::SWANKIsInSyncMode
+    variable ::tkcon::SWANKSyncContinuation 
+    variable ::tkcon::SWANKEventQueue
+    # control::control assert {$SWANKIsInSyncMode == 1}
+
+    set i -1
+    foreach Event $SWANKEventQueue {
+        incr i
+        AssertEq [TypeTag $Event] l
+        set EventAsList [Unleash $Event]
+        set ContinuationId [ExtractContinuationId $EventAsList]
+        if { $ContinuationId == $SWANKSyncContinuation } {
+            set SWANKEventQueue [lreplace $SWANKEventQueue $i $i]
+            return $Event
+        }
+    }
+    return {}
+}
+
+proc ::mprs::MaybeProcessSyncEventFromQueue {} {
+    variable ::tkcon::SWANKIsInSyncMode
     # find if it is in SWANKSyncContinuation
     # if found, process it
     # note if abort is called, we throw so we need another read loop for sync
@@ -219,7 +269,14 @@ proc ::mprs::MaybeProcessSyncEvent {ContId EventAsList} {
     if {$SWANKIsInSyncMode == 0} {
         return
     }
-    return {}
+    set Event ExtractSyncEventFromQueueIfExists
+    if { $Event eq {} } {
+        return {0}
+    }
+    
+    puts "Imitating return of 'aaaa' from sync event $Event"
+    
+    return {1 aaaa}
 }
 
 # this is an async event. Process it. E.g. call a continuation

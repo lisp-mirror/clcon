@@ -44,7 +44,12 @@ exec wish "$0" ${1+"$@"}
 #budden } else {
 #budden     package require Tk 8.4
 #budden }
+package require control
+
+control::control assert enabled 1
+
 source /s2/cl-tk/init-cl-tk-tcl-runtime.tcl
+
 
 # We need to load some package to get what's available, and we
 # choose ctext because we'll use it if its available in the editor
@@ -92,7 +97,7 @@ namespace eval ::tkcon {
     # but we need to distinguish before sync and async events, so we need to store at least one
     # async continuation. contains dictionary: id->{procname context}.
     # when :return or :abort event is received, procname is invoked on context, event, id
-    variable SWANKSyncContinuation
+    variable SWANKSyncContinuation {}
 
     # Continuations for async events
     # dictionary: id->{procname context} for async events only
