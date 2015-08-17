@@ -1071,7 +1071,7 @@ proc ::tkcon::EvalCmd {w cmd} {
 		    set PRIV(errorInfo) "Socket-based errorInfo not available"
 		}
 	    } elseif {$PRIV(apptype) eq "swank"} {
-		set code [catch {EvalInSwank $cmd} res]
+		set code [catch {EvalInSwankAsync $cmd} res]
 		if {$code == 1} {
 		    set PRIV(errorInfo) "Socket-based errorInfo not available"
 		}

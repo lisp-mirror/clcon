@@ -2,6 +2,11 @@
 ## Copyright (c) 2015 Denis Budyak
 ## MIT License
 
+# Initialize the ::mprs namespace (message parser)
+#
+namespace eval ::mprs {
+}
+
 proc ::tkcon::GenContinuationCounter {} {
     # See also swank-protocol::connection-request-counter
  variable ContinuationCounter
@@ -23,15 +28,22 @@ proc ::tkcon::CalculateThreadDesignatorForSwank {ItIsListenerEval} {
     }
 }
 
-proc ::tkcon::FormatSwankRexEvalMessage {cmd ItIsListenerEval} {
-    set ContinuationCounter [GenContinuationCounter]
-    set ThreadDesignator [CalculateThreadDesignatorForSwank $ItIsListenerEval]
+proc ::tkcon::FormatSwankRexEvalMessageInner {cmd ThreadDesignator ContinuationCounter} {
     # commented out line is for my patched version which passes readtable
     # set msgNoLen "(:emacs-rex-rt $cmd \"COMMON-LISP-USER\" nil $ThreadDesignator $ContinuationCounter)"
     set msgNoLen "(:emacs-rex $cmd \"COMMON-LISP-USER\" $ThreadDesignator $ContinuationCounter)"
     set strLenHex [format "%06X" [string length $msgNoLen]]
     set msgAndLen [string cat $strLenHex $msgNoLen]
     return $msgAndLen
+}
+
+proc ::tkcon::FormatSwankRexEvalMessage {cmd ItIsListenerEval {ContinuationCounter {}}} {
+    set ThreadDesignator [CalculateThreadDesignatorForSwank $ItIsListenerEval]
+    if { $ContinuationCounter eq {} } {
+        set ContinuationCounter [GenContinuationCounter]
+    }      
+
+    return [FormatSwankRexEvalMessageInner $cmd $ThreadDesignator $ContinuationCounter]
 }
 
 proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form ItIsListenerEval} {
@@ -43,8 +55,32 @@ proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form ItIsListenerEval} {
     }
 }
 
+
+# tries to evaluate code in sync mode and returns a result
+proc ::tkcon::EvalInSwankSync {lispcode} {
+    #proc ::tkcon::FormatSwankRexEvalMessageInner {cmd ThreadDesignator ContinuationCounter} 
+    variable SWANKIsInSyncMode
+    SWANKIsInSyncMode = 1
+    try {
+        return [::mprs::EvalInSwankSyncInner $lispcode]
+    } finally {
+        mprs::DeleteSyncEventsFromTheQueue
+        SWANKIsInSyncMode = 0
+    }
+}
+
+
+# evaluates lispcode synchonously and returns a result (inner)
+proc ::mprs::EvalInSwankSyncInner {lispcode} {
+    variable ::tkcon::SWANKSyncContinuation
+    set ::tkcon::SWANKSyncContinuation [GenContinationCounter]
+
+}
+
+
 ## ItIsListenerEval must be 1 to wrap form into (swank-repl:listener-eval ...) or 0 otherwise
-proc ::tkcon::EvalInSwank {form {ItIsListenerEval 1}} {
+# If ContinuationCounter is not passed, it is calculated when needed
+proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ContinuationCounter {}}} {
     variable OPT
     variable PRIV
 
@@ -82,7 +118,7 @@ proc ::tkcon::EvalInSwank {form {ItIsListenerEval 1}} {
     
     #puts [list $PRIV(app) $cmd]
     
-    set cmd [FormatSwankRexEvalMessage $cmd $ItIsListenerEval]
+    set cmd [FormatSwankRexEvalMessage $cmd $ItIsListenerEval $ContinuationCounter]
     puts "About to send to SWANK: $cmd"
 
     # tr "About to send $cmd to SWANK"
@@ -105,7 +141,7 @@ proc ::tkcon::EvalInSwank {form {ItIsListenerEval 1}} {
 ##  be read with read-response.
 ## ItIsListenerEval must be 1 if form is (swank-repl:listener-eval ...) or 0 otherwise
 proc ::tkcon::SwankEmacsRex {form {ItIsListenerEval 0}} {
-    EvalInSwank $form $ItIsListenerEval
+    EvalInSwankAsync $form $ItIsListenerEval
 }
 
 ## swank-protocol::request-swank-require
@@ -127,11 +163,6 @@ proc ::tkcon::SwankRequestCreateRepl {} {
     variable PRIV
     ::tkcon::SwankEmacsRex {(swank-repl:create-repl nil :coding-system "utf-8-unix")}
     set PRIV(SwankThread) 1
-}
-
-# Initialize the ::mprs namespace (message parser)
-#
-namespace eval ::mprs {
 }
 
 proc ::mprs::TypeTag {x} {
@@ -416,7 +447,7 @@ proc ::tkcon::AttachSwank {name} {
     #interp alias {} ::tkcon::EvalAttached {} \
         #        ::tkcon::EvalSlave uplevel \#0
 
-    interp alias {} ::tkcon::EvalAttached {} ::tkcon::EvalInSwank {} \#0
+    interp alias {} ::tkcon::EvalAttached {} ::tkcon::EvalInSwankAsync {} \#0
     fconfigure $name -buffering full -blocking 0
     
     # It is important we initialize connection before binding fileevent
@@ -480,7 +511,7 @@ proc ::tkcon::ExpandLispSymbol str {
     testProc $LispCmd 1
     #puts "Ok"
     #tr [alias]
-    set SwankReply [::tkcon::EvalInSwank "$LispCmd" 0]
+    set SwankReply [::tkcon::EvalInSwankSync "$LispCmd" 0]
     tr "Passed EvalInSwank"
 
     puts $SwankReply
