@@ -97,11 +97,11 @@ namespace eval ::tkcon {
     # Continuations for async events
     # dictionary: id->{procname context} for async events only
     variable SWANKAsyncContinuations
-    # Queue of async events (list, first element of a list is a first element of a queue)"
-    variable SWANKAsyncEventQueue
+    # Queue of all events (list, first element of a list is a first element of a queue)"
+    variable SWANKEventQueue {}
 
     # 1 when we are processing synchronous negotiation
-    variable SWANKIsInSyncMode 
+    variable SWANKIsInSyncMode 0
 }
 
 ## ::tkcon::SourceHere - buddens command to load file from the same dir where

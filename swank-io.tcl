@@ -172,71 +172,105 @@ proc ::mprs::Cadr {x} {
 ::mprs::AssertEq [::mprs::Car [::mprs::Cadr {l:return {l:ok s(format\\ destination\\ control-string\\ &rest\\ format-arguments) } n160 }]] :ok
 
 
-proc ::mprs::ExtractContinuationId {MessageAsList} {
-    set MessageHead [lindex $MessageAsList 0]
-    if {[lsearch {:return :abort} $MessageHead] >= 0} {
-        return [Unleash [lindex $MessageAsList 2]]               
+proc ::mprs::ExtractContinuationId {EventAsList} {
+    set EventHead [lindex $EventAsList 0]
+    if {[lsearch {:return :abort} $EventHead] >= 0} {
+        return [Unleash [lindex $EventAsList 2]]               
     }
 }
 
-proc ::mprs::MaybeProcessSyncEvent {ContId MessageAsList} {
+proc ::mprs::MaybeProcessSyncEvent {ContId EventAsList} {
     # find if it is in SWANKSyncContinuation
     # if found, process it
     # note if abort is called, we throw so we need another read loop for sync
     # messages. I think we mast configure -blocking 1 and put async messages into a queue
     # also we need global var to distinguish if we are in sync mode.
+    if {$SWANKIsInSyncMode == 0} {
+        return
+    }
     return {}
 }
 
-proc ::mprs::ProcessAsyncEvent {ContId MessageAsList} {
-    puts "ProcessAsyncEvent Id=$ContId Data=[Unleash [lindex $MessageAsList 1]]"
+# this is an async event. Process it. E.g. call a continuation
+proc ::mprs::ProcessAsyncEvent {EventAsList} {
+    set ContinuationId [ExtractContinuationId $EventAsList]
+    puts "ProcessAsyncEvent Id=$ContinuationId Data=[Unleash [lindex $EventAsList 1]]"
+    update
     return {}
-}  
+} 
 
-
-proc ::mprs::ProcessEventWithContinuationId {ContId MessageAsList} {
-    set ProcessedSync [MaybeProcessSyncEvent $ContId $MessageAsList]
-    if { $ProcessedSync == 1 } return
-    ::mprs::ProcessAsyncEvent $ContId $MessageAsList
-    return
+## ::mprs::ProcessEventsFromQueue
+#  we are in async mode
+#
+proc ::mprs::ProcessEventsFromQueue {} {
+    variable ::tkcon::SWANKEventQueue
+    variable ::tkcon::SWANKIsInSyncMode
+    while {($SWANKIsInSyncMode == 0)&&([llength $SWANKEventQueue] > 0)} {
+        ProcessFirstEventFromQueue
+    }
 }
 
-proc ::mprs::SwankProcessMessage {Message} {
-    # First of all we must have checked disconnect event, but let's skip it for now
-    # eof must be processed in Readable function itself    
-
+# we know there is an event on the queue. Lets process it.
+proc ::mprs::ProcessFirstEventFromQueue {} {
+    variable ::tkcon::SWANKEventQueue
+    # Pop event 
+    set Event [lindex $SWANKEventQueue 0]
+    set SWANKEventQueue [lreplace $SWANKEventQueue 0 0]
+    
     # We only understand list-shaped events
-    AssertEq [TypeTag $Message] l
-    set MessageAsList [Unleash $Message]
-    set MessageHead [lindex $MessageAsList 0]
-    set ContinuationId [ExtractContinuationId $MessageAsList]
+    AssertEq [TypeTag $Event] l
+    set EventAsList [Unleash $Event]
+    set EventHead [lindex $EventAsList 0]
+    set ContinuationId [ExtractContinuationId $EventAsList]
 
     puts "ContinuationId = $ContinuationId"
     
-    # If this is an event with continuation, process it
-    if { $ContinuationId ne {}} {
-        ProcessEventWithContinuationId $ContinuationId $MessageAsList
-        return
-    }
+    ProcessAsyncEvent $EventAsList 
+}
 
-    # Otherwise, process it another way
-    puts "Skipping event $Message so far..."
-    return   
+## ::mprs::ProcessEventsFromQueueIfAppropriate
+# Depending of SWANKIsInSyncMode state, processes either sync or async message
+# This proc is called from sync event loop and from fileevent (async event processing sequence)
+# In sync mode, tries to find sync message on the queue
+# In async mode, takes first message from the queue
+proc ::mprs::ProcessEventsFromQueueIfAppropriate {} {
+    variable ::tkcon::SWANKEventQueue
+    variable ::tkcon::SWANKIsInSyncMode
+    # eof must be processed in Readable function itself    
+
+    if { $SWANKIsInSyncMode == 1 } {
+        set result MaybeProcessSyncEventFromQueue
+        return $result
+    } else {
+        ProcessEventsFromQueue
+        # return value makes no sence here
+    }
 }
 
 
 ## Temporary procedure to handle input from SWANK
 ## does not have counterparts in swank-protocol!!
 proc ::tkcon::TempSwankChannelReadable {sock} {
-    set Message [SwankReadMessageString]
+    variable SWANKEventQueue
+    variable SWANKIsInSyncMode
+
+    # First of all we must have checked disconnect event, but let's skip it for now
+    set Event [SwankReadMessageString]
 
     # just for debugging 
-    puts "message from socket: $Message"
+    puts "message from socket: $Event"
 
-    if { [string index $Message 0] eq "(" } {
-        puts "Skipping lisp-formed event $Message"
+    if { [string index $Event 0] eq "(" } {
+        puts "Skipping lisp-formed event $Event"
     } else {
-        ::mprs::SwankProcessMessage $Message
+        puts "queue is $SWANKEventQueue . Lets post to it"
+        if { $SWANKIsInSyncMode == 0 } {
+            lappend SWANKEventQueue $Event
+            ::mprs::ProcessEventsFromQueueIfAppropriate
+        } else {
+            lappend SWANKEventQueue $Event
+            # Do nothing more. Sync negotiation loop would vwait this var
+        }
     }
 }
 

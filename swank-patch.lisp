@@ -97,10 +97,13 @@
   (flet ((f (tag a)
            (format ou "~A~A " tag a)))
     (etypecase val
+      ; note that keywords are downcased
       (keyword (f #\: (cl-tk:tcl-escape (string-downcase (symbol-name val)))))
       (string (f #\s (cl-tk:tcl-escape val)))
       (number (f #\n val))
+      ; while other symbols are printed as is (upcased)
       (symbol (my-symbol-tcl-form val ou))
+      ; top-level lists are not wrapped with {} as they are strings already
       (list
        (format ou (if (= level 0) "l" "{l"))
        (dolist (y val)
