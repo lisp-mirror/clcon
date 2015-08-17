@@ -83,6 +83,25 @@ namespace eval ::tkcon {
     variable EXPECT 0
     variable ScriptDirectory
     set ScriptDirectory [file dirname [info script]]
+
+    # Continuations for sync events - hope we have no sync dialog yet - all sync dialogs
+    # should be of the form:
+    # sync call -> sync reply or
+    # sync call -> eof on lisp side
+    # so we don't need the variable yet
+    # but we need to distinguish before sync and async events, so we need to store at least one
+    # async continuation. contains dictionary: id->{procname context}.
+    # when :return or :abort event is received, procname is invoked on context, event, id
+    variable SWANKSyncContinuation
+
+    # Continuations for async events
+    # dictionary: id->{procname context} for async events only
+    variable SWANKAsyncContinuations
+    # Queue of async events (list, first element of a list is a first element of a queue)"
+    variable SWANKAsyncEventQueue
+
+    # 1 when we are processing synchronous negotiation
+    variable SWANKIsInSyncMode 
 }
 
 ## ::tkcon::SourceHere - buddens command to load file from the same dir where

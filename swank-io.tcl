@@ -48,7 +48,7 @@ proc ::tkcon::EvalInSwank {form {ItIsListenerEval 1}} {
     variable OPT
     variable PRIV
 
-    puts "entered EvalInSwank"
+    #puts "entered EvalInSwank"
 
     # tcl escape: if lisp command starts from . , we (temporarily?) consider it as tcl escape
     if {[string index $form 0] eq "."} {
@@ -129,6 +129,102 @@ proc ::tkcon::SwankRequestCreateRepl {} {
     set PRIV(SwankThread) 1
 }
 
+# Initialize the ::mprs namespace (message parser)
+#
+namespace eval ::mprs {
+}
+
+proc ::mprs::TypeTag {x} {
+    string index $x 0
+}
+
+proc ::mprs::Unleash {x} {
+    subst -nocommands -novariables [string range $x 1 end]
+}
+
+proc ::mprs::Unleash2 {x} {
+    lindex [Unleash $x] 0
+}
+
+## minial testing facility
+# tests are runned when code is loading (horrible!)
+proc ::mprs::AssertEq {x y} {
+    if {! ($x eq $y)} {
+        error "Assertion failure: $x eq $y"
+    }
+}
+
+proc ::mprs::Car {x} {
+    if {[TypeTag $x] eq "l"} {
+        lindex [Unleash $x] 0
+    } else { error "Car: $x is not a list"
+    }
+}
+
+proc ::mprs::Cadr {x} {
+    if {[TypeTag $x] eq "l"} {
+        lindex [Unleash $x] 1
+    } else { error "Car: $x is not a list"
+    }
+}
+
+# test
+::mprs::AssertEq [::mprs::Car [::mprs::Cadr {l:return {l:ok s(format\\ destination\\ control-string\\ &rest\\ format-arguments) } n160 }]] :ok
+
+
+proc ::mprs::ExtractContinuationId {MessageAsList} {
+    set MessageHead [lindex $MessageAsList 0]
+    if {[lsearch {:return :abort} $MessageHead] >= 0} {
+        return [Unleash [lindex $MessageAsList 2]]               
+    }
+}
+
+proc ::mprs::MaybeProcessSyncEvent {ContId MessageAsList} {
+    # find if it is in SWANKSyncContinuation
+    # if found, process it
+    # note if abort is called, we throw so we need another read loop for sync
+    # messages. I think we mast configure -blocking 1 and put async messages into a queue
+    # also we need global var to distinguish if we are in sync mode.
+    return {}
+}
+
+proc ::mprs::ProcessAsyncEvent {ContId MessageAsList} {
+    puts "ProcessAsyncEvent Id=$ContId Data=[Unleash [lindex $MessageAsList 1]]"
+    return {}
+}  
+
+
+proc ::mprs::ProcessEventWithContinuationId {ContId MessageAsList} {
+    set ProcessedSync [MaybeProcessSyncEvent $ContId $MessageAsList]
+    if { $ProcessedSync == 1 } return
+    ::mprs::ProcessAsyncEvent $ContId $MessageAsList
+    return
+}
+
+proc ::mprs::SwankProcessMessage {Message} {
+    # First of all we must have checked disconnect event, but let's skip it for now
+    # eof must be processed in Readable function itself    
+
+    # We only understand list-shaped events
+    AssertEq [TypeTag $Message] l
+    set MessageAsList [Unleash $Message]
+    set MessageHead [lindex $MessageAsList 0]
+    set ContinuationId [ExtractContinuationId $MessageAsList]
+
+    puts "ContinuationId = $ContinuationId"
+    
+    # If this is an event with continuation, process it
+    if { $ContinuationId ne {}} {
+        ProcessEventWithContinuationId $ContinuationId $MessageAsList
+        return
+    }
+
+    # Otherwise, process it another way
+    puts "Skipping event $Message so far..."
+    return   
+}
+
+
 ## Temporary procedure to handle input from SWANK
 ## does not have counterparts in swank-protocol!!
 proc ::tkcon::TempSwankChannelReadable {sock} {
@@ -137,12 +233,10 @@ proc ::tkcon::TempSwankChannelReadable {sock} {
     # just for debugging 
     puts "message from socket: $Message"
 
-    if { [string index $Message 0] eq "!" } {
-        set cmd [string range $Message 1 end]
-        eval $cmd
-        return
+    if { [string index $Message 0] eq "(" } {
+        puts "Skipping lisp-formed event $Message"
     } else {
-        return $Message
+        ::mprs::SwankProcessMessage $Message
     }
 }
 
@@ -197,6 +291,9 @@ proc ::tkcon::SwankReadMessage {} {
 ## Modelled after defmethod lime::connect :after
 ## some parts are not implemented yet
 proc ::tkcon::SetupSwankConnection {channel} {
+        # this is not from lime!
+    SwankNoteTclConnection 
+
   #(swank-protocol:request-connection-info connection)
   #;; Read the connection information message
   #(let* ((info (swank-protocol:read-message connection))
@@ -229,9 +326,6 @@ proc ::tkcon::SetupSwankConnection {channel} {
 
     # Start it up
     # disabled at emacs SwankRequestInitPresentations
-
-    # this is not from lime!
-    SwankNoteTclConnection 
 
     SwankRequestCreateRepl
 

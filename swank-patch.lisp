@@ -42,7 +42,7 @@
 ;(defun tcl-connection-p (connection)
 ;  (gethash connection *tcl-connections*))
 
-(defun convert-object-to-tcl (object package)
+#|(defun convert-object-to-tcl (object package)
   "If possible, convert object to tcl commands. FIXME: use target"
   (log-to-file "entered convert-object-to-tcl")
   (swank::dcase object
@@ -54,13 +54,81 @@
              (cl-tk:tcl-escape string))
      )
     (t
-     nil)))
+     nil)))|#
+
+
+#|(defun convert-object-to-tcl-inner (x ou)
+  (format ou "{")
+  (etypecase x
+    (cons
+     (format ou "list")
+     (dolist (y x)
+       (format ou " ")
+       (convert-object-to-tcl-inner y ou)
+       )
+     )
+    (string
+     (format ou "~A\"" (cl-tk:tcl-escape x))
+     #| (map nil
+          (lambda (y)
+            (case y
+              ((#\\ #\")
+               (write-char #\\ ou)))
+            (write-char y ou))
+          x) |#)
+    (integer
+     (format ou "~D" x))
+    (symbol
+     (format ou "~A" x)))
+  (format ou "}")) |#
+
+(defun my-symbol-tcl-form (s ou)
+  (let* ((package (symbol-package s))
+         (package-string
+          (if package (package-name package) "NIL"))
+         (name (symbol-name s)))
+    (format ou "y{~A ~A} "
+            (cl-tk:tcl-escape package-string)
+            (cl-tk:tcl-escape name))))
+  
+
+(defun my-tcl-form (val ou level)
+  "package must be bound to swank::*swank-io-package*, and with-standard-io-syntax must be around"
+  (flet ((f (tag a)
+           (format ou "~A~A " tag a)))
+    (etypecase val
+      (keyword (f #\: (cl-tk:tcl-escape (string-downcase (symbol-name val)))))
+      (string (f #\s (cl-tk:tcl-escape val)))
+      (number (f #\n val))
+      (symbol (my-symbol-tcl-form val ou))
+      (list
+       (format ou (if (= level 0) "l" "{l"))
+       (dolist (y val)
+         (my-tcl-form y ou (+ level 1)))
+       (format ou (if (= level 0) "" "} "))))))
+
+(defun convert-object-to-tcl-inner (x ou)
+                                        ;(prin1 (cl-tk::tcl-form x)  ou)
+  (my-tcl-form x ou 0))
+
+(defun convert-object-to-tcl (object)
+  (with-standard-io-syntax
+    (let ((*package* swank::*swank-io-package*))
+      (with-output-to-string (ou)
+        (convert-object-to-tcl-inner object ou)))))
+      
 
 
 ; test                                        
 (assert (string-equal
-         (clco::convert-object-to-tcl '(:write-string "asdfasdf" :repl-result) *package*)
-         "!puts target=repl-result;puts asdfasdf"))
+         (clco::convert-object-to-tcl '(:write-string "asdfasdf" :repl-result))
+         "l:write-string sasdfasdf :repl-result "))
+
+(assert (string-equal 
+         (clco::convert-object-to-tcl '(:return
+                                        (:ok "(format destination control-string &rest format-arguments)")
+                                        160))
+         "l:return {l:ok s(format\\ destination\\ control-string\\ &rest\\ format-arguments) } n160 "))
 
 
 #| examples of dcase: (defun sentinel-serve (msg)
@@ -87,15 +155,14 @@
      
 
 (defun swank/rpc::prin1-to-string-for-emacs (object package)
+  "Note that some events can be passed to tcl connection before we know it is a tcl connection. There can be a trouble parsing that kind of event on tcl side. Good practive would be to at least warn on tcl side if that kind of event would be received"
   (when (eq (car object) :write-string)
     (log-to-file "entered prin1-to-string-for-emacs with ~S" swank::*emacs-connection*)
     )
   (cond
     ((tcl-connection-p swank::*emacs-connection*)
-     (or
-      (convert-object-to-tcl object package)
-      (swank/rpc::swank/rpc-original-prin1-to-string-for-emacs object package)
-      ))
+     (convert-object-to-tcl object)
+     )
     (t
      (swank/rpc::swank/rpc-original-prin1-to-string-for-emacs object package))))
 
