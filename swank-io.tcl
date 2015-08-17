@@ -48,6 +48,8 @@ proc ::tkcon::EvalInSwank {form {ItIsListenerEval 1}} {
     variable OPT
     variable PRIV
 
+    puts "entered EvalInSwank"
+
     # tcl escape: if lisp command starts from . , we (temporarily?) consider it as tcl escape
     if {[string index $form 0] eq "."} {
         tkcon main [string range $form 1 end]
@@ -324,3 +326,44 @@ proc ::tkcon::NewSwank {host port} {
 
 
 
+## ::tkcon::ExpandLispSymbol (currently known as ExpandProcname)
+# - expand a lisp symbol based on $str
+# ARGS:	str	- partial proc name to expand
+# Used to Call:	        ::tkcon::ExpandBestMatch
+# Used to Return:	list containing longest unique match followed by all the
+#		possible further matches
+##
+
+proc ::tkcon::testProc {a1 a2} {
+   puts $a1
+   puts $a2
+}
+proc ::tkcon::ExpandLispSymbol str {
+
+    
+    # require at least a single character, otherwise continue
+    if {$str eq ""} {return -code continue}
+    
+    set LispCmd {(subseq (format nil "~{ ~A~}" (first (swank:simple-completions "a" "COMMON-LISP-USER"))) 1)}
+    
+    #проблема 1 - похоже, нас не понимает tcl - не видит, что это один аргумент.
+    #проблема 2 - нужно выполнить синхронно и вернуть результат, обыыный \EvalAttached' - асинхронный
+    
+    testProc $LispCmd 1
+    #puts "Ok"
+    #tr [alias]
+    set SwankReply [::tkcon::EvalInSwank "$LispCmd" 0]
+    tr "Passed EvalInSwank"
+
+    puts $SwankReply
+    
+    set match [list $SwankReply]
+
+    if {[llength $match] > 1} {
+	regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
+	set match [linsert $match 0 $str]
+    } else {
+	regsub -all {([^\\]) } $match {\1\\ } match
+    }
+    return -code [expr {$match eq "" ? "continue" : "break"}] $match
+}

@@ -4743,6 +4743,7 @@ proc ::tkcon::Bindings {} {
 	<<TkCon_Expand>>	<Key-Tab>
 	<<TkCon_ExpandFile>>	<Key-Escape>
 	<<TkCon_ExpandProc>>	<Control-Alt-Key-u>
+	<<TkCon_ExpandLisp>>	<Control-Alt-Key-j>
 	<<TkCon_ExpandVar>>	<Alt-v>
 	<<TkCon_Tab>>		<Control-i>
 	<<TkCon_Tab>>		<Alt-i>
@@ -4901,6 +4902,10 @@ proc ::tkcon::Bindings {} {
     }
     bind TkConsole <<TkCon_ExpandProc>> {
 	if {[%W compare insert > limit]} {::tkcon::Expand %W proc}
+	break ; # could check "%K" == "Tab"
+    }
+    bind TkConsole <<TkCon_ExpandLisp>> {
+	if {[%W compare insert > limit]} {::tkcon::Expand %W lispsymbol}
 	break ; # could check "%K" == "Tab"
     }
     bind TkConsole <<TkCon_ExpandVar>> {
@@ -5336,6 +5341,7 @@ proc ::tkcon::Expand {w {type ""}} {
     # matches, otherwise "continue" says "I got nothing, continue on"
     # We can ignore return codes from the specific expand type checks
     switch -glob $type {
+        li* { set code [catch {ExpandLispSymbol $str} res] }
 	pa* { set code [catch {ExpandPathname $str} res] }
 	pr* { set code [catch {ExpandProcname $str} res] }
 	v*  { set code [catch {ExpandVariable $str} res] }
