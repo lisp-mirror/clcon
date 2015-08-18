@@ -20,7 +20,7 @@
 #
 # 1. Connection can be broken
 # 2. Window can disappear
-# 3. Synchronous event can interfere { $::mprs::SWANKIsInSyncMode == 1 }
+# 3. Synchronous mode can switch on { $::mprs::SWANKIsInSyncMode == 1 }
 # 4. What I forgot? 
 # Check all situations and behave appropriately. 
 
@@ -371,7 +371,15 @@ proc ::mprs::MaybeProcessSyncEventFromQueue {} {
 # this is an async event. Process it. E.g. call a continuation
 proc ::mprs::ProcessAsyncEvent {EventAsList} {
     set ContinuationId [ExtractContinuationId $EventAsList]
-    puts "ProcessAsyncEvent Id=$ContinuationId Data=[Unleash [lindex $EventAsList 1]]"
+    # we don't need to Unleash keywords
+    set Head [Unleash [lindex $EventAsList 0]]
+    if { $Head eq ":write-string" } {
+        puts [Unleash [lindex $EventAsList 1]]
+        ::tkcon::SheduleCheckSWANKEventQueue
+    } else {
+        puts "ProcessAsyncEvent stub Id=$ContinuationId Data=[Unleash [lindex $EventAsList 1]]"
+        ::tkcon::SheduleCheckSWANKEventQueue
+    }
     return {}
 } 
 
