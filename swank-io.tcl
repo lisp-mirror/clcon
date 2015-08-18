@@ -2,8 +2,25 @@
 ## Copyright (c) 2015 Denis Budyak
 ## MIT License
 
-# Initialize the ::mprs namespace (message parser)
+# General notes
+# puts is aliased sometimes in tkcon so that it calls update idletasks.
+# So, don't use idle in this file or switch to another debugging mechanism.
+
+# Writing event handlers for lisp events:
+# Event handler must call SheduleCheckSWANKEventQueue when appropriate to ensure
+# that communication won't lock up. This protocol seem to be simplier to debug:
+# if something is wrong, it just locks up.
+# Beware that if event loop is called inside of your event handler,
+# bad things can happen:
 #
+# 1. Connection can be broken
+# 2. Window can disappear
+# 3. Synchronous event can interfere { $::mprs::SWANKIsInSyncMode == 1 }
+# 4. What I forgot? 
+# Check all situations and behave appropriately. 
+
+# Initialize the ::mprs namespace (message parser)
+# This is for SWANK communication-related stuff, though some parts are in ::tkcon namespace
 namespace eval ::mprs {
 }
 
@@ -60,10 +77,16 @@ proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form ItIsListenerEval} {
 # e.g. .puts [::tkcon::EvalInSwankSync {(swank:simple-completions "sw" '"COMMON-LISP-USER")}]
 
 # tries to evaluate code in sync mode and returns a result
+# Can call inner event loop, but no async events are processed.
+# If some async event handler is on the stack already and sheduled events,
+# we can't help it. 
 proc ::tkcon::EvalInSwankSync {lispcode} {
     #proc ::tkcon::FormatSwankRexEvalMessageInner {cmd ThreadDesignator ContinuationCounter} 
     variable SWANKIsInSyncMode
     variable SWANKSyncContinuation
+    if { $SWANKIsInSyncMode == 1 } {
+        error "::tkcon::EvalInSwankSync is not reenterable"
+    }
     set SWANKIsInSyncMode 1
     try {
         return [::mprs::EvalInSwankSyncInner $lispcode]
@@ -71,16 +94,9 @@ proc ::tkcon::EvalInSwankSync {lispcode} {
         mprs::DeleteSyncEventsFromTheQueue
         set SWANKSyncContinuation {}
         set SWANKIsInSyncMode 0
+        SheduleCheckSWANKEventQueue
     }
 }
-
-
-proc ::mprs::DeleteSyncEventsFromTheQueue {} {
-    while { [ExtractSyncEventFromQueueIfExists] ne {} } {
-    }
-}
-
-
 
 # evaluates lispcode synchonously and returns a result (inner)
 proc ::mprs::EvalInSwankSyncInner {lispcode} {
@@ -110,6 +126,17 @@ proc ::mprs::EvalInSwankSyncInner {lispcode} {
         } else {
             # this was async event, it is now in the queue. Lets sleep further
         }
+    }
+}
+
+
+proc ::mprs::DeleteSyncEventsFromTheQueue {} {
+    while { 1 == 1  } {
+        set a [ExtractSyncEventFromQueueIfExists]
+        if { $a eq {} } {
+            return
+        }
+        puts "Dropping sync event $a"
     }
 }
 
@@ -298,23 +325,23 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
     return {}
 } 
 
-## ::mprs::ProcessEventsFromQueue
-#  we are in async mode
-#
-proc ::mprs::ProcessEventsFromQueue {} {
+# If there is an event on the queue, process it.
+proc ::mprs::ProcessFirstEventFromQueueAsyncrhonously {} {
     variable ::tkcon::SWANKEventQueue
     variable ::tkcon::SWANKIsInSyncMode
-    while {($SWANKIsInSyncMode == 0)&&([llength $SWANKEventQueue] > 0)} {
-        ProcessFirstEventFromQueue
+    
+    # If we are in sync mode, we can't do that now. So we return.
+    # User must ensure that on exit of async mode <<CheckSWANKEventQueue>> is generated
+    if { $SWANKIsInSyncMode == 1 } {
+        return 
     }
-}
 
-# we know there is an event on the queue. Lets process it.
-proc ::mprs::ProcessFirstEventFromQueue {} {
-    variable ::tkcon::SWANKEventQueue
-    # Pop event 
+    # Pop event
     set Event [lindex $SWANKEventQueue 0]
     set SWANKEventQueue [lreplace $SWANKEventQueue 0 0]
+    if { $Event eq {} } {
+        return
+    }
     
     # We only understand list-shaped events
     AssertEq [TypeTag $Event] l
@@ -341,9 +368,17 @@ proc ::mprs::ProcessEventsFromQueueIfAppropriate {} {
         set result MaybeProcessSyncEventFromQueue
         return $result
     } else {
-        ProcessEventsFromQueue
+        ProcessFirstEventFromQueueAsyncrhonously
         # return value makes no sence here
     }
+}
+
+## Generates <<CheckSWANKEventQueue>> event
+# The event means that we must try to process some events from SWANK event queue
+proc ::tkcon::SheduleCheckSWANKEventQueue {} {
+    variable PRIV
+    set w $PRIV(console)
+    event generate $w <<CheckSWANKEventQueue>> -when tail
 }
 
 
@@ -363,12 +398,13 @@ proc ::tkcon::TempSwankChannelReadable {sock} {
         puts "Skipping lisp-formed event $Event"
     } else {
         puts "queue is $SWANKEventQueue . Lets post to it"
+        lappend SWANKEventQueue $Event
         if { $SWANKIsInSyncMode == 0 } {
-            lappend SWANKEventQueue $Event
-            ::mprs::ProcessEventsFromQueueIfAppropriate
+            SheduleCheckSWANKEventQueue
         } else {
-            lappend SWANKEventQueue $Event
-            # Do nothing more. Sync negotiation loop would vwait this var
+            # no event sheduling is required as we are in vwait SWANKEventQueue
+            # as we return from this handler, vwait will return and
+            # sync processing will continue
         }
     }
 }
@@ -423,8 +459,12 @@ proc ::tkcon::SwankReadMessage {} {
 
 ## Modelled after defmethod lime::connect :after
 ## some parts are not implemented yet
-proc ::tkcon::SetupSwankConnection {channel} {
-        # this is not from lime!
+proc ::tkcon::SetupSwankConnection {channel console} {
+
+    # this is tcl/tk specific
+    bind $console <<CheckSWANKEventQueue>> ::mprs::ProcessEventsFromQueueIfAppropriate
+
+    # this is not from lime!
     SwankNoteTclConnection 
 
   #(swank-protocol:request-connection-info connection)
@@ -519,11 +559,10 @@ proc ::tkcon::AttachSwank {name} {
     fconfigure $name -buffering full -blocking 0
     
     # It is important we initialize connection before binding fileevent
-    SetupSwankConnection $name
+    SetupSwankConnection $name $PRIV(console)
 
     # The file event will just puts whatever data is found
     # into the interpreter
-    # fileevent $name readable [list ::tkcon::EvalSocketEvent $name]
     fileevent $name readable [list ::tkcon::TempSwankChannelReadable $name]
     
     return [AttachId]
@@ -536,6 +575,8 @@ proc ::tkcon::OuterNewSwank {} {
 ## ::tkcon::NewSwank - called to create a socket to connect to
 # ARGS:	none
 # Results:	It will create a socket, and attach if requested
+# FIXME logic does not follow logic from tkcon.
+# Study relations between consoles and interpretes in tkon and fix thie sequence.
 ##
 proc ::tkcon::NewSwank {host port} {
     variable PRIV
@@ -575,7 +616,7 @@ proc ::tkcon::ExpandLispSymbol str {
 
     # string quoting is a bullshit here!
     puts "We must quote string $str better!"
-    set LispCmd "(swank:simple-completions \"$str\" '\"COMMON-LISP-USER\")"
+    set LispCmd "(cl:progn (cl::sleep 0.5) (swank:simple-completions \"$str\" '\"COMMON-LISP-USER\"))"
 
     
     #проблема 1 - похоже, нас не понимает tcl - не видит, что это один аргумент.
