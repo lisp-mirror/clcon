@@ -24,6 +24,7 @@
 # 4. What I forgot? 
 # Check all situations and behave appropriately. 
 
+
 # Initialize the ::mprs namespace (message parser)
 # This is for SWANK communication-related stuff, though some parts are in ::tkcon namespace
 namespace eval ::mprs {
@@ -82,7 +83,7 @@ proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form ItIsListenerEval} {
 
 proc ::tkcon::myerror {text} {
     idebug on
-    puts "myerror: $text"
+    puts "myerror: $text" stderr
     tk_messageBox -title "myerror" -message $text
     idebug break
 }
@@ -124,18 +125,18 @@ proc ::mprs::EvalInSwankSyncInner {lispcode} {
     # Delay all async events from lisp. Process sync events. 
     while {1 == 1} {
 
-        puts "EvalInSwankSyncInner goes vwait for SWANKEventQueue"
+        putd "EvalInSwankSyncInner goes vwait for SWANKEventQueue"
 
         vwait ::tkcon::SWANKEventQueue
 
-        puts "EvalInSwankSyncInner woke up on vwait SWANKEventQueue"
+        putd "EvalInSwankSyncInner woke up on vwait SWANKEventQueue"
 
         set processed [MaybeProcessSyncEventFromQueue]
 
-        puts "MaybeProcessSyncEventFromQueue returned $processed"
+        putd "MaybeProcessSyncEventFromQueue returned $processed"
         if { [lindex $processed 0] == 1} {
             set result [lindex $processed 1]
-            puts "EvalInSwankSyncInner: about to return $result"
+            putd "EvalInSwankSyncInner: about to return $result"
             return $result
         } else {
             # this was async event, it is now in the queue. Lets sleep further
@@ -150,7 +151,7 @@ proc ::mprs::DeleteSyncEventsFromTheQueue {} {
         if { $a eq {} } {
             return
         }
-        puts "Dropping sync event $a"
+        putd "Dropping sync event $a"
     }
 }
 
@@ -161,7 +162,7 @@ proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ThreadDesignator {}} 
     variable OPT
     variable PRIV
 
-    #puts "entered EvalInSwank"
+    #putd "entered EvalInSwank"
 
     # tcl escape: if lisp command starts from . , we (temporarily?) consider it as tcl escape
     if {[string index $form 0] eq "."} {
@@ -187,23 +188,23 @@ proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ThreadDesignator {}} 
 
     set cmd $form
     
-    puts "regsub result: $cmd"
+    putd "regsub result: $cmd"
 
     set cmd [SwankMaybeWrapFormIntoListenerEval $cmd $ItIsListenerEval]
 
-    puts "wrapped to listener eval: $cmd"
+    putd "wrapped to listener eval: $cmd"
     
-    #puts [list $PRIV(app) $cmd]
+    #putd [list $PRIV(app) $cmd]
     
     set cmd [FormatSwankRexEvalMessage $cmd $ItIsListenerEval $ThreadDesignator $ContinuationCounter]
-    puts "About to send to SWANK: $cmd"
+    putd "About to send to SWANK: $cmd"
 
     # tr "About to send $cmd to SWANK"
 
     set code [catch {puts -nonewline $PRIV(app) $cmd ; flush $PRIV(app)} result]
         if {$code && [eof $PRIV(app)]} {
             ## Interpreter died or disappeared
-            puts "$code eof [eof $PRIV(app)]"
+            putd "$code eof [eof $PRIV(app)]"
             EvalSocketClosed $PRIV(app)
         }
     return -code $code $result
@@ -253,15 +254,18 @@ proc ::mprs::TypeTag {x} {
 proc ::mprs::Unleash {x} {
     set tt [TypeTag $x]
     if { $tt eq "\{" } {
-        subst -nocommands -novariables [string range $x 2 end-2]
+        string range $x 2 end-2
+        #subst -nocommands -novariables [string range $x 2 end-2]
     } elseif { $tt eq ":" } {
         # problem can be with single keyword as space is added after it.
         if {[string index $x end] eq " "} {
             tr "We get space at the end of keyword $x"
         }
-        subst -nocommands -novariables [string range $x 0 end]
+        string range $x 0 end
+        #subst -nocommands -novariables [string range $x 0 end]
     } else {
-        subst -nocommands -novariables [string range $x 1 end]
+        string range $x 1 end
+        #subst -nocommands -novariables [string range $x 1 end]
     }
 }
 
@@ -320,10 +324,10 @@ proc ::mprs::ExtractSyncEventFromQueueIfExists {} {
     foreach Event $SWANKEventQueue {
         incr i
 
-        puts "Checking if $Event is sync = $SWANKSyncContinuation"
+        putd "Checking if $Event is sync = $SWANKSyncContinuation"
         
         AssertEq [Consp $Event] 1
-        puts "Passed AssertEq"
+        putd "Passed AssertEq"
         set EventAsList [Unleash $Event]
         set ContinuationId [ExtractContinuationId $EventAsList]
         if { $ContinuationId == $SWANKSyncContinuation } {
@@ -352,17 +356,17 @@ proc ::mprs::MaybeProcessSyncEventFromQueue {} {
     set EventAsList [Unleash $Event]
     set EventHead [lindex $EventAsList 0]
 
-    puts "EventHead = $EventHead"
+    putd "EventHead = $EventHead"
 
     if {$EventHead eq ":abort"} {
-        puts "Processing of :abort sync return is not done yet, throwing"
+        putd "Processing of :abort sync return is not done yet, throwing"
         throw "abort of sync eval"
     } elseif {$EventHead eq ":return"} {
         set Body [lindex $EventAsList 1]
-        puts "Body = $Body"
+        putd "Body = $Body"
         return [list 1 $Body]
     } else {
-        puts "Unknown head $EventHead in sync reply $Event"
+        putd "Unknown head $EventHead in sync reply $Event"
     }
     # assume event is processed (if it is not an :abort)
     return [list 1 $Event]
@@ -374,10 +378,10 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
     # we don't need to Unleash keywords
     set Head [Unleash [lindex $EventAsList 0]]
     if { $Head eq ":write-string" } {
-        puts [Unleash [lindex $EventAsList 1]]
+        puts -nonewline [Unleash [lindex $EventAsList 1]]
         ::tkcon::SheduleCheckSWANKEventQueue
     } else {
-        puts "ProcessAsyncEvent stub Id=$ContinuationId Data=[Unleash [lindex $EventAsList 1]]"
+        putd "ProcessAsyncEvent stub Id=$ContinuationId Data=[Unleash [lindex $EventAsList 1]]"
         ::tkcon::SheduleCheckSWANKEventQueue
     }
     return {}
@@ -407,7 +411,7 @@ proc ::mprs::ProcessFirstEventFromQueueAsyncrhonously {} {
     set EventHead [lindex $EventAsList 0]
     set ContinuationId [ExtractContinuationId $EventAsList]
 
-    puts "ContinuationId = $ContinuationId"
+    putd "ContinuationId = $ContinuationId"
     
     ProcessAsyncEvent $EventAsList 
 }
@@ -450,12 +454,12 @@ proc ::tkcon::TempSwankChannelReadable {sock} {
     set Event [SwankReadMessageString]
 
     # just for debugging 
-    puts "message from socket: $Event"
+    putd "message from socket: $Event"
 
     if { [string index $Event 0] eq "(" } {
-        puts "Skipping lisp-formed event $Event"
+        putd "Skipping lisp-formed event $Event"
     } else {
-        puts "queue is $SWANKEventQueue . Lets post to it"
+        putd "queue is $SWANKEventQueue . Lets post to it"
         lappend SWANKEventQueue $Event
         if { $SWANKIsInSyncMode == 0 } {
             SheduleCheckSWANKEventQueue
@@ -552,8 +556,8 @@ proc ::tkcon::SetupSwankConnection {channel console} {
     #SwankRequestSwankRequire1 "swank-presentations"
     SwankRequestSwankRequire1 "swank-repl"
 
-    # puts is for debugging here
-    puts [SwankReadMessage]
+    # putd is for debugging here
+    putd [SwankReadMessage]
 
     # Start it up
     # disabled at emacs SwankRequestInitPresentations
@@ -561,8 +565,8 @@ proc ::tkcon::SetupSwankConnection {channel console} {
     SwankRequestCreateRepl
 
     # Wait for startup
-    # puts is for debugging here
-    puts [SwankReadMessage]
+    # putd is for debugging here
+    putd [SwankReadMessage]
 
     #;; Read all the other messages, dumping them
     #(swank-protocol:read-all-messages connection))
@@ -619,7 +623,7 @@ proc ::tkcon::AttachSwank {name} {
     # It is important we initialize connection before binding fileevent
     SetupSwankConnection $name $PRIV(console)
 
-    # The file event will just puts whatever data is found
+    # The file event will just putd whatever data is found
     # into the interpreter
     fileevent $name readable [list ::tkcon::TempSwankChannelReadable $name]
     
@@ -668,16 +672,16 @@ proc ::tkcon::ExpandLispSymbol str {
     # set LispCmd {(subseq (format nil "~{ ~A~}" (first (swank:simple-completions "a" "COMMON-LISP-USER"))) 1)}
 
     # string quoting is a bullshit here!
-    puts "We must quote string $str better!"
+    putd "We must quote string $str better!"
     set LispCmd "(cl:progn (cl::sleep 0.5) (swank:simple-completions \"$str\" '\"COMMON-LISP-USER\"))"
    
     #testProc $LispCmd 1
-    ##puts "Ok"
+    ##putd "Ok"
     ##tr [alias]
     set SwankReply [::tkcon::EvalInSwankSync $LispCmd]
     
-    puts "EvalInSwankSync returned $SwankReply"
-    puts "car swankreply = [::mprs::Car $SwankReply]"
+    putd "EvalInSwankSync returned $SwankReply"
+    putd "car swankreply = [::mprs::Car $SwankReply]"
 
 
 #(:return
@@ -689,14 +693,14 @@ proc ::tkcon::ExpandLispSymbol str {
     if {[::mprs::Car $SwankReply] eq ":ok"} {
         set ExpansionsAndBestMatch [::mprs::Cadr $SwankReply]
     } else {
-        puts "ExpandLispSymbol: I don't know what is [::mprs::Car $SwankReply]"
+        putd "ExpandLispSymbol: I don't know what is [::mprs::Car $SwankReply]"
         return
     }
     
     set match [::mprs::UnleashList [::mprs::Car $ExpansionsAndBestMatch]]
     # set MatchesList 
 
-    puts "ExpandLispSymbol: match = $match"
+    putd "ExpandLispSymbol: match = $match"
 
     if {[llength $match] > 1} {
 	regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str

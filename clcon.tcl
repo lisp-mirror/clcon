@@ -110,6 +110,17 @@ namespace eval ::tkcon {
     variable SWANKIsInSyncMode 0
 }
 
+## putd - output debugging string
+## like tkcon_puts, but paints at some other color
+# ARGS:	string
+# Outputs:	the string with a color-coded text tag
+## 
+proc putd arg1 {
+    tkcon console insert output "$arg1\n" debug_string
+    tkcon console see output
+    update idletasks
+}
+
 ## ::tkcon::SourceHere - buddens command to load file from the same dir where
 # clcon itself is located. Be sure to load into main interpreter when you need it:
 # 
@@ -153,6 +164,7 @@ proc ::tkcon::Init {args} {
 	stdin		\#000000
 	stdout		\#0000FF
 	stderr		\#FF0000
+        debug_string    \#888888
     } {
 	if {![info exists COLOR($key)]} { set COLOR($key) $default }
     }
@@ -828,7 +840,7 @@ proc ::tkcon::InitTab {w} {
     }
     $con configure -height $OPT(rows) -width $OPT(cols)
 
-    foreach col {prompt stdout stderr stdin proc} {
+    foreach col {prompt stdout stderr stdin proc debug_string} {
 	$con tag configure $col -foreground $COLOR($col)
     }
     $con tag configure var -background $COLOR(var)
@@ -3394,6 +3406,7 @@ proc tkcon {cmd args} {
 ##
 ## Some procedures to make up for lack of built-in shell commands
 ##
+
 
 ## tkcon_puts -
 ## This allows me to capture all stdout/stderr to the console window
