@@ -98,7 +98,7 @@ proc ::tkcon::EvalInSwankSync {lispcode} {
     }
 }
 
-# evaluates lispcode synchonously and returns a result (inner)
+# See ::tkcon::EvalInSwankSync
 proc ::mprs::EvalInSwankSyncInner {lispcode} {
     variable ::tkcon::SWANKSyncContinuation
     variable ::tkcon::SWANKEventQueue
@@ -108,7 +108,7 @@ proc ::mprs::EvalInSwankSyncInner {lispcode} {
     # send command
     ::tkcon::EvalInSwankAsync $lispcode 0 t $ContinuationCounter
 
-    # sit down while it is processing
+    # Delay all async events from lisp. Process sync events. 
     while {1 == 1} {
 
         puts "EvalInSwankSyncInner goes vwait for SWANKEventQueue"
@@ -122,6 +122,7 @@ proc ::mprs::EvalInSwankSyncInner {lispcode} {
         puts "MaybeProcessSyncEventFromQueue returned $processed"
         if { [lindex $processed 0] == 1} {
             set result [lindex $processed 1]
+            puts "EvalInSwankSyncInner: about to return $result"
             return $result
         } else {
             # this was async event, it is now in the queue. Lets sleep further
@@ -311,9 +312,23 @@ proc ::mprs::MaybeProcessSyncEventFromQueue {} {
     if { $Event eq {} } {
         return {0}
     }
-    
-    puts "Skipping check of event (it can be :abort) and returning it"
-    
+
+    set EventAsList [Unleash $Event]
+    set EventHead [lindex $EventAsList 0]
+
+    puts "EventHead = $EventHead"
+
+    if {$EventHead eq ":abort"} {
+        puts "Processing of :abort sync return is not done yet, throwing"
+        throw "abort of sync eval"
+    } elseif {$EventHead eq ":return"} {
+        set Body [lindex $EventAsList 1]
+        puts "Body = $Body"
+        return [list 1 $Body]
+    } else {
+        puts "Unknown head $EventHead in sync reply $Event"
+    }
+    # assume event is processed (if it is not an :abort)
     return [list 1 $Event]
 }
 
@@ -601,11 +616,6 @@ proc ::tkcon::NewSwank {host port} {
 # Used to Return:	list containing longest unique match followed by all the
 #		possible further matches
 ##
-
-proc ::tkcon::testProc {a1 a2} {
-   puts $a1
-   puts $a2
-}
 proc ::tkcon::ExpandLispSymbol str {
 
     
@@ -617,20 +627,26 @@ proc ::tkcon::ExpandLispSymbol str {
     # string quoting is a bullshit here!
     puts "We must quote string $str better!"
     set LispCmd "(cl:progn (cl::sleep 0.5) (swank:simple-completions \"$str\" '\"COMMON-LISP-USER\"))"
-
-    
-    #проблема 1 - похоже, нас не понимает tcl - не видит, что это один аргумент.
-    #проблема 2 - нужно выполнить синхронно и вернуть результат, обыыный \EvalAttached' - асинхронный
-    
+   
     #testProc $LispCmd 1
     ##puts "Ok"
     ##tr [alias]
     set SwankReply [::tkcon::EvalInSwankSync $LispCmd]
     #tr "Passed EvalInSwank"
   
-    puts $SwankReply
+    puts "EvalInSwankSync returned $SwankReply"
+    puts "car swankreply = [Car $SwankReply]"
+
+    if {[Car $SwankReply] eq ":ok"} {
+        set ExpansionsAndBestMatch [Cadr $Body]
+    } else {
+        puts "ExpandLispSymbol: I don't know what is [Car $SwankReply]"
+        return
+    }
     
-    set match [list $SwankReply]
+    set match [Car $ExpansionsAndBestMatch]
+
+    puts "ExpandLispSymbol: match = $match"
 
     if {[llength $match] > 1} {
 	regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
