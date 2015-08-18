@@ -372,7 +372,6 @@ proc ::mprs::MaybeProcessSyncEventFromQueue {} {
 proc ::mprs::ProcessAsyncEvent {EventAsList} {
     set ContinuationId [ExtractContinuationId $EventAsList]
     puts "ProcessAsyncEvent Id=$ContinuationId Data=[Unleash [lindex $EventAsList 1]]"
-    update
     return {}
 } 
 
