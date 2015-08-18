@@ -2,6 +2,11 @@
 ## Copyright (c) 2015 Denis Budyak
 ## MIT License
 
+# Main checkpoints are:
+# ::tkcon::EvalInSwankSync - synchronously evaluate lisp in "t" swank thread and return result
+# Dont forget to qualify all symbols you use in your command
+# 
+
 # General notes
 # puts is aliased sometimes in tkcon so that it calls update idletasks.
 # So, don't use idle in this file or switch to another debugging mechanism.
@@ -74,6 +79,14 @@ proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form ItIsListenerEval} {
     }
 }
 
+
+proc ::tkcon::myerror {text} {
+    idebug on
+    puts "myerror: $text"
+    tk_messageBox -title "myerror" -message $text
+    idebug break
+}
+
 # e.g. .puts [::tkcon::EvalInSwankSync {(swank:simple-completions "sw" '"COMMON-LISP-USER")}]
 
 # tries to evaluate code in sync mode and returns a result
@@ -85,7 +98,7 @@ proc ::tkcon::EvalInSwankSync {lispcode} {
     variable SWANKIsInSyncMode
     variable SWANKSyncContinuation
     if { $SWANKIsInSyncMode == 1 } {
-        error "::tkcon::EvalInSwankSync is not reenterable"
+        myerror "::tkcon::EvalInSwankSync is not reenterable"
     }
     set SWANKIsInSyncMode 1
     try {
@@ -215,7 +228,7 @@ proc ::tkcon::SwankRequestSwankRequire1 {requirement} {
 
 ## swank-protocol::request-init-presentations
 proc ::tkcon::SwankRequestInitPresentations {} {
-    error "presentations are disabled in EMACS setup"
+    myerror "presentations are disabled in EMACS setup"
     ::tkcon::SwankEmacsRex "(swank:init-presentations)"
 }
 
@@ -234,32 +247,38 @@ proc ::mprs::TypeTag {x} {
 }
 
 proc ::mprs::Unleash {x} {
-    subst -nocommands -novariables [string range $x 1 end]
-}
-
-proc ::mprs::Unleash2 {x} {
-    lindex [Unleash $x] 0
+    if { [TypeTag $x] eq "\{" } {
+        puts "WOW"
+        subst -nocommands -novariables [string range $x 2 end-2]
+    } else {
+        subst -nocommands -novariables [string range $x 1 end]
+    }
 }
 
 ## minial testing facility
 # tests are runned when code is loading (horrible!)
 proc ::mprs::AssertEq {x y} {
+    puts "Entering AssertEq"
     if {! ($x eq $y)} {
-        error "Assertion failure: $x eq $y"
+        ::tkcon::myerror "Assertion failure: $x eq $y"
     }
 }
 
+proc ::mprs::Consp {x} {
+    string match {[l\\\{]} [TypeTag $x]
+}
+
 proc ::mprs::Car {x} {
-    if {[TypeTag $x] eq "l"} {
+    if {[Consp $x]} {
         lindex [Unleash $x] 0
-    } else { error "Car: $x is not a list"
+    } else { ::tkcon::myerror "Car: $x is not a list"
     }
 }
 
 proc ::mprs::Cadr {x} {
-    if {[TypeTag $x] eq "l"} {
+    if {[Consp $x]} {
         lindex [Unleash $x] 1
-    } else { error "Car: $x is not a list"
+    } else { ::tkcon::myerror "Car: $x is not a list"
     }
 }
 
@@ -288,6 +307,7 @@ proc ::mprs::ExtractSyncEventFromQueueIfExists {} {
         puts "Checking if $Event is sync = $SWANKSyncContinuation"
         
         AssertEq [TypeTag $Event] l
+        puts "Passed AssertEq"
         set EventAsList [Unleash $Event]
         set ContinuationId [ExtractContinuationId $EventAsList]
         if { $ContinuationId == $SWANKSyncContinuation } {
@@ -359,7 +379,7 @@ proc ::mprs::ProcessFirstEventFromQueueAsyncrhonously {} {
     }
     
     # We only understand list-shaped events
-    AssertEq [TypeTag $Event] l
+    AssertEq [Consp $Event] 1
     set EventAsList [Unleash $Event]
     set EventHead [lindex $EventAsList 0]
     set ContinuationId [ExtractContinuationId $EventAsList]
@@ -632,8 +652,7 @@ proc ::tkcon::ExpandLispSymbol str {
     ##puts "Ok"
     ##tr [alias]
     set SwankReply [::tkcon::EvalInSwankSync $LispCmd]
-    #tr "Passed EvalInSwank"
-  
+    
     puts "EvalInSwankSync returned $SwankReply"
     puts "car swankreply = [Car $SwankReply]"
 

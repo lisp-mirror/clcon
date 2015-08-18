@@ -105,10 +105,10 @@
       (symbol (my-symbol-tcl-form val ou))
       ; top-level lists are not wrapped with {} as they are strings already
       (list
-       (format ou (if (= level 0) "l" "{l"))
+       (format ou "{l")
        (dolist (y val)
          (my-tcl-form y ou (+ level 1)))
-       (format ou (if (= level 0) "" "} "))))))
+       (format ou "} ")))))
 
 (defun convert-object-to-tcl-inner (x ou)
                                         ;(prin1 (cl-tk::tcl-form x)  ou)
