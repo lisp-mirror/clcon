@@ -4724,6 +4724,9 @@ proc tcl_unknown args {
 	    }
 	}
     }
+    # at least we know that the problem exists
+    puts "tcl_unknown failed to help us with $args"
+    tk_messageBox -title "tcl_unknown" -message "failed with $args"
     return -code continue
 }
 
