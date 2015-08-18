@@ -246,19 +246,35 @@ proc ::mprs::TypeTag {x} {
     string index $x 0
 }
 
+## ::mprs::Unleash 
+# removes type tag of element so that it looks more like tcl data
+# for nested structures, you also need to call Unleash for every element.
+# See ::mprs::UnleashList
 proc ::mprs::Unleash {x} {
-    if { [TypeTag $x] eq "\{" } {
-        puts "WOW"
+    set tt [TypeTag $x]
+    if { $tt eq "\{" } {
         subst -nocommands -novariables [string range $x 2 end-2]
+    } elseif { $tt eq ":" } {
+        # problem can be with single keyword as space is added after it.
+        if {[string index $x end] eq " "} {
+            tr "We get space at the end of keyword $x"
+        }
+        subst -nocommands -novariables [string range $x 0 end]
     } else {
         subst -nocommands -novariables [string range $x 1 end]
     }
 }
 
+# list is tagged with l or {l . Returns its elements Unleashed
+proc ::mprs::UnleashList {typedlist} {
+    set TypedElements [Unleash $typedlist]
+    lmap x $TypedElements {Unleash $x}
+}
+
+
 ## minial testing facility
 # tests are runned when code is loading (horrible!)
 proc ::mprs::AssertEq {x y} {
-    puts "Entering AssertEq"
     if {! ($x eq $y)} {
         ::tkcon::myerror "Assertion failure: $x eq $y"
     }
@@ -306,7 +322,7 @@ proc ::mprs::ExtractSyncEventFromQueueIfExists {} {
 
         puts "Checking if $Event is sync = $SWANKSyncContinuation"
         
-        AssertEq [TypeTag $Event] l
+        AssertEq [Consp $Event] 1
         puts "Passed AssertEq"
         set EventAsList [Unleash $Event]
         set ContinuationId [ExtractContinuationId $EventAsList]
@@ -654,16 +670,24 @@ proc ::tkcon::ExpandLispSymbol str {
     set SwankReply [::tkcon::EvalInSwankSync $LispCmd]
     
     puts "EvalInSwankSync returned $SwankReply"
-    puts "car swankreply = [Car $SwankReply]"
+    puts "car swankreply = [::mprs::Car $SwankReply]"
 
-    if {[Car $SwankReply] eq ":ok"} {
-        set ExpansionsAndBestMatch [Cadr $Body]
+
+#(:return
+# (:ok
+#  (("defcas" "defclass" "defconstant" "defconstant-uneql" "defconstant-uneql-name" "defconstant-uneql-new-value" "defconstant-uneql-old-value" "defgeneric" "defglobal" "defimplementation" "define-alien-routine" "define-alien-type" "define-alien-variable" "define-cas-expander" "define-compiler-macro" "define-condition" "define-hash-table-test" "define-load-time-global" "define-method-combination" "define-modify-macro" ...)
+#   "def"))
+
+    
+    if {[::mprs::Car $SwankReply] eq ":ok"} {
+        set ExpansionsAndBestMatch [::mprs::Cadr $SwankReply]
     } else {
-        puts "ExpandLispSymbol: I don't know what is [Car $SwankReply]"
+        puts "ExpandLispSymbol: I don't know what is [::mprs::Car $SwankReply]"
         return
     }
     
-    set match [Car $ExpansionsAndBestMatch]
+    set match [::mprs::UnleashList [::mprs::Car $ExpansionsAndBestMatch]]
+    # set MatchesList 
 
     puts "ExpandLispSymbol: match = $match"
 
@@ -675,3 +699,5 @@ proc ::tkcon::ExpandLispSymbol str {
     }
     return -code [expr {$match eq "" ? "continue" : "break"}] $match
 }
+
+    
