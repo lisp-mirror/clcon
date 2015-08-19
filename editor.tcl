@@ -196,7 +196,8 @@ proc edit {args} {
 	    -t*	{ set opts(-type) [lindex $args 1] }
 	    -w*	{ set opts(-wrap) [lindex $args 1] }
             -o* { set opts(-offset) [lindex $args 1] }
-	    --	{ set args [lreplace $args 0 0]; break }
+	    #--	{ set args [lreplace $args 0 0]; break }
+            --	{ break }
 	    default {return -code error "unknown option \"[lindex $args 0]\""}
 	}
 	set args [lreplace $args 0 1]
@@ -343,7 +344,7 @@ proc edit {args} {
     if {[string compare $opts(-find) {}]} {
 	::tkcon::Find $w.text $opts(-find) -case 1
     }
-    if {[string compare $opts(-offset) {}]} {
+    if {$opts(-offset) ne {}} {
 	$w.text mark set insert $opts(-offset)
         $w.text see insert
     }

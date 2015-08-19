@@ -16,40 +16,74 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
         (swank::find-definitions symbol))
     )))
 
+(defun tcl-escape-filename (filename)
+  (cl-tk:tcl-escape (SWANK/BACKEND:PATHNAME-TO-FILENAME filename)))
+
 (defun print-one-hyperlink-tcl-source (stream text file offset)
   "Generates tcl code which prints out one hyperlink"
   (let ((escaped-text (cl-tk:tcl-escape text))
-        (escaped-file (cl-tk:tcl-escape (SWANK/BACKEND:PATHNAME-TO-FILENAME file)))
+        (escaped-file (tcl-escape-filename file))
+        (offset-2 (format nil "{0.0+ ~A chars}" offset))
         )
     (format stream "::tkcon::WriteActiveText $w ~A {::tkcon::EditFileAtOffset ~A ~A};"
             escaped-text
             escaped-file
-            offset)))
+            offset-2)))
 
 (defun print-just-line (stream text)
   (format stream "::tkcon::WritePassiveText $w ~A" (cl-tk:tcl-escape text)))
 
+
+(defun parse-location-into-file-and-pos (location)
+  "returns either values of file and position or nil"
+  (cond
+    ((and (eq (car location) :location)
+          (eq (car (second location)) :file)
+          (eq (car (third location)) :position))
+     (let ((file (second (second location)))
+           (position (second (third location))))
+       (values file position)))
+    (t nil)))  
+
 (defun write-one-dspec-and-location (dspec location stream)
   (let ((printed-dspec (prin1-to-string dspec)))
-    (cond
-      ((and (eq (car location) :location)
-            (eq (car (second location)) :file)
-            (eq (car (third location)) :position))
-       (let ((file (second (second location)))
-             (position (second (third location))))
-         (print-one-hyperlink-tcl-source stream printed-dspec file position)))
-      (t ; something wrong with location
-       (print-just-line stream printed-dspec)))))
+    (multiple-value-bind (file position)
+        (parse-location-into-file-and-pos location)
+      (cond
+        ((and file position)
+         (print-one-hyperlink-tcl-source stream printed-dspec file position))
+        (t ; something wrong with location
+         (print-just-line stream printed-dspec))))))
 
+(defun write-code-to-pass-to-loc (stream loc)
+  (multiple-value-bind (file offset)
+      (parse-location-into-file-and-pos loc)
+    (cond
+      ((and file offset)
+       (let ((escaped-file (tcl-escape-filename file))
+             (offset-2 (format nil "{0.0+ ~A chars}" offset)))
+         (format stream "tkcon::EditFileAtOffset ~A ~A" escaped-file offset-2)))
+      (t
+       (print-just-line stream "Unable to locate to definition")
+       ))))
+  
 
 (defun server-lookup-definition (text)
   "Returns a string which must be evaluated in tcl to print hypertext menu of links"
-  (let ((dspecs-and-locations
-         (swank-find-definitions-for-clcon text)))
+  (let* ((dspecs-and-locations
+          (swank-find-definitions-for-clcon text))
+         (l (length dspecs-and-locations)))
     (with-output-to-string (ou)
-      (dolist (dal dspecs-and-locations)
-        (destructuring-bind (dspec loc) dal
-          (write-one-dspec-and-location dspec loc ou))))))
+      (case l
+        (0 (print-just-line ou "No definitions found"))
+        (t
+         (dolist (dal dspecs-and-locations)
+           (destructuring-bind (dspec loc) dal
+             (cond
+               ((= l 1)
+                (write-code-to-pass-to-loc ou loc))
+               (t
+                (write-one-dspec-and-location dspec loc ou))))))))))
 
 
 

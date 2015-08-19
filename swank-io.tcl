@@ -858,7 +858,7 @@ proc ::tkcon::WritePassiveText {w text} {
 
 
 proc ::tkcon::EditFileAtOffset {filename offset} {
-    edit $filename
+    edit -type file -offset $offset $filename
     #see offset - incoroporate it into edit.
     # $w mark set insert "0.0+ $offset chars"
     # focus -force $editor
