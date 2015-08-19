@@ -124,7 +124,7 @@ Init - инициавлизация консоли
 OuterNewSwank -
   NewSwank (заменяем на MakeSwankConnection)
 
-NewSwank
+MakeSwankConnection
   set sock
   AttachSwank $sock
 
@@ -191,7 +191,6 @@ socket_only - открыт сокет
 initialized - инициализирован (требуется консоль)
 dead - умер
   
-Живо ли оно.
 
 
 Именованные массивы

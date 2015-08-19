@@ -159,31 +159,39 @@ proc ::mprs::DeleteSyncEventsFromTheQueue {} {
 ## ItIsListenerEval must be 1 to wrap form into (swank-repl:listener-eval ...) or 0 otherwise
 # If ContinuationCounter is not passed, it is calculated when needed
 proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ThreadDesignator {}} {ContinuationCounter {}}} {
-    variable OPT
     variable PRIV
 
     #putd "entered EvalInSwank"
 
     # tcl escape: if lisp command starts from . , we (temporarily?) consider it as tcl escape
     if {[string index $form 0] eq "."} {
-        ::tkcon::Main [string range $form 1 end]
+        # FIXME or just eval? Which interpreter are we in now?
+        puts [interp alias ::tkcon::EvalAttached]
+        ::tkcon::EvalAttached [string range $form 1 end]
         return
     }
     
-    if {$PRIV(deadapp)} {
-	if {![info exists PRIV(app)] || \
-		[catch {eof $PRIV(app)} eof] || $eof} {
-	    return
-	} else {
-	    set PRIV(appname) [string range $PRIV(appname) 5 end]
-	    set PRIV(deadapp) 0
-	    Prompt "\n\"$PRIV(app)\" alive\n" [CmdGet $PRIV(console)]
-	}
-    }
+    set ConnectionName $PRIV(SwankConnection)
+    upvar \#0 $ConnectionName con
+    set sock $con(sock)
+    putd "I think socket stream is $sock"
 
-    # FIXME - we don't need that for lisp! Some other translation should occur!
-    # Sockets get \'s interpreted, so that users can
-    # send things like \n\r or explicit hex values
+    putd "Here we must check if socket is dead, but this is skipped"
+#   if {$PRIV(deadapp)} {
+#	if {![info exists PRIV(app)] || \
+#		[catch {eof $PRIV(app)} eof] || $eof} {
+#	    return
+#	} else {
+#	    set PRIV(appname) [string range $PRIV(appname) 5 end]
+#	    set PRIV(deadapp) 0
+#	    Prompt "\n\"$PRIV(app)\" alive\n" [CmdGet $PRIV(console)]
+#	}
+#   }
+
+    # We don't need that for lisp. Some other translation should occur, hopefully we done it ok
+    # Commend from old code:
+    ## Sockets get \'s interpreted, so that users can
+    ## send things like \n\r or explicit hex values
     #set cmd [subst -novariables -nocommands $form]
 
     set cmd $form
@@ -194,18 +202,15 @@ proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ThreadDesignator {}} 
 
     putd "wrapped to listener eval: $cmd"
     
-    #putd [list $PRIV(app) $cmd]
-    
     set cmd [FormatSwankRexEvalMessage $cmd $ItIsListenerEval $ThreadDesignator $ContinuationCounter]
     putd "About to send to SWANK: $cmd"
 
-    # tr "About to send $cmd to SWANK"
-
-    set code [catch {puts -nonewline $PRIV(app) $cmd ; flush $PRIV(app)} result]
-        if {$code && [eof $PRIV(app)]} {
-            ## Interpreter died or disappeared
-            putd "$code eof [eof $PRIV(app)]"
-            EvalSocketClosed $PRIV(app)
+    
+    set code [catch {puts -nonewline $sock $cmd ; flush $sock} result]
+        if {$code && [eof $sock]} {
+            ## SWANK server stream died or disappeared
+            putd "$code eof [eof $sock]"
+            EvalSocketClosed $sock $ConnectionName
         }
     return -code $code $result
 }
@@ -503,7 +508,8 @@ proc ::tkcon::SwankReadMessageFromStream {stream} {
 ## from swank-protocol::read-message-string
 proc ::tkcon::SwankReadMessageString {} {
     variable PRIV
-    set channel $PRIV(app)
+    upvar \#0 $PRIV(SwankConnection) con
+    set channel $con(sock)
     fconfigure $channel -blocking 1
     set result [SwankReadMessageFromStream $channel]
     # channel might have been closed while executing
@@ -575,7 +581,7 @@ proc ::tkcon::SetupSwankConnection {channel console} {
 
 
 ## ::tkcon::AttachSwank - called to setup SWANK connection
-# ARGS:	name	- socket identifier 
+# ARGS:	name	- swank connection name  
 # Results:	::tkcon::EvalAttached is recreated to send commands to socket
 ##
 proc ::tkcon::AttachSwank {name} {
@@ -598,35 +604,29 @@ proc ::tkcon::AttachSwank {name} {
         catch {close $sock}
         return -code error "Channel \"$sock\" returned EOF"
     }
-    set app $sock
-    set type swank
 
-    if {![info exists app]} { set app $sock }
 
-    # SwankThread is like swank-protocol::connection thread slot
-    array set PRIV [list app $app appname $sock apptype $type deadapp 0 SwankThread t]
+    set PRIV(SwankThread) t
+    set PRIV(SwankConnection) $name
 
-    ## ::tkcon::EvalAttached - evaluates the args in the attached interp
-    ## args should be passed to this procedure as if they were being
-    ## passed to the 'eval' procedure.  This procedure is dynamic to
-    ## ensure evaluation occurs in the right interp.
-    # ARGS:	args	- the command and args to evaluate
-    ##
-    set PRIV(namesp) ::
-    set namespOK 0
+    # interp alias {} ::tkcon::EvalAttached {} ::tkcon::EvalInSwankAsync {} \#0
+
+    if { $con(state) eq "socket_only" } {
+        fconfigure $sock -buffering full -blocking 0
     
-    #interp alias {} ::tkcon::EvalAttached {} \
-        #        ::tkcon::EvalSlave uplevel \#0
+        # It is important we initialize connection before binding fileevent
+        SetupSwankConnection $sock $PRIV(console)
 
-    interp alias {} ::tkcon::EvalAttached {} ::tkcon::EvalInSwankAsync {} \#0
-    fconfigure $sock -buffering full -blocking 0
-    
-    # It is important we initialize connection before binding fileevent
-    SetupSwankConnection $sock $PRIV(console)
+        # The file event will just putd whatever data is found
+        # into the interpreter
+        fileevent $sock readable [list ::tkcon::TempSwankChannelReadable $sock]
 
-    # The file event will just putd whatever data is found
-    # into the interpreter
-    fileevent $sock readable [list ::tkcon::TempSwankChannelReadable $sock]
+        set con(state) "initialized"
+    } elseif { $con(state) eq "initialized" } {
+        # do nothing
+    } else {
+        myerror "Unexpected state $con(state)"
+    }
     
     return [AttachId]
 }

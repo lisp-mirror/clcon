@@ -211,9 +211,7 @@ proc ::tkcon::Init {args} {
 	overrideexit	1
 	usehistory	1
 	resultfilter	{}
-
 	exec		slave
-        swank-connection {}
     } {
 	if {![info exists OPT($key)]} { set OPT($key) $default }
     }
@@ -250,6 +248,9 @@ proc ::tkcon::Init {args} {
 	root		.
 	uid		0
 	tabs		{}
+
+        SwankConnection {}
+        SwankThread      {}
     } {
 	if {![info exists PRIV($key)]} { set PRIV($key) $default }
     }

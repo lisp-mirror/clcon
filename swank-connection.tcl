@@ -59,6 +59,7 @@ proc ::swcnn::TerminateCurrentConnection {} {
 # Results:	It will create a socket, and attach console to it
 # FIXME console vs interpreter - can we have one interpreter (or one swank)
 # for several tabs? This is noncence, but what does tkcon think?
+# We assume that console is attached to slave interpreter already
 proc ::swcnn::MakeSwankConnection {host port} {
     variable CurrentSwankConnection
 
