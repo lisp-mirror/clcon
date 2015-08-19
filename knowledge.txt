@@ -216,3 +216,8 @@ dead - умер
     set con(sock) 123123213213
     puts $con(sock)
     puts "that's it"
+
+
+Гиперссылки в тексте
+------------------
+Искать hoterrors в swank-io.tcl и clcon.tcl

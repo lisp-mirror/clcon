@@ -671,6 +671,7 @@ proc ::tkcon::OuterNewSwank {} {
 #}
 
 
+# server-lookup-definition
 
 ## ::tkcon::ExpandLispSymbol (currently known as ExpandProcname)
 # - expand a lisp symbol based on $str

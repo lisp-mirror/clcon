@@ -11,5 +11,6 @@
   :components ((:file "package")
                (:file "swank-original-functions")
                (:file "swank-rpc-original-functions")
+               (:file "find-definition")
                (:file "swank-patch")
                ))
