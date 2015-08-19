@@ -208,6 +208,7 @@ proc ::tkcon::Init {args} {
 	resultfilter	{}
 
 	exec		slave
+    swank-connection {}
     } {
 	if {![info exists OPT($key)]} { set OPT($key) $default }
     }
