@@ -3,7 +3,9 @@
 ## MIT License
 
 # Main checkpoints are:
+# ::tkcon::EvalInSwankAsync - normal evaluation
 # ::tkcon::EvalInSwankSync - synchronously evaluate lisp in "t" swank thread and return result
+# ::tkcon::EvalInSwankFromConsole - especially for evaluation of command typed in from the console
 # Dont forget to qualify all symbols you use in your command
 # 
 
@@ -165,8 +167,9 @@ proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ThreadDesignator {}} 
 
     # tcl escape: if lisp command starts from . , we (temporarily?) consider it as tcl escape
     if {[string index $form 0] eq "."} {
-        # FIXME or just eval? Which interpreter are we in now?
-        puts [interp alias ::tkcon::EvalAttached]
+        # I believe this code is called in main interpreter
+        # It seems that PRIV and OPT are only available in main interpreter
+        # puts "EvalAttached = [interp alias ::tkcon::EvalAttached]"
         ::tkcon::EvalAttached [string range $form 1 end]
         return
     }
@@ -579,6 +582,14 @@ proc ::tkcon::SetupSwankConnection {channel console} {
     #
 }
 
+proc ::tkcon::DisconnectFromSwank {} {
+    variable PRIV
+    set name $PRIV(SwankConnection)
+    set PRIV(SwankConnection) {}
+    ::swcnn::TerminateConnection $name
+    Prompt
+}             
+
 
 ## ::tkcon::AttachSwank - called to setup SWANK connection
 # ARGS:	name	- swank connection name  
@@ -624,9 +635,13 @@ proc ::tkcon::AttachSwank {name} {
         set con(state) "initialized"
     } elseif { $con(state) eq "initialized" } {
         # do nothing
+        putd "Initialized already"
+        # We can't reach this point as we call AttachSwank only from OuterNewSwank
     } else {
         myerror "Unexpected state $con(state)"
     }
+
+    Prompt
     
     return [AttachId]
 }
@@ -712,4 +727,83 @@ proc ::tkcon::ExpandLispSymbol str {
     return -code [expr {$match eq "" ? "continue" : "break"}] $match
 }
 
+## Clone of ::tkcon::Eval (see clcon.tcl) and ::tkcon::EvalCmd
+# Some code is lost while copying... 
+proc ::tkcon::EvalInSwankFromConsole { w } {
+    variable OPT
+    variable PRIV
+    
+    set cmd [CmdGet $w]
+    # we do not split commands
+    $w mark set insert end-1c
+    $w insert end \n
+
+    #Code from EvalCmd follows
+
+    $w mark set output end
+    if {$cmd ne ""} {
+	set code 0
+        
+	if {$OPT(subhistory)} {
+            # do nothing. In good time, take the code from EvalCmd
+	}
+	if {$code} {
+            # this should never happen in clcon, as we removed previous block
+	    $w insert output $cmd\n stderr
+	} else {
+	    ## We are about to evaluate the command, so move the limit
+	    ## mark to ensure that further <Return>s don't cause double
+	    ## evaluation of this command - for cases like the command
+	    ## has a vwait or something in it
+	    $w mark set limit end
+            set code [catch {EvalInSwankAsync $cmd} res]
+            if {$code == 1} {
+                set PRIV(errorInfo) $::errorInfo
+                # was - "Socket-based errorInfo not available", but command can fail on tcl side
+            }
+	    if {![winfo exists $w]} {
+		# early abort - must be a deleted tab
+		return
+	    }
+	    AddSlaveHistory $cmd
+	    # Run any user defined result filter command.  The command is
+	    # passed result code and data.
+	    if {[llength $OPT(resultfilter)]} {
+                # do nothing in lisp
+	    }
+
+	    #budden catch {EvalAttached [list set _ $res]}
+
+            # FIXME remove it - it is from OPT(maxlinelen)
+            set trailer ""
+
+	    if {$code} {
+		if {$OPT(hoterrors)} {
+		    set tag [UniqueTag $w]
+		    $w insert output $res [list stderr $tag] \n$trailer stderr
+		    $w tag bind $tag <Enter> \
+			    [list $w tag configure $tag -under 1]
+		    $w tag bind $tag <Leave> \
+			    [list $w tag configure $tag -under 0]
+		    $w tag bind $tag <ButtonRelease-1> \
+			    "if {!\[info exists tk::Priv(mouseMoved)\] || !\$tk::Priv(mouseMoved)} \
+			    {[list $OPT(edit) -attach [Attach] -type error -- $PRIV(errorInfo)]}"
+		} else {
+		    $w insert output $res\n$trailer stderr
+		}
+	    } elseif {$res ne ""} {
+		$w insert output $res stdout $trailer stderr \n stdout
+	    }
+	}
+    }
+
+    putd "the following code in EvalInSwankFromConsole must run after return event"
+    Prompt
+    set PRIV(event) [EvalSlave history nextid]
+
+    
+    
+    #EvalInSwankAsync $cmd
+}
+    
     

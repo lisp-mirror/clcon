@@ -173,6 +173,8 @@ proc ::tkcon::MainInit {}
   interp alias {} ::tkcon::Main {} ::tkcon::InterpEval MainMenuDup 
   
 
+Пространство имен tkcon есть только в главном интерпретаторе.
+Доступно через .tkcon main
 
 
 Как хранить соединения?

@@ -180,7 +180,10 @@ proc ::tkcon::Init {args} {
 	blinktime	500
 	blinkrange	1
 	buffer		1512
+
+        # does not work with SWANK
 	maxlinelen	0
+        
 	calcmode	0
 	cols		80
 	debugPrompt	{(level \#$level) debug [history nextid] > }
@@ -210,7 +213,10 @@ proc ::tkcon::Init {args} {
 	gets		{congets}
 	overrideexit	1
 	usehistory	1
+
+        # does not work with SWANK
 	resultfilter	{}
+        
 	exec		slave
     } {
 	if {![info exists OPT($key)]} { set OPT($key) $default }
@@ -1014,6 +1020,13 @@ proc ::tkcon::GarbageCollect {} {
 # Calls:	::tkcon::CmdGet, ::tkcon::CmdSep, ::tkcon::EvalCmd
 ## 
 proc ::tkcon::Eval {w} {
+    variable PRIV
+    if {$PRIV(SwankConnection) ne {}} {
+        # this is an async command!
+        EvalInSwankFromConsole $w
+        return
+    }
+    
     set complete [CmdSep [CmdGet $w] cmds last]
     $w mark set insert end-1c
     $w insert end \n
@@ -1455,19 +1468,26 @@ proc ::tkcon::Prompt {{pre {}} {post {}} {prompt {}}} {
     if {![winfo exists $w]} { return }
     if {$pre ne ""} { $w insert end $pre stdout }
     set i [$w index end-1c]
-    if {!$OPT(showstatusbar)} {
-	if {$PRIV(appname) ne ""} {
-	    $w insert end ">$PRIV(appname)< " prompt
-	}
-	if {$PRIV(namesp) ne "::"} {
-	    $w insert end "<$PRIV(namesp)> " prompt
-	}
-    }
-    if {$prompt ne ""} {
-	$w insert end $prompt prompt
+
+    if {$PRIV(SwankConnection) ne {}} {
+        $w insert end "CL-UsER>" prompt
     } else {
-	$w insert end [EvalSlave subst $OPT(prompt1)] prompt
+        if {!$OPT(showstatusbar)} {
+            if {$PRIV(appname) ne ""} {
+                $w insert end ">$PRIV(appname)< " prompt
+            }
+            if {$PRIV(namesp) ne "::"} {
+                $w insert end "<$PRIV(namesp)> " prompt
+            }
+        }
+        if {$prompt ne ""} {
+            $w insert end $prompt prompt
+        } else {
+            $w insert end [EvalSlave subst $OPT(prompt1)] prompt
+        }
     }
+
+    
     $w mark set output $i
     $w mark set insert end
     $w mark set limit insert
@@ -1477,6 +1497,7 @@ proc ::tkcon::Prompt {{pre {}} {post {}} {prompt {}}} {
     set ::tkcon::PRIV(StatusCursor) [$w index insert]
     $w see end
 }
+
 proc ::tkcon::RePrompt {{pre {}} {post {}} {prompt {}}} {
     # same as prompt, but does nothing for those actions where we
     # only wanted to refresh the prompt on attach change when the
@@ -1602,7 +1623,8 @@ proc ::tkcon::InitMenus {w title} {
 	$m add command -label "Clear Console" -underline 1 -accel Ctrl-l \
 		-command { clear; ::tkcon::Prompt }
 	$m add separator
-    $m add command -label "1.Attach to SWANK" -underline 0 -command "::tkcon::OuterNewSwank"
+        $m add command -label "1.Attach to SWANK" -underline 0 -command "::tkcon::OuterNewSwank"
+        $m add command -label "2.Disconnect from SWANK" -underline 0 -command "::tkcon::DisconnectFromSwank"
 	$m add cascade -label "Attach To ..." -underline 0 -menu $m.attach
 
 	## Attach Console Menu
