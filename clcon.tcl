@@ -4439,6 +4439,7 @@ proc ::tkcon::Bindings {} {
     bind TkConsole <<PrevLine>> {}
 
     ## Now make all our virtual event bindings
+#	<<TkCon_Expand>>	<Key-Tab>
     set bindings {
 	<<TkCon_Exit>>		<$PRIV(CTRL)-q>
 	<<TkCon_New>>		<$PRIV(CTRL)-N>
@@ -4451,10 +4452,10 @@ proc ::tkcon::Bindings {} {
 	<<TkCon_Slave>>		<$PRIV(CTRL)Key-1>
 	<<TkCon_Master>>	<$PRIV(CTRL)Key-2>
 	<<TkCon_Main>>		<$PRIV(CTRL)Key-3>
-	<<TkCon_Expand>>	<Key-Tab>
-	<<TkCon_ExpandFile>>	<Key-Escape>
+	<<TkCon_ExpandFile>>	<Control-Key-F3>
 	<<TkCon_ExpandProc>>	<Control-Alt-Key-u>
-	<<TkCon_ExpandLisp>>	<Control-Alt-Key-j>
+	<<TkCon_ExpandLisp>>	<Control-Alt-Key-i>
+	<<TkCon_ExpandLisp>>	<Key-Tab>
         <<TkCon_LispFindDefinition>> <Alt-period>
 	<<TkCon_ExpandVar>>	<Alt-v>
 	<<TkCon_Tab>>		<Control-i>
