@@ -774,25 +774,25 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
 
 	    #budden catch {EvalAttached [list set _ $res]}
 
-            # FIXME remove it - it is from OPT(maxlinelen)
-            set trailer ""
-
 	    if {$code} {
 		if {$OPT(hoterrors)} {
 		    set tag [UniqueTag $w]
-		    $w insert output $res [list stderr $tag] \n$trailer stderr
+		    $w insert output $res [list stderr $tag] \n stdout
 		    $w tag bind $tag <Enter> \
 			    [list $w tag configure $tag -under 1]
 		    $w tag bind $tag <Leave> \
-			    [list $w tag configure $tag -under 0]
+                        [list $w tag configure $tag -under 0]
+                    $w tag bind $tag <Alt-w> \
+			    "if {!\[info exists tk::Priv(mouseMoved)\] || !\$tk::Priv(mouseMoved)} \
+			    {[list $OPT(edit) -attach [Attach] -type error -- $PRIV(errorInfo)]}"
 		    $w tag bind $tag <ButtonRelease-1> \
 			    "if {!\[info exists tk::Priv(mouseMoved)\] || !\$tk::Priv(mouseMoved)} \
 			    {[list $OPT(edit) -attach [Attach] -type error -- $PRIV(errorInfo)]}"
 		} else {
-		    $w insert output $res\n$trailer stderr
+		    $w insert output $res\n stderr
 		}
 	    } elseif {$res ne ""} {
-		$w insert output $res stdout $trailer stderr \n stdout
+		$w insert output $res stdout \n stdout
 	    }
 	}
     }
@@ -806,4 +806,16 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
     #EvalInSwankAsync $cmd
 }
     
-    
+## Write a hyperlink to a file
+# problem is that we need mouse click to activate the hyperlink
+#proc WriteFileHyperlink {filename position} {
+#    
+#		    set tag [UniqueTag $w]
+#		    $w insert output $res [list stderr $tag] \n stdout
+#		    $w tag bind $tag <Enter> \
+#			    [list $w tag configure $tag -under 1]
+#		    $w tag bind $tag <Leave> \
+#			    [list $w tag configure $tag -under 0]
+#		    $w tag bind $tag <ButtonRelease-1> \
+#			    "if {!\[info exists tk::Priv(mouseMoved)\] || !\$tk::Priv(mouseMoved)} \
+#			    {[list $OPT(edit) -attach [Attach] -type error -- $PRIV(errorInfo)]}"
