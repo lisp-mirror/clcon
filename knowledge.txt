@@ -221,3 +221,16 @@ dead - умер
 Гиперссылки в тексте
 ------------------
 Искать hoterrors в swank-io.tcl и clcon.tcl
+
+
+Вставить текст в консоль:
+-------------------------
+.tkcon main .tab1 insert end "asdfasdf"
+
+[::tkcon::UniqueTag .tab1]
+.tkcon main {.tab1 insert end "asdfasdf" [list stderr _tag27]}
+.tkcon main {.tab1 tag configure _tag27 -underline 1}
+
+Возможно нужно делать disambiguation в списке исходников,
+и указывать не на строчку, а на dspec, дающий уже уникальное место.
+Тогда dspec-ы будут устойчивы к редактированию. 

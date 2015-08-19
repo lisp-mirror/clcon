@@ -672,6 +672,34 @@ proc ::tkcon::OuterNewSwank {} {
 
 
 # server-lookup-definition
+# THIS IS FIND-DEFINITION INDEED!
+proc ::tkcon::ExpandLispSymbol str {
+
+    # require at least a single character, otherwise continue
+    if {$str eq ""} {return -code continue}
+    
+    # string quoting is a bullshit here!
+    putd "We must quote string $str better!"
+    set LispCmd "(cl:progn (clcon-server:server-lookup-definition \"$str\"))"
+   
+    set SwankReply [::tkcon::EvalInSwankSync $LispCmd]
+    
+    putd "EvalInSwankSync returned $SwankReply"
+    putd "car swankreply = [::mprs::Car $SwankReply]"
+  
+    if {[::mprs::Car $SwankReply] eq ":ok"} {
+        set TclCode [::mprs::Unleash [::mprs::Cadr $SwankReply]]
+        putd "I will now eval code $TclCode"
+        eval $TclCode
+    } else {
+        putd "ListDefinitions: I don't know what is [::mprs::Car $SwankReply]"
+        return
+    }
+    
+    return -code "break" $str
+}
+
+
 
 ## ::tkcon::ExpandLispSymbol (currently known as ExpandProcname)
 # - expand a lisp symbol based on $str
@@ -680,7 +708,8 @@ proc ::tkcon::OuterNewSwank {} {
 # Used to Return:	list containing longest unique match followed by all the
 #		possible further matches
 ##
-proc ::tkcon::ExpandLispSymbol str {
+# we hid ExpandLispSymbol for a while as we use expandsymbol as entrypoint to find-definition
+proc ::tkcon::ExpandLispSymbolHIDDEN str {
 
     
     # require at least a single character, otherwise continue
@@ -783,9 +812,6 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
 			    [list $w tag configure $tag -under 1]
 		    $w tag bind $tag <Leave> \
                         [list $w tag configure $tag -under 0]
-                    $w tag bind $tag <Alt-w> \
-			    "if {!\[info exists tk::Priv(mouseMoved)\] || !\$tk::Priv(mouseMoved)} \
-			    {[list $OPT(edit) -attach [Attach] -type error -- $PRIV(errorInfo)]}"
 		    $w tag bind $tag <ButtonRelease-1> \
 			    "if {!\[info exists tk::Priv(mouseMoved)\] || !\$tk::Priv(mouseMoved)} \
 			    {[list $OPT(edit) -attach [Attach] -type error -- $PRIV(errorInfo)]}"
@@ -807,16 +833,13 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
     #EvalInSwankAsync $cmd
 }
     
-## Write a hyperlink to a file
+# Write a hyperlink to a console w
 # problem is that we need mouse click to activate the hyperlink
-#proc WriteFileHyperlink {filename position} {
-#    
-#		    set tag [UniqueTag $w]
-#		    $w insert output $res [list stderr $tag] \n stdout
-#		    $w tag bind $tag <Enter> \
-#			    [list $w tag configure $tag -under 1]
-#		    $w tag bind $tag <Leave> \
-#			    [list $w tag configure $tag -under 0]
-#		    $w tag bind $tag <ButtonRelease-1> \
-#			    "if {!\[info exists tk::Priv(mouseMoved)\] || !\$tk::Priv(mouseMoved)} \
-#			    {[list $OPT(edit) -attach [Attach] -type error -- $PRIV(errorInfo)]}"
+proc ::tkcon::WriteActiveText {w text code} {
+    set tag [UniqueTag $w]
+    $w tag configure $tag -foreground ForestGreen
+    $w insert output $text [list stdout $tag] \n stdout
+    $w tag bind $tag <Enter> [list $w tag configure $tag -under 1]
+    $w tag bind $tag <Leave> [list $w tag configure $tag -under 0]
+    $w tag bind $tag <ButtonRelease-1> $code
+}
