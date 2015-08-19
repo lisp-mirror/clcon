@@ -4618,6 +4618,8 @@ proc unknown args {
 proc tcl_unknown args {
     global auto_noexec auto_noload env unknown_pending tcl_interactive
     global errorCode errorInfo
+    #tk_messageBox -title "tcl_unknown" -message "$args"
+    puts "tcl_unknown $args"
 
     # If the command word has the form "namespace inscope ns cmd"
     # then concatenate its arguments onto the end and evaluate it.
