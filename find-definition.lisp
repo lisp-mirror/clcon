@@ -16,22 +16,61 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
         (swank::find-definitions symbol))
     )))
 
-(defun print-one-hyperlink-tcl-source (stream text file line)
+(defun print-one-hyperlink-tcl-source (stream text file offset)
   "Generates tcl code which prints out one hyperlink"
-  (format stream "puts ~A"
-          (cl-tk:tcl-escape
-           (format nil "~A ~A ~A"
-                   text file line))))
+  (let ((escaped-text (cl-tk:tcl-escape text))
+        (escaped-file (cl-tk:tcl-escape (SWANK/BACKEND:PATHNAME-TO-FILENAME file)))
+        )
+    (format stream "::tkcon::WriteActiveText $w ~A {::tkcon::EditFileAtOffset ~A ~A};"
+            escaped-text
+            escaped-file
+            offset)))
+
+(defun print-just-line (stream text)
+  (format stream "::tkcon::WritePassiveText $w ~A" (cl-tk:tcl-escape text)))
+
+(defun write-one-dspec-and-location (dspec location stream)
+  (let ((printed-dspec (prin1-to-string dspec)))
+    (cond
+      ((and (eq (car location) :location)
+            (eq (car (second location)) :file)
+            (eq (car (third location)) :position))
+       (let ((file (second (second location)))
+             (position (second (third location))))
+         (print-one-hyperlink-tcl-source stream printed-dspec file position)))
+      (t ; something wrong with location
+       (print-just-line stream printed-dspec)))))
 
 
 (defun server-lookup-definition (text)
   "Returns a string which must be evaluated in tcl to print hypertext menu of links"
-  (with-output-to-string (ou)
-    (print-one-hyperlink-tcl-source ou "myproc" "/s2/clcon/buka.tcl" 1)
-  ))
+  (let ((dspecs-and-locations
+         (swank-find-definitions-for-clcon text)))
+    (with-output-to-string (ou)
+      (dolist (dal dspecs-and-locations)
+        (destructuring-bind (dspec loc) dal
+          (write-one-dspec-and-location dspec loc ou))))))
+
+
 
 
 #| 
+
+(defun budden-open-file-at-position (file position)
+  (check-type position fixnum)
+  (open-file (correct-path file))
+  (budden-goto-position (get-current-text-ctrl *buffer-manager*) position))
+  
+(defmethod budden-goto-position ((text ltk:text) position)
+  "clone of goto"
+  (check-type position integer)
+  (let ((cursor-pos (format nil "{0.0+ ~A chars}" position)))
+    (ltk::scroll-to text cursor-pos)
+    (ltk::set-cursor-pos text cursor-pos)
+    (ltk::force-focus text)))
+
+
+able::budden-open-file-at-position
 
  (defmethod on-lookup-definition ((text ltk:text))
   (let* ((name (get-current-token text))

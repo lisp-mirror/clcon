@@ -674,6 +674,7 @@ proc ::tkcon::OuterNewSwank {} {
 # server-lookup-definition
 # THIS IS FIND-DEFINITION INDEED!
 proc ::tkcon::ExpandLispSymbol str {
+    variable PRIV
 
     # require at least a single character, otherwise continue
     if {$str eq ""} {return -code continue}
@@ -688,9 +689,11 @@ proc ::tkcon::ExpandLispSymbol str {
     putd "car swankreply = [::mprs::Car $SwankReply]"
   
     if {[::mprs::Car $SwankReply] eq ":ok"} {
-        set TclCode [::mprs::Unleash [::mprs::Cadr $SwankReply]]
+        # what about code injection? FIXME safety
+        set TclCode "set w $PRIV(console); [::mprs::Unleash [::mprs::Cadr $SwankReply]]"
         putd "I will now eval code $TclCode"
         eval $TclCode
+        $PRIV(console) see end
     } else {
         putd "ListDefinitions: I don't know what is [::mprs::Car $SwankReply]"
         return
@@ -843,3 +846,21 @@ proc ::tkcon::WriteActiveText {w text code} {
     $w tag bind $tag <Leave> [list $w tag configure $tag -under 0]
     $w tag bind $tag <ButtonRelease-1> $code
 }
+
+
+# Passive text
+# Do we really need unique tag here? FIXME (add some more tags like stderr)
+proc ::tkcon::WritePassiveText {w text} {
+    set tag [UniqueTag $w]
+    $w tag configure $tag -foreground grey
+    $w insert output $text\n [list stdout $tag]
+}
+
+
+proc ::tkcon::EditFileAtOffset {filename offset} {
+    edit $filename
+    #see offset - incoroporate it into edit.
+    # $w mark set insert "0.0+ $offset chars"
+    # focus -force $editor
+}
+    
