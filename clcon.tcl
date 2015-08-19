@@ -89,7 +89,7 @@ namespace eval ::tkcon {
 
     variable EXPECT 0
     # 1 - enable unknown from tkcon, 0 - disable. Processed at startup only (I guess)
-    variable ENABLE_UNKNOWN 1
+    variable ENABLE_UNKNOWN 0
     variable ScriptDirectory
     set ScriptDirectory [file dirname [info script]]
 
