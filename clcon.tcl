@@ -124,7 +124,7 @@ proc putd arg1 {
     update idletasks
 }
 
-## ::tkcon::SourceHere - buddens command to load file from the same dir where
+## TkconSourceHere - buddens command to load file from the same dir where
 # clcon itself is located. Be sure to load into main interpreter when you need it:
 # 
 proc TkconSourceHere {arg} {
@@ -132,6 +132,7 @@ proc TkconSourceHere {arg} {
     source [file join $::tkcon::ScriptDirectory $arg]
 }
 
+TkconSourceHere swank-connection.tcl
 TkconSourceHere swank-io.tcl
 
 ## ::tkcon::Init - inits tkcon

@@ -122,7 +122,7 @@ Init - инициавлизация консоли
 
 ----- AS IS ----------
 OuterNewSwank -
-  NewSwank
+  NewSwank (заменяем на MakeSwankConnection)
 
 NewSwank
   set sock
@@ -170,7 +170,7 @@ proc tkcon - не находит не одного случая, превращ�
 
 proc ::tkcon::MainInit {}
   ...
-  interp alias {} ::tkcon::Main {} ::tkcon::InterpEval MainMenuDup which is one 
+  interp alias {} ::tkcon::Main {} ::tkcon::InterpEval MainMenuDup 
   
 
 
@@ -183,3 +183,25 @@ proc ::tkcon::MainInit {}
 очищается не знаю как - видимо, вручную?
 
 
+
+Именованные массивы
+--------------------
+а) http://wiki.tcl.tk/1032
+    set name "SwankConnection234"
+    variable $name
+    array set $name [list a b]
+    set ${name}(sock) 123123213213
+    parray $name
+    puts [set ${name}(sock)]
+    puts "that's it"
+
+
+
+б) Из clcon
+    set name "SwankConnection333"
+    variable $name
+    upvar \#0 $name con
+    array set $name [list a b]
+    set con(sock) 123123213213
+    puts $con(sock)
+    puts "that's it"

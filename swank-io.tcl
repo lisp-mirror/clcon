@@ -582,28 +582,29 @@ proc ::tkcon::AttachSwank {name} {
     variable PRIV
     variable OPT
     variable ATTACH
+    variable $name
+    upvar \#0 $name con
+    set sock $con(sock)
 
     if {[llength [info level 0]] == 1} {
 	# no args were specified, return the attach info instead
 	return [AttachId]
     }
-    set path [concat $PRIV(name) $OPT(exec)]
-
     set PRIV(displayWin) .
     global tcl_version
-    if {[catch {eof $name} res]} {
-        return -code error "No known channel \"$name\""
+    if {[catch {eof $sock} res]} {
+        return -code error "No known channel \"$sock\""
     } elseif {$res} {
-        catch {close $name}
-        return -code error "Channel \"$name\" returned EOF"
+        catch {close $sock}
+        return -code error "Channel \"$sock\" returned EOF"
     }
-    set app $name
+    set app $sock
     set type swank
 
-    if {![info exists app]} { set app $name }
+    if {![info exists app]} { set app $sock }
 
     # SwankThread is like swank-protocol::connection thread slot
-    array set PRIV [list app $app appname $name apptype $type deadapp 0 SwankThread t]
+    array set PRIV [list app $app appname $sock apptype $type deadapp 0 SwankThread t]
 
     ## ::tkcon::EvalAttached - evaluates the args in the attached interp
     ## args should be passed to this procedure as if they were being
@@ -618,41 +619,41 @@ proc ::tkcon::AttachSwank {name} {
         #        ::tkcon::EvalSlave uplevel \#0
 
     interp alias {} ::tkcon::EvalAttached {} ::tkcon::EvalInSwankAsync {} \#0
-    fconfigure $name -buffering full -blocking 0
+    fconfigure $sock -buffering full -blocking 0
     
     # It is important we initialize connection before binding fileevent
-    SetupSwankConnection $name $PRIV(console)
+    SetupSwankConnection $sock $PRIV(console)
 
     # The file event will just putd whatever data is found
     # into the interpreter
-    fileevent $name readable [list ::tkcon::TempSwankChannelReadable $name]
+    fileevent $sock readable [list ::tkcon::TempSwankChannelReadable $sock]
     
     return [AttachId]
 }
 
 proc ::tkcon::OuterNewSwank {} {
-    ::tkcon::NewSwank 127.0.0.1 4009
+    # ::tkcon::NewSwank 127.0.0.1 4009
+    ::swcnn::MakeSwankConnection 127.0.0.1 4009
 }
 
 ## ::tkcon::NewSwank - called to create a socket to connect to
-# ARGS:	none
 # Results:	It will create a socket, and attach if requested
 # FIXME logic does not follow logic from tkcon.
 # Study relations between consoles and interpretes in tkon and fix thie sequence.
 ##
-proc ::tkcon::NewSwank {host port} {
-    variable PRIV
-    if {[catch {
-	set sock [socket $host $port]
-        fconfigure $sock -encoding utf-8
-    } err]} {
-	tk_messageBox -title "Socket Connection Error" \
-		-message "Unable to connect to \"$host:$port\":\n$err" \
-		-icon error -type ok
-    } else {
-	AttachSwank $sock
-    }
-}
+#proc ::tkcon::NewSwank {host port} {
+#    variable PRIV
+#    if {[catch {
+#	set sock [socket $host $port]
+#        fconfigure $sock -encoding utf-8
+#    } err]} {
+#	tk_messageBox -title "Socket Connection Error" \
+#		-message "Unable to connect to \"$host:$port\":\n$err" \
+#		-icon error -type ok
+#    } else {
+#	AttachSwank $sock
+#    }
+#}
 
 
 
