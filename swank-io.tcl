@@ -648,7 +648,8 @@ proc ::tkcon::AttachSwank {name} {
 
 proc ::tkcon::OuterNewSwank {} {
     # ::tkcon::NewSwank 127.0.0.1 4009
-    ::swcnn::MakeSwankConnection 127.0.0.1 4009
+    variable OPT
+    ::swcnn::MakeSwankConnection 127.0.0.1 $OPT(swank-port)
 }
 
 ## ::tkcon::NewSwank - called to create a socket to connect to
@@ -671,9 +672,9 @@ proc ::tkcon::OuterNewSwank {} {
 #}
 
 
-# server-lookup-definition
-# THIS IS FIND-DEFINITION INDEED!
-proc ::tkcon::ExpandLispSymbol str {
+## ::tkcon::LispFindDefinitionInner
+# Similar to ::tkcon::ExpandLispSymbol
+proc ::tkcon::LispFindDefinitionInner str {
     variable PRIV
 
     # require at least a single character, otherwise continue
@@ -698,8 +699,7 @@ proc ::tkcon::ExpandLispSymbol str {
         putd "ListDefinitions: I don't know what is [::mprs::Car $SwankReply]"
         return
     }
-    
-    return -code "break" $str
+    return $str
 }
 
 
@@ -712,8 +712,8 @@ proc ::tkcon::ExpandLispSymbol str {
 #		possible further matches
 ##
 # we hid ExpandLispSymbol for a while as we use expandsymbol as entrypoint to find-definition
-proc ::tkcon::ExpandLispSymbolHIDDEN str {
-
+proc ::tkcon::ExpandLispSymbol str {
+    variable OPT
     
     # require at least a single character, otherwise continue
     if {$str eq ""} {return -code continue}
@@ -722,7 +722,11 @@ proc ::tkcon::ExpandLispSymbolHIDDEN str {
 
     # string quoting is a bullshit here!
     putd "We must quote string $str better!"
-    set LispCmd "(cl:progn (cl::sleep 0.5) (swank:simple-completions \"$str\" '\"COMMON-LISP-USER\"))"
+    if { $OPT(putd-enabled) == 1 } {
+        set LispCmd "(cl:progn (cl::sleep 0.5) (swank:simple-completions \"$str\" '\"COMMON-LISP-USER\"))"
+    } else {
+        set LispCmd "(swank:simple-completions \"$str\" '\"COMMON-LISP-USER\")"
+    }
    
     #testProc $LispCmd 1
     ##putd "Ok"
@@ -863,4 +867,23 @@ proc ::tkcon::EditFileAtOffset {filename offset} {
     # $w mark set insert "0.0+ $offset chars"
     # focus -force $editor
 }
+
+
+## ::tkcon::LispFindDefinition - clone of ::tkcon::Expand - 
+# ARGS:	w	- text widget in which to expand str
+# Calls:	::tkcon::Expand(Pathname|Procname|Variable)
+# Outputs:	The string to match is expanded to the longest possible match.
+#		If ::tkcon::OPT(showmultiple) is non-zero and the user longest
+#		match equaled the string to expand, then all possible matches
+#		are output to stdout.  Triggers bell if no matches are found.
+# Returns:	number of matches found
+## 
+proc ::tkcon::LispFindDefinition {w {type ""}} {
+    set exp "\[^\\\\\]\[\[ \t\n\r\\\{\"$\]"
+    set tmp [$w search -backwards -regexp $exp insert-1c limit-1c]
+    if {[string compare {} $tmp]} {append tmp +2c} else {set tmp limit}
+    set str [$w get $tmp insert]
+    LispFindDefinitionInner $str
+}
+
     

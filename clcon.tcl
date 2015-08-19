@@ -119,9 +119,12 @@ namespace eval ::tkcon {
 # Outputs:	the string with a color-coded text tag
 ## 
 proc putd arg1 {
-    tkcon console insert output "$arg1\n" debug_string
-    tkcon console see output
-    update idletasks
+    variable ::tkcon::OPT
+    if { $::tkcon::OPT(putd-enabled) == 1 } {
+        tkcon console insert output "$arg1\n" debug_string
+        tkcon console see output
+        update idletasks
+    }
 }
 
 ## TkconSourceHere - buddens command to load file from the same dir where
@@ -213,6 +216,8 @@ proc ::tkcon::Init {args} {
 	gets		{congets}
 	overrideexit	1
 	usehistory	1
+        putd-enabled    0
+        swank-port      4009
 
         # does not work with SWANK
 	resultfilter	{}
@@ -397,6 +402,8 @@ proc ::tkcon::Init {args} {
 		-nontcl		{ set OPT(nontcl) [regexp -nocase $truth $val]}
 		-root		{ set PRIV(root) $val }
 		-font		{ set OPT(font) $val }
+                -putd-enabled   { set OPT(putd-enabled) $val }
+                -swank-port     { set OPT(swank-port) $val }
 		-rcfile	{}
 		default	{ lappend slaveargs $arg; incr i -1 }
 	    }
@@ -4448,6 +4455,7 @@ proc ::tkcon::Bindings {} {
 	<<TkCon_ExpandFile>>	<Key-Escape>
 	<<TkCon_ExpandProc>>	<Control-Alt-Key-u>
 	<<TkCon_ExpandLisp>>	<Control-Alt-Key-j>
+        <<TkCon_LispFindDefinition>> <Alt-period>
 	<<TkCon_ExpandVar>>	<Alt-v>
 	<<TkCon_Tab>>		<Control-i>
 	<<TkCon_Tab>>		<Alt-i>
@@ -4610,6 +4618,10 @@ proc ::tkcon::Bindings {} {
     }
     bind TkConsole <<TkCon_ExpandLisp>> {
 	if {[%W compare insert > limit]} {::tkcon::Expand %W lispsymbol}
+	break ; # could check "%K" == "Tab"
+    }
+    bind TkConsole <<TkCon_LispFindDefinition>> {
+	if {[%W compare insert > limit]} {::tkcon::LispFindDefinition %W}
 	break ; # could check "%K" == "Tab"
     }
     bind TkConsole <<TkCon_ExpandVar>> {
@@ -5073,6 +5085,7 @@ proc ::tkcon::Expand {w {type ""}} {
     } else { bell }
     return [incr len -1]
 }
+
 
 ## ::tkcon::ExpandPathname - expand a file pathname based on $str
 ## This is based on UNIX file name conventions
