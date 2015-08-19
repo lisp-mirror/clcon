@@ -125,13 +125,13 @@
 ; test                                        
 (assert (string-equal
          (clco::convert-object-to-tcl '(:write-string "asdfasdf" :repl-result))
-         "l:write-string sasdfasdf :repl-result "))
+         "{l:write-string sasdfasdf :repl-result } "))
 
 (assert (string-equal 
          (clco::convert-object-to-tcl '(:return
                                         (:ok "(format destination control-string &rest format-arguments)")
                                         160))
-         "l:return {l:ok s(format\\ destination\\ control-string\\ &rest\\ format-arguments) } n160 "))
+         "{l:return {l:ok s(format\\ destination\\ control-string\\ &rest\\ format-arguments) } n160 } "))
 
 
 #| examples of dcase: (defun sentinel-serve (msg)
