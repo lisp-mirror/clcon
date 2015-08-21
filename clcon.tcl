@@ -1039,13 +1039,9 @@ proc ::tkcon::Eval {w} {
     variable PRIV
     set gotcmd [CmdGet $w]
     if {$PRIV(SwankConnection) ne {}} {
-        if {[string index $gotcmd 0] eq "."} {
-            set gotcmd [string range $gotcmd 1 end]
-        } else {
-        # this is an async command!
-            EvalInSwankFromConsole $w
-            return
-        }
+        # FIXME: this is an async command, can we return from it? 
+        EvalInSwankFromConsole $w
+        return
     }
     
     set complete [CmdSep $gotcmd cmds last]
@@ -1126,13 +1122,7 @@ proc ::tkcon::EvalCmd {w cmd} {
 		    set PRIV(errorInfo) "Non-Tcl errorInfo not available"
 		}
 	    } elseif {$PRIV(apptype) eq "socket"} {
-                # tr "About to enter EvalSocket"
 		set code [catch {EvalSocket $cmd} res]
-		if {$code == 1} {
-		    set PRIV(errorInfo) "Socket-based errorInfo not available"
-		}
-	    } elseif {$PRIV(apptype) eq "swank"} {
-		set code [catch {EvalInSwankAsync $cmd} res]
 		if {$code == 1} {
 		    set PRIV(errorInfo) "Socket-based errorInfo not available"
 		}
