@@ -28,13 +28,13 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
         (escaped-file (tcl-escape-filename file))
         (offset-2 (format nil "{0.0+ ~A chars}" offset))
         )
-    (format stream "::tkcon::WriteActiveText $w ~A {::tkcon::EditFileAtOffset ~A ~A};"
+    (format stream "::tkcon::WriteActiveText $w ~A output {::tkcon::EditFileAtOffset ~A ~A}; $w insert output \\\n; "
             escaped-text
             escaped-file
             offset-2)))
 
 (defun print-just-line (stream text)
-  (format stream "::tkcon::WritePassiveText $w ~A" (cl-tk:tcl-escape text)))
+  (format stream "::tkcon::WritePassiveText $w ~A output; $w insert output \\\n; " (cl-tk:tcl-escape text)))
 
 
 (defun parse-location-into-file-and-pos (location)

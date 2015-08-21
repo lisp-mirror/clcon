@@ -104,7 +104,7 @@ proc ::insp::SwankInspect { LispExpr } {
 	wm title $w "$word - tkcon Edit"
     }
 
-# --------------------------------- frames              
+# --------------------------------- frames-----------------              
     
 # making title frame
     frame $w.title
@@ -133,7 +133,7 @@ proc ::insp::SwankInspect { LispExpr } {
     scrollbar $w.body.sx -orient h -command [list $w.body.text xview]
     scrollbar $w.body.sy -orient v -command [list $w.body.text yview]
 
-# ----------------------------------- menu
+# ----------------------------------- menu -------------------
     
     set menu [menu $w.mbar]
     $w configure -menu $menu
@@ -145,33 +145,28 @@ proc ::insp::SwankInspect { LispExpr } {
     
     $w.title.text insert 0.0 $InspectedTitle
     $w.body.text insert 0.0 $InspectedContents
+    ::tkcon::WriteActiveText $w.body.text "blabla" end {tk_messageBox -message "Ura"}
 
 # --------------------------------- pack ---------------------
     
 # layout body elements in body 
     grid $w.body.text - $w.body.sy -sticky news
     grid $w.body.sx - -sticky ew
-    grid columnconfigure $w.body 0 -weight 1 -minsize 10
-    grid columnconfigure $w.body 1 -weight 1 -minsize 10
-    grid rowconfigure $w.body 0 -weight 1 -minsize 10
+    grid columnconfigure $w.body 0 -weight 1 
+    grid columnconfigure $w.body 1 -weight 1
+    grid rowconfigure $w.body 0 -weight 1 
 
 # now layout title elements in title
     grid $w.title.text - $w.title.sy -sticky news
     grid $w.title.sx - -sticky ew
-    grid columnconfigure $w.title 0 -weight 1 -minsize 10
-    grid columnconfigure $w.title 1 -weight 1 -minsize 10
-    grid rowconfigure $w.title 0 -weight 1 -minsize 10
+    grid columnconfigure $w.title 0 -weight 1
+    grid columnconfigure $w.title 1 -weight 1
+    grid rowconfigure $w.title 0 -weight 1
 
-# combine the entire widget
-    pack $w.title -side top -fill x
+    # combine the entire widget
+    pack $w.title -side top -fill x 
     pack $w.body -fill both
     
-    grid columnconfigure $w 0 -weight 1
-    grid columnconfigure $w 1 -weight 1
-    grid rowconfigure $w 0 -weight 1
-    grid rowconfigure $w 1 -weight 1
-    
-
     wm deiconify $w
     focus $w.body.text
 }

@@ -855,13 +855,15 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
     
     #EvalInSwankAsync $cmd
 }
-    
-# Write a hyperlink to a console w
+
+
+# Write a hyperlink to a text widget w
 # problem is that we need mouse click to activate the hyperlink
-proc ::tkcon::WriteActiveText {w text code} {
+proc ::tkcon::WriteActiveText {w text index code} {
     set tag [UniqueTag $w]
     $w tag configure $tag -foreground ForestGreen
-    $w insert output $text [list stdout $tag] \n stdout
+    # $w insert output $text [list stdout $tag] \n stdout
+    $w insert $index $text $tag  
     $w tag bind $tag <Enter> [list $w tag configure $tag -under 1]
     $w tag bind $tag <Leave> [list $w tag configure $tag -under 0]
     $w tag bind $tag <ButtonRelease-1> $code
