@@ -214,6 +214,7 @@ proc ::tkcon::Init {args} {
 	overrideexit	1
 	usehistory	1
         putd-enabled    0
+        swank-ip        127.0.0.1
         swank-port      4009
 
         # does not work with SWANK
@@ -400,6 +401,7 @@ proc ::tkcon::Init {args} {
 		-root		{ set PRIV(root) $val }
 		-font		{ set OPT(font) $val }
                 -putd-enabled   { set OPT(putd-enabled) $val }
+                -swank-ip       { set OPT(swank-ip) $val }
                 -swank-port     { set OPT(swank-port) $val }
 		-rcfile	{}
 		default	{ lappend slaveargs $arg; incr i -1 }

@@ -639,7 +639,7 @@ proc ::tkcon::AttachSwank {name} {
 proc ::tkcon::OuterNewSwank {} {
     # ::tkcon::NewSwank 127.0.0.1 4009
     variable OPT
-    ::swcnn::MakeSwankConnection 127.0.0.1 $OPT(swank-port)
+    ::swcnn::MakeSwankConnection $OPT(swank-ip) $OPT(swank-port)
 }
 
 ## ::tkcon::NewSwank - called to create a socket to connect to
