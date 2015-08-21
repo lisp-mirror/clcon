@@ -47,7 +47,7 @@ exec wish "$0" ${1+"$@"}
 package require Tk 8.4
 
 
-source /s2/cl-tk/init-cl-tk-tcl-runtime.tcl
+#source /s2/cl-tk/init-cl-tk-tcl-runtime.tcl
 
 
 # We need to load some package to get what's available, and we
