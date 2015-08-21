@@ -59,13 +59,23 @@ proc ::insp::InitInspector { LispExpr } {
 
 
 proc ::clconcmd::insp {arg} {
-    ::insp::SwankInspect $arg
+    tkcon main ::insp::SwankInspect $arg
+}
+
+
+proc ::insp::ConfigureTextFonts {text} {
+    variable ::tkcon::COLOR
+    $text configure \
+        -foreground $COLOR(stdin) \
+        -background $COLOR(bg) \
+        -insertbackground $COLOR(cursor) \
+        -font $::tkcon::OPT(font) -borderwidth 1 -highlightthickness 0 \
+        -undo 1
 }
 
 
 proc ::insp::SwankInspect { LispExpr } {
     variable ::tkcon::PRIV
-    variable ::tkcon::COLOR
     variable ::tkcon::OPT
 
     set reply {InitInspector $LispExpr}
@@ -95,14 +105,11 @@ proc ::insp::SwankInspect { LispExpr } {
     }
 
     set txt [text $w.text]
+
+    ConfigureTextFonts $w.text
     $w.text configure \
 	-xscrollcommand [list $w.sx set] \
-	-yscrollcommand [list $w.sy set] \
-	-foreground $COLOR(stdin) \
-	-background $COLOR(bg) \
-	-insertbackground $COLOR(cursor) \
-	-font $::tkcon::OPT(font) -borderwidth 1 -highlightthickness 0 \
-	-undo 1
+	-yscrollcommand [list $w.sy set] 
     catch {
 	# 8.5+ stuff
 	set tabsp [expr {$OPT(tabspace) * [font measure $OPT(font) 0]}]
@@ -118,9 +125,34 @@ proc ::insp::SwankInspect { LispExpr } {
     FileMenu $w $menu
     EditMenu $w $menu
 
-    $w.text insert 1.0 $InspectedTitle\n
-    $w.text insert insert -----------------\n
-    $w.text insert $InspectedContents\n
+# buddens experiments :) 
+    frame $w.title
+    text $w.title.text
+    scrollbar $w.title.sx -orient h -command [list $w.title.text xview]
+    scrollbar $w.title.sy -orient v -command [list $w.title.text yview]
+    ConfigureTextFonts $w.title.text
+    $w.title.text configure \
+        -xscrollcommand [list $w.title.sx set] \
+        -yscrollcommand [list $w.title.sy set] 
+        
+    $w.title.text insert 0.0 $InspectedTitle
+
+# end of buddens experiments
+
+    
+    grid $w.title.text - $w.title.sy -sticky news
+    grid $w.title.sx - -sticky ew
+    
+    grid $w.title -row 0
+    grid $w.text -row 1 
+    # grid $w.sx - -sticky ew
+    grid columnconfigure $w 0 -weight 1
+    grid columnconfigure $w 1 -weight 1
+    grid rowconfigure $w 0 -weight 1
+    grid rowconfigure $w 1 -weight 100
+    
+    $w.text insert end -----------------\n
+    $w.text insert end $InspectedContents
 
     wm deiconify $w
     focus $w.text
@@ -150,5 +182,5 @@ proc ::insp::EditMenu {w menu} {
     $m add command -label "Find" -under 0 \
 	-command [list ::tkcon::FindBox $text]
     bind $w <Control-Key-f>             [list ::tkcon::Findbox $text]
-    bind $w <Control-Key-а>             [list ::tkcon::Findbox $text]
+    bind $w <Control-Key-Cyrillic_a>             [list ::tkcon::Findbox $text]
 }    
