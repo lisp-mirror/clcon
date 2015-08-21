@@ -164,16 +164,6 @@ proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ThreadDesignator {}} 
     variable PRIV
 
     #putd "entered EvalInSwank"
-
-    # tcl escape: if lisp command starts from . , we (temporarily?) consider it as tcl escape
-    if {[string index $form 0] eq "."} {
-        # I believe this code is called in main interpreter
-        # It seems that PRIV and OPT are only available in main interpreter
-        # puts "EvalAttached = [interp alias ::tkcon::EvalAttached]"
-        ::tkcon::EvalAttached [string range $form 1 end]
-        return
-    }
-    
     set ConnectionName $PRIV(SwankConnection)
     upvar \#0 $ConnectionName con
     set sock $con(sock)

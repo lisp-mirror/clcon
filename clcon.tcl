@@ -1025,13 +1025,18 @@ proc ::tkcon::GarbageCollect {} {
 ## 
 proc ::tkcon::Eval {w} {
     variable PRIV
+    set gotcmd [CmdGet $w]
     if {$PRIV(SwankConnection) ne {}} {
+        if {[string index $gotcmd 0] eq "."} {
+            set gotcmd [string range $gotcmd 1 end]
+        } else {
         # this is an async command!
-        EvalInSwankFromConsole $w
-        return
+            EvalInSwankFromConsole $w
+            return
+        }
     }
     
-    set complete [CmdSep [CmdGet $w] cmds last]
+    set complete [CmdSep $gotcmd cmds last]
     $w mark set insert end-1c
     $w insert end \n
     if {[llength $cmds]} {
