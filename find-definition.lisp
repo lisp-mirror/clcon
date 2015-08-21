@@ -1,6 +1,9 @@
 ; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*- 
 (in-package :clco)
 
+
+
+
 (defun standard-readtable ()
   (with-standard-io-syntax *readtable*))
 
@@ -86,6 +89,10 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
                 (write-one-dspec-and-location dspec loc ou))))))))))
 
 
+
+;сюда нужно перенести код из oduvanchik по выделению символа и применить его для вызова лиспового комплишена из clcon
+
+;get-token-prefix
 
 
 #| 
