@@ -104,30 +104,11 @@ proc ::insp::SwankInspect { LispExpr } {
 	wm title $w "$word - tkcon Edit"
     }
 
-    set txt [text $w.text]
-
-    ConfigureTextFonts $w.text
-    $w.text configure \
-	-xscrollcommand [list $w.sx set] \
-	-yscrollcommand [list $w.sy set] 
-    catch {
-	# 8.5+ stuff
-	set tabsp [expr {$OPT(tabspace) * [font measure $OPT(font) 0]}]
-	$w.text configure -tabs [list $tabsp left] -tabstyle wordprocessor
-    }
-
-    scrollbar $w.sx -orient h -command [list $w.text xview]
-    scrollbar $w.sy -orient v -command [list $w.text yview]
-
-    set menu [menu $w.mbar]
-    $w configure -menu $menu
-
-    FileMenu $w $menu
-    EditMenu $w $menu
-
-# buddens experiments :) 
+# --------------------------------- frames              
+    
+# making title frame
     frame $w.title
-    text $w.title.text
+    text $w.title.text -height 1
     scrollbar $w.title.sx -orient h -command [list $w.title.text xview]
     scrollbar $w.title.sy -orient v -command [list $w.title.text yview]
     ConfigureTextFonts $w.title.text
@@ -135,36 +116,73 @@ proc ::insp::SwankInspect { LispExpr } {
         -xscrollcommand [list $w.title.sx set] \
         -yscrollcommand [list $w.title.sy set] 
         
-    $w.title.text insert 0.0 $InspectedTitle
+# make body frame    
+    frame $w.body
+    text $w.body.text
 
-# end of buddens experiments
+    ConfigureTextFonts $w.body.text
+    $w.body.text configure \
+	-xscrollcommand [list $w.body.sx set] \
+	-yscrollcommand [list $w.body.sy set] 
+    catch {
+	# 8.5+ stuff
+	set tabsp [expr {$OPT(tabspace) * [font measure $OPT(font) 0]}]
+	$w.body.text configure -tabs [list $tabsp left] -tabstyle wordprocessor
+    }
 
+    scrollbar $w.body.sx -orient h -command [list $w.body.text xview]
+    scrollbar $w.body.sy -orient v -command [list $w.body.text yview]
+
+# ----------------------------------- menu
     
+    set menu [menu $w.mbar]
+    $w configure -menu $menu
+    
+    FileMenu $w $menu $w.body.text
+    EditMenu $w $menu $w.body.text
+
+# ------------------------------ fill texts ------------------
+    
+    $w.title.text insert 0.0 $InspectedTitle
+    $w.body.text insert 0.0 $InspectedContents
+
+# --------------------------------- pack ---------------------
+    
+# layout body elements in body 
+    grid $w.body.text - $w.body.sy -sticky news
+    grid $w.body.sx - -sticky ew
+    grid columnconfigure $w.body 0 -weight 1 -minsize 10
+    grid columnconfigure $w.body 1 -weight 1 -minsize 10
+    grid rowconfigure $w.body 0 -weight 1 -minsize 10
+
+# now layout title elements in title
     grid $w.title.text - $w.title.sy -sticky news
     grid $w.title.sx - -sticky ew
+    grid columnconfigure $w.title 0 -weight 1 -minsize 10
+    grid columnconfigure $w.title 1 -weight 1 -minsize 10
+    grid rowconfigure $w.title 0 -weight 1 -minsize 10
+
+# combine the entire widget
+    pack $w.title -side top -fill x
+    pack $w.body -fill both
     
-    grid $w.title -row 0
-    grid $w.text -row 1 
-    # grid $w.sx - -sticky ew
     grid columnconfigure $w 0 -weight 1
     grid columnconfigure $w 1 -weight 1
     grid rowconfigure $w 0 -weight 1
-    grid rowconfigure $w 1 -weight 100
+    grid rowconfigure $w 1 -weight 1
     
-    $w.text insert end -----------------\n
-    $w.text insert end $InspectedContents
 
     wm deiconify $w
-    focus $w.text
+    focus $w.body.text
 }
 
 
-proc ::insp::FileMenu {w menu} {
+proc ::insp::FileMenu {w menu text} {
     set m [menu [::tkcon::MenuButton $menu File file]]
     $m add command -label "Save As..."  -underline 0 \
-	-command [list ::tkcon::Save {} widget $w.text]
+	-command [list ::tkcon::Save {} widget $text]
     $m add command -label "Append To..."  -underline 0 \
-	-command [list ::tkcon::Save {} widget $w.text a+]
+	-command [list ::tkcon::Save {} widget $text a+]
     $m add separator
     $m add command -label "Dismiss" -underline 0 -accel "Control-w" \
 	-command [list destroy $w]
@@ -172,8 +190,7 @@ proc ::insp::FileMenu {w menu} {
     bind $w <Control-Key-Cyrillic_tse>		[list destroy $w]
 }
 
-proc ::insp::EditMenu {w menu} {
-    set text $w.text
+proc ::insp::EditMenu {w menu text} {
     set m [menu [::tkcon::MenuButton $menu Edit edit]]
     $m add command -label "Copy"  -under 0 \
 	-command [list tk_textCopy $text]
