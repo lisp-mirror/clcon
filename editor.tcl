@@ -59,7 +59,7 @@ proc edit {args} {
 	wm title $w "$word - tkcon Edit"
     }
 
-    set txt [ctext $w.text]
+    set txt [text $w.text]
     $w.text configure -wrap $opts(-wrap) \
 	-xscrollcommand [list $w.sx set] \
 	-yscrollcommand [list $w.sy set] \
