@@ -5047,7 +5047,13 @@ proc ::tkcon::Insert {w s} {
 # Returns:	number of matches found
 ## 
 proc ::tkcon::Expand {w {type ""}} {
-    set exp "\[^\\\\\]\[\[ \t\n\r\\\{\"$\]"
+    switch -glob $type {
+        li* {
+            # we might also want to pass current line to lisp 
+            set exp "\[^\\\\\]\[\[ \t\n\r\\\(\",@\]"
+        }
+        default { set exp "\[^\\\\\]\[\[ \t\n\r\\\{\"$\]" }
+    }
     set tmp [$w search -backwards -regexp $exp insert-1c limit-1c]
     if {[string compare {} $tmp]} {append tmp +2c} else {set tmp limit}
     set str [$w get $tmp insert]
