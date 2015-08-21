@@ -86,7 +86,8 @@ namespace eval ::tkcon {
 
     variable EXPECT 0
     # 1 - enable unknown from tkcon, 0 - disable. Processed at startup only (I guess)
-    variable ENABLE_UNKNOWN 0
+    # -1 - enable unknown completely in main interpreter and all slaves
+    variable ENABLE_UNKNOWN -1
     variable ScriptDirectory
     set ScriptDirectory [file dirname [info script]]
 
@@ -295,7 +296,7 @@ proc ::tkcon::Init {args} {
 	lappend PRIV(slavealias) history
 	set OPT(prompt1) {[history nextid] % }
     } else {
-        if { $ENABLE_UNKNOWN == 1 } {
+        if { $ENABLE_UNKNOWN != 0 } {
             lappend PRIV(slaveprocs) tcl_unknown unknown
         }
 	set OPT(prompt1) {([file tail [pwd]]) [history nextid] % }
@@ -4416,6 +4417,8 @@ proc lremove {args} {
 
 if { $::tkcon::ENABLE_UNKNOWN == 1 } {
     TkconSourceHere tkcon-unknown.tcl
+} elseif { $::tkcon::ENABLE_UNKNOWN == -1 } {
+    TkconSourceHere tkcon-unknown-mini.tcl
 }
 
 
