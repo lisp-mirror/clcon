@@ -45,9 +45,6 @@ exec wish "$0" ${1+"$@"}
 #budden     package require Tk 8.4
 #budden }
 package require Tk 8.4
-package require control
-
-control::control assert enabled 1
 
 
 source /s2/cl-tk/init-cl-tk-tcl-runtime.tcl
