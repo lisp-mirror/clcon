@@ -66,6 +66,13 @@ foreach pkg [info loaded {}] {
 # Unset temporary global vars
 catch {unset pkg file name version}
 
+namespace eval ::clconcmd {
+    # Namespace for clcon commands
+    # ??? Do we need to alias it to slave interpreters??? I think yes as
+    # we need to run them in context of one console
+}
+
+
 # Initialize the ::tkcon namespace
 #
 namespace eval ::tkcon {
@@ -249,6 +256,7 @@ proc ::tkcon::Init {args} {
 	slaveprocs	{
 	    alias clear dir dump echo idebug lremove
 	    tkcon_puts tkcon_gets observe observe_var unalias which what
+            ::clconcmd::insp
 	}
 	RCS		{RCS: @(#) $Id: tkcon.tcl,v 1.120 2013/01/23 01:19:51 hobbs Exp $}
 	HEADURL		{https://bitbucket.org/budden/clcon}
@@ -564,6 +572,7 @@ proc ::tkcon::InitSlave {slave {slaveargs {}} {slaveargv0 {}}} {
 	set errorInfo ${__tkcon_error}
 	unset __tkcon_error
     }
+    $slave eval { namespace eval ::clconcmd {} }
     foreach cmd $PRIV(slaveprocs) { $slave eval [dump proc $cmd] }
     foreach cmd $PRIV(slavealias) { $slave alias $cmd $cmd }
     interp alias $slave ::ls $slave ::dir -full
@@ -3539,6 +3548,7 @@ proc tkcon_gets args {
 
 
 TkconSourceHere editor.tcl
+TkconSourceHere inspector.tcl
 
 interp alias {} ::more {} ::edit
 interp alias {} ::less {} ::edit
