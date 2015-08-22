@@ -274,7 +274,7 @@ proc ::mprs::TypeTag {x} {
 ## ::mprs::Unleash 
 # removes type tag of element so that it looks more like tcl data
 # for nested structures, you also need to call Unleash for every element.
-# See ::mprs::UnleashList
+# See ::mprs::UnleashListOfAtoms
 proc ::mprs::Unleash {x} {
     set tt [TypeTag $x]
     if { $tt eq "\{" } {
@@ -293,8 +293,9 @@ proc ::mprs::Unleash {x} {
     }
 }
 
-# list is tagged with l or {l . Returns its elements Unleashed
-proc ::mprs::UnleashList {typedlist} {
+# list is tagged with l or {l . Returns its elements Unleashed. Will work correctly only if all
+# elements are atoms
+proc ::mprs::UnleashListOfAtoms {typedlist} {
     set TypedElements [Unleash $typedlist]
     lmap x $TypedElements {Unleash $x}
 }
@@ -766,7 +767,7 @@ proc ::tkcon::ExpandLispSymbol str {
         return
     }
     
-    set match [::mprs::UnleashList [::mprs::Car $ExpansionsAndBestMatch]]
+    set match [::mprs::UnleashListOfAtoms [::mprs::Car $ExpansionsAndBestMatch]]
     # set MatchesList 
 
     putd "ExpandLispSymbol: match = $match"
