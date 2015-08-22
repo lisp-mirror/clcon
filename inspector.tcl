@@ -78,16 +78,49 @@ proc ::insp::SwankInspect { LispExpr } {
     variable ::tkcon::PRIV
     variable ::tkcon::OPT
 
-    set reply {InitInspector $LispExpr}
+    set reply [InitInspector $LispExpr]
 
-    # We have to parse data and build representation. Also we can do that on lisp side.
-    # For now, let's assume we have text and we must only show it.
+    # We well parse data here.
 
-    set InspectedTitle "#<cons {DB735A3}>"
-    set InspectedContents "A proper list: \
-0: a \
-1: 2 "
+    putd "reply = $reply"
+    set ReplyAsDict [::mprs::Unleash $reply]
+    set InspectedTitle [dict get $ReplyAsDict :title]
+    set InspectedContentU [::mprs::Unleash [dict get $ReplyAsDict :content]]
+    set InspectedData [::mprs::Unleash [lindex $InspectedContentU 0]]
+    set InspectedMagicNumbers [lindex $InspectedContentU 1 end]
 
+    putd "InspectedData = $InspectedData"
+    
+    #set reply "A proper list: \
+#0: a \
+#1: 2 "
+    
+    set w [PrepareGui1]
+
+    $w.title.text insert 0.0 "$InspectedTitle\nMagic numbers: $InspectedMagicNumbers"
+
+    set b $w.body.text
+
+    foreach s $InspectedData {
+        if {[::mprs::Consp $s] == 1} {
+            ::tkcon::WriteActiveText $b $s end "tk_messageBox -message ура! -parent $w"
+        } else {
+            $b insert end [::mprs::Unleash $s]
+        }
+    }
+
+    
+#    $w.body.text insert 0.0 $InspectedData
+
+#    ::tkcon::WriteActiveText $w.body.text "blabla" end {tk_messageBox -message "ура!"}
+
+    PrepareGui2 $w
+}
+
+
+# Make toplevel widget and its children 
+proc ::insp::PrepareGui1 {} {
+    variable ::tkcon::PRIV
     # Create unique edit window toplevel
     set w $PRIV(base).__edit
     set i 0
@@ -108,7 +141,8 @@ proc ::insp::SwankInspect { LispExpr } {
     
 # making title frame
     frame $w.title
-    text $w.title.text -height 1
+    # height 2 - for magic numbers
+    text $w.title.text -height 2
     scrollbar $w.title.sx -orient h -command [list $w.title.text xview]
     scrollbar $w.title.sy -orient v -command [list $w.title.text yview]
     ConfigureTextFonts $w.title.text
@@ -141,14 +175,13 @@ proc ::insp::SwankInspect { LispExpr } {
     FileMenu $w $menu $w.body.text
     EditMenu $w $menu $w.body.text
 
-# ------------------------------ fill texts ------------------
-    
-    $w.title.text insert 0.0 $InspectedTitle
-    $w.body.text insert 0.0 $InspectedContents
-    ::tkcon::WriteActiveText $w.body.text "blabla" end {tk_messageBox -message "ура!"}
+    return $w
+}
 
+
+# layout and show inspector window
+proc PrepareGui2 {w} {    
 # --------------------------------- pack ---------------------
-    
 # layout body elements in body 
     grid $w.body.text - $w.body.sy -sticky news
     grid $w.body.sx - -sticky ew
