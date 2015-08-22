@@ -44,6 +44,7 @@ exec wish "$0" ${1+"$@"}
 #budden } else {
 #budden     package require Tk 8.4
 #budden }
+encoding system utf-8
 package require Tk 8.4
 
 

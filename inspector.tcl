@@ -97,7 +97,7 @@ proc ::insp::SwankInspect { LispExpr } {
     wm withdraw $w
 
     # title 
-    set word "Inspector"
+    set word "Инспектор"
     if {[string length $word] > 20} {
 	wm title $w "[string range $word 0 16]... - tkcon Edit"
     } else {
@@ -145,7 +145,7 @@ proc ::insp::SwankInspect { LispExpr } {
     
     $w.title.text insert 0.0 $InspectedTitle
     $w.body.text insert 0.0 $InspectedContents
-    ::tkcon::WriteActiveText $w.body.text "blabla" end {tk_messageBox -message "Ura"}
+    ::tkcon::WriteActiveText $w.body.text "blabla" end {tk_messageBox -message "ура!"}
 
 # --------------------------------- pack ---------------------
     
