@@ -9,8 +9,10 @@
   :depends-on (:cl-tk :swank)
   :serial t
   :components ((:file "package")
+               (:file "utils")
                (:file "swank-original-functions")
                (:file "swank-rpc-original-functions")
                (:file "find-definition")
                (:file "swank-patch")
+               (:file "swank-inspector" :description "inspector backend pieces")
                ))

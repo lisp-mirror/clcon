@@ -1,13 +1,6 @@
 ; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*- 
 (in-package :clco)
 
-
-
-
-(defun standard-readtable ()
-  (with-standard-io-syntax *readtable*))
-
-
 (defun swank-find-definitions-for-clcon (name)
   "Return a list ((DSPEC LOCATION) ...) of definitions for NAME.
 DSPEC is a string and LOCATION a source location. NAME is a string. See also swank:find-definitions-for-emacs. FIXME must be called in the context of current buffer"
@@ -18,9 +11,6 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
       (when found
         (swank::find-definitions symbol))
     )))
-
-(defun tcl-escape-filename (filename)
-  (cl-tk:tcl-escape (SWANK/BACKEND:PATHNAME-TO-FILENAME filename)))
 
 (defun print-one-hyperlink-tcl-source (stream text file offset)
   "Generates tcl code which prints out one hyperlink"
