@@ -157,7 +157,7 @@
 |#
      
 
-(defun swank/rpc::prin1-to-string-for-emacs (object package)
+(def-patched-swank-fun swank/rpc::prin1-to-string-for-emacs (object package)
   "Note that some events can be passed to tcl connection before we know it is a tcl connection. There can be a trouble parsing that kind of event on tcl side. Good practive would be to at least warn on tcl side if that kind of event would be received"
   (when (eq (car object) :write-string)
     (log-to-file "entered prin1-to-string-for-emacs with ~S" swank::*emacs-connection*)
