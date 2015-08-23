@@ -103,7 +103,12 @@ proc ::insp::SwankInspect { LispExpr } {
 
     foreach s $InspectedData {
         if {[::mprs::Consp $s] == 1} {
-            ::tkcon::WriteActiveText $b $s end "tk_messageBox -message ура! -parent $w"
+            set item [::mprs::Unleash $s]
+            if {[lindex $item 0] eq :value} {
+                ::tkcon::WriteActiveText $b [::mprs::Unleash [lindex $item 1]] end "tk_messageBox -message [lindex $item 2] -parent $w"
+            } else {
+                $b insert end "I don't know what is $s"
+            }
         } else {
             $b insert end [::mprs::Unleash $s]
         }
