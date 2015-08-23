@@ -838,10 +838,8 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
     Prompt
     set PRIV(event) [EvalSlave history nextid]
 
-    
-    
-    #EvalInSwankAsync $cmd
-}
+
+
 
 
 # Write a hyperlink to a text widget w
