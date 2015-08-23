@@ -70,6 +70,7 @@ Use two items on Console menubar item
 
 ## IDE Commands
 Place dot (.) in the first position of the command to invoke named IDE command. Currently there are only two commands:
+
 ```.insp lisp-expr``` should call inspector on lisp-expr, but currently there is only a stub of inspector
 
 ```.tcsoh filename.tcl``` loads tcl file from current directory into main IDE tcl interpeter 
