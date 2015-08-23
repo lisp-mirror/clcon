@@ -176,7 +176,7 @@ proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ThreadDesignator {}} 
 
     if {[string index $form 0] eq "."} {
         if {[string range $form 0 2] eq "..."} {
-            set form [string cat "tkcon main " [string range $form 3 end]]
+            set form [string cat "tkcon main {" [string range $form 3 end] "}"]
         } elseif {[string range $form 0 1] eq ".."} {
             set form [string range $form 2 end]
         } else {
