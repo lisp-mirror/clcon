@@ -9,10 +9,10 @@ Developed on Debian 8. Also seem to work on Windows 7 with ActiveTcl 8.6
 
 ## Current state
 - REPL
--- completion in Repl
--- find source in Repl
--- command history
--- stub of swank-based inspector
+- completion in Repl
+- find source in Repl
+- command history
+- stub of swank-based inspector
 
 ## Installation and startup 
 To test, start your lisp, load SWANK and do 
