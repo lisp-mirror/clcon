@@ -86,7 +86,8 @@ proc ::insp::SwankInspect { LispExpr } {
     InitInspector $LispExpr
 }
 
-# Parses (:return (:ok ...)) event to message or errs.
+# Parses (:return (:ok x)) event to message or errs.
+# Returns x if all ok
 # Use it as an util?
 proc ::insp::ParseReturnOk { EventAsList } {
     set EventHead [lindex $EventAsList 0]
@@ -103,9 +104,7 @@ proc ::insp::ParseReturnOk { EventAsList } {
     }
 }
 
-
-# This is a contiuation assigned on reply event 
-proc ::insp::SwankInspect1 { EventAsList } {
+proc ::insp::InsertDataToShow { w EventAsList } {
     # We well parse data here.
     set ReplyAsDict [::insp::ParseReturnOk $EventAsList]
     set InspectedTitle [dict get $ReplyAsDict :title]
@@ -113,17 +112,16 @@ proc ::insp::SwankInspect1 { EventAsList } {
     set InspectedData [::mprs::Unleash [lindex $InspectedContentU 0]]
     set InspectedMagicNumbers [lindex $InspectedContentU 1 end]
 
-    putd "InspectedData = $InspectedData"
-    
-    #set reply "A proper list: \
-#0: a \
-#1: 2 "
-    
-    set w [PrepareGui1]
-
-    [TitleOfInspector $w] insert 0.0 "$InspectedTitle\nMagic numbers: $InspectedMagicNumbers"
-
+    # bind var for convenience
     set b [BodyTextOfInspector $w]
+    
+    # clear old data if it existed
+    [TitleOfInspector $w] delete 0.0 end
+    $b delete 0.0 end
+    
+    # and now insert what we have parsed
+    
+    [TitleOfInspector $w] insert 0.0 "$InspectedTitle\nMagic numbers: $InspectedMagicNumbers"
 
     foreach s $InspectedData {
         if {[::mprs::Consp $s] == 1} {
@@ -140,12 +138,12 @@ proc ::insp::SwankInspect1 { EventAsList } {
             $b insert end [::mprs::Unleash $s]
         }
     }
+}
 
-    
-#    $w.body.text insert 0.0 $InspectedData
-
-#    ::tkcon::WriteActiveText $w.body.text "blabla" end {tk_messageBox -message "ура!"}
-
+# This is a contiuation assigned on reply on initialization request 
+proc ::insp::SwankInspect1 { EventAsList } {
+    set w [PrepareGui1]
+    InsertDataToShow $w $EventAsList
     PrepareGui2 $w
 }
 
@@ -165,8 +163,8 @@ proc ::insp::InspectNthPart {w id} {
 }
 
 
-proc ::insp::ShowSomethingNewInInspector { w Event } {
-    puts "::insp::ShowSomethingNewInInspector unimplemented - $Event"
+proc ::insp::ShowSomethingNewInInspector { w EventAsList } {
+    InsertDataToShow $w $EventAsList   
 }
 
 
@@ -229,7 +227,6 @@ proc ::insp::PrepareGui1 {} {
 
     return $w
 }
-
 
 # layout and show inspector window
 proc PrepareGui2 {w} {    
