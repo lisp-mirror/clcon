@@ -97,15 +97,18 @@ proc ::insp::SwankInspect { LispExpr } {
     
     set w [PrepareGui1]
 
-    $w.title.text insert 0.0 "$InspectedTitle\nMagic numbers: $InspectedMagicNumbers"
+    [TitleOfInspector $w] insert 0.0 "$InspectedTitle\nMagic numbers: $InspectedMagicNumbers"
 
-    set b $w.body.text
+    set b [BodyTextOfInspector $w]
 
     foreach s $InspectedData {
         if {[::mprs::Consp $s] == 1} {
             set item [::mprs::Unleash $s]
             if {[lindex $item 0] eq {:value}} {
-                ::tkcon::WriteActiveText $b [::mprs::Unleash [lindex $item 1]] end "tk_messageBox -message [lindex $item 2] -parent $w"
+                ::tkcon::WriteActiveText $b \
+                    [::mprs::Unleash [lindex $item 1]] \
+                    end \
+                    "insp::InspectNthPart $w [::mprs::Unleash [lindex $item 2]]"
             } else {
                 $b insert end "I don't know what is $s"
             }
@@ -120,6 +123,26 @@ proc ::insp::SwankInspect { LispExpr } {
 #    ::tkcon::WriteActiveText $w.body.text "blabla" end {tk_messageBox -message "ура!"}
 
     PrepareGui2 $w
+}
+
+## insp::InspectNthPart
+# Args: Id
+# Returns: Don't matter
+# We will send message
+# (:emacs-rex
+#  (swank:inspect-nth-part 1)
+#  "COMMON-LISP-USER" t 35)
+# And arrange callback for it so that it asynchronously showed new contents in inspector
+proc ::insp::InspectNthPart {w id} {
+    puts "inspectNthPart $w $id"
+    set ContId [::tkcon::GenContinuationCounter]
+    set OnReply "::insp::ShowSomethingNewInInspector $w \$Event"
+    ::tkcon::EvalInSwankAsync "(swank:inspect-nth-part $id)" $OnReply 0 t $ContId
+}
+
+
+proc ::insp::ShowSomethingNewInInspector { w Event } {
+    puts "::insp::ShowSomethingNewInInspector unimplemented"
 }
 
 
@@ -209,7 +232,6 @@ proc PrepareGui2 {w} {
     focus $w.body.text
 }
 
-
 proc ::insp::FileMenu {w menu text} {
     set m [menu [::tkcon::MenuButton $menu File file]]
     $m add command -label "Save As..."  -underline 0 \
@@ -234,3 +256,11 @@ proc ::insp::EditMenu {w menu text} {
     bind $w <Control-Key-f>             [list ::tkcon::Findbox $text]
     bind $w <Control-Key-Cyrillic_a>             [list ::tkcon::Findbox $text]
 }    
+
+proc ::insp::TitleOfInspector {w} {
+    return $w.title.text
+}
+
+proc ::insp::BodyTextOfInspector {w} {
+    return $w.body.text
+}

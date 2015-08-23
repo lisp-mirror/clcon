@@ -3,7 +3,7 @@
 ## MIT License
 
 # Main checkpoints are:
-# ::tkcon::EvalInSwankAsync - normal evaluation
+# ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDesignator {}} {ContinuationCounter {}}  - normal evaluation
 # ::tkcon::EvalInSwankSync - synchronously evaluate lisp in "t" swank thread and return result
 # ::tkcon::EvalInSwankFromConsole - especially for evaluation of command typed in from the console
 # Dont forget to qualify all symbols you use in your command
@@ -344,6 +344,9 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
 
 ## Continuations work for sync or async event
 # Code accepts event in $Event variable which contains event unleashed one time
+# code might look like this
+# "::tkcon::EvalInSwankFromConsoleContinuation $w \$Event $cmd"
+# where w and cmd are local variables
 proc ::mprs::EnqueueContinuation {ContinuationId code} {
     variable ContinuationsDict
     dict set ContinuationsDict $ContinuationId [list {Event} $code]
