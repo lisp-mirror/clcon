@@ -2579,6 +2579,10 @@ proc ::tkcon::MainInit {} {
 	    # oh my god, an empty loop!
 	}
 	set interp [Slave $slave [list interp create Slave$i]]
+
+        interp eval $interp "proc ::CurrentInterpreterPath {tag} { set result $interp \n if { \$tag ne {} } {             puts \"CurrentInterpreterPath = \$result\ (\$tag)\" } \n return \$result }"
+        interp eval $interp "::CurrentInterpreterPath {Created at GetSlave}"
+        
 	return $interp
     }
 
