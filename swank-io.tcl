@@ -190,7 +190,7 @@ proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDe
     ## send things like \n\r or explicit hex values
     #set cmd [subst -novariables -nocommands $form]
 
-    ::CurrentInterpreterPath "EvalInSwankAsync 2"
+    ::CurIntPath "EvalInSwankAsync 2"
     
     if { $ContinuationCounter eq {} } {
         set ContinuationCounter [GenContinuationCounter]

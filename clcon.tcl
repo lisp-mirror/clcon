@@ -553,8 +553,8 @@ proc ::tkcon::InitSlave {slave {slaveargs {}} {slaveargv0 {}}} {
     }
     if {![interp exists $slave]} { interp create $slave }
 
-    interp eval $slave "proc ::CurrentInterpreterPath {puts} { set result $slave \n if { \$puts ne {} } {             puts  \"CurrentInterpreterPath = \$result\ (\$puts)\" } \n return \$result }"
-    interp eval $slave "::CurrentInterpreterPath {::tkcon::InitSlave-slave}"
+    interp eval $slave "proc ::CurIntPath {puts} { set result $slave \n if { \$puts ne {} } {             puts  \"CurIntPath = \$result\ (\$puts)\" } \n return \$result }"
+    interp eval $slave "::CurIntPath {::tkcon::InitSlave-slave}"
    
     if {[interp eval $slave info command source] == ""} {
 	$slave alias source SafeSource $slave
@@ -568,7 +568,7 @@ proc ::tkcon::InitSlave {slave {slaveargs {}} {slaveargv0 {}}} {
 	interp eval $slave { catch unknown }
     }
 
-    set cip [interp eval $slave {::CurrentInterpreterPath {}}]
+    set cip [interp eval $slave {::CurIntPath {}}]
     puts "$cip (aa)"
     
     # This will likely be overridden to call DeleteTab where possible
@@ -2580,8 +2580,8 @@ proc ::tkcon::MainInit {} {
 	}
 	set interp [Slave $slave [list interp create Slave$i]]
 
-        interp eval $interp "proc ::CurrentInterpreterPath {tag} { set result $interp \n if { \$tag ne {} } {             puts \"CurrentInterpreterPath = \$result\ (\$tag)\" } \n return \$result }"
-        interp eval $interp "::CurrentInterpreterPath {Created at GetSlave}"
+        interp eval $interp "proc ::CurIntPath {tag} { set result $interp \n if { \$tag ne {} } {             puts \"CurIntPath = \$result\ (\$tag)\" } \n return \$result }"
+        interp eval $interp "::CurIntPath {Created at GetSlave}"
         
 	return $interp
     }
@@ -5861,9 +5861,9 @@ proc ::tkcon::Resource {} {
     InitSlave $::tkcon::OPT(exec)
 }
 
-proc ::CurrentInterpreterPath {puts} { set result {AtSource}
+proc ::CurIntPath {puts} { set result {Source}
     if { $puts ne {} } {
-        puts "CurrentInterpreterPath = $result ($puts)"
+        puts "CurIntPath = $result ($puts)"
     }
     return $result
 }
