@@ -68,11 +68,13 @@ New options:
 ## Connecting/disconnecting to/from SWANK
 Use two items on Console menubar item
 
-## tcl escapes
-Place dot (.) in the first position to send special IDE command. Currently there are only two commands:
+## IDE Commands
+Place dot (.) in the first position of the command to invoke named IDE command. Currently there are only two commands:
 ```.insp lisp-expr``` should call inspector on lisp-expr, but currently there is only a stub of inspector
+
 ```.tcsoh filename.tcl``` loads tcl file from current directory into main IDE tcl interpeter 
 
+## Tcl escapes
 Place two dots (..) to pass arbitrary tcl command to slave tcl interpreter (which can be wiped out soon from the IDE completely).
 Place three dots (...) to pass tcl command to master tcl interpreter of the IDE. E.g.
 
