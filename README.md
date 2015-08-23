@@ -56,23 +56,26 @@ New options:
 ## Connecting/disconnecting to/from SWANK
 Use two items on Console menubar item
 
-## Tcl commands
-Place dot (.) in the first position of line to send command to tkconsole instead of SWANK server. 
-Many tkcon commands are supported, but some are broken. Beware that tkcon is rather powerful
-and it had a way to run unix commands. I think I have broken it, but don't harm your system!
+## tcl escapes
+Place dot (.) in the first position to send special IDE command. Currently there are only two commands:
+```.insp lisp-expr``` should call inspector on lisp-expr, but currently there is only a stub of inspector
+```.tcsoh filename.tcl``` loads tcl file from current directory into main IDE tcl interpeter 
 
-## Hot swapping development of tcl side
-Well all we are lispers and we like incremental development. For that you can try
+Place two dots (..) to pass arbitrary tcl command to slave tcl interpreter (which can be wiped out soon from the IDE completely).
+Place three dots (...) to pass tcl command to master tcl interpreter of the IDE. E.g.
 
 ```
-.tkcon main source path/swank-io.tcl
+...source path/swank-io.tcl
 ```
+would load tcl code into main IDE's interpreter. 
 
-to reload swank-io.tcl which contains swank communication routines. 
+## Tcl errors
+Many tcl errors printed in read are clickable with mouse. Error stack is shown by the click. 
 
 ## Completion
 Completion works in console, use Tab to complete lisp symbol prefix (may contain package or part of package name).
 Use Ctrl-F3 to complete filename (Unix-style, names containing space may not work). 
+Tcl completion is currently broken. 
 
 ## Find source command
 Currently finding a source can't properly extract symbol. So to see how it work just type
