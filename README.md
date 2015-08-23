@@ -9,10 +9,11 @@ Developed on Debian 8. Also seem to work on Windows 7 with ActiveTcl 8.6
 
 ## Current state
 - REPL
-- completion in Repl
+- completion for lisp symbols and filenames in Repl
 - find source in Repl
 - command history
 - stub of swank-based inspector
+- you can still run tcl code with special "escapes"
 
 ## Installation and startup 
 To test, start your lisp, load SWANK and do 
@@ -43,6 +44,10 @@ or
 ```
 #!lisp
 (defun my-func (x) (map 'string 'identity (list #\\ #\" #\$)))
+```
+or
+```
+(dotimes (i 10) (print i) (sleep 0.5))
 ```
 
 at the console and press Return. Expression should be evaluated on lisp side correctly
@@ -83,8 +88,8 @@ Many tcl errors printed in read are clickable with mouse. Error stack is shown b
 All is simple - don't use them. They are broken. I plan remove them soon. 
 
 ## Completion
-Completion works in console, use Tab to complete lisp symbol prefix (may contain package or part of package name).
-Use Ctrl-F3 to complete filename (Unix-style, names containing space may not work). 
+Completion works in console, use **Tab** to complete lisp symbol prefix (may contain package or part of package name).
+Use **Ctrl-F3** to complete filename (Unix-style, names containing space may not work). 
 Tcl completion is currently broken. 
 
 ## Find source command
