@@ -4,11 +4,17 @@
 
 # Main checkpoints are:
 # ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDesignator {}} {ContinuationCounter {}}  - normal evaluation
-# continuation may be of the form:
-# "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList $cmd"
-# where w and cmd are local variables, $EventAsList is a parameter of Continuation. 
+# where w and cmd are local variables, $EventAsList is a parameter of Continuation.
+# continuation maybe of form
+#"::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $cmd]"
+# where $w and $cmd are local variables. $cmd is put into list to be passed as string/
+# $EventAsList is preceded by \  not to be evaluated too early.
+#
 # ::tkcon::EvalInSwankSync - synchronously evaluate lisp in "t" swank thread and return result
+# E.g. for completion 
+#
 # ::tkcon::EvalInSwankFromConsole - especially for evaluation of command typed in from the console
+# Manages history, prompt, etc.
 # Dont forget to qualify all symbols you use in your command
 # 
 
@@ -346,13 +352,11 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
 
 
 ## Continuations work for sync or async event
-# Code accepts event in $Event variable which contains event unleashed one time
-# code might look like this
-# "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList $cmd"
-# where w and cmd are local variables
+# Code accepts event in $EventAsList variable which contains event unleashed one time
 proc ::mprs::EnqueueContinuation {ContinuationId code} {
     variable ContinuationsDict
     dict set ContinuationsDict $ContinuationId [list {EventAsList} $code]
+    puts "ContinuationsDict = $ContinuationsDict"
 }
 
 
@@ -832,7 +836,7 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
                 set code [catch {
                     # FIXME. I suppose this is slow. How to use apply here? Budden
                     EvalInSwankAsync $cmd \
-                        "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList $cmd"
+                        "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $cmd]"
                 } res]
             }
 
@@ -885,11 +889,12 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
 
 # procedure 
 proc ::tkcon::EvalInSwankFromConsoleContinuation {w EventAsList cmd} {
+    putd "EISFCC : EventAsList = $EventAsList"
     if {![winfo exists $w]} {
         # early abort - must be a deleted tab
         return
     }
-            
+
     AddSlaveHistory $cmd
 
     if { [::mprs::Car [lindex $EventAsList 1]] ne {:ok} } {
