@@ -4,6 +4,9 @@
 
 # Main checkpoints are:
 # ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDesignator {}} {ContinuationCounter {}}  - normal evaluation
+# continuation may be of the form:
+# "::tkcon::EvalInSwankFromConsoleContinuation $w \$Event $cmd"
+# where w and cmd are local variables, $Event is a parameter of Continuation
 # ::tkcon::EvalInSwankSync - synchronously evaluate lisp in "t" swank thread and return result
 # ::tkcon::EvalInSwankFromConsole - especially for evaluation of command typed in from the console
 # Dont forget to qualify all symbols you use in your command
@@ -649,6 +652,11 @@ proc ::tkcon::OuterNewSwank {} {
 #}
 
 
+proc ::tkcon::QuoteLispObjToString {str} {
+    putd "We must quote string $str better!"
+    return [string cat "\"" $str "\""]    
+}
+
 ## ::tkcon::LispFindDefinitionInner
 # Similar to ::tkcon::ExpandLispSymbol
 proc ::tkcon::LispFindDefinitionInner str {
@@ -658,8 +666,8 @@ proc ::tkcon::LispFindDefinitionInner str {
     if {$str eq ""} {return -code continue}
     
     # string quoting is a bullshit here!
-    putd "We must quote string $str better!"
-    set LispCmd "(cl:progn (clcon-server:server-lookup-definition \"$str\"))"
+    set Quoted [QuoteLispObjToString $str]
+    set LispCmd "(cl:progn (clcon-server:server-lookup-definition $Quoted))"
    
     set SwankReply [::tkcon::EvalInSwankSync $LispCmd]
     
@@ -699,11 +707,11 @@ proc ::tkcon::ExpandLispSymbol str {
     # set LispCmd {(subseq (format nil "~{ ~A~}" (first (swank:simple-completions "a" "COMMON-LISP-USER"))) 1)}
 
     # string quoting is a bullshit here!
-    putd "We must quote string $str better!"
+    set Quoted [QuoteLispObjToString $str]
     if { $OPT(putd-enabled) == 1 } {
-        set LispCmd "(cl:progn (cl::sleep 0.5) (swank:simple-completions \"$str\" '\"COMMON-LISP-USER\"))"
+        set LispCmd "(cl:progn (cl::sleep 0.5) (swank:simple-completions $Quoted '\"COMMON-LISP-USER\"))"
     } else {
-        set LispCmd "(swank:simple-completions \"$str\" '\"COMMON-LISP-USER\")"
+        set LispCmd "(swank:simple-completions $Quoted '\"COMMON-LISP-USER\")"
     }
    
     #testProc $LispCmd 1
