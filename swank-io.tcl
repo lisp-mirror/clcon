@@ -5,8 +5,8 @@
 # Main checkpoints are:
 # ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDesignator {}} {ContinuationCounter {}}  - normal evaluation
 # continuation may be of the form:
-# "::tkcon::EvalInSwankFromConsoleContinuation $w \$Event $cmd"
-# where w and cmd are local variables, $Event is a parameter of Continuation
+# "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList $cmd"
+# where w and cmd are local variables, $EventAsList is a parameter of Continuation. 
 # ::tkcon::EvalInSwankSync - synchronously evaluate lisp in "t" swank thread and return result
 # ::tkcon::EvalInSwankFromConsole - especially for evaluation of command typed in from the console
 # Dont forget to qualify all symbols you use in your command
@@ -348,11 +348,11 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
 ## Continuations work for sync or async event
 # Code accepts event in $Event variable which contains event unleashed one time
 # code might look like this
-# "::tkcon::EvalInSwankFromConsoleContinuation $w \$Event $cmd"
+# "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList $cmd"
 # where w and cmd are local variables
 proc ::mprs::EnqueueContinuation {ContinuationId code} {
     variable ContinuationsDict
-    dict set ContinuationsDict $ContinuationId [list {Event} $code]
+    dict set ContinuationsDict $ContinuationId [list {EventAsList} $code]
 }
 
 
@@ -832,7 +832,7 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
                 set code [catch {
                     # FIXME. I suppose this is slow. How to use apply here? Budden
                     EvalInSwankAsync $cmd \
-                        "::tkcon::EvalInSwankFromConsoleContinuation $w \$Event $cmd"
+                        "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList $cmd"
                 } res]
             }
 
