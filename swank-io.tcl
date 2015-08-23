@@ -98,7 +98,7 @@ proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form ItIsListenerEval} {
 
 proc ::tkcon::myerror {text} {
     idebug on
-    puts "myerror: $text" stderr
+    puts stderr "myerror: $text" 
     tk_messageBox -title "myerror" -message $text
     idebug break
 }
@@ -356,7 +356,7 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
 proc ::mprs::EnqueueContinuation {ContinuationId code} {
     variable ContinuationsDict
     dict set ContinuationsDict $ContinuationId [list {EventAsList} $code]
-    puts "ContinuationsDict = $ContinuationsDict"
+    putd "ContinuationsDict = $ContinuationsDict"
 }
 
 
