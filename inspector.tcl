@@ -49,7 +49,7 @@ proc ::insp::InitInspector { LispExpr } {
     putd "Entered InitInspector with $LispExpr"
     set Quoted [::tkcon::QuoteLispObjToString $LispExpr]
     set RealExpr "(swank:init-inspector $Quoted)"
-    ::tkcon::EvalInSwankAsync $RealExpr "::insp::SwankInspect1 \$Event" 0 :repl-thread 
+    ::tkcon::EvalInSwankAsync $RealExpr "::insp::SwankInspect1 \$EventAsList" 0 :repl-thread 
 
 
 # (clco::convert-object-to-tcl '(:title "#<cons {BD735A3}>" :id 0 :content (("A proper list:" "\n" "0" ": "
@@ -86,12 +86,28 @@ proc ::insp::SwankInspect { LispExpr } {
     InitInspector $LispExpr
 }
 
-# This is a contiuation assigned on reply event 
-proc ::insp::SwankInspect1 { Event } {
-    # We well parse data here.
+# Parses (:return (:ok ...)) event to message or errs.
+# Use it as an util?
+proc ::insp::ParseReturnOk { EventAsList } {
+    set EventHead [lindex $EventAsList 0]
+    if { $EventHead ne {:return} } {
+        puts stderr "Something wrong: in SWANK reply we expected :return, but get $EventHead"
+    }
+    set SwankReply [::mprs::Unleash [lindex $EventAsList 1]]
+    set HeadSwankReply [lindex $SwankReply 0]
+    if {$HeadSwankReply eq {:ok}} {
+        set result [::mprs::Unleash [lindex $SwankReply 1]]
+        return $result
+    } else {
+        error "I don't know what is $HeadSwankReply while parsing swank reply $Event"
+    }
+}
 
-    putd "reply = $reply"
-    set ReplyAsDict [::mprs::Unleash $reply]
+
+# This is a contiuation assigned on reply event 
+proc ::insp::SwankInspect1 { EventAsList } {
+    # We well parse data here.
+    set ReplyAsDict [::insp::ParseReturnOk $EventAsList]
     set InspectedTitle [dict get $ReplyAsDict :title]
     set InspectedContentU [::mprs::Unleash [dict get $ReplyAsDict :content]]
     set InspectedData [::mprs::Unleash [lindex $InspectedContentU 0]]
@@ -144,7 +160,7 @@ proc ::insp::SwankInspect1 { Event } {
 proc ::insp::InspectNthPart {w id} {
     puts "inspectNthPart $w $id"
     set ContId [::tkcon::GenContinuationCounter]
-    set OnReply "::insp::ShowSomethingNewInInspector $w \$Event"
+    set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
     ::tkcon::EvalInSwankAsync "(swank:inspect-nth-part $id)" $OnReply 0 t $ContId
 }
 
