@@ -30,6 +30,7 @@
 # Initialize the ::mprs namespace (message parser)
 # This is for SWANK communication-related stuff, though some parts are in ::tkcon namespace
 namespace eval ::mprs {
+    variable ContinuationsDict {}
 }
 
 proc ::tkcon::GenContinuationCounter {} {
@@ -405,12 +406,45 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
     if { $Head eq ":write-string" } {
         puts -nonewline [Unleash [lindex $EventAsList 1]]
         ::tkcon::SheduleCheckSWANKEventQueue
+    } elseif { [ContinuationExistsP $ContinuationId ] == 1 } {
+        # we should have generated event which would evaluate continuation later.
+        # but what we will do with sync events then?
+        # we must either run all continations asynchronously, either run all continuations synchronously.
+        putd "About to RunContinuation for $ContinuationId"
+        RunContinuation $ContinuationId $EventAsList
     } else {
-        putd "ProcessAsyncEvent stub Id=$ContinuationId Data=[Unleash [lindex $EventAsList 1]]"
+        putd "ProcessAsyncEvent - skipping Id=$ContinuationId Data=[Unleash [lindex $EventAsList 1]]"
         ::tkcon::SheduleCheckSWANKEventQueue
     }
     return {}
 } 
+
+
+## Continuations work for sync or async event
+# Code accepts event in $Event variable which contains event unleashed one time
+proc ::mprs::EnqueueContinuation {ContinuationId code} {
+    variable ContinuationsDict
+    dict set ContinuationsDict $ContinuationId [list {Event} $code]
+}
+
+
+proc ::mprs::ContinuationExistsP {ContinuationId} {
+    variable ContinuationsDict
+    if { [dict exists $ContinuationsDict $ContinuationId] } {
+        return 1
+    } else {
+        return 0
+    }
+}
+
+## We know continuiation exists. Runs its continuation synchronously. 
+proc ::mprs::RunContinuation {ContinuationId EventAsList} {
+    variable ContinuationsDict
+    set Continuation [dict get $ContinuationsDict $ContinuationId]
+    dict unset ContinuationsDict $ContinuationId
+    apply $Continuation $EventAsList
+}
+    
 
 # If there is an event on the queue, process it.
 proc ::mprs::ProcessFirstEventFromQueueAsyncrhonously {} {
@@ -619,6 +653,7 @@ proc ::tkcon::AttachSwank {name} {
     variable $name
     upvar \#0 $name con
     set sock $con(sock)
+    puts stderr "WARNING! tkcol allows for several consoles, but do not try to have more than one SWANK attachment simultanously" 
 
     if {[llength [info level 0]] == 1} {
 	# no args were specified, return the attach info instead
@@ -731,6 +766,7 @@ proc ::tkcon::LispFindDefinitionInner str {
 # we hid ExpandLispSymbol for a while as we use expandsymbol as entrypoint to find-definition
 proc ::tkcon::ExpandLispSymbol str {
     variable OPT
+    variable PRIV
     
     # require at least a single character, otherwise continue
     if {$str eq ""} {return -code continue}
