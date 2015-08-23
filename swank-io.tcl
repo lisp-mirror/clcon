@@ -126,7 +126,7 @@ proc ::mprs::EvalInSwankSyncInner {lispcode} {
     set ::tkcon::SWANKSyncContinuation $ContinuationCounter
 
     # send command
-    ::tkcon::EvalInSwankAsync $lispcode 0 t $ContinuationCounter
+    ::tkcon::EvalInSwankAsync $lispcode {} 0 t $ContinuationCounter
 
     # Delay all async events from lisp. Process sync events. 
     while {1 == 1} {
@@ -164,7 +164,7 @@ proc ::mprs::DeleteSyncEventsFromTheQueue {} {
 
 ## ItIsListenerEval must be 1 to wrap form into (swank-repl:listener-eval ...) or 0 otherwise
 # If ContinuationCounter is not passed, it is calculated when needed
-proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ThreadDesignator {}} {ContinuationCounter {}}} {
+proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDesignator {}} {ContinuationCounter {}}} {
     variable PRIV
 
     #putd "entered EvalInSwank"
@@ -221,6 +221,12 @@ proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ThreadDesignator {}} 
     ## send things like \n\r or explicit hex values
     #set cmd [subst -novariables -nocommands $form]
 
+    ::CurrentInterpreterPath "EvalInSwankAsync 2"
+    
+    if { $ContinuationCounter eq {} } {
+        set ContinuationCounter [GenContinuationCounter]
+    }
+   
     set cmd $form
     
     putd "regsub result: $cmd"
@@ -251,7 +257,7 @@ proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ThreadDesignator {}} 
 ##  be read with read-response.
 ## ItIsListenerEval must be 1 if form is (swank-repl:listener-eval ...) or 0 otherwise
 proc ::tkcon::SwankEmacsRex {form {ItIsListenerEval 0}} {
-    EvalInSwankAsync $form $ItIsListenerEval
+    EvalInSwankAsync $form {} $ItIsListenerEval
 }
 
 ## swank-protocol::request-swank-require
