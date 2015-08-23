@@ -157,7 +157,7 @@ proc ::mprs::DeleteSyncEventsFromTheQueue {} {
         if { $a eq {} } {
             return
         }
-        putd "Dropping sync event $a"
+        puts stderr "Dropping sync event $a. This is likely a FIXME in swank-io.tcl. Continuation will persist"
     }
 }
 
@@ -185,6 +185,10 @@ proc ::tkcon::EvalInSwankAsync {form {ItIsListenerEval 1} {ThreadDesignator {}} 
         # I believe this code is called in main interpreter
         # It seems that PRIV and OPT are only available in main interpreter
         # puts "EvalAttached = [interp alias ::tkcon::EvalAttached]"
+
+        # It looks like error management is done by EvalAttached so we
+        # don't need it
+
         set res [::tkcon::EvalAttached $form]
 
         # this is lame but it works!
@@ -593,7 +597,7 @@ proc ::tkcon::AttachSwank {name} {
     variable $name
     upvar \#0 $name con
     set sock $con(sock)
-    puts stderr "WARNING! tkcol allows for several consoles, but do not try to have more than one SWANK attachment simultanously" 
+    puts stderr "WARNING! tkcon allows for several consoles, but do not try to have more than one SWANK attachment simultanously" 
 
     if {[llength [info level 0]] == 1} {
 	# no args were specified, return the attach info instead
