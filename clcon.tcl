@@ -135,11 +135,16 @@ proc putd arg1 {
 
 ## TkconSourceHere - buddens command to load file from the same dir where
 # clcon itself is located. Be sure to load into main interpreter when you need it:
-# 
-proc TkconSourceHere {arg} {
-    variable ScriptDirectory
-    source [file join $::tkcon::ScriptDirectory $arg]
+#
+proc TkconSourceHere { filename } {
+    variable ::tkcon::ScriptDirectory
+    source [file join $ScriptDirectory $filename]
 }
+
+proc ::clconcmd::tcsoh {filename} {
+    tkcon main TkconSourceHere $filename
+}
+    
 
 TkconSourceHere swank-connection.tcl
 TkconSourceHere swank-io.tcl
@@ -257,7 +262,7 @@ proc ::tkcon::Init {args} {
 	slaveprocs	{
 	    alias clear dir dump echo idebug lremove
 	    tkcon_puts tkcon_gets observe observe_var unalias which what
-            ::clconcmd::insp
+            ::clconcmd::insp ::clconcmd::tcsoh 
 	}
 	RCS		{RCS: @(#) $Id: tkcon.tcl,v 1.120 2013/01/23 01:19:51 hobbs Exp $}
 	HEADURL		{https://bitbucket.org/budden/clcon}
@@ -5874,6 +5879,8 @@ proc ::CurIntPath {puts} { set result {Source}
 ##
 proc ::tkcon::AtSource {} {
     variable PRIV
+
+    puts stderr "Entering ::tkcon::AtSource"
 
     # the info script assumes we always call this while being sourced
     set PRIV(SCRIPT) [info script]
