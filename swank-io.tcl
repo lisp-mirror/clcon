@@ -167,37 +167,6 @@ proc ::mprs::DeleteSyncEventsFromTheQueue {} {
 proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDesignator {}} {ContinuationCounter {}}} {
     variable PRIV
 
-    #putd "entered EvalInSwank"
-
-    # tcl escape: if lisp command starts from . , we (temporarily?) consider it as tcl escape
-    # ... - tkcon main
-    # .. - just eval in slave interpreter
-    # . - add ::clconcmd:: to resolve clcon command
-
-    if {[string index $form 0] eq "."} {
-        if {[string range $form 0 2] eq "..."} {
-            set form [string cat "tkcon main {" [string range $form 3 end] "}"]
-        } elseif {[string range $form 0 1] eq ".."} {
-            set form [string range $form 2 end]
-        } else {
-            set form [string cat "::clconcmd::" [string range $form 1 end]]
-        }
-        # I believe this code is called in main interpreter
-        # It seems that PRIV and OPT are only available in main interpreter
-        # puts "EvalAttached = [interp alias ::tkcon::EvalAttached]"
-
-        # It looks like error management is done by EvalAttached so we
-        # don't need it
-
-        set res [::tkcon::EvalAttached $form]
-
-        # this is lame but it works!
-        # Correct code for working with results see in EvalAttached or something like this.
-        puts $res 
-
-        return 
-    }
-    
     set ConnectionName $PRIV(SwankConnection)
     upvar \#0 $ConnectionName con
     set sock $con(sock)
@@ -236,6 +205,9 @@ proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDe
     putd "wrapped to listener eval: $cmd"
     
     set cmd [FormatSwankRexEvalMessage $cmd $ItIsListenerEval $ThreadDesignator $ContinuationCounter]
+
+    ::mprs::EnqueueContinuation $ContinuationCounter $continuation 
+
     putd "About to send to SWANK: $cmd"
 
     
@@ -767,6 +739,51 @@ proc ::tkcon::ExpandLispSymbol str {
     return -code [expr {$match eq "" ? "continue" : "break"}] $match
 }
 
+proc ::tkcon::TclEscapeP { cmd } {
+    if {[string index $cmd 0] eq "."} {
+        return 1
+    } else {
+        return 0
+    }
+}
+
+# Shows prompt, records history
+proc ::tkcon::DoAfterCommand {} {
+    variable PRIV
+    Prompt
+    set PRIV(event) [EvalSlave history nextid]
+}
+
+proc ::tkcon::EvalTclEscape { w form } {
+    # tcl escape: if lisp command starts from . , we (temporarily?) consider it as tcl escape
+    # ... - tkcon main
+    # .. - just eval in slave interpreter
+    # . - add ::clconcmd:: to resolve clcon command
+
+    if {[string range $form 0 2] eq "..."} {
+        set form [string cat "tkcon main {" [string range $form 3 end] "}"]
+    } elseif {[string range $form 0 1] eq ".."} {
+        set form [string range $form 2 end]
+    } else {
+        set form [string cat "::clconcmd::" [string range $form 1 end]]
+    }
+    # I believe this code is called in main interpreter
+    # It seems that PRIV and OPT are only available in main interpreter
+    # puts "EvalAttached = [interp alias ::tkcon::EvalAttached]"
+    
+    # It looks like error management is done by EvalAttached so we
+    # don't need it
+    
+    set res [::tkcon::EvalAttached $form]
+    
+    # this is lame but it works!
+    # Correct code for working with results see in EvalAttached or something like this.
+    puts $res 
+
+    return 
+}
+
+
 ## Clone of ::tkcon::Eval (see clcon.tcl) and ::tkcon::EvalCmd
 # Some code is lost while copying... 
 proc ::tkcon::EvalInSwankFromConsole { w } {
@@ -796,7 +813,22 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
 	    ## evaluation of this command - for cases like the command
 	    ## has a vwait or something in it
 	    $w mark set limit end
-            set code [catch {EvalInSwankAsync $cmd} res]
+
+            set IsTcl [TclEscapeP $cmd]
+            if { $IsTcl } {
+                set code [catch {EvalTclEscape $w $cmd} res]
+            } else {
+                set code [catch {
+                    # FIXME. I suppose this is slow. How to use apply here? Budden
+                    EvalInSwankAsync $cmd \
+                        "::tkcon::EvalInSwankFromConsoleContinuation $w \$Event $cmd"
+                } res]
+            }
+
+            # for tcl escape, subsequent lines are executed after a command
+            # for lisp, some of subsequent lines are executed after SENDING a command
+            # see EvalInSwankFromConsoleContinuation
+               
             if {$code == 1} {
                 set PRIV(errorInfo) $::errorInfo
                 # was - "Socket-based errorInfo not available", but command can fail on tcl side
@@ -805,16 +837,14 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
 		# early abort - must be a deleted tab
 		return
 	    }
-	    AddSlaveHistory $cmd
-	    # Run any user defined result filter command.  The command is
-	    # passed result code and data.
-	    if {[llength $OPT(resultfilter)]} {
-                # do nothing in lisp
-	    }
 
-	    #budden catch {EvalAttached [list set _ $res]}
+            
+            if { $IsTcl } {
+                # for lisp, we add to history when command returns
+                AddSlaveHistory $cmd
+            }
 
-	    if {$code} {
+            if {$code} {
 		if {$OPT(hoterrors)} {
 		    set tag [UniqueTag $w]
 		    $w insert output $res [list stderr $tag] \n stdout
@@ -834,12 +864,32 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
 	}
     }
 
-    putd "the following code in EvalInSwankFromConsole must run after return event"
-    Prompt
-    set PRIV(event) [EvalSlave history nextid]
+    if { $IsTcl } {
+        # for lisp, we show prompt after end of evaluation
+        DoAfterCommand
+    }
+}
 
 
 
+# procedure 
+proc ::tkcon::EvalInSwankFromConsoleContinuation {w EventAsList cmd} {
+    if {![winfo exists $w]} {
+        # early abort - must be a deleted tab
+        return
+    }
+            
+    AddSlaveHistory $cmd
+
+    if { [::mprs::Car [lindex $EventAsList 1]] ne {:ok} } {
+        puts stderr "Something wrong: result is $EventAsList"        
+    }
+
+    # No need to do output - it is done when :write-string was processed
+    # puts "::tkcon::EvalInSwankFromConsoleContinuation Event = $Event "
+
+    DoAfterCommand
+}
 
 
 # Write a hyperlink to a text widget w
