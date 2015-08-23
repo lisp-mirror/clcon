@@ -7,6 +7,13 @@ MIT (or BSD) license (see tkcon's copyright)
 ## Supported platforms
 Developed on Debian 8. Also seem to work on Windows 7 with ActiveTcl 8.6
 
+## Current state
+- REPL
+-- completion in Repl
+-- find source in Repl
+-- command history
+-- stub of swank-based inspector
+
 ## Installation and startup 
 To test, start your lisp, load SWANK and do 
 
@@ -72,6 +79,9 @@ would load tcl code into main IDE's interpreter.
 ## Tcl errors
 Many tcl errors printed in read are clickable with mouse. Error stack is shown by the click. 
 
+## Multiple consoles, multiple tabs.
+All is simple - don't use them. They are broken. I plan remove them soon. 
+
 ## Completion
 Completion works in console, use Tab to complete lisp symbol prefix (may contain package or part of package name).
 Use Ctrl-F3 to complete filename (Unix-style, names containing space may not work). 
@@ -86,6 +96,18 @@ on the fresh lisp prompt and press Alt-.
 If there is a single source, you just go to source. 
 If there are many, they are printed at console and you can click on either on them with mouse (no way to do that
 with keyboard now, sorry for that, this is a bug)
+
+## What is my REPL hang up?
+menu ber/Connection/Disconnect from swank
+menu bar/Connection/Connect to swank
+- this can help
+
+as you disconnect, you get into tcl prompt. Don't issue any commands, otherwise your history would mess up
+with tcl commands which you can later run as lisp commands. I plan to remove tcl console functionality at all,
+as we have tcl escapes alredy.
+
+## Multiline commands
+Not supported, neither in lisp, nor in tcl. Undefined consequences. 
 
 ## Also Read tkcon manual
 Manual is [here](http://tkcon.sourceforge.net/docs/index.html)
