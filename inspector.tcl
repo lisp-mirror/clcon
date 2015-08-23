@@ -104,13 +104,20 @@ proc ::insp::ParseReturnOk { EventAsList } {
     }
 }
 
-proc ::insp::InsertDataToShow { w EventAsList } {
+proc ::insp::InsertDataToShowOrBeep { w EventAsList } {
     # We well parse data here.
     set ReplyAsDict [::insp::ParseReturnOk $EventAsList]
-    set InspectedTitle [dict get $ReplyAsDict :title]
-    set InspectedContentU [::mprs::Unleash [dict get $ReplyAsDict :content]]
-    set InspectedData [::mprs::Unleash [lindex $InspectedContentU 0]]
-    set InspectedMagicNumbers [lindex $InspectedContentU 1 end]
+    set HaveTitle [dict exists $ReplyAsDict :title]
+    if { $HaveTitle } {
+        set InspectedTitle [dict get $ReplyAsDict :title]
+        set InspectedContentU [::mprs::Unleash [dict get $ReplyAsDict :content]]
+        set InspectedData [::mprs::Unleash [lindex $InspectedContentU 0]]
+        set InspectedMagicNumbers [lindex $InspectedContentU 1 end]
+    } else {
+        set InspectedTitle "<no data>"
+        set InspectedData ""
+        set InspectedMagicNumbers ""
+    }
 
     # bind var for convenience
     set b [BodyTextOfInspector $w]
@@ -143,7 +150,7 @@ proc ::insp::InsertDataToShow { w EventAsList } {
 # This is a contiuation assigned on reply on initialization request 
 proc ::insp::SwankInspect1 { EventAsList } {
     set w [PrepareGui1]
-    InsertDataToShow $w $EventAsList
+    InsertDataToShowOrBeep $w $EventAsList
     PrepareGui2 $w
 }
 
@@ -156,15 +163,34 @@ proc ::insp::SwankInspect1 { EventAsList } {
 #  "COMMON-LISP-USER" t 35)
 # And arrange callback for it so that it asynchronously showed new contents in inspector
 proc ::insp::InspectNthPart {w id} {
-    puts "inspectNthPart $w $id"
     set ContId [::tkcon::GenContinuationCounter]
     set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
     ::tkcon::EvalInSwankAsync "(swank:inspect-nth-part $id)" $OnReply 0 t $ContId
 }
 
+proc ::insp::InspectorPop { w } {
+    set ContId [::tkcon::GenContinuationCounter]
+    set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
+    ::tkcon::EvalInSwankAsync "(swank:inspector-pop)" $OnReply 0 t $ContId
+}
+
+proc ::insp::InspectorNext { w } {
+    set ContId [::tkcon::GenContinuationCounter]
+    set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
+    ::tkcon::EvalInSwankAsync "(swank:inspector-next)" $OnReply 0 t $ContId
+}
+
+
+proc ::insp::InspectorReinspect { w } {
+    set ContId [::tkcon::GenContinuationCounter]
+    set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
+    ::tkcon::EvalInSwankAsync "(swank:inspector-reinspect)" $OnReply 0 t $ContId
+}
+
+
 
 proc ::insp::ShowSomethingNewInInspector { w EventAsList } {
-    InsertDataToShow $w $EventAsList   
+    InsertDataToShowOrBeep $w $EventAsList   
 }
 
 
@@ -172,7 +198,7 @@ proc ::insp::ShowSomethingNewInInspector { w EventAsList } {
 proc ::insp::PrepareGui1 {} {
     variable ::tkcon::PRIV
     # Create unique edit window toplevel
-    set w $PRIV(base).__edit
+    set w $PRIV(base).__inspector
     set i 0
     while {[winfo exists $w[incr i]]} {}
     append w $i
@@ -224,6 +250,7 @@ proc ::insp::PrepareGui1 {} {
     
     FileMenu $w $menu $w.body.text
     EditMenu $w $menu $w.body.text
+    InspectMenu $w $menu $w.body.text
 
     return $w
 }
@@ -254,7 +281,7 @@ proc PrepareGui2 {w} {
 }
 
 proc ::insp::FileMenu {w menu text} {
-    set m [menu [::tkcon::MenuButton $menu File file]]
+    set m [menu [::tkcon::MenuButton $menu "1.File" file]]
     $m add command -label "Save As..."  -underline 0 \
 	-command [list ::tkcon::Save {} widget $text]
     $m add command -label "Append To..."  -underline 0 \
@@ -267,7 +294,7 @@ proc ::insp::FileMenu {w menu text} {
 }
 
 proc ::insp::EditMenu {w menu text} {
-    set m [menu [::tkcon::MenuButton $menu Edit edit]]
+    set m [menu [::tkcon::MenuButton $menu "2.Edit" edit]]
     $m add command -label "Copy"  -under 0 \
 	-command [list tk_textCopy $text]
     $m add separator
@@ -278,6 +305,23 @@ proc ::insp::EditMenu {w menu text} {
     bind $w <Control-Key-Cyrillic_a>             [list ::tkcon::Findbox $text]
 }    
 
+
+proc ::insp::InspectMenu {w menu text} {
+    set m [menu [::tkcon::MenuButton $menu "3.Inspect" inspect]]
+
+    $m add command -label "Back" -accelerator <BackSpace> -command [list ::insp::InspectorPop $w]
+    bind $w <BackSpace> [list ::insp::InspectorPop $w]
+    bind $w <Alt-Key-Left> [list ::insp::InspectorPop $w]
+
+    $m add command -label "Forward" -accelerator <Alt-Key-Right> -command [list ::insp::InspectorNext $w]
+    bind $w <Alt-Key-Right> [list ::insp::InspectorNext $w]
+
+    $m add command -label "Refresh" -accelerator <F5> -command [list ::insp::InspectorReinspect $w]
+    bind $w <F5> [list ::insp::InspectorReinspect $w]
+    
+}    
+
+
 proc ::insp::TitleOfInspector {w} {
     return $w.title.text
 }
@@ -285,3 +329,13 @@ proc ::insp::TitleOfInspector {w} {
 proc ::insp::BodyTextOfInspector {w} {
     return $w.body.text
 }
+
+proc ::insp::DebugStartup {} {
+    variable ::tkcon::OPT
+    if { $OPT(putd-enabled) } {
+        ::insp::InitInspector {'defun}
+    }
+}
+
+
+#::insp::DebugStartup
