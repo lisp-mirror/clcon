@@ -44,7 +44,13 @@ namespace eval ::insp {
 #            10 0 500)))
 #  32)
 # We can't still eval in :repl-thread synchonously, so this is just a demo.
+# We will run init-inspector asynchronously and 
 proc ::insp::InitInspector { LispExpr } {
+    putd "Entered InitInspector with $LispExpr"
+    set Quoted [::tkcon::QuoteLispObjToString $LispExpr]
+    set RealExpr "(swank:init-inspector $Quoted)"
+    ::tkcon::EvalInSwankAsync $RealExpr "::insp::SwankInspect1 \$Event" 0 :repl-thread 
+
 
 # (clco::convert-object-to-tcl '(:title "#<cons {BD735A3}>" :id 0 :content (("A proper list:" "\n" "0" ": "
 #              (:value "a" 1)
@@ -53,8 +59,8 @@ proc ::insp::InitInspector { LispExpr } {
 #              "\n")
 #             10 0 500)))
     
-    set result "{l:title s#<cons\\ \\{BD735A3\\}> :id n0 :content {l{lsA\\ proper\\ list: sn s0 s:\\  {l:value sa n1 } sn s1 s:\\  {l:value s2 n2 } sn } n10 n0 n500 } } "
-    return $result             
+#    set result "{l:title s#<cons\\ \\{BD735A3\\}> :id n0 :content {l{lsA\\ proper\\ list: sn s0 s:\\  {l:value sa n1 } sn s1 s:\\  {l:value s2 n2 } sn } n10 n0 n500 } } "
+#    SwankInspect1 $result             
 }
 
 
@@ -73,13 +79,15 @@ proc ::insp::ConfigureTextFonts {text} {
         -undo 1
 }
 
-
+# Initializes inspector with lisp expr. 
 proc ::insp::SwankInspect { LispExpr } {
-    variable ::tkcon::PRIV
-    variable ::tkcon::OPT
+    # only passes request to emacs. Initialization is done asyncrhonously
+    # by SwankInspect1
+    InitInspector $LispExpr
+}
 
-    set reply [InitInspector $LispExpr]
-
+# This is a contiuation assigned on reply event 
+proc ::insp::SwankInspect1 { Event } {
     # We well parse data here.
 
     putd "reply = $reply"
@@ -142,7 +150,7 @@ proc ::insp::InspectNthPart {w id} {
 
 
 proc ::insp::ShowSomethingNewInInspector { w Event } {
-    puts "::insp::ShowSomethingNewInInspector unimplemented"
+    puts "::insp::ShowSomethingNewInInspector unimplemented - $Event"
 }
 
 
