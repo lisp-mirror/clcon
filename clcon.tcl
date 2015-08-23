@@ -552,6 +552,10 @@ proc ::tkcon::InitSlave {slave {slaveargs {}} {slaveargv0 {}}} {
 	return -code error "Don't init the master interpreter, goofball"
     }
     if {![interp exists $slave]} { interp create $slave }
+
+    interp eval $slave "proc ::CurrentInterpreterPath {puts} { set result $slave \n if { \$puts ne {} } {             puts  \"CurrentInterpreterPath = \$result\ (\$puts)\" } \n return \$result }"
+    interp eval $slave "::CurrentInterpreterPath {::tkcon::InitSlave-slave}"
+   
     if {[interp eval $slave info command source] == ""} {
 	$slave alias source SafeSource $slave
 	$slave alias load SafeLoad $slave
@@ -563,6 +567,10 @@ proc ::tkcon::InitSlave {slave {slaveargs {}} {slaveargv0 {}}} {
 	interp eval $slave { catch {source [file join $tcl_library init.tcl]} }
 	interp eval $slave { catch unknown }
     }
+
+    set cip [interp eval $slave {::CurrentInterpreterPath {}}]
+    puts "$cip (aa)"
+    
     # This will likely be overridden to call DeleteTab where possible
     $slave alias exit exit
     interp eval $slave {
@@ -5848,6 +5856,14 @@ proc ::tkcon::Resource {} {
     Bindings
     InitSlave $::tkcon::OPT(exec)
 }
+
+proc ::CurrentInterpreterPath {puts} { set result {AtSource}
+    if { $puts ne {} } {
+        puts "CurrentInterpreterPath = $result ($puts)"
+    }
+    return $result
+}
+
 
 ## Initialize only if we haven't yet, and do other stuff that prepares to
 ## run.  It only actually inits (and runs) tkcon if it is the main script.
