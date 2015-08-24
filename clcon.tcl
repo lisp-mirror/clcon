@@ -1611,8 +1611,20 @@ proc ::tkcon::InitMenus {w title} {
 
         $m add command -label "1.Attach to SWANK" -underline 0 -command "::tkcon::OuterNewSwank"
         $m add command -label "2.Disconnect from SWANK" -underline 0 -command "::tkcon::DisconnectFromSwank"
-	$m add command -label "3.Clear Console" -underline 0 -command { clear; ::tkcon::Prompt }
+        set WarnOnClear {"I dont know if we are in the evaluation now.\
+ I'll print a prompt for you, but if your SWANK stopped\
+ responding, this will not make it work. In this case try reconnecting\
+ to SWANK or wait for your evaluation to return normally"}
 
+        # This is a FIXME. Best way to fix is not to print prompt at all and to just collect all characters which user prints. Completion and other context-dependent actions will be disbled until prompt occurs.
+        
+	$m add command -label "3.Clear Console" \
+            -underline 0 \
+            -command "\
+  clear; \
+  puts stderr $WarnOnClear ; \
+  ::tkcon::Prompt"
+        
 	$m add separator
         
 	$m add cascade -label "Tkcon console menu (defunct) ..." -underline 0 -menu $m.tkcon_console
