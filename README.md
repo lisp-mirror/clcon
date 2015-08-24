@@ -75,16 +75,15 @@ Place dot (.) in the first position of the command to invoke named IDE command. 
 
 ```.insp*``` call inspector to inspect ```*``` (result of previous REPL evaluation)
 
-```.tcsoh filename.tcl``` loads tcl file from current directory into main IDE tcl interpeter 
+```.tcsoh filename.tcl``` loads tcl file from directory where clcon.tcl script is located into main IDE tcl interpeter 
 
 ## Tcl escapes
-Place two dots (..) to pass arbitrary tcl command to slave tcl interpreter (which can be wiped out soon from the IDE completely).
-Place three dots (...) to pass tcl command to master tcl interpreter of the IDE. E.g.
+Place two dots (..) to pass arbitrary tcl command to tcl interpreter. E.g. this will display a message box.
 
 ```
-...source path/swank-io.tcl
+..tk_messageBox -title "clcon" -message "Wow, it works!" -parent $::tkcon::PRIV(console)
 ```
-would load tcl code into main IDE's interpreter. 
+
 
 ## Tcl errors
 Many tcl errors printed in read are clickable with mouse. Error stack is shown by the click. 
