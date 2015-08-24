@@ -1,7 +1,7 @@
 # README #
 
 ## What's that
-An attempt to adapt [tkcon](http://tkcon.sourceforge.net/) to Common Lisp (communication via SWANK)
+**clcon** is an attempt to adapt [tkcon](http://tkcon.sourceforge.net/) to Common Lisp (communication via SWANK)
 MIT (or BSD) license (see tkcon's copyright)
 
 ## Supported platforms
