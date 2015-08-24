@@ -4,8 +4,8 @@
 exec wish "$0" ${1+"$@"}
 
 #
-## tkcon.tcl
-## Enhanced Tk Console, part of the VerTcl system
+## clcon.tcl
+## A fork of tkcon.tcl
 ##
 ## Originally based off Brent Welch's Tcl Shell Widget
 ## (from "Practical Programming in Tcl and Tk")
@@ -18,26 +18,8 @@ exec wish "$0" ${1+"$@"}
 ##
 ## source standard_disclaimer.tcl
 ## source bourbon_ware.tcl
-##
-
-# Proxy support for retrieving the current version of Tkcon.
-#
-# Mon Jun 25 12:19:56 2001 - Pat Thoyts
-#
-# In your tkcon.cfg or .tkconrc file put your proxy details into the
-# `proxy' member of the `PRIV' array. e.g.:
-#
-#    set ::tkcon::PRIV(proxy) wwwproxy:8080
-#
-# If you want to be prompted for proxy authentication details (eg for
-# an NT proxy server) make the second element of this variable non-nil - eg:
-#
-#    set ::tkcon::PRIV(proxy) {wwwproxy:8080 1}
-#
-# Or you can set the above variable from within tkcon by calling 
-#
-#    tkcon master set ::tkcon:PRIV(proxy) wwwproxy:8080
-#
+## Copyright (c) Denis Budyak 2015
+## 
 
 #budden if {$tcl_version < 8.4} {
 #budden     return -code error "tkcon requires at least Tcl/Tk 8.4"
@@ -262,8 +244,6 @@ proc ::tkcon::Init {args} {
 	    tkcon_puts tkcon_gets observe observe_var unalias which what
             ::clconcmd::insp* ::clconcmd::tcsoh 
 	}
-	RCS		{RCS: @(#) $Id: tkcon.tcl,v 1.120 2013/01/23 01:19:51 hobbs Exp $}
-	HEADURL		{https://bitbucket.org/budden/clcon}
 
 	docs		"https://bitbucket.org/budden/clcon"
 	email		{}
@@ -1551,12 +1531,10 @@ proc ::tkcon::About {} {
 	grid $w.b -sticky se -padx 6 -pady 4
 	$w.text tag config center -justify center
 	$w.text tag config title -justify center -font {Courier -18 bold}
-	# strip down the RCS info displayed in the about box
-	regexp {,v ([0-9\./: ]*)} $PRIV(RCS) -> RCS
 	$w.text insert 1.0 "About clcon v$PRIV(version)" title \
 		"\n\nCopyright 1995-2002 Jeffrey Hobbs \
-		\n\nCopyright 2015 Denis Budyak \
-		\nRelease Info: v$PRIV(version), CVS v$RCS\
+		\nCopyright 2015 Denis Budyak \
+		\n\nRelease Info: v$PRIV(version) \
 		\nDocumentation and source available at:\n$PRIV(docs)\
 		\nUsing: Tcl v$tcl_patchLevel / Tk v$tk_patchLevel" center
 	$w.text config -state disabled
@@ -1743,10 +1721,7 @@ proc ::tkcon::InitMenus {w title} {
     ## Help Menu
     ##
     foreach m [list [menu $w.help] [menu $w.pop.help]] {
-	$m add command -label "About " -underline 0 -accel $PRIV(ACC)A \
-		-command ::tkcon::About
-	$m add command -label "Retrieve Latest Version" -underline 0 \
-		-command ::tkcon::Retrieve
+	$m add command -label "About " -command ::tkcon::About
 	if {![catch {package require ActiveTcl} ver]} {
 	    set cmd ""
 	    if {$tcl_platform(platform) == "windows"} {
@@ -5579,153 +5554,6 @@ proc ::tkcon::SafeWindow {i w option args} {
 	}
     }
     return -code $code $msg
-}
-
-proc ::tkcon::RetrieveFilter {host} {
-    variable PRIV
-    set result {}
-    if {[info exists PRIV(proxy)]} {
-	if {![regexp "^(localhost|127\.0\.0\.1)" $host]} {
-	    set result [lrange [split [lindex $PRIV(proxy) 0] :] 0 1]
-	}
-    }
-    return $result
-}
-
-proc ::tkcon::RetrieveAuthentication {} {
-    package require Tk
-    if {[catch {package require base64}]} {
-        if {[catch {package require Trf}]} {
-            error "base64 support not available"
-        } else {
-            set local64 "base64 -mode enc"
-        }
-    } else {
-        set local64 "base64::encode"
-    }
-
-    set dlg [toplevel .auth]
-    catch {wm attributes $dlg -type dialog}
-    wm title $dlg "Authenticating Proxy Configuration"
-    set f1 [frame ${dlg}.f1]
-    set f2 [frame ${dlg}.f2]
-    button $f2.b -text "OK" -command "destroy $dlg"
-    pack $f2.b -side right
-    label $f1.l2 -text "Username"
-    label $f1.l3 -text "Password"
-    entry $f1.e2 -textvariable "[namespace current]::conf_userid"
-    entry $f1.e3 -textvariable "[namespace current]::conf_passwd" -show *
-    grid $f1.l2 -column 0 -row 0 -sticky e
-    grid $f1.l3 -column 0 -row 1 -sticky e
-    grid $f1.e2 -column 1 -row 0 -sticky news
-    grid $f1.e3 -column 1 -row 1 -sticky news
-    grid columnconfigure $f1 1 -weight 1
-    pack $f2 -side bottom -fill x
-    pack $f1 -side top -anchor n -fill both -expand 1
-    tkwait window $dlg
-    set result {}
-    if {[info exists [namespace current]::conf_userid]} {
-	set data [subst $[namespace current]::conf_userid]
-	append data : [subst $[namespace current]::conf_passwd]
-	set data [$local64 $data]
-	set result [list "Proxy-Authorization" "Basic $data"]
-    }
-    unset [namespace current]::conf_passwd
-    return $result
-}
-
-proc ::tkcon::Retrieve {} {
-    # A little bit'o'magic to grab the latest tkcon from CVS and
-    # save it locally.  It doesn't support proxies though...
-    variable PRIV
-
-    set defExt ""
-    if {[string match "windows" $::tcl_platform(platform)]} {
-	set defExt ".tcl"
-    }
-    set file [tk_getSaveFile -title "Save Latest tkcon to ..." \
-	    -defaultextension $defExt \
-	    -initialdir  [file dirname $PRIV(SCRIPT)] \
-	    -initialfile [file tail $PRIV(SCRIPT)] \
-	    -parent $PRIV(root) \
-	    -filetypes {{"Tcl Files" {.tcl .tk}} {"All Files" {*.*}}}]
-    if {[string compare $file ""]} {
-	package require http 2
-	set headers {}
-	if {[info exists PRIV(proxy)]} {
-	    ::http::config -proxyfilter [namespace origin RetrieveFilter]
-	    if {[lindex $PRIV(proxy) 1] != {}} {
-		set headers [RetrieveAuthentication]
-	    }
-	}
-	set token [::http::geturl $PRIV(HEADURL) \
-		-headers $headers -timeout 30000]
-	::http::wait $token
-	set code [catch {
-	    set ncode [::http::ncode $token]
-	    set i 0
-	    while {(($ncode >= 301) && ($ncode <= 307)) && [incr i] < 5} {
-		# redirect to meta Location
-		array set meta [::http::meta $token]
-		::http::cleanup $token
-		if {![info exists meta(Location)]} { break }
-		set url $meta(Location)
-		if {![string match "http*" $url]
-		    && [regexp {https?://[^/]+} $PRIV(HEADURL) srvr]} {
-		    # attach the same http server info
-		    set url $srvr/$url
-		}
-		set token [::http::geturl $url -headers $headers -timeout 30000]
-		::http::wait $token
-		set ncode [::http::ncode $token]
-	    }
-	    if {$ncode != 200} {
-		return "expected http return code 200, received $ncode"
-	    }
-	    set status [::http::status $token]
-	    if {$status == "ok"} {
-		set data [::http::data $token]
-		regexp {Id: tkcon.tcl,v (\d+\.\d+)} $data -> rcsVersion
-		regexp {VERSION\s+"(\d+\.\d+[^\"]*)"} $data -> tkconVersion
-		if {(![info exists rcsVersion] || ![info exists tkconVersion])
-		    && [tk_messageBox -type yesno -icon warning \
-			    -parent $PRIV(root) \
-			    -title "Invalid tkcon source code" \
-			    -message "Source code retrieved does not appear\
-			to be correct.\nContinue with save to \"$file\"?"] \
-			== "no"} {
-		    return "invalid tkcon source code retrieved"
-		}
-		set fid [open $file w]
-		# We don't want newline mode to change
-		fconfigure $fid -translation binary
-		puts -nonewline $fid $data
-		close $fid
-	    } else {
-		return "expected http status ok, received $status"
-	    }
-	} err]
-	::http::cleanup $token
-	if {$code == 2} {
-	    tk_messageBox -type ok -icon info -parent $PRIV(root) \
-		    -title "Failed to retrieve source" \
-		    -message "Failed to retrieve latest tkcon source:\n$err\n$PRIV(HEADURL)"
-	} elseif {$code} {
-	    return -code error $err
-	} else {
-	    if {![info exists rcsVersion]}   { set rcsVersion   "UNKNOWN" }
-	    if {![info exists tkconVersion]} { set tkconVersion "UNKNOWN" }
-	    if {[tk_messageBox -type yesno -icon info -parent $PRIV(root) \
-		    -title "Retrieved tkcon v$tkconVersion, RCS $rcsVersion" \
-		    -message "Successfully retrieved tkcon v$tkconVersion,\
-		    RCS $rcsVersion.  Shall I resource (not restart) this\
-		    version now?"] == "yes"} {
-		set PRIV(SCRIPT) $file
-		set PRIV(version) $tkconVersion.$rcsVersion
-		::tkcon::Resource
-	    }
-	}
-    }
 }
 
 ## 'send' package that handles multiple communication variants
