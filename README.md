@@ -5,7 +5,7 @@
 MIT (or BSD) license (see tkcon's copyright)
 
 ## Supported platforms
-Developed on Debian 8. Also seem to work on Windows 7 with ActiveTcl 8.6
+**clcon** is being developed on Debian 8 at x86 processor. Also it is sometimes tested on 32-bit Windows 7 with ActiveTcl 8.6 and seem to work too.
 
 ## Current state
 - REPL
