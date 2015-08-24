@@ -693,6 +693,34 @@ proc ::tkcon::LispFindDefinitionInner str {
 
 
 
+# Similar to ::tkcon::ExpandLispSymbol
+# FIXME - we need call compilation asynchronously, handle other results,
+# print code context (from lisp)
+# handle query to load failed compilation
+proc ::tkcon::CompileLispFileTmp filename {
+    variable PRIV
+
+    set Quoted [QuoteLispObjToString $filename]
+    set LispCmd "(clcon-server::compile-file-for-tcl $Quoted nil)"
+   
+    set SwankReply [::tkcon::EvalInSwankSync $LispCmd]
+    
+    putd "EvalInSwankSync returned $SwankReply"
+    putd "car swankreply = [::mprs::Car $SwankReply]"
+  
+    if {[::mprs::Car $SwankReply] eq ":ok"} {
+        # what about code injection? FIXME safety
+        set TclCode "set w $PRIV(console); [::mprs::Unleash [::mprs::Cadr $SwankReply]]"
+        putd "I will now eval code $TclCode"
+        eval $TclCode
+        $PRIV(console) see end
+    } else {
+        putd "ListDefinitions: I don't know what is [::mprs::Car $SwankReply]"
+    }
+}
+
+
+
 ## ::tkcon::ExpandLispSymbol (currently known as ExpandProcname)
 # - expand a lisp symbol based on $str
 # ARGS:	str	- partial proc name to expand

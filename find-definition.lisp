@@ -39,6 +39,7 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
     (t nil)))  
 
 (defun write-one-dspec-and-location (dspec location stream)
+  "It is also used by compilation-error browse, some arbitrary string is passed instead of dspec. Beware!"
   (let ((printed-dspec (prin1-to-string dspec)))
     (multiple-value-bind (file position)
         (parse-location-into-file-and-pos location)
