@@ -4524,7 +4524,11 @@ proc ::tkcon::Bindings {} {
     bind $PRIV(root) <<TkCon_PrevTab>>	{ ::tkcon::GotoTab -1 ; break }
     bind $PRIV(root) <<TkCon_Close>>	{ ::tkcon::Destroy }
     bind $PRIV(root) <<TkCon_About>>	{ ::tkcon::About }
+
     bind $PRIV(root) <<TkCon_Find>>	{ ::tkcon::FindBox $::tkcon::PRIV(console) }
+    bind $PRIV(root) <Control-Key-f>	{ ::tkcon::FindBox $::tkcon::PRIV(console) }
+    bind $PRIV(root) <Control-Key-Cyrillic_a>	{ ::tkcon::FindBox $::tkcon::PRIV(console) }
+    
     bind $PRIV(root) <<TkCon_Slave>>	{
 	::tkcon::Attach {}
 	::tkcon::RePrompt "\n" [::tkcon::CmdGet $::tkcon::PRIV(console)]
@@ -5066,6 +5070,10 @@ proc ::tkcon::Insert {w s} {
     $w see insert
 }
 
+proc ::tkcon:BeginningOfLispSymbolRegexp {} {
+    "\[^\\\\\]\[\[ \t\n\r\\\(\",@\]"
+}
+
 ## ::tkcon::Expand - 
 # ARGS:	w	- text widget in which to expand str
 # 	type	- type of expansion (path / proc / variable)
@@ -5080,7 +5088,7 @@ proc ::tkcon::Expand {w {type ""}} {
     switch -glob $type {
         li* {
             # we might also want to pass current line to lisp 
-            set exp "\[^\\\\\]\[\[ \t\n\r\\\(\",@\]"
+            set exp BeginningOfLispSymbolRegexp
         }
         default { set exp "\[^\\\\\]\[\[ \t\n\r\\\{\"$\]" }
     }
