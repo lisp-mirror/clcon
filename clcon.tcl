@@ -213,8 +213,9 @@ proc ::tkcon::Init {args} {
 
         # does not work with SWANK
 	resultfilter	{}
-        
-	exec		slave
+
+        # there is also 'exec' option equal to 'slave', but now we work
+        # in main interpreter and it is specified ~70 loc below
     } {
 	if {![info exists OPT($key)]} { set OPT($key) $default }
     }
@@ -282,7 +283,11 @@ proc ::tkcon::Init {args} {
     ## You can set this from the command line with -exec ""
     ## A side effect is that all tkcon command line args will be used
     ## by the first console only.
-    #set OPT(exec) {}
+    set OPT(exec) {}
+
+    ## To work in slave mode (tkcon default) run
+    ## clcon with arg -exec slave
+    ## But this will break SWANK client. Bdden
 
     if {$PRIV(WWW)} {
 	lappend PRIV(slavealias) history
