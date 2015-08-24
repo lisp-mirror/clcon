@@ -1540,7 +1540,7 @@ proc ::tkcon::About {} {
 	wm transient $w $PRIV(root)
 	wm group $w $PRIV(root)
 	catch {wm attributes $w -type dialog}
-	wm title $w "About tkcon v$PRIV(version)"
+	wm title $w "About clcon v$PRIV(version)"
 	wm resizable $w 0 0
 	button $w.b -text Dismiss -command [list wm withdraw $w]
 	text $w.text -height 9 -width 60 \
@@ -1553,10 +1553,11 @@ proc ::tkcon::About {} {
 	$w.text tag config title -justify center -font {Courier -18 bold}
 	# strip down the RCS info displayed in the about box
 	regexp {,v ([0-9\./: ]*)} $PRIV(RCS) -> RCS
-	$w.text insert 1.0 "About tkcon v$PRIV(version)" title \
-		"\n\nCopyright 1995-2002 Jeffrey Hobbs, $PRIV(email)\
+	$w.text insert 1.0 "About clcon v$PRIV(version)" title \
+		"\n\nCopyright 1995-2002 Jeffrey Hobbs \
+		\n\nCopyright 2015 Denis Budyak \
 		\nRelease Info: v$PRIV(version), CVS v$RCS\
-		\nDocumentation available at:\n$PRIV(docs)\
+		\nDocumentation and source available at:\n$PRIV(docs)\
 		\nUsing: Tcl v$tcl_patchLevel / Tk v$tk_patchLevel" center
 	$w.text config -state disabled
 	bind $w <Escape> [list destroy $w]
@@ -1592,8 +1593,8 @@ proc ::tkcon::InitMenus {w title} {
 	eval [list $PRIV(popup).[string tolower $m] entryconfigure $l] $args
     }
 
-    foreach m [list File Console Edit Interp Prefs History Help] {
- 	set l [string tolower $m]
+    foreach m [list 1.File 2.Console 3.Edit 4.Interp 5.Prefs 6.History 7.Help] {
+ 	set l [string tolower [string range $m 2 end]]
  	MenuButton $w $m $l
  	$w.pop add cascade -label $m -underline 0 -menu $w.pop.$l
     }
@@ -1629,24 +1630,30 @@ proc ::tkcon::InitMenus {w title} {
     foreach m [list [menu $w.console -disabledfore $COLOR(disabled)] \
 	    [menu $w.pop.console -disabledfore $COLOR(disabled)]] {
 	$m add command -label "$title Console"	-state disabled
-	$m add command -label "New Console" -underline 0 -accel $PRIV(ACC)N \
-		-command ::tkcon::New
-	$m add command -label "New Tab" -underline 4 -accel $PRIV(ACC)T \
-		-command ::tkcon::NewTab
-	$m add command -label "Delete Tab" -underline 0 \
-		-command ::tkcon::DeleteTab -state disabled
-	$m add command -label "Close Console" -underline 0 -accel $PRIV(ACC)w \
-		-command ::tkcon::Destroy
-	$m add command -label "Clear Console" -underline 1 -accel Ctrl-l \
-		-command { clear; ::tkcon::Prompt }
-	$m add separator
+
         $m add command -label "1.Attach to SWANK" -underline 0 -command "::tkcon::OuterNewSwank"
         $m add command -label "2.Disconnect from SWANK" -underline 0 -command "::tkcon::DisconnectFromSwank"
-	$m add cascade -label "Attach To ..." -underline 0 -menu $m.attach
+	$m add command -label "3.Clear Console" -underline 0 -command { clear; ::tkcon::Prompt }
 
-	## Attach Console Menu
+	$m add separator
+        
+	$m add cascade -label "Tkcon console menu (defunct) ..." -underline 0 -menu $m.tkcon_console
+	set su [menu $m.tkcon_console -disabledforeground $COLOR(disabled)]
+        
+	$su add command -label "New Console" -underline 0 -accel $PRIV(ACC)N \
+            -command ::tkcon::New
+	$su add command -label "New Tab" -underline 4 -accel $PRIV(ACC)T \
+            -command ::tkcon::NewTab
+	$su add command -label "Delete Tab" -underline 0 \
+            -command ::tkcon::DeleteTab -state disabled
+	$su add command -label "Close Console" -underline 0 -accel $PRIV(ACC)w \
+            -command ::tkcon::Destroy
+
+	$m add cascade -label "Attach To ... (defunct)" -underline 0 -menu $su.attach
+
+	## Attach Menu
 	##
-	set sub [menu $m.attach -disabledforeground $COLOR(disabled)]
+	set sub [menu $su.attach -disabledforeground $COLOR(disabled)]
 	$sub add cascade -label "Interpreter" -underline 0 -menu $sub.apps
 	$sub add cascade -label "Namespace"   -underline 0 -menu $sub.name
 
@@ -1687,14 +1694,14 @@ proc ::tkcon::InitMenus {w title} {
 		 -command [list ::tkcon::Paste $text]
 	$m add separator
 	$m add command -label "Find"  -underline 0 -accel $PRIV(ACC)F \
-		-command [list ::tkcon::FindBox $text]
+            -command [list ::tkcon::FindBox $text]
     }
 
     ## Interp Menu
     ##
     foreach m [list $w.interp $w.pop.interp] {
 	menu $m -disabledforeground $COLOR(disabled) \
-		-postcommand [list ::tkcon::InterpMenu $m]
+            -postcommand [list ::tkcon::InterpMenu $m]
     }
 
     ## Prefs Menu
@@ -1808,6 +1815,9 @@ proc ::tkcon::InterpMenu w {
 
     if {![winfo exists $w]} return
     $w delete 0 end
+
+    $w add command -label "This menu is defunct!!!" -state disabled
+
     foreach {app type} [Attach] break
     $w add command -label "[string toupper $type]: $app" -state disabled
     if {($OPT(nontcl) && $type eq "interp") || $PRIV(deadapp)} {
@@ -1816,7 +1826,7 @@ proc ::tkcon::InterpMenu w {
 	$w add command -state disabled -label "dead or non-Tcl interps"
 	return
     }
-
+   
     ## Show Last Error
     ##
     $w add separator
@@ -1827,13 +1837,17 @@ proc ::tkcon::InterpMenu w {
     ##
     $w add separator
     $w add command -label "Manage Packages" -underline 0 \
-	-command [list ::tkcon::InterpPkgs $app $type]
+	-command [list ::tkcon::InterpPkgs $app $type] \
+        -state disabled
+    # state disabled added by budden
 
     ## Init Interp
     ##
     $w add separator
     $w add command -label "Send tkcon Commands" \
-	    -command [list ::tkcon::InitInterp $app $type]
+        -command [list ::tkcon::InitInterp $app $type] \
+        -state disabled
+    # state disabled added by budden
 }
 
 ## ::tkcon::PkgMenu - fill in  in the applications sub-menu
