@@ -65,7 +65,7 @@ You can also change this option in runtime from 'Prefs' menu. Changed value is n
 
 ```-swank-ip ADDR``` - assign an alternate IP address for swank server (default is 127.0.0.1).
 
-```-swank-port NNNN``` - assign alternate port for swank connection. Do not connect to the port use use for SLIME/EMACS interaction. 
+```-swank-port NNNN``` - assign alternate port for swank connection (default is 4009). Do not connect to the port use use for SLIME/EMACS interaction. 
 
 ## Connecting/disconnecting to/from SWANK
 Use two items on Console menubar item
