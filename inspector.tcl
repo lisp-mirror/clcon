@@ -109,10 +109,12 @@ proc ::insp::InsertDataToShowOrBeep { w EventAsList } {
     set ReplyAsDict [::insp::ParseReturnOk $EventAsList]
     set HaveTitle [dict exists $ReplyAsDict :title]
     if { $HaveTitle } {
-        set InspectedTitle [dict get $ReplyAsDict :title]
+        set InspectedTitle [::mprs::Unleash [dict get $ReplyAsDict :title]]
         set InspectedContentU [::mprs::Unleash [dict get $ReplyAsDict :content]]
         set InspectedData [::mprs::Unleash [lindex $InspectedContentU 0]]
-        set InspectedMagicNumbers [lindex $InspectedContentU 1 end]
+        set InspectedMagicNumbers [lmap x [lrange $InspectedContentU 1 end] {::mprs::Unleash $x} ]
+        putd $InspectedMagicNumbers
+        set ObjectTooLarge [expr { [lindex $InspectedMagicNumbers 0] > [lindex $InspectedMagicNumbers 2] } ]
     } else {
         set InspectedTitle "<no data>"
         set InspectedData ""
@@ -144,6 +146,11 @@ proc ::insp::InsertDataToShowOrBeep { w EventAsList } {
         } else {
             $b insert end [::mprs::Unleash $s]
         }
+    }
+    if { $ObjectTooLarge } {
+        set tag [::tkcon::UniqueTag $b]
+        $b tag configure $tag -foreground Red
+        $b insert end {[ Object too large to inspect ]} $tag
     }
 }
 

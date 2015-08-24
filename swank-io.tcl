@@ -923,10 +923,10 @@ proc ::tkcon::WriteActiveText {w text index code} {
 
 # Passive text
 # Do we really need unique tag here? FIXME (add some more tags like stderr)
-proc ::tkcon::WritePassiveText {w text} {
+proc ::tkcon::WritePassiveText {w text index} {
     set tag [UniqueTag $w]
     $w tag configure $tag -foreground grey
-    $w insert output $text\n [list stdout $tag]
+    $w insert $index $text\n [list stdout $tag]
 }
 
 
@@ -940,15 +940,9 @@ proc ::tkcon::EditFileAtOffset {filename offset} {
 
 ## ::tkcon::LispFindDefinition - clone of ::tkcon::Expand - 
 # ARGS:	w	- text widget in which to expand str
-# Calls:	::tkcon::Expand(Pathname|Procname|Variable)
-# Outputs:	The string to match is expanded to the longest possible match.
-#		If ::tkcon::OPT(showmultiple) is non-zero and the user longest
-#		match equaled the string to expand, then all possible matches
-#		are output to stdout.  Triggers bell if no matches are found.
-# Returns:	number of matches found
 ## 
-proc ::tkcon::LispFindDefinition {w {type ""}} {
-    set exp "\[^\\\\\]\[\[ \t\n\r\\\{\"$\]"
+proc ::tkcon::LispFindDefinition {w} {
+    set exp BeginningOfLispSymbolRegexp
     set tmp [$w search -backwards -regexp $exp insert-1c limit-1c]
     if {[string compare {} $tmp]} {append tmp +2c} else {set tmp limit}
     set str [$w get $tmp insert]
