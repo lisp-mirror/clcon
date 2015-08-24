@@ -64,8 +64,8 @@ proc ::insp::InitInspector { LispExpr } {
 }
 
 
-proc ::clconcmd::insp {arg} {
-    tkcon main ::insp::SwankInspect $arg
+proc ::clconcmd::insp* {} {
+    tkcon main ::insp::SwankInspect "*"
 }
 
 
