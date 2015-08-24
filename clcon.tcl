@@ -198,7 +198,6 @@ proc ::tkcon::Init {args} {
         # does not work with SWANK
 	maxlinelen	0
         
-	calcmode	0
 	cols		80
 	debugPrompt	{(level \#$level) debug [history nextid] > }
 	dead		{}
@@ -216,7 +215,6 @@ proc ::tkcon::Init {args} {
 	prompt1		{ignore this, it's set below}
 	rows		20
 	scrollypos	right
-	showmenu	1
 	showmultiple	1
 	showstatusbar	1
 	slaveeval	{}
@@ -772,9 +770,7 @@ proc ::tkcon::InitUI {title} {
     InitMenus $PRIV(menubar) $title
     Bindings
 
-    if {$OPT(showmenu)} {
-	$root configure -menu $PRIV(menubar)
-    }
+    $root configure -menu $PRIV(menubar)
 
     grid $con  -row 1 -column 1 -sticky news
     grid $sy   -row 1 -column [expr {$OPT(scrollypos)=="left"?0:2}] -sticky ns
@@ -1099,7 +1095,6 @@ proc ::tkcon::EvalCmd {w cmd} {
 	if {$OPT(subhistory)} {
 	    set ev [EvalSlave history nextid]
 	    incr ev -1
-	    ## FIX: calcmode doesn't work with requesting history events
 	    if {$cmd eq "!!"} {
 		set code [catch {EvalSlave history event $ev} cmd]
 		if {!$code} {$w insert output $cmd\n stdin}
@@ -1116,11 +1111,7 @@ proc ::tkcon::EvalCmd {w cmd} {
 		    regsub -all -- $old $cmd $new cmd
 		    $w insert output $cmd\n stdin
 		}
-	    } elseif {$OPT(calcmode) && ![catch {expr $cmd} err]} {
-		AddSlaveHistory $cmd
-		set cmd $err
-		set code -1
-	    }
+	    } 
 	}
 	if {$code} {
 	    $w insert output $cmd\n stderr
@@ -1709,29 +1700,12 @@ proc ::tkcon::InitMenus {w title} {
     ## Prefs Menu
     ##
     foreach m [list [menu $w.prefs] [menu $w.pop.prefs]] {
-	$m add check -label "Brace Highlighting" \
-		-underline 0 -variable ::tkcon::OPT(lightbrace)
-	$m add check -label "Command Highlighting" \
-		-underline 0 -variable ::tkcon::OPT(lightcmd)
-	$m add check -label "History Substitution" \
-		-underline 0 -variable ::tkcon::OPT(subhistory)
-	$m add check -label "Hot Errors" \
-		-underline 4 -variable ::tkcon::OPT(hoterrors)
-	$m add check -label "Non-Tcl Attachments" \
+	$m add check -label "1.Putd-enabled" \
+		-underline 0 -variable ::tkcon::OPT(putd-enabled)
+	$m add check -label "2.Non-Tcl Attachments (defunct)" \
 		-underline 0 -variable ::tkcon::OPT(nontcl)
-	$m add check -label "Calculator Mode" \
-		-underline 1 -variable ::tkcon::OPT(calcmode)
-	$m add check -label "Show Multiple Matches" \
+	$m add check -label "3.Show Multiple Matches" \
 		-underline 0 -variable ::tkcon::OPT(showmultiple)
-	if {!$PRIV(AQUA)} {
-	    $m add check -label "Show Menubar" \
-		-underline 5 -variable ::tkcon::OPT(showmenu) \
-		-command {
-		    $::tkcon::PRIV(root) configure \
-			-menu [expr {$::tkcon::OPT(showmenu) ?
-				     $::tkcon::PRIV(menubar) : {}}]
-		}
-	}
 	$m add check -label "Show Statusbar" \
 	    -underline 5 -variable ::tkcon::OPT(showstatusbar) \
 	    -command {
