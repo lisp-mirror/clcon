@@ -61,6 +61,8 @@ New options:
 
 ```-putd-enabled 1``` - enable printing lots of debug messages. ```-putd-enabled 0``` - to disable (default).
 
+You can also change this option in runtime from 'Prefs' menu. Changed value is not saved for future sessions. 
+
 ```-swank-ip ADDR``` - assign an alternate IP address for swank server (default is 127.0.0.1).
 
 ```-swank-port NNNN``` - assign alternate port for swank connection. Do not connect to the port use use for SLIME/EMACS interaction. 
