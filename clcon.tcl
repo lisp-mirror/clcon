@@ -558,7 +558,8 @@ proc ::tkcon::InitSlave {slave {slaveargs {}} {slaveargv0 {}}} {
     }
     if {![interp exists $slave]} { interp create $slave }
 
-    interp eval $slave "proc ::CurIntPath {puts} { set result $slave \n if { \$puts ne {} } {             puts  \"CurIntPath = \$result\ (\$puts)\" } \n return \$result }"
+    #interp eval $slave "proc ::CurIntPath {puts} { set result $slave \n if { \$puts ne {} } {             puts  \"CurIntPath = \$result\ (\$puts)\" } \n return \$result }"
+    interp eval $slave "proc ::CurIntPath {puts} {}"
     interp eval $slave "::CurIntPath {::tkcon::InitSlave-slave}"
    
     if {[interp eval $slave info command source] == ""} {
@@ -573,8 +574,8 @@ proc ::tkcon::InitSlave {slave {slaveargs {}} {slaveargv0 {}}} {
 	interp eval $slave { catch unknown }
     }
 
-    set cip [interp eval $slave {::CurIntPath {}}]
-    puts "$cip (aa)"
+    #set cip [interp eval $slave {::CurIntPath {}}]
+    #puts "$cip (aa)"
     
     # This will likely be overridden to call DeleteTab where possible
     $slave alias exit exit
@@ -2585,7 +2586,8 @@ proc ::tkcon::MainInit {} {
 	}
 	set interp [Slave $slave [list interp create Slave$i]]
 
-        interp eval $interp "proc ::CurIntPath {tag} { set result $interp \n if { \$tag ne {} } {             puts \"CurIntPath = \$result\ (\$tag)\" } \n return \$result }"
+        #interp eval $interp "proc ::CurIntPath {tag} { set result $interp \n if { \$tag ne {} } {             puts \"CurIntPath = \$result\ (\$tag)\" } \n return \$result }"
+        interp eval $slave "proc ::CurIntPath {puts} {}"
         interp eval $interp "::CurIntPath {Created at GetSlave}"
         
 	return $interp
@@ -5866,13 +5868,8 @@ proc ::tkcon::Resource {} {
     InitSlave $::tkcon::OPT(exec)
 }
 
-proc ::CurIntPath {puts} { set result {Source}
-    if { $puts ne {} } {
-        puts "CurIntPath = $result ($puts)"
-    }
-    return $result
-}
-
+#interp eval {} "proc ::CurIntPath {puts} { set result $slave \n if { \$puts ne {} } {             puts  \"CurIntPath = \$result\ (\$puts)\" } \n return \$result }"
+interp eval {} "proc ::CurIntPath {puts} { }"
 
 ## Initialize only if we haven't yet, and do other stuff that prepares to
 ## run.  It only actually inits (and runs) tkcon if it is the main script.
