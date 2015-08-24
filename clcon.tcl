@@ -260,7 +260,7 @@ proc ::tkcon::Init {args} {
 	slaveprocs	{
 	    alias clear dir dump echo idebug lremove
 	    tkcon_puts tkcon_gets observe observe_var unalias which what
-            ::clconcmd::insp ::clconcmd::tcsoh 
+            ::clconcmd::insp* ::clconcmd::tcsoh 
 	}
 	RCS		{RCS: @(#) $Id: tkcon.tcl,v 1.120 2013/01/23 01:19:51 hobbs Exp $}
 	HEADURL		{https://bitbucket.org/budden/clcon}
