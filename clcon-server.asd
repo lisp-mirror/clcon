@@ -15,4 +15,5 @@
                (:file "find-definition")
                (:file "swank-patch")
                (:file "swank-inspector" :description "inspector backend pieces")
+               (:file "swank-compilation-errors")
                ))
