@@ -281,7 +281,7 @@ proc PrepareGui2 {w} {
 
     # combine the entire widget
     pack $w.title -side top -fill x 
-    pack $w.body -fill both
+    pack $w.body -fill both -expand 1
     
     wm deiconify $w
     focus $w.body.text
