@@ -1,11 +1,12 @@
 # README #
 
 ## What's that
-**clcon** is an attempt to adapt [tkcon](http://tkcon.sourceforge.net/) to Common Lisp (communication via SWANK)
-MIT (or BSD) license (see tkcon's copyright)
+**clcon** is a cross-platform Common Lisp IDE under construction. Supported platforms: 
 
-## Supported platforms
-**clcon** is being developed on Debian 8 at x86 processor. Also it is sometimes tested on 32-bit Windows 7 with ActiveTcl 8.6 and seem to work too.
+- Debian 8 (32 bit) at x86 processor
+- Windows 7 (32 bit)
+
+Code is completely portable and should run on other platforms too. 
 
 ## Screenshots
 [See here](https://bitbucket.org/budden/clcon/wiki/Screenshots)
@@ -19,11 +20,12 @@ MIT (or BSD) license (see tkcon's copyright)
 - you can still run tcl code with special "escapes"
 
 ## Installation and startup 
-First of all you need fresh versions of SBCL and tcl/tk. 
+You need:
+- fresh versions of [SBCL](http://www.sbcl.org/platform-table.html) 
+- fresh version of tcl/tk. On Windows, you can download tcl/tk from [Activestate](http://www.activestate.com/activetcl/downloads). On Debian, use your package manager to download tk8.6 . 
+- [quicklisp](https://www.quicklisp.org/beta/) set up at your SBCL
 
-Also you need a [quicklisp](https://www.quicklisp.org/beta/)
-
-Next, install dependencies. 
+Next, start your SBCL and install dependencies. 
 
 ```
 #!lisp
@@ -33,12 +35,13 @@ Next, install dependencies.
 
 To load server-side code to lisp, use
 ```
+#!lisp
 (push "path/to/clcon-server-source/" asdf:*central-registry*)
 (asdf:load-system :clcon-server)
 (swank:create-server :port 4009 :dont-close t)
 ```
 
-As you have lisp running, at your shell prompt or "command line prompt" on windows start IDE
+After that, start IDE
 ```
 wish clcon.tcl
 ``` 
@@ -59,7 +62,7 @@ or
 (dotimes (i 10) (print i) (sleep 0.5))
 ```
 
-at the console and press Return. Expression should be evaluated on lisp side correctly
+at the IDE's console and press Return. Expression should be evaluated on lisp side correctly
 and result should be printed at clcon. 
 
 cl-user package is assumed for all interaction. If you change package, consequences are undefined.
