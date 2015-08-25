@@ -41,8 +41,9 @@ Extracts data from leashed string. Lisp object converted to tcl as follows:
 - **symbol** - a string package::name (package is "nil" for symbols without home package, no case transformation); avoid symbols like ```|a b|```
 - **number** - printed lisp representation
 - **list** - tcl list of leashed objects. E.g. 
-```set nth2 [lindex [::mprs::Unleash $LeashedLispList] 2]```
-```puts [::mprs::Consp $nth2]``` 
+
+```set nth2 [lindex [::mprs::Unleash $LeashedLispList] 2]
+puts [::mprs::Consp $nth2]``` 
 
 will print 1 if (nth LispList 2) is a cons. 
 
@@ -62,9 +63,9 @@ When I need to call lisp from tcl, I just use tcl string-handling procedures to 
 ## tcl functions ##
 ###::tkcon::QuoteLispToString###
 E.g. example from find definition machinery: 
-```set Quoted [::tkcon::QuoteLispObjToString $str]```
-```set LispCmd "(cl:progn (clcon-server:server-lookup-definition $Quoted))"```
-```set SwankReply [::tkcon::EvalInSwankSync $LispCmd]```
+`set Quoted [::tkcon::QuoteLispObjToString $str]
+set LispCmd "(cl:progn (clcon-server:server-lookup-definition $Quoted))"
+set SwankReply [::tkcon::EvalInSwankSync $LispCmd]`
 
 QuoteLispToString was really tested only for passing symbol names, beware!
 
