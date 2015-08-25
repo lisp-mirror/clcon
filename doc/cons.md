@@ -6,7 +6,7 @@ Swank/Slime use some subset of sexp format to communicate messages to each other
 
 Inside the messages, all user-typed data and printed results are encoded as strings. Here we consider passing messages themselves, not user data. 
 
-To deal with that data in tcl, we encode it to string on the lisp side. As we have that string in tcl, we can: 
+To deal with that data in tcl, we encode it to string on the lisp side. As we have that so-called "leashed" string in tcl, we can: 
 
 - enquery lisp type of the data
 - extract the data in a string form (type information is lost)
