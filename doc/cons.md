@@ -1,62 +1,70 @@
-# Serializing lisp objects to tcl and vice versa #
+# Serializing lisp objects to tcl and vice versa (beta) #
 
 ## Concepts 
 
-Swank/Slime use lisp format to communicate to each other. Of course, user-typed commands and results are encoded into lisp strings, but communication protocol itself is based on (limited subset of) s-expressions. So printed representation of conses is passed through sockets. See \*slime-events\* in EMACS to see the data. To deal with that data in clcon, we need to be able to handle some sorts of lisp data in tcl. 
+Swank/Slime use some subset of sexp format to communicate messages to each other. See \*slime-events\* EMACS buffer to see the data. 
 
-When I need to pass lisp data to tcl, I encode it as strings with type tags. Having that string on the tcl side, you can:  
+Inside the messages, all user-typed data and printed results are encoded as strings. Here we consider passing messages themselves, not user data. 
 
-i) learn lisp type of data
-ii) extract data in a string form
+To deal with that data in tcl, we encode it to string on the lisp side. As we have that string in tcl, we can: 
 
-After you extracted data, you can not know what type it was.  So when you code working with lisp data in tcl, check type before extracting data or rely on the knowledge of the format of lisp data you have received. 
+- enquery lisp type of the data
+- extract the data in a string form (type information is lost)
 
-To pass lisp data from tcl to lisp, you can just use tcl strings, but you must quote strings appropriately to avoid problems with spaces and other special characters. 
+To pass lisp data from tcl to lisp, we use strings and add special quoting for user-entered data.
 
-## Warning
-API described was not tested thoroughly. We usually assume that we get "normal" things, e.g. that symbol names do not contain spaces, dollar signs, sharpsigns etc. Some problems can occur sometimes. We definitely need some more testing. 
+## Lisp functions ##
 
-## Dictionary 
-[cons.tcl](../cons.tcl) contains functions to work with lisp data. They are (as the time of writing) in ::mprs namespace. Lisp objects initially come in in a "leashed" form. The form contains type type tag so you can now which lisp type it represents.
+###clcon-server::my-tcl-form###
+Encodes lisp data into a "leashed" string. 
+
+## Tcl functions ##
+Source: ([cons.tcl](../cons.tcl)). 
+
+###::mprs::Consp###
 ```::mprs::Consp $LeashedDataFromLisp``` - check if the object is a cons
-If it is not a cons, extract lisp type tag with 
-```::mprs::TypeTag $LeashedDataFromLisp```
-Tags are encoded in lisp function ```clcon-server::my-tcl-form``` (see it). As the time of writing,
-known tags are:
-```:``` - keyword
-```y``` - other symbol 
-```s``` - string
-```n``` - number
 
-As you found a type, you can extract lisp data with 
-```[::mprs::Unleash $LeashedStringFromLisp]```
-Also there is such sugar as ::mprs::Car which returns leashed first element of a list. 
-Rules of converting to string are the following:
+###::mprs::TypeTag###
+Extract type tag of lisp atom. 
+Tags:
+- ```:``` - keyword
+- ```y``` - other symbol 
+- ```s``` - string
+- ```n``` - number
 
- - **string** will be returned as tcl string, which can be safely passed as a single argument to tcl functions (does not disintegrate into list when you use $x)
- - **keywords** - as downcased name (this is SWANK/SLIME's tradition). If you are sure that your leashed lisp string is a **keyword**, you can omit call to ```Unleash``` alltogether - Unleash indeed returns keywords "as is".
- - **symbol** - as a string package::name (package is "nil" for symbols without home package, no case transformation), 
- - **numbers** as their printed lisp representation
- 
+###::mprs::Unleash###
+Extracts data from leashed string. Lisp object converted to tcl as follows:
+- **string** will turn into a tcl string, which can be safely passed as a single argument to tcl functions (does not disintegrate into list when you use $x)
+- **keyword** - downcased keyword (this is SWANK/SLIME's tradition). If you are sure that your leashed lisp string represents a **keyword**, you can omit call to ```Unleash``` alltogether - Unleash indeed returns keywords "as is".
+- **symbol** - a string package::name (package is "nil" for symbols without home package, no case transformation); avoid symbols like ```|a b|```
+- **number** - printed lisp representation
+- **list** - tcl list of leashed objects. E.g. 
+```set nth2 [lindex [::mprs::Unleash $LeashedLispList] 2]
+puts [::mprs::Consp $nth2]``` 
+
+will print 1 if (nth LispList 2) is a cons. 
+- **conses with atomic cdrs* - just don't try them. *FIXME we should assert it in clcon-server::my-tcl-form.* 
+- **other objects* - encoding error 
+
+###::mprs::Car###
+Sugar. Returns in a leashed form first element of unleashed list. E.g. ```puts [::mprs::Consp [::mprs::Car $MyLeashedLispList]]``` will print 1 if (car lisp-list) is a cons. 
+
+###::mprs::UnleashListOfAtoms tcl###
+Sugar. Unleashes the list and all its elements. Useful when you have list of symbols or numbers.
 
 
-Avoid passing funny symbols with names like ```"a b"``` into tcl, this is untested and this can break your code. 
+# Serializing data from tcl to lisp #
+When I need to call lisp from tcl, I just use tcl string-handling procedures to form lisp expression. Search tcl source for 'EvalInSwank' pattern. User-entered data must be passed as a string. E.g. when we complete "defu", we must send "defu", not just *defu* . 
 
-List is decoded into tcl list of leashed objects. Use
-```[lindex [::lide::Unleash $LeashedLispList] 2]``` to extract (nth LispList 2).
-Extracted object is in a leashed form, so you can again learn its type and so on. Dotted pairs (cons with atomic cdr's) are unsopported. Consequences undefined if you try to encode it on lisp side.
-*FIXME we should check it in clcon-server::my-tcl-form.* 
-
-If you know that all elements of your list are atoms and you know their text contain no spaces, you can use
-```[::lide::UnleashListOfAtoms $LeashedListOfAtomsWithoutSpacesInside]```
-
-## Serializing data from tcl to lisp ##
-When I need to call lisp from tcl, I just use strings to form lisp expression. See uses of EvalSometimes lisp expects lisp data in string form. E.g. for completion we must send "partial-symbo-name", not just *partial-symbol-name* . For that cases I use ::tkcon::QuoteLispToString: 
-
+## tcl functions ##
+###::tkcon::QuoteLispToString###
+E.g. example from find definition machinery: 
 ```set Quoted [::tkcon::QuoteLispObjToString $str]
 set LispCmd "(cl:progn (clcon-server:server-lookup-definition $Quoted))"
 set SwankReply [::tkcon::EvalInSwankSync $LispCmd]```
 
-QuoteLispToString is not thoroughly tested for all types of lisp data, beware!
+QuoteLispToString was really tested only for passing symbol names, beware!
 
+## lisp functions ##
+None. Code must be sent in a form such that SWANK could read it.
 
