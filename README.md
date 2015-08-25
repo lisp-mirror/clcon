@@ -7,6 +7,9 @@ MIT (or BSD) license (see tkcon's copyright)
 ## Supported platforms
 **clcon** is being developed on Debian 8 at x86 processor. Also it is sometimes tested on 32-bit Windows 7 with ActiveTcl 8.6 and seem to work too.
 
+## Screenshots
+[See here](https://bitbucket.org/budden/clcon/wiki/Screenshots)
+
 ## Current state
 - REPL
 - completion for lisp symbols and filenames in Repl
@@ -57,6 +60,7 @@ cl-user package is assumed for all interaction. If you change package, consequen
 
 ## User manual 
 [User manual is here](https://bitbucket.org/budden/clcon/src/default/doc/user-manual.md)
+[Wiki](https://bitbucket.org/budden/clcon/wiki/) contains screenshots, but otherwise is not very useful. 
 
 ## Developers manual 
 [See here](https://bitbucket.org/budden/clcon/src/default/doc/)
