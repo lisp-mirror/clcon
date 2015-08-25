@@ -41,11 +41,11 @@ Extracts data from leashed string. Lisp object converted to tcl as follows:
 - **symbol** - a string package::name (package is "nil" for symbols without home package, no case transformation); avoid symbols like `|a b|`
 - **number** - printed lisp representation
 - **list** - tcl list of leashed objects. E.g. `puts [::mprs::Consp [lindex [::mprs::Unleash $LeashedLispList] 2]]` will print 1 if (nth LispList 2) is a cons. 
-- **conses with atomic cdrs* - just don't try them. *FIXME we should assert it in clcon-server::my-tcl-form.* 
-- **other objects* - encoding error 
+- **dotted list** - encoding error
+- **other objects** - encoding error 
 
 ###::mprs::Car###
-Sugar. Returns in a leashed form first element of unleashed list. E.g. `puts [::mprs::Consp [::mprs::Car $MyLeashedLispList]]` will print 1 if (car lisp-list) is a cons. 
+Sugar. Returns in a leashed form first element of unleashed list. E.g. `puts [::mprs::Consp [::mprs::Car $MyLeashedLispList]]` will print 1 if `(car lisp-list)` is a cons. 
 
 ###::mprs::UnleashListOfAtoms tcl###
 Sugar. Unleashes the list and all its elements. Useful when you have list of symbols or numbers.
