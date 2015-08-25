@@ -48,7 +48,7 @@ proc InsertNewText {i} {
 
 
 proc DoOnSelect {tbl text} {
-    InsertNewText [string cat $text [$tbl index active]]
+    InsertNewText [string cat "Active index: " [$tbl index active] "\nThis is a error detail window. It is filled with current error details as user browses through error list. Also there will be 'goto source' hotkey\n"  $text "\nFIXME sort of messages\n"]
     # return -code continue
 }
 
@@ -58,6 +58,7 @@ proc SwankBrowseErrors1 { EventAsList } {
     set w [PrepareGui1]
     EnsureTextView
     bind $w.tf.tbl <<TablelistSelect>> [list DoOnSelect $w.tf.tbl "TableListSelect fired"]
+    DoOnSelect $w.tf.tbl "Initial data"
     # InsertDataToShowOrBeep $w $EventAsList
 }
 
@@ -77,6 +78,7 @@ proc EnsureTextView {} {
     }
     
     toplevel $w
+    wm title $w "Error details"
     frame $w.body
     text $w.body.text
 
@@ -145,9 +147,9 @@ proc PrepareGui1 {} {
 
     $tbl columnconfigure 0 -wrap true  
     
-    $tbl insert end [list "blblblb"]
+    $tbl insert end [list "error 1"]
     $tbl insert end [list "one more error"]
-    $tbl insert end [list "sadfffffffffffffffffffffffffffffffffffffffffffffffffffjkljfds djsflklk"]    
+    $tbl insert end [list "such a long error: sadfffffffffffffffffffffffffffffffffffffffffffffffffffjkljfds djsflklk"]    
 
     set f1 $w.tf
     scrollbar $f1.sy -orient v -command [list $tbl yview]
