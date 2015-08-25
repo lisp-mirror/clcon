@@ -27,6 +27,7 @@ Source: ([cons.tcl](../cons.tcl)).
 ###::mprs::TypeTag###
 Extract type tag of lisp atom. 
 Tags:
+
 - ```:``` - keyword
 - ```y``` - other symbol 
 - ```s``` - string
@@ -34,6 +35,7 @@ Tags:
 
 ###::mprs::Unleash###
 Extracts data from leashed string. Lisp object converted to tcl as follows:
+
 - **string** will turn into a tcl string, which can be safely passed as a single argument to tcl functions (does not disintegrate into list when you use $x)
 - **keyword** - downcased keyword (this is SWANK/SLIME's tradition). If you are sure that your leashed lisp string represents a **keyword**, you can omit call to ```Unleash``` alltogether - Unleash indeed returns keywords "as is".
 - **symbol** - a string package::name (package is "nil" for symbols without home package, no case transformation); avoid symbols like ```|a b|```
@@ -43,6 +45,7 @@ Extracts data from leashed string. Lisp object converted to tcl as follows:
 puts [::mprs::Consp $nth2]``` 
 
 will print 1 if (nth LispList 2) is a cons. 
+
 - **conses with atomic cdrs* - just don't try them. *FIXME we should assert it in clcon-server::my-tcl-form.* 
 - **other objects* - encoding error 
 
