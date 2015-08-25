@@ -19,24 +19,30 @@ MIT (or BSD) license (see tkcon's copyright)
 - you can still run tcl code with special "escapes"
 
 ## Installation and startup 
-To test, start your lisp, load SWANK and do 
+First of all you need fresh versions of SBCL and tcl/tk. 
+
+Also you need a [quicklisp](https://www.quicklisp.org/beta/)
+
+Next, install dependencies. 
 
 ```
 #!lisp
+(ql:quickload :swank) ; don't need it if you have SLIME already
+(ql:quickload :cl-tk) 
+```
+
+To load server-side code to lisp, use
+```
+(push "path/to/clcon-server-source/" asdf:*central-registry*)
+(asdf:load-system :clcon-server)
 (swank:create-server :port 4009 :dont-close t)
 ```
 
-Then set up path to :clcon-server system and load it
-```
-(push "path/to/clcon-server/" asdf:*central-registry*)
-(asdf:load-system :clcon-server)
-```
-
-Then start 
+As you have lisp running, at your shell prompt or "command line prompt" on windows start IDE
 ```
 wish clcon.tcl
 ``` 
-on your shell (cmd on windows). It should connect automatically to swank. 
+It should start up the IDE and connect automatically to swank. 
 Then type in expression like 
 
 ```
@@ -60,6 +66,7 @@ cl-user package is assumed for all interaction. If you change package, consequen
 
 ## User manual 
 [User manual is here](https://bitbucket.org/budden/clcon/src/default/doc/user-manual.md)
+
 [Wiki](https://bitbucket.org/budden/clcon/wiki/) contains screenshots, but otherwise is not very useful. 
 
 ## Developers manual 
