@@ -21,6 +21,7 @@ Code is completely portable and should run on other platforms too.
 
 ## Installation and startup 
 You need:
+
 - fresh versions of [SBCL](http://www.sbcl.org/platform-table.html) 
 - fresh version of tcl/tk. On Windows, you can download tcl/tk from [Activestate](http://www.activestate.com/activetcl/downloads). On Debian, use your package manager to download tk8.6 . 
 - [quicklisp](https://www.quicklisp.org/beta/) set up at your SBCL
