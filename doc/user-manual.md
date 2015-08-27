@@ -26,6 +26,8 @@ Place dot (.) in the first position of the command to invoke named IDE command. 
 
 ```.tcsoh filename.tcl``` loads tcl file from directory where clcon.tcl script is located into main IDE tcl interpeter 
 
+```.help``` lists available IDE commands (no real help, sorry :) )
+
 Tcl escapes
 -----------
 Place two dots (..) to pass arbitrary tcl command to tcl interpreter. E.g. this will display a message box.
