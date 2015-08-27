@@ -337,6 +337,8 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
     if { $Head eq ":write-string" } {
         puts -nonewline [Unleash [lindex $EventAsList 1]]
         ::tkcon::SheduleCheckSWANKEventQueue
+    } elseif { $Head eq ":eval-no-wait" } {
+        eval [Unleash [lindex $EventAsList 1]]
     } elseif { [ContinuationExistsP $ContinuationId ] == 1 } {
         # we should have generated event which would evaluate continuation later.
         # but what we will do with sync events then?
