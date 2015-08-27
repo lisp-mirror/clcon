@@ -125,13 +125,18 @@ proc ::insp::InsertDataToShowOrBeep { w EventAsList } {
     set b [BodyTextOfInspector $w]
     
     # clear old data if it existed
-    [TitleOfInspector $w] delete 0.0 end
-    $b delete 0.0 end
+    [TitleOfInspector $w] RoDelete 0.0 end
+    $b RoDelete 0.0 end
     
     # and now insert what we have parsed
     
-    [TitleOfInspector $w] insert 0.0 "$InspectedTitle\nMagic numbers: $InspectedMagicNumbers"
+    [TitleOfInspector $w] RoInsert 0.0 "$InspectedTitle\nMagic numbers: $InspectedMagicNumbers"
 
+    if { $ObjectTooLarge } {
+        set tag [::tkcon::UniqueTag $b]
+        $b tag configure $tag -foreground Red
+        $b RoInsert end {[ Object too large to inspect ]} $tag
+    }
     foreach s $InspectedData {
         if {[::mprs::Consp $s] == 1} {
             set item [::mprs::Unleash $s]
@@ -141,16 +146,16 @@ proc ::insp::InsertDataToShowOrBeep { w EventAsList } {
                     end \
                     "insp::InspectNthPart $w [::mprs::Unleash [lindex $item 2]]"
             } else {
-                $b insert end "I don't know what is $s"
+                $b RoInsert end "I don't know what is $s"
             }
         } else {
-            $b insert end [::mprs::Unleash $s]
+            $b RoInsert end [::mprs::Unleash $s]
         }
     }
     if { $ObjectTooLarge } {
         set tag [::tkcon::UniqueTag $b]
         $b tag configure $tag -foreground Red
-        $b insert end {[ Object too large to inspect ]} $tag
+        $b RoInsert end {[ Object too large to inspect ]} $tag
     }
 }
 
@@ -226,6 +231,7 @@ proc ::insp::PrepareGui1 {} {
     frame $w.title
     # height 2 - for magic numbers
     text $w.title.text -height 2
+    InitTextReadonly $w.title.text 1
     scrollbar $w.title.sx -orient h -command [list $w.title.text xview]
     scrollbar $w.title.sy -orient v -command [list $w.title.text yview]
     ConfigureTextFonts $w.title.text
@@ -236,6 +242,7 @@ proc ::insp::PrepareGui1 {} {
 # make body frame    
     frame $w.body
     text $w.body.text
+    InitTextReadonly $w.body.text 1
 
     ConfigureTextFonts $w.body.text
     $w.body.text configure \
