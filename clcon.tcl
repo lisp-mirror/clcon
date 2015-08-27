@@ -2,9 +2,11 @@
 # -*- tcl -*-
 # \
 exec wish "$0" ${1+"$@"}
-
 #
 ## clcon.tcl
+## 
+## Common Lisp IDE
+## 
 ## A fork of tkcon.tcl
 ##
 ## Originally based off Brent Welch's Tcl Shell Widget
@@ -18,6 +20,7 @@ exec wish "$0" ${1+"$@"}
 ##
 ## source standard_disclaimer.tcl
 ## source bourbon_ware.tcl
+## 
 ## Copyright (c) Denis Budyak 2015
 ## 
 
@@ -29,6 +32,9 @@ exec wish "$0" ${1+"$@"}
 encoding system utf-8
 package require Tk 8.4
 
+## This is a way to add directory for wcb package
+lappend ::auto_path [file join [file dirname [info script]] "lib/wcb3.5"]
+package require wcb
 
 #source /s2/cl-tk/init-cl-tk-tcl-runtime.tcl
 
@@ -55,7 +61,6 @@ namespace eval ::clconcmd {
     # we need to run them in context of one console
 }
 
-
 # Initialize the ::tkcon namespace
 #
 namespace eval ::tkcon {
@@ -78,8 +83,7 @@ namespace eval ::tkcon {
     # 1 - enable unknown from tkcon, 0 - disable. Processed at startup only (I guess)
     # -1 - enable unknown completely in main interpreter and all slaves
     variable ENABLE_UNKNOWN -1
-    variable ScriptDirectory
-    set ScriptDirectory [file dirname [info script]]
+    
 
     # Continuations for sync events - hope we have no sync dialog yet - all sync dialogs
     # should be of the form:
@@ -115,11 +119,13 @@ proc putd arg1 {
     }
 }
 
+
+
 ## TkconSourceHere - buddens command to load file from the same dir where
 # clcon itself is located. Be sure to load into main interpreter when you need it:
 #
 proc TkconSourceHere { filename } {
-    variable ::tkcon::ScriptDirectory
+    set ScriptDirectory [file dirname [info script]]
     source [file join $ScriptDirectory $filename]
 }
 
