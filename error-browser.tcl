@@ -3,7 +3,17 @@
 
 package require tablelist
 
+# FIXME remove it when embedded into main app
+lappend ::auto_path [file join [file dirname [info script]] "lib/wcb3.5"]
+package require wcb
 
+proc WidgetParent { w } {
+    set lst [split $w .]
+    set sublist [lrange $lst 0 end-1]
+    puts "sublist = $sublist"
+    return [join $sublist .]
+}
+    
 catch {font create tkconfixed -family Courier -size -20}
 #	    $con configure -font tkconfixed
 
@@ -38,27 +48,64 @@ proc InsertDataToShowOrBeep { w EventAsList } {
 
 
 
-proc InsertNewText {i} {
+proc InsertNewText {idx} {
+    global data
     global tv
+           
+    set item [lindex $data $idx]
+    set MyCode [dict get $item {details-code}]
+
     EnsureTextView
     $tv.body.text delete 0.0 end
-    $tv.body.text insert end $i
+    $tv.body.text insert end $MyCode
     event generate $tv <<GoToTop>>
 }
 
 
-proc DoOnSelect {tbl text} {
-    InsertNewText [string cat "Active index: " [$tbl index active] "\nThis is a error detail window. It is filled with current error details as user browses through error list. Also there will be 'goto source' hotkey\n"  $text "\nFIXME sort of messages\n"]
-    # return -code continue
+proc DoOnSelect {tbl idx} {
+    after idle [InsertNewText $idx]
 }
 
+
+proc InitData { EventAsList } {
+    global data
+    
+    set data [list {title "error 1" details-code {
+                  $w RoInsert 0.0 "wow";
+                  $w RoInsert end "ura"
+              }} {title "error 2" details-code {
+                  $w RoInsert 0.0 "2222";
+              }}
+             ]
+
+}
+        
 # This is a contiuation assigned on reply on initialization request 
 proc SwankBrowseErrors1 { EventAsList } {
     global tv
+    global MyActiveIndex
+
+    InitData $EventAsList
+    
     set w [PrepareGui1]
+
+    set MyActiveIndex -1
+
     EnsureTextView
-    bind $w.tf.tbl <<TablelistSelect>> [list DoOnSelect $w.tf.tbl "TableListSelect fired"]
-    DoOnSelect $w.tf.tbl "Initial data"
+
+    set tbl $w.tf.tbl
+    
+    wcb::callback $tbl before activate DoOnSelect
+    
+#    bind $w.tf.tbl <<TablelistSelect>> [list DoOnSelect $w.tf.tbl]
+#    bind $w.tf.tbl <<TablelistCellUpdated>> [list DoOnSelect $w.tf.tbl]
+#    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
+
+    focus $tbl
+
+    FillHeaders $tbl
+    
+    DoOnSelect $tbl 0
     # InsertDataToShowOrBeep $w $EventAsList
 }
 
@@ -107,6 +154,15 @@ proc EnsureTextView {} {
 
 }
     
+# Fills browser from data 
+proc FillHeaders {tbl} {
+    global data
+    foreach item $data {
+        set title [dict get $item {title}]
+        $tbl insert end [list $title]
+    }
+}
+
 
 
 # Make toplevel widget and its children 
@@ -131,6 +187,9 @@ proc PrepareGui1 {} {
         set w ""
     }
 
+    # Widget root
+    set root $w 
+
 # --------------------------------- frames-----------------              
 
 # paned window
@@ -138,7 +197,7 @@ proc PrepareGui1 {} {
     frame $w.tf
     set tbl $w.tf.tbl
     
-    tablelist::tablelist $tbl -columns {20 "Compiler notes"} -stretch all -spacing 10
+    tablelist::tablelist $tbl -columns {20 ""} -stretch all -spacing 10
 
     $tbl configure \
         -foreground \#000000 \
@@ -147,10 +206,6 @@ proc PrepareGui1 {} {
 
     $tbl columnconfigure 0 -wrap true  
     
-    $tbl insert end [list "error 1"]
-    $tbl insert end [list "one more error"]
-    $tbl insert end [list "such a long error: sadfffffffffffffffffffffffffffffffffffffffffffffffffffjkljfds djsflklk"]    
-
     set f1 $w.tf
     scrollbar $f1.sy -orient v -command [list $tbl yview]
     $tbl configure -yscrollcommand [list $f1.sy set]
@@ -163,8 +218,6 @@ proc PrepareGui1 {} {
 
     # other frame and text
 
-    focus $tbl
-    
 #    pack $w.pane -side top -expand yes -fill both -pady 2 -padx 2m
 
     return $w    
@@ -185,6 +238,7 @@ proc BodyTextOfErrorBrowser {w} {
 proc DebugStartup {} {
     SwankBrowseErrors1 {'defun}
 }
+
 
 
 DebugStartup
