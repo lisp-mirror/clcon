@@ -1,13 +1,15 @@
 ## This is just pure tcl/tk application
 ## 
 
-package require tablelist
+#package require wcb
 
-# FIXME remove it when embedded into main app
-lappend ::auto_path [file join [file dirname [info script]] "lib/wcb3.5"]
-package require wcb
-source [file join [file dirname [info script]] rotext.tcl]
-              
+#source [file join [file dirname [info script]] rotext.tcl]
+
+
+proc ::clconcmd::erbr {} {
+    tkcon main ::erbr::SwankBrowseErrors1 {'defun}
+}
+
 
 namespace eval ::erbr {
     variable data
@@ -103,7 +105,6 @@ namespace eval ::erbr {
         # InsertDataToShowOrBeep $w $EventAsList
     }
 
-    
     # This is a contiuation assigned on reply on initialization request 
     proc SwankBrowseErrors1 { EventAsList } {
         variable tv
@@ -122,6 +123,8 @@ namespace eval ::erbr {
         #    bind $w.tf.tbl <<TablelistCellUpdated>> [list DoOnSelect $w.tf.tbl]
         #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
 
+
+        DoGoToTop $w
         
         focus $tbl
 
@@ -144,13 +147,13 @@ namespace eval ::erbr {
 
     proc EnsureTextView {} {
         variable tv
-        set tv .tv
+        set tv .__error-browser1.tv
         set w $tv
 
         if {[winfo exists $tv]} {
             return
         }
-        
+        puts "wtf1 $w"
         toplevel $w
         wm title $w "Error details"
         frame $w.body
@@ -233,29 +236,27 @@ namespace eval ::erbr {
     
     # }    
 
+
+  
     # Make toplevel widget and its children 
     proc PrepareGui1 {} {
         variable TitleListWindow
 
         # ---------------------------- make toplevel window TitleListWindow -----------    
-        # Create unique edit window toplevel
-        if { 1 == 0 } {
-            set w .__inspector
-            set i 0
-            while {[winfo exists $w[incr i]]} {}
-            append w $i
-            toplevel $w
-            wm withdraw $w
-            
-            # title 
-            set word "Error browser"
-            if {[string length $word] > 20} {
-                wm title $w "[string range $word 0 16]... - tkcon Edit"
-            } else {
-                wm title $w "$word - tkcon Edit"
-            }
+        set w .__error-browser
+        set i 0
+        while {[winfo exists $w[incr i]]} {}
+        append w $i
+        puts "wtf2 $w"
+        toplevel $w
+        wm withdraw $w
+        
+        # title 
+        set word "Error browser"
+        if {[string length $word] > 20} {
+            wm title $w "[string range $word 0 16]... - tkcon Edit"
         } else {
-            set w ""
+            wm title $w "$word - tkcon Edit"
         }
 
         set TitleListWindow $w
@@ -315,4 +316,4 @@ namespace eval ::erbr {
 
 }
 
-::erbr::DebugStartup
+# ::erbr::DebugStartup

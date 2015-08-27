@@ -31,6 +31,8 @@ exec wish "$0" ${1+"$@"}
 #budden }
 encoding system utf-8
 package require Tk 8.4
+# package require tablelist - it must work after toplevel window creation
+
 
 ## This is a way to add directory for wcb package
 lappend ::auto_path [file join [file dirname [info script]] "lib/wcb3.5"]
@@ -77,6 +79,9 @@ namespace eval ::tkcon {
     # info to configure.  COLOR has the color data.
     variable OPT
     variable COLOR
+
+    variable ScriptDirectory 
+    set ScriptDirectory [file dirname [info script]]
 
     # PRIV is used for internal data that only tkcon should fiddle with.
     variable PRIV
@@ -131,8 +136,8 @@ proc putd arg1 {
 # clcon itself is located. Be sure to load into main interpreter when you need it:
 #
 proc TkconSourceHere { filename } {
-    set ScriptDirectory [file dirname [info script]]
-    source [file join $ScriptDirectory $filename]
+    variable ::tkcon::ScriptDirectory
+    source [file join $::tkcon::ScriptDirectory $filename]
 }
 
 proc ::clconcmd::tcsoh {filename} {
@@ -143,7 +148,7 @@ TkconSourceHere rotext.tcl
 TkconSourceHere swank-connection.tcl
 TkconSourceHere swank-io.tcl
 
-TkconSourceHere error-browser.tcl
+
 
 ## ::tkcon::Init - inits tkcon
 #
@@ -5776,5 +5781,10 @@ proc ::tkcon::AtSource {} {
     }
 }
 tkcon::AtSource
+
+# it must work after toplevel window creation
+package require tablelist
+TkconSourceHere error-browser.tcl
+
 
 package provide tkcon $::tkcon::VERSION
