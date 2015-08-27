@@ -6,6 +6,8 @@ package require tablelist
 # FIXME remove it when embedded into main app
 lappend ::auto_path [file join [file dirname [info script]] "lib/wcb3.5"]
 package require wcb
+source [file join [file dirname [info script]] rotext.tcl]
+              
 
 proc WidgetParent { w } {
     set lst [split $w .]
@@ -47,17 +49,22 @@ proc InsertDataToShowOrBeep { w EventAsList } {
 
 
 
-
+# Insert text from index into detail window, and raise it
 proc InsertNewText {idx} {
     global data
     global tv
-           
-    set item [lindex $data $idx]
-    set MyCode [dict get $item {details-code}]
 
+    set item [lindex $data $idx]
+
+    set MyCode [dict get $item {DetailsCode}]
+
+    set text $tv.body.text
     EnsureTextView
-    $tv.body.text delete 0.0 end
-    $tv.body.text insert end $MyCode
+    $text RoDelete 0.0 end
+    #    $tv.body.text RoInsert end $MyCode
+    set lambda [list {w} $MyCode]
+    apply $lambda [list $text]
+    
     event generate $tv <<GoToTop>>
 }
 
@@ -70,16 +77,28 @@ proc DoOnSelect {tbl idx} {
 proc InitData { EventAsList } {
     global data
     
-    set data [list {title "error 1" details-code {
-                  $w RoInsert 0.0 "wow";
-                  $w RoInsert end "ura"
-              }} {title "error 2" details-code {
-                  $w RoInsert 0.0 "2222";
-              }}
-             ]
+    set data {}
 
 }
-        
+
+proc AppendData {title DetailsCode} {
+    global TitleListWindow
+    global tv
+    global data
+    set NewItem [dict create title $title DetailsCode $DetailsCode]
+    lappend data $NewItem
+
+    set tbl $TitleListWindow.tf.tbl    
+    $tbl insert end [list $title]
+
+    # If we inserted first item, highlight it
+    if {[llength $data] == 1} {
+        after idle [$tbl activate 0]
+    }
+    # InsertDataToShowOrBeep $w $EventAsList
+}
+
+       
 # This is a contiuation assigned on reply on initialization request 
 proc SwankBrowseErrors1 { EventAsList } {
     global tv
@@ -101,12 +120,18 @@ proc SwankBrowseErrors1 { EventAsList } {
 #    bind $w.tf.tbl <<TablelistCellUpdated>> [list DoOnSelect $w.tf.tbl]
 #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
 
+  
     focus $tbl
 
-    FillHeaders $tbl
-    
-    DoOnSelect $tbl 0
-    # InsertDataToShowOrBeep $w $EventAsList
+    after 1000 {AppendData "error 1" {
+        $w RoInsert 0.0 "wow";
+        $w RoInsert end "ura"
+    }}
+
+    after 2000 {AppendData "error 2" {
+        $w RoInsert 0.0 "2222"
+    }}
+  
 }
 
 proc DoGoToTop {w} {
@@ -127,20 +152,23 @@ proc EnsureTextView {} {
     toplevel $w
     wm title $w "Error details"
     frame $w.body
-    text $w.body.text
+    set text $w.body.text
+    text $text
 
-    ConfigureTextFonts $w.body.text
-    $w.body.text configure -yscrollcommand [list $w.body.sy set] 
+    InitTextReadonly $text 1
+
+    ConfigureTextFonts $text
+    $text configure -yscrollcommand [list $w.body.sy set] 
     catch {
 	# 8.5+ stuff
 	set tabsp [expr {$OPT(tabspace) * [font measure $OPT(font) 0]}]
-	$w.body.text configure -tabs [list $tabsp left] -tabstyle wordprocessor
+	$text configure -tabs [list $tabsp left] -tabstyle wordprocessor
     }
 
     #scrollbar $w.body.sx -orient h -command [list $w.body.text xview]
-    scrollbar $w.body.sy -orient v -command [list $w.body.text yview]
+    scrollbar $w.body.sy -orient v -command [list $text yview]
     
-    grid $w.body.text - $w.body.sy -sticky news
+    grid $text - $w.body.sy -sticky news
     #grid $w.body.sx - -sticky ew
     grid columnconfigure $w.body 0 -weight 1 
     grid columnconfigure $w.body 1 -weight 1
@@ -167,6 +195,7 @@ proc FillHeaders {tbl} {
 
 # Make toplevel widget and its children 
 proc PrepareGui1 {} {
+    global TitleListWindow
     # Create unique edit window toplevel
     if { 1 == 0 } {
         set w .__inspector
@@ -187,8 +216,7 @@ proc PrepareGui1 {} {
         set w ""
     }
 
-    # Widget root
-    set root $w 
+    set TitleListWindow $w
 
 # --------------------------------- frames-----------------              
 
