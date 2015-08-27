@@ -14,6 +14,7 @@
                (:file "swank-rpc-original-functions")
                (:file "find-definition")
                (:file "swank-patch")
+               (:file "eval-in-tcl")
                (:file "swank-inspector" :description "inspector backend pieces")
                (:file "swank-compilation-errors")
                ))

@@ -57,11 +57,20 @@ namespace eval ::erbr {
 
 
     # Insert text from index into detail window, and raise it
-    proc InsertNewText {idx} {
+    proc RefershDetails {idx} {
         variable data
         variable tv
 
         set item [lindex $data $idx]
+
+        # are we out of range?
+        if { $item eq "" } {
+            if { [winfo exists $tv] } {
+                wm withdraw $tv
+            }
+            return
+        }
+        
 
         set MyCode [dict get $item {DetailsCode}]
 
@@ -77,7 +86,7 @@ namespace eval ::erbr {
 
 
     proc DoOnSelect {tbl idx} {
-        after idle [InsertNewText $idx]
+        after idle [RefershDetails $idx]
     }
 
 
@@ -85,6 +94,7 @@ namespace eval ::erbr {
         variable data
         
         set data {}
+        
 
     }
 
@@ -107,9 +117,10 @@ namespace eval ::erbr {
 
     # This is a contiuation assigned on reply on initialization request 
     proc SwankBrowseErrors1 { EventAsList } {
+        # EventAsList is ignored
         variable tv
 
-        InitData $EventAsList
+        InitData {}
         
         set w [PrepareGui1]
 
@@ -128,14 +139,16 @@ namespace eval ::erbr {
         
         focus $tbl
 
-        after 100 {::erbr::AppendData "error 1" {
-            $w RoInsert 0.0 "wow";
-            $w RoInsert end "ura"
-        }}
+        # after 100 {::erbr::AppendData "error 1" {
+        #     $w RoInsert 0.0 "wow";
+        #     $w RoInsert end "ura"
+        # }}
 
-        after 200 {::erbr::AppendData "error 2" {
-            $w RoInsert 0.0 "2222"
-        }}
+        # after 200 {::erbr::AppendData "error 2" {
+        #     $w RoInsert 0.0 "2222"
+        # }}
+
+        return
         
     }
 
@@ -146,14 +159,16 @@ namespace eval ::erbr {
     }
 
     proc EnsureTextView {} {
+        variable ::tkcon::PRIV
+        # Create unique edit window toplevel
         variable tv
-        set tv .__error-browser1.tv
+        set tv $PRIV(base).sdfasdf
         set w $tv
 
         if {[winfo exists $tv]} {
             return
         }
-        puts "wtf1 $w"
+        puts "Now will call toplevel $w"
         toplevel $w
         wm title $w "Error details"
         frame $w.body
@@ -236,6 +251,15 @@ namespace eval ::erbr {
     
     # }    
 
+    proc ClearTitleList {} {
+        variable TitleListWindow
+        
+        set tbl $TitleListWindow.tf.tbl
+
+        $tbl delete 0 end
+    }
+
+        
 
   
     # Make toplevel widget and its children 
@@ -243,11 +267,16 @@ namespace eval ::erbr {
         variable TitleListWindow
 
         # ---------------------------- make toplevel window TitleListWindow -----------    
-        set w .__error-browser
-        set i 0
-        while {[winfo exists $w[incr i]]} {}
-        append w $i
-        puts "wtf2 $w"
+        variable ::tkcon::PRIV
+        # Create unique edit window toplevel
+        set w $PRIV(base).fycj1
+        puts $w
+        if {[winfo exists $w]} {
+            ClearTitleList
+            return $w
+        }
+
+        puts "Now will call toplevel $w"
         toplevel $w
         wm withdraw $w
         

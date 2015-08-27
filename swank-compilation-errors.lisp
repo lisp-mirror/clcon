@@ -1,22 +1,43 @@
 ; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*- 
 (in-package :clco)
 
+(defun calc-details-code (note)
+  (let* ((title (getf note :message))
+         (location (getf note :location))
+         (source-context (getf note :source-context))
+         (references (getf note :references))
+         (details-code
+          (with-output-to-string (ou)
+            (cond
+              ((not (or location references source-context))
+               nil) ; string will be empty
+              (t
+               (print-just-line ou title :index "end")
+               (when location
+                 (write-one-dspec-and-location "Go to Source" location ou :index "end")
+                 (print-just-line ou (format nil "~%") :index "end"))
+               (when source-context
+                 (print-just-line ou source-context :index "end"))
+               (when references
+                 (print-just-line ou
+                                  (format nil "~%References: ~S" references))
+                                  ))))))
+    (format nil "::erbr::AppendData ~A ~A"
+            (cl-tk:tcl-escape title)
+            (cl-tk:tcl-escape details-code))))
+  
+
 (defun compile-file-for-tcl (filename load-p &rest options)
   "Later we must add load-p logic if compilation failed. Now we just ignore it. Otherwise we would need
 to decide how to organise dialog between parties. So we just compile, and return code to be evaluated to print result with hyperlinks"
   (let* ((compilation-result (apply #'swank:compile-file-for-emacs filename load-p options))
          (notes (swank::compilation-result-notes compilation-result))
-         (i 0))
-    (with-output-to-string (ou)
-      (print-just-line ou "========= MESSAGES ===========")
+         )
+    (print notes)
+    (when notes
+      (eval-in-tcl "::erbr::SwankBrowseErrors1 {}")
       (dolist (note notes)
-        (unless (= i 0)
-          (print-just-line ou "---------------------------"))
-        (print-just-line ou (getf note :message))
-        (let ((location (getf note :location)))
-          (when location
-            (write-one-dspec-and-location "Source" location ou)))
-        (incf i)))
-    ))
+        (eval-in-tcl (calc-details-code note))
+        ))))
 
 
