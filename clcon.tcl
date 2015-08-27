@@ -61,6 +61,12 @@ namespace eval ::clconcmd {
     # we need to run them in context of one console
 }
 
+proc ::clconcmd::help {} {
+    set result1 [info procs ::clconcmd::*]
+    regsub -all "::clconcmd::" $result1 "" result2
+    puts $result2
+}
+
 # Initialize the ::tkcon namespace
 #
 namespace eval ::tkcon {
