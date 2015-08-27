@@ -12,19 +12,21 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
         (swank::find-definitions symbol))
     )))
 
-(defun print-one-hyperlink-tcl-source (stream text file offset)
+(defun print-one-hyperlink-tcl-source (stream text file offset &key (index "output"))
   "Generates tcl code which prints out one hyperlink"
   (let ((escaped-text (cl-tk:tcl-escape text))
         (escaped-file (tcl-escape-filename file))
         (offset-2 (format nil "{0.0+ ~A chars}" offset))
         )
-    (format stream "::tkcon::WriteActiveText $w ~A output {::tkcon::EditFileAtOffset ~A ~A}; $w insert output \\\n; "
+    (format stream "::tkcon::WriteActiveText $w ~A ~A {::tkcon::EditFileAtOffset ~A ~A}; $w insert ~A \\\n; "
             escaped-text
+            index
             escaped-file
-            offset-2)))
+            offset-2
+            index)))
 
-(defun print-just-line (stream text)
-  (format stream "::tkcon::WritePassiveText $w ~A output; $w insert output \\\n; " (cl-tk:tcl-escape text)))
+(defun print-just-line (stream text &key (index "output"))
+  (format stream "::tkcon::WritePassiveText $w ~A ~A; $w insert ~A \\\n; " (cl-tk:tcl-escape text) index index))
 
 
 (defun parse-location-into-file-and-pos (location)
@@ -38,16 +40,16 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
        (values file position)))
     (t nil)))  
 
-(defun write-one-dspec-and-location (dspec location stream)
+(defun write-one-dspec-and-location (link-text location stream &key (index "output"))
   "It is also used by compilation-error browse, some arbitrary string is passed instead of dspec. Beware!"
   (let ((printed-dspec (prin1-to-string dspec)))
     (multiple-value-bind (file position)
         (parse-location-into-file-and-pos location)
       (cond
         ((and file position)
-         (print-one-hyperlink-tcl-source stream printed-dspec file position))
+         (print-one-hyperlink-tcl-source stream printed-dspec file position :index index))
         (t ; something wrong with location
-         (print-just-line stream printed-dspec))))))
+         (print-just-line stream printed-dspec :index index))))))
 
 (defun write-code-to-pass-to-loc (stream loc)
   (multiple-value-bind (file offset)
