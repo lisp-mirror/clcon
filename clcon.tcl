@@ -143,6 +143,8 @@ TkconSourceHere rotext.tcl
 TkconSourceHere swank-connection.tcl
 TkconSourceHere swank-io.tcl
 
+TkconSourceHere error-browser.tcl
+
 ## ::tkcon::Init - inits tkcon
 #
 # Calls:	::tkcon::InitUI
