@@ -5070,7 +5070,7 @@ proc ::tkcon::Insert {w s} {
     $w see insert
 }
 
-proc ::tkcon:BeginningOfLispSymbolRegexp {args} {
+proc ::tkcon::BeginningOfLispSymbolRegexp {} {
     return "\[^\\\\\]\[\[ \t\n\r\\\(\",@\\'\]"
 }
 
@@ -5088,7 +5088,7 @@ proc ::tkcon::Expand {w {type ""}} {
     switch -glob $type {
         li* {
             # we might also want to pass current line to lisp 
-            set exp [::tkcon:BeginningOfLispSymbolRegexp dummy]
+            set exp ::tkcon::BeginningOfLispSymbolRegexp
         }
         default { set exp "\[^\\\\\]\[\[ \t\n\r\\\{\"$\]" }
     }
