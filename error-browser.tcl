@@ -162,7 +162,7 @@ namespace eval ::erbr {
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
         variable tv
-        set tv $PRIV(base).sdfasdf
+        set tv $PRIV(base).erbrTv
         set w $tv
 
         if {[winfo exists $tv]} {
@@ -211,30 +211,28 @@ namespace eval ::erbr {
         }
     }
 
-    # proc TitleListFileMenu {w menu text} {
-    #     set m [menu [::tkcon::MenuButton $menu "1.File" file]]
+    proc TitleListFileMenu {w menu} {
+         set m [menu [::tkcon::MenuButton $menu "1.File" file]]
     #     $m add command -label "Save As..."  -underline 0 \
         # 	-command [list ::tkcon::Save {} widget $text]
     #     $m add command -label "Append To..."  -underline 0 \
         # 	-command [list ::tkcon::Save {} widget $text a+]
     #     $m add separator
-    #     $m add command -label "Dismiss" -underline 0 -accel "Control-w" \
-        # 	-command [list destroy $w]
-    #     bind $w <Control-Key-w>		[list destroy $w]
-    #     bind $w <Control-Key-Cyrillic_tse>		[list destroy $w]
-    # }
+         $m add command -label "1.Dismiss" -underline 0 -accel "Escape" -command [list destroy $w]
+        bind $w <Escape>		[list destroy $w]
+        #     bind $w <Control-Key-Cyrillic_tse>		[list destroy $w]
+    }
 
-    # proc TitleListEditMenu {w menu text} {
-    #     set m [menu [::tkcon::MenuButton $menu "2.Edit" edit]]
-    #     $m add command -label "Copy"  -under 0 \
-        # 	-command [list tk_textCopy $text]
+    proc TitleListEditMenu {w menu} {
+        set tbl [GetTitleListMenuTbl $w]
+        set m [menu [::tkcon::MenuButton $menu "2.Edit" edit]]
+        $m add command -label "1.Copy" -under 0 -command [list tk_textCopy $tbl] -state disabled
     #     $m add separator
 
-    #     $m add command -label "Find" -under 0 \
-        # 	-command [list ::tkcon::FindBox $text]
-    #     bind $w <Control-Key-f>             [list ::tkcon::Findbox $text]
-    #     bind $w <Control-Key-Cyrillic_a>             [list ::tkcon::Findbox $text]
-    # }    
+        $m add command -label "2.Find" -under 0 -command [list ::erbr::TableListFindbox $tbl] -accel "Control-F" -state disabled
+        bind $w <Control-Key-f> [list ::erbr::TableListFindbox $tbl]
+        bind $w <Control-Key-Cyrillic_a> [list ::erbr::TableListFindbox $tbl]
+    }    
 
     # proc TitleListInspectMenu {w menu text} {
     #     set m [menu [::tkcon::MenuButton $menu "3.Inspect" inspect]]
@@ -254,9 +252,7 @@ namespace eval ::erbr {
     proc ClearTitleList {} {
         variable TitleListWindow
         
-        set tbl $TitleListWindow.tf.tbl
-
-        $tbl delete 0 end
+        [::erbr::GetTitleListMenuTbl $TitleListWindow] delete 0 end
     }
 
         
@@ -269,14 +265,13 @@ namespace eval ::erbr {
         # ---------------------------- make toplevel window TitleListWindow -----------    
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
-        set w $PRIV(base).fycj1
+        set w $PRIV(base).erbrTlv
         puts $w
         if {[winfo exists $w]} {
             ClearTitleList
             return $w
         }
 
-        puts "Now will call toplevel $w"
         toplevel $w
         wm withdraw $w
         
@@ -293,10 +288,10 @@ namespace eval ::erbr {
         # ----------------------------------- menu -------------------
         
         set menu [menu $w.mbar]
-        #$w configure -menu $menu
+        $w configure -menu $menu
         
-        #TitleListFileMenu $w $menu $w.body.text
-        #TitleListEditMenu $w $menu $w.body.text
+        TitleListFileMenu $w $menu
+        TitleListEditMenu $w $menu
         #TitleListInspectMenu $w $menu $w.body.text
 
         
@@ -325,6 +320,11 @@ namespace eval ::erbr {
         pack $f1 -side top -fill x
 
         return $w    
+    }
+
+    # Returns tablelist by main error browser window
+    proc GetTitleListMenuTbl {w} {
+        return $w.tf.tbl
     }
 
     proc TitleOfErrorBrowser {w} {

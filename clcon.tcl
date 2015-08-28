@@ -4483,6 +4483,7 @@ proc ::tkcon::Bindings {} {
 	<<TkCon_ExpandLisp>>	<Control-Alt-Key-i>
 	<<TkCon_ExpandLisp>>	<Key-Tab>
         <<TkCon_LispFindDefinition>> <Alt-period>
+        <<TkCon_LispFindDefinition>> <Alt-Key-Cyrillic_yu>
 	<<TkCon_ExpandVar>>	<Alt-v>
 	<<TkCon_Tab>>		<Control-i>
 	<<TkCon_Tab>>		<Alt-i>
