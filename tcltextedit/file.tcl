@@ -41,35 +41,21 @@
 #?   if the file is unsaved there will be a warning message.
 #?
 #?
-#?-Net
-#?
-#? %2Abstract%
-#? The Net menu contains items Open URL 
-#? 
-#? %2Open URL%
-#? Just enter the complete url including the filename and hit Ok.
-#? The file will be downloaded into a new edit window via the HTTP protocol.
-#?
-#?
-#?
 #? Related topics: %lFILE%
 
 
 # File handling routines for TCLTextEdit
 #
 # The info record:
-# There are two types of info records-
-# file and http 
+# There is one type of info records-
 #  
 # {file path+filename}
-# {http path+filename host} 
 #
 #
 #External commands:
 ##
 # Load    $info   ; Load file into next free window   
 #                 ; file path+filename 
-#                 ; http path+filename host 
 #                 ; options: -force if there is enough information in the info field the file
 #                 ;           will be loaded without prompting the user
 #                 ;
@@ -95,11 +81,7 @@
 #
 # DoLoadFile    $info ; Load file from filesystem
 #
-# DoLoadHTTP    $info ; Load file from http
-#
 # GetNextFree         ; Get next free window/file number (used when creating a new window/file)
-#
-# URL2info      $url  ; Converts a regular URL (http://dot.com) to a info list
 #
 # Close         $n    ; Closes window/file $n If file is unsaved the user will be prompted
 #
@@ -109,7 +91,6 @@
 # 
 # Ask		$s    ; Presents a widget with YES/NO/CANCEL buttons, returns yes/no or cancel 
 #
-# HTTPLoadRequest $info ; Http load request
 # FILELoadRequest $info ; File load request
 # FILESaveRequest $info ; File save request
 #
@@ -121,23 +102,6 @@ namespace eval file {
 
 
     #===================================== Misc formatting commands/functions  ===================================
-    proc URL2info { url } {
-        set a [ split $url "/" ]
-        if { [regexp -nocase "http:" [lindex $a 0] ] } { set start 2 } else {set start 0 }
-        set host [lindex $a $start]
-        incr start
-        set file ""
-        set i 0
-        foreach n $a {
-            if {$i>=$start} {set file "$file/$n"}
-            incr i
-        }
-
-        if {$file==""} { set file "/index.html" }
-
-        return "http {$file} {$host}"
-    }
-
     proc GetNextFree {} {
         global window numw
 
@@ -173,56 +137,6 @@ namespace eval file {
 
 
     #===================================== Requests ==============================
-    proc HTTPLoadRequest {param} {
-        set ou .ou
-        catch {destroy $ou}
-        toplevel $ou
-        wm title $ou "Open URL"
-
-        set tmp ""
-
-        set data "-1"
-
-        frame $ou.fr1
-        frame $ou.fr2
-        pack $ou.fr1 $ou.fr2 -side left
-
-        label $ou.fr1.lab -text "URL:"
-        xentry $ou.fr1.ent  
-        pack $ou.fr1.lab $ou.fr1.ent -side left -pady 10 -padx 10
-
-        $ou.fr1.ent insert end [lindex $param 1]
-        $ou.fr1.ent selection range 0 end
-
-        xbutton $ou.fr2.ok -text Ok -width 10 -command "set data 1"
-
-        xbutton $ou.fr2.can -text Cancel -width 10 -command "$ou.fr1.ent delete 0 end ; set data 1"
-        pack $ou.fr2.ok $ou.fr2.can -side top -padx 10 -pady 5
-
-        focus $ou.fr1.ent
-
-        bind $ou.fr1.ent <Return> "set data 1"
-        bind $ou.fr1.ent <KP_Enter> "set data 1"
-        bind $ou.fr1.ent <Escape> "$ou.fr1.ent delete 0 end ; set data 1"
-
-
-        powin $ou
-        grab $ou
-
-        vwait data
-
-
-        if {[$ou.fr1.ent get]!=""} {
-            set r [URL2info [$ou.fr1.ent get]]
-        } {
-            set r ""
-        }
-
-
-        destroy $ou
-        return $r
-    }                                          
-
     proc FILELoadRequest {param} {
         global c
         return "file {[tk_getOpenFile -title "Open file" -initialfile [lindex $param 1]  -filetypes $c(filetypes)  ]}"
@@ -245,26 +159,6 @@ namespace eval file {
                 .text insert end [read $f 10000]
             }
             close $f
-        }
-        return $fi
-    }
-
-    proc DoLoadHTTP { fi } {
-        c $fi
-        if {[lindex $fi 1]!=""} {
-            set filename [lindex $fi 1]
-            set host [lindex $fi 2]
-            set port 80
-
-            set sock [socket $host $port]
-            puts $sock "GET $filename\n"
-            c "GET $filename\n"
-            flush $sock
-            fconfigure $sock -blocking 0
-            while {![eof $sock]} {
-                .text insert end [read $sock 100]
-            }
-            close $sock
         }
         return $fi
     }
@@ -297,7 +191,6 @@ namespace eval file {
             c "Not forced"
             switch [lindex $info 0] {
                 file {set inf [FILELoadRequest $info] }
-                http {set inf [HTTPLoadRequest $info] }
             }
         }
 
@@ -310,11 +203,6 @@ namespace eval file {
                 Supertext::reset $current_window 
             }
 
-            http {
-                if { [llength $inf]<2 } {set inf [HTTPLoadRequest $inf] }
-                set inf [DoLoadHTTP $inf]
-                Supertext::reset $current_window 
-            }
         }
 
         if {[lindex $inf 1]==""} {
@@ -365,7 +253,6 @@ namespace eval file {
 
             switch [lindex $info 0] {
                 file {set inf [FILESaveRequest $info] }
-                http {set inf [FILESaveRequest $info] }
             }
         }
 
@@ -373,11 +260,6 @@ namespace eval file {
 
             file {
                 if { [llength $inf]<2 } {set inf [FILESaveRequest $inf] }
-                set inf [DoSaveFile $inf] 
-            }
-
-            http {
-                set inf [FILESaveRequest $inf]
                 set inf [DoSaveFile $inf] 
             }
 
