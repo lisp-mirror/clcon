@@ -66,9 +66,9 @@
 bind .text <Alt-KeyPress> win::updateln
 
 bind .text <Escape> {
-win::updateln
-.menu.editmenu unpost
-.menu.searchmenu unpost
+    win::updateln
+    .menu.editmenu unpost
+    .menu.searchmenu unpost
 }
 
 bind .text <KP_Enter> win::updateln
@@ -80,16 +80,16 @@ bindtags .text "Text .text . all"
 ####
 
 bind Menu <Escape> {
-tkMenuEscape %W
-.menu unpost
-focus .text
+    tkMenuEscape %W
+    .menu unpost
+    focus .text
 }
 
 proc xbind { what key to } {
-set l [split $key "|"]
-foreach n $l {
- bind $what <$n> $to
- }
+    set l [split $key "|"]
+    foreach n $l {
+        bind $what <$n> $to
+    }
 }
 
 #####################################################################################
@@ -103,8 +103,8 @@ bind .text <Button-3>	{.menu.editmenu post [winfo pointerx . ] [winfo pointery .
 bind .text <Shift-Button-3>	{.menu.searchmenu post [winfo pointerx . ] [winfo pointery .]}
 bind .text <Button>	{ win::updateln }
 bind .text <Button-1>	{ .menu.editmenu unpost 
-			  .menu.searchmenu unpost 
-			}
+    .menu.searchmenu unpost 
+}
 
 
 #Remove some unwanted bindings
@@ -147,8 +147,8 @@ xbind .text $c(key-goto)		{ Goto_line_ask }
 #Alt-F key bindings
 xbind  Text $c(key-saveas)	{ file::Save $window($current_window,info) }
 xbind  Text $c(key-searchagain) { global SearchString
-			  	  if {$SearchString==""} {Find find } else { FindIt } 
-				}
+    if {$SearchString==""} {Find find } else { FindIt } 
+}
 xbind Text $c(key-closefile)    { file::Close $current_window }
 xbind Text $c(key-saveall)      { file::SaveAll }
 

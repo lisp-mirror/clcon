@@ -20,118 +20,118 @@
 
 namespace eval speed {
 
-namespace export Update Button Side Assign Remove Edit
+    namespace export Update Button Side Assign Remove Edit
 
 
-proc Edit {} {
-global current_button c home
-c $current_button
+    proc Edit {} {
+        global current_button c home
+        c $current_button
 
-macro::rec global current_button
-macro::rec "set current_button $current_button"
-macro::rec "speed::Edit"
+        macro::rec global current_button
+        macro::rec "set current_button $current_button"
+        macro::rec "speed::Edit"
 
-set n "file $home/[lindex $c(speed) [expr $current_button - 1]].mac"
-c "file $n"
+        set n "file $home/[lindex $c(speed) [expr $current_button - 1]].mac"
+        c "file $n"
 
-file::Load $n -force
+        file::Load $n -force
 
-.mnu unpost
-}
-
-
-proc Remove {} {
-global current_button c
-c $current_button
-
-macro::rec global current_button
-macro::rec "set current_button $current_button"
-macro::rec "speed::Remove"
-
-if {$current_button!=-1} {
-set n [expr $current_button - 1]
-set c(speed) [ lreplace $c(speed) $n $n]
-speed::Update
-}
-.mnu unpost
-}
-
-proc Assign {name} {
-global current_button c
-c $current_button
-
-macro::rec global current_button
-macro::rec "set current_button $current_button"
-macro::rec "speed::Assign $name"
-
-if {$current_button==-1} {
-set c(speed) "$c(speed) {$name}"
-} else {
-set n [expr $current_button - 1]
-set c(speed) [ lreplace $c(speed) $n $n $name ]
-}
-
-speed::Update
-.mnu unpost
-}
+        .mnu unpost
+    }
 
 
-proc Update {} {
-global current_button c
+    proc Remove {} {
+        global current_button c
+        c $current_button
 
-c
-set menu .mnu
-destroy $menu
-menu $menu -tearoff 0
-menu $menu.macros
+        macro::rec global current_button
+        macro::rec "set current_button $current_button"
+        macro::rec "speed::Remove"
 
-$menu add command -label "Never mind" -command "$menu unpost"
-$menu add command -label "Remove this." -command "speed::Remove"
-$menu add command -label "Edit this." -command "speed::Edit"
-$menu add cascade -label "Assign" -menu $menu.list
-xmenu $menu.list 
+        if {$current_button!=-1} {
+            set n [expr $current_button - 1]
+            set c(speed) [ lreplace $c(speed) $n $n]
+            speed::Update
+        }
+        .mnu unpost
+    }
 
-$menu configure -tearoff $c(tearoff) -background $c(color-menubg) -foreground $c(color-menutxt) -activebackground $c(color-menuactive) -activeforeground $c(color-menuactivetext)
+    proc Assign {name} {
+        global current_button c
+        c $current_button
 
-foreach n [macro::names] {
-$menu.list add command -label $n -command "speed::Assign {$n}"
-}
-set current_button -1
+        macro::rec global current_button
+        macro::rec "set current_button $current_button"
+        macro::rec "speed::Assign $name"
+
+        if {$current_button==-1} {
+            set c(speed) "$c(speed) {$name}"
+        } else {
+            set n [expr $current_button - 1]
+            set c(speed) [ lreplace $c(speed) $n $n $name ]
+        }
+
+        speed::Update
+        .mnu unpost
+    }
 
 
-#Delete all buttons within frame .wl
-foreach n [winfo children .wl] {
-destroy $n
-}
+    proc Update {} {
+        global current_button c
 
-#Add all relevant buttons to frame
-set i 1
-foreach n $c(speed) {
-xbutton  .wl.t$i -text "$n" -command "macro::play {$n}"
-pack .wl.t$i -side left
-bind .wl.t$i <Button-3> "speed::Button $i"
-incr i
-}
+        c
+        set menu .mnu
+        destroy $menu
+        menu $menu -tearoff 0
+        menu $menu.macros
 
-if {[llength $c(speed)]==0} {
-label .wl.t -text "Right click here to add macro buttons" 
-pack .wl.t
-bind .wl.t <Button-3> speed::Side
-}
+        $menu add command -label "Never mind" -command "$menu unpost"
+        $menu add command -label "Remove this." -command "speed::Remove"
+        $menu add command -label "Edit this." -command "speed::Edit"
+        $menu add cascade -label "Assign" -menu $menu.list
+        xmenu $menu.list 
 
-}
+        $menu configure -tearoff $c(tearoff) -background $c(color-menubg) -foreground $c(color-menutxt) -activebackground $c(color-menuactive) -activeforeground $c(color-menuactivetext)
 
-proc Button {n} {
-global current_button
-set current_button $n
-.mnu post [winfo pointerx . ] [winfo pointery .]
-}
+        foreach n [macro::names] {
+            $menu.list add command -label $n -command "speed::Assign {$n}"
+        }
+        set current_button -1
 
-proc Side {} {
-global current_button
-set current_button -1
-.mnu post [winfo pointerx . ] [winfo pointery .]
-}
+
+        #Delete all buttons within frame .wl
+        foreach n [winfo children .wl] {
+            destroy $n
+        }
+
+        #Add all relevant buttons to frame
+        set i 1
+        foreach n $c(speed) {
+            xbutton  .wl.t$i -text "$n" -command "macro::play {$n}"
+            pack .wl.t$i -side left
+            bind .wl.t$i <Button-3> "speed::Button $i"
+            incr i
+        }
+
+        if {[llength $c(speed)]==0} {
+            label .wl.t -text "Right click here to add macro buttons" 
+            pack .wl.t
+            bind .wl.t <Button-3> speed::Side
+        }
+
+    }
+
+    proc Button {n} {
+        global current_button
+        set current_button $n
+        .mnu post [winfo pointerx . ] [winfo pointery .]
+    }
+
+    proc Side {} {
+        global current_button
+        set current_button -1
+        .mnu post [winfo pointerx . ] [winfo pointery .]
+    }
 
 
 }

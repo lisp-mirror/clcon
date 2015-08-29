@@ -41,27 +41,27 @@
 
 #--------------------- Widgets ----------------------------
 proc xbutton {w args} {
-c
-eval "button $w $args -borderwidth 1 -foreground black"
+    c
+    eval "button $w $args -borderwidth 1 -foreground black"
 }
 
 proc xentry {w args} {
-global c
-c
-eval "entry $w $args -background $c(color-editbg) -foreground $c(color-edittxt) -borderwidth 1"
+    global c
+    c
+    eval "entry $w $args -background $c(color-editbg) -foreground $c(color-edittxt) -borderwidth 1"
 }
 
 proc xmenu {w args} {
-global c
-c
-eval "menu $w $args -tearoff $c(tearoff) -background $c(color-menubg) -foreground $c(color-menutxt) -activebackground $c(color-menuactive) -activeforeground $c(color-menuactivetext)"
+    global c
+    c
+    eval "menu $w $args -tearoff $c(tearoff) -background $c(color-menubg) -foreground $c(color-menutxt) -activebackground $c(color-menuactive) -activeforeground $c(color-menuactivetext)"
 }
 
 #----------------------------------------------------------
 
 proc gbn {n} {
-global c
-return "([lindex [split $c($n) "|"] 0])"
+    global c
+    return "([lindex [split $c($n) "|"] 0])"
 }
 
 set dbutton 0
@@ -74,9 +74,9 @@ bind .wl <Button-3> speed::Side
 frame .wb -background $c(color-menubg)
 
 Supertext::text .text -yscrollcommand ".scrolly set"  -xscrollcommand ".scrollx set" \
--setgrid true -wrap none -background $c(color-editbg) -foreground $c(color-edittxt) \
--exportselection 0 -borderwidth 2 -highlightthickness 0  -insertbackground $c(color-cursor) \
--font $c(font-editor) -borderwidth 1
+    -setgrid true -wrap none -background $c(color-editbg) -foreground $c(color-edittxt) \
+    -exportselection 0 -borderwidth 2 -highlightthickness 0  -insertbackground $c(color-cursor) \
+    -font $c(font-editor) -borderwidth 1
 
 scrollbar .scrolly -command ".text yview" -background $c(color-menubg) -activebackground $c(color-menuactive) -troughcolor $c(color-menubg)
 scrollbar .scrollx -command ".text xview" -orient horiz -background $c(color-menubg) -activebackground $c(color-menuactive) -troughcolor $c(color-menubg)
@@ -105,40 +105,40 @@ pack .status  -side bottom -fill x
 .status.c create line 19 13   14 18 -fill gray70
 
 bind .status.c <Motion> {
-global dbutton dxx dyy
+    global dbutton dxx dyy
 
-set gr [wm grid .]
+    set gr [wm grid .]
 
-if {$dbutton} {
- set WW [expr ((%X-[winfo rootx .]) / [lindex $gr 2])-2 ]
- set HH [expr ((%Y-[winfo rooty .]) / [lindex $gr 3])-3 ]
- set q "x"
- if {$WW<56} { set WW 56 }
- if {$HH<1} { set HH 1 }
- wm geometry . "=$WW$q$HH"
- update
- }
+    if {$dbutton} {
+        set WW [expr ((%X-[winfo rootx .]) / [lindex $gr 2])-2 ]
+        set HH [expr ((%Y-[winfo rooty .]) / [lindex $gr 3])-3 ]
+        set q "x"
+        if {$WW<56} { set WW 56 }
+        if {$HH<1} { set HH 1 }
+        wm geometry . "=$WW$q$HH"
+        update
+    }
 }
 
 bind .status.c <ButtonPress> {
-global dbutton dxx dyy
-set dxx %x
-set dyy %y
-set dbutton 1
+    global dbutton dxx dyy
+    set dxx %x
+    set dyy %y
+    set dbutton 1
 }
 
 bind .status.c <ButtonRelease> {
-global dbutton
-set dbutton 0
+    global dbutton
+    set dbutton 0
 }
 bind .status.c <FocusOut> {
-global dbutton
-set dbutton 0
+    global dbutton
+    set dbutton 0
 }
 
 button .b -text "check" -command {
-c [winfo rootx .]
-WsetWH . 100 100
+    c [winfo rootx .]
+    WsetWH . 100 100
 }
 
 pack .wl -fill x
