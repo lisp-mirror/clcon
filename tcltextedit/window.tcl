@@ -95,21 +95,18 @@ namespace eval win {
                         .text delete 1.0 end
                         tk_textPaste .text
                         .menu.file entryconfigure [.menu.file index "Save"] -state disabled
-                        macro::rec win::activate $n
                         win::update
                         .menu.windowmenu entryconfigure [.menu.windowmenu index "View/Edit Clipboard"] -state disabled
                     }                                              
                     200    {
                         UpdateFileList
                         .menu.file entryconfigure [.menu.file index "Save"] -state disabled
-                        macro::rec win::activate $n
                         win::update
                         .menu.windowmenu entryconfigure [.menu.windowmenu index "Filelist"] -state disabled
                     }
                     300    {
                         .menu.file entryconfigure [.menu.file index "Save"] -state disabled
                         pml::inserttext .text [pml::gettopic]
-                        macro::rec win::activate $n
                         win::update
                         .menu.windowmenu entryconfigure [.menu.windowmenu index "Help"] -state disabled
                         .text configure -state disabled
@@ -174,7 +171,6 @@ namespace eval win {
 
             set current_window $n
             win::activate $current_window
-            macro::rec win::activate $current_window
             return 1
         }
     }
@@ -203,7 +199,6 @@ namespace eval win {
 
             set current_window $n
             win::activate $current_window
-            macro::rec win::activate $current_window
         }
     }
 

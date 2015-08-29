@@ -44,20 +44,11 @@
 #?-Net
 #?
 #? %2Abstract%
-#? The Net menu contains 3 items Open URL,Open FTP, Save As FTP 
+#? The Net menu contains items Open URL 
 #? 
 #? %2Open URL%
 #? Just enter the complete url including the filename and hit Ok.
 #? The file will be downloaded into a new edit window via the HTTP protocol.
-#?
-#? %2Open FTP%
-#? Just enter address,username,password and path+filename.
-#? If the save funtion is used after opening a file via ftp, the
-#? editor will try to upload the file via ftp with the same parameters 
-#? as it was opened with.
-#? 
-#? %2Save As FTP%
-#? 
 #?
 #?
 #?
@@ -67,19 +58,17 @@
 # File handling routines for TCLTextEdit
 #
 # The info record:
-# There are three types of info records-
-# file,http and ftp 
+# There are two types of info records-
+# file and http 
 #  
 # {file path+filename}
 # {http path+filename host} 
-# {ftp  path+filename host user password}
 #
 #
 #External commands:
 ##
 # Load    $info   ; Load file into next free window   
 #                 ; file path+filename 
-#                 ; ftp  path+filename host user passwd 
 #                 ; http path+filename host 
 #                 ; options: -force if there is enough information in the info field the file
 #                 ;           will be loaded without prompting the user
@@ -88,7 +77,6 @@
 #
 # Save $n         ; Save file from window $n
 #                 ; file path+filename 
-#                 ; ftp  host user passwd path+filename
 #                 ; options: -force if there is enough information in the info field the file
 #                 ;           will be saved without prompting the user
 #                 ;
@@ -105,13 +93,9 @@
 #Internal commands:
 # DoSaveFile    $info ; Save file to a filesystem
 #
-# DoSaveFTP     $info ; Save file to ftp
-#
 # DoLoadFile    $info ; Load file from filesystem
 #
 # DoLoadHTTP    $info ; Load file from http
-#
-# DoLoadFTP     $info ; Load file from ftp
 #
 # GetNextFree         ; Get next free window/file number (used when creating a new window/file)
 #
@@ -126,8 +110,6 @@
 # Ask		$s    ; Presents a widget with YES/NO/CANCEL buttons, returns yes/no or cancel 
 #
 # HTTPLoadRequest $info ; Http load request
-# FTPLoadRequest  $info ; Ftp Load request
-# FTPSaveRequest  $info ; Ftp save request
 # FILELoadRequest $info ; File load request
 # FILESaveRequest $info ; File save request
 #
@@ -179,7 +161,6 @@ namespace eval file {
     proc NewFile {} {
         global window current_window
         c
-        macro::rec file::NewFile
 
         win::activate [GetNextFree]
         set window($current_window,change) 0
@@ -242,140 +223,6 @@ namespace eval file {
         return $r
     }                                          
 
-
-    proc FTPLoadRequest {param} {
-
-        set ou .ou
-        catch {destroy $ou}
-        toplevel $ou
-        wm title $ou "Open FTP"
-
-        set data "-1"
-
-
-        frame $ou.right
-        xbutton $ou.right.ok -text "Ok" -width 5 -command "set data 1"
-
-        xbutton $ou.right.cancel -text "Cancel" -width 5 -command "$ou.left.f4.e delete 0 end ; set data 1"
-        pack $ou.right.ok $ou.right.cancel -pady 5
-
-        frame $ou.left
-
-        frame $ou.left.f1
-        label $ou.left.f1.l -text "Host:" -width 10
-        xentry $ou.left.f1.e -width 20 -textvariable host
-        pack $ou.left.f1.l $ou.left.f1.e -side left
-
-        frame $ou.left.f2
-        label $ou.left.f2.l -text "Username:" -width 10
-        xentry $ou.left.f2.e -width 20 -textvariable username
-        pack $ou.left.f2.l $ou.left.f2.e -side left
-
-        frame $ou.left.f3
-        label $ou.left.f3.l -text "Password:" -width 10
-        xentry $ou.left.f3.e -width 20 -textvariable password -show *
-        pack $ou.left.f3.l $ou.left.f3.e -side left
-
-        frame $ou.left.f4
-        label $ou.left.f4.l -text "Filename:" -width 10
-        xentry $ou.left.f4.e -width 20 -textvariable filename
-        pack $ou.left.f4.l $ou.left.f4.e -side left
-
-        pack $ou.left.f1 $ou.left.f2 $ou.left.f3 $ou.left.f4 -side top
-
-        pack $ou.left $ou.right  -side left
-
-
-        bind $ou <Return> "set data 1"
-        bind $ou <KP_Enter> "set data 1"
-        bind $ou <Escape> "$ou.left.f4.e delete 0 end ; set data 1"
-
-        grab $ou
-        focus $ou.left.f1.e
-
-        $ou.left.f4.e insert end [lindex $param 1]
-        $ou.left.f1.e insert end [lindex $param 2]
-        $ou.left.f2.e insert end [lindex $param 3]
-        $ou.left.f3.e insert end [lindex $param 4]
-
-        powin $ou
-
-        vwait data
-
-        set r "ftp {[$ou.left.f4.e get]} {[$ou.left.f1.e get]} {[$ou.left.f2.e get]} {[$ou.left.f3.e get]}"
-
-        #file host user pwd
-        destroy $ou
-        return $r
-    }
-
-    proc FTPSaveRequest {param} {
-
-        set ou .ou
-        catch {destroy $ou}
-        toplevel $ou
-        wm title $ou "Save FTP"
-
-        set data "-1"
-
-
-        frame $ou.right
-        xbutton $ou.right.ok -text "Ok" -width 5 -command "set data 1"
-
-        xbutton $ou.right.cancel -text "Cancel" -width 5 -command "$ou.left.f4.e delete 0 end ; set data 1"
-        pack $ou.right.ok $ou.right.cancel -pady 5
-
-        frame $ou.left
-
-        frame $ou.left.f1
-        label $ou.left.f1.l -text "Host:" -width 10
-        xentry $ou.left.f1.e -width 20 -textvariable host
-        pack $ou.left.f1.l $ou.left.f1.e -side left
-
-        frame $ou.left.f2
-        label $ou.left.f2.l -text "Username:" -width 10
-        xentry $ou.left.f2.e -width 20 -textvariable username
-        pack $ou.left.f2.l $ou.left.f2.e -side left
-
-        frame $ou.left.f3
-        label $ou.left.f3.l -text "Password:" -width 10
-        xentry $ou.left.f3.e -width 20 -textvariable password -show *
-        pack $ou.left.f3.l $ou.left.f3.e -side left
-
-        frame $ou.left.f4
-        label $ou.left.f4.l -text "Filename:" -width 10
-        xentry $ou.left.f4.e -width 20 -textvariable filename
-        pack $ou.left.f4.l $ou.left.f4.e -side left
-
-        pack $ou.left.f1 $ou.left.f2 $ou.left.f3 $ou.left.f4 -side top
-
-        pack $ou.left $ou.right  -side left
-
-
-        bind $ou <Return> "set data 1"
-        bind $ou <KP_Enter> "set data 1"
-        bind $ou <Escape> "$ou.left.f4.e delete 0 end ; set data 1"
-
-        grab $ou
-        focus $ou.left.f1.e
-
-        $ou.left.f4.e insert end [lindex $param 1]
-        $ou.left.f1.e insert end [lindex $param 2]
-        $ou.left.f2.e insert end [lindex $param 3]
-        $ou.left.f3.e insert end [lindex $param 4]
-
-        powin $ou
-
-        vwait data
-
-        set r "ftp {[$ou.left.f4.e get]} {[$ou.left.f1.e get]} {[$ou.left.f2.e get]} {[$ou.left.f3.e get]}"
-
-        #file host user pwd
-        destroy $ou
-        return $r
-    }
-
-
     proc FILELoadRequest {param} {
         global c
         return "file {[tk_getOpenFile -title "Open file" -initialfile [lindex $param 1]  -filetypes $c(filetypes)  ]}"
@@ -401,32 +248,6 @@ namespace eval file {
         }
         return $fi
     }
-
-
-    proc DoLoadFTP { fi } {
-        global home
-        c $fi
-        c [lindex $fi 1]
-        c [lindex $fi 2]
-        c [lindex $fi 3]
-        c [lindex $fi 4]
-
-        if {[lindex $fi 1]!=""} {
-            if {[FTP::Open [lindex $fi 2] [lindex $fi 3] [lindex $fi 4] ]!=1} { return "error Unable to connect to ftp host" }
-            if {[FTP::Get [lindex $fi 1] "$home/temp~" ]!=1} { return "error File not found" }
-            FTP::Close
-
-            set f [open "$home/temp~" "RDONLY" ]
-            .text delete 1.0 end
-            while {![eof $f]} {
-                .text insert end [read $f 10000]
-            }
-            close $f     
-            file delete -force "$home/temp~"
-        } else { return "" }
-        return $fi
-    }
-
 
     proc DoLoadHTTP { fi } {
         c $fi
@@ -459,24 +280,6 @@ namespace eval file {
         return $fi
     }
 
-    proc DoSaveFTP { fi } {
-        global home
-        c $fi
-
-        set f [open "$home/temp~"  w]
-        puts $f [.text get 0.1 "end-1 char"] nonewline
-        close $f      
-
-        FTP::Open [lindex $fi 2] [lindex $fi 3] [lindex $fi 4]
-        FTP::Put "$home/temp~" [lindex $fi 1]
-        FTP::Close
-
-        file delete -force "$home/temp~"
-
-        return $fi
-    }
-
-
     #=============================== Load Level 2  =================================================
     # With the -force argument the Load procedure tries to load the file without prompting the user,
     # however if there are any missing arguments in the info argument the user will be prompted.
@@ -494,7 +297,6 @@ namespace eval file {
             c "Not forced"
             switch [lindex $info 0] {
                 file {set inf [FILELoadRequest $info] }
-                ftp  {set inf [FTPLoadRequest $info] }
                 http {set inf [HTTPLoadRequest $info] }
             }
         }
@@ -506,12 +308,6 @@ namespace eval file {
                 if { [llength $inf]<2 } {set inf [FILELoadRequest $inf] }
                 set inf [DoLoadFile $inf]
                 Supertext::reset $current_window 
-            }
-
-            ftp  {
-                if { [llength $inf]<5 } {set inf [FTPLoadRequest $inf] }
-                set inf [DoLoadFTP  $inf] 
-                Supertext::reset $current_window
             }
 
             http {
@@ -541,10 +337,6 @@ namespace eval file {
 	set window($current_window,info) $inf
 	addrecent $window($current_window,info)
 	win::update
-
-
-        macro::rec "file::Load" $inf -force
-
         c "Action taken: $inf"
         tkTextSetCursor .text 1.0
         focus .text
@@ -573,7 +365,6 @@ namespace eval file {
 
             switch [lindex $info 0] {
                 file {set inf [FILESaveRequest $info] }
-                ftp  {set inf [FTPSaveRequest $info] }
                 http {set inf [FILESaveRequest $info] }
             }
         }
@@ -583,11 +374,6 @@ namespace eval file {
             file {
                 if { [llength $inf]<2 } {set inf [FILESaveRequest $inf] }
                 set inf [DoSaveFile $inf] 
-            }
-
-            ftp  {
-                if { [llength $inf]<5 } {set inf [FTPSaveRequest $inf] }
-                set inf [DoSaveFTP  $inf] 
             }
 
             http {
@@ -608,8 +394,6 @@ namespace eval file {
             set window($current_window,echange) 1
             set window($current_window,info) $inf
         } else { c "Save failed" }
-
-        macro::rec "file::Save" $inf -force
 
         c "Action taken: $inf"
         win::update
@@ -671,8 +455,6 @@ namespace eval file {
     proc Close {i} {
         global window
         c
-        macro::rec file::Close $i
-
         if {$window($i,echange)==1} {
             if {$window($i,change)==1} {
                 switch [Ask [win::pton $window($i,name)]] {
@@ -692,8 +474,6 @@ namespace eval file {
     proc SaveAll {} {
         global window numw current_window
 
-        macro::rec file::SaveAll
-
         set o $current_window
         foreach n [win::names] {
             win::activate $n
@@ -706,8 +486,6 @@ namespace eval file {
     proc CloseAll {} {
         global current_window window
         c "start"
-
-        macro::rec file::CloseAll
 
         set savelist ""
         set nosavelist ""

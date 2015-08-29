@@ -103,13 +103,6 @@ proc GrepIt {} {
 
     c $SearchString $SearchPos $SearchDir $findcase
 
-    macro::rec global SearchString SearchPos SearchDir findcase 
-    macro::rec set SearchString $SearchString
-    macro::rec set SearchPos    $SearchPos
-    macro::rec set SearchDir    $SearchDir
-    macro::rec set findcase     $findcase
-    macro::rec GrepIt
-
     set greps ""
 
     if {$SearchString!=""} {
@@ -166,12 +159,6 @@ proc FindIt {} {
     set SearchPos insert
 
     c $SearchString $SearchPos $SearchDir $findcase
-
-    macro::rec global SearchString SearchPos SearchDir findcase 
-    macro::rec set SearchString $SearchString
-    macro::rec set SearchDir    $SearchDir
-    macro::rec set findcase     $findcase
-    macro::rec FindIt
 
     if {$SearchString!=""} {
 
@@ -238,16 +225,6 @@ proc ReplaceIt {n} {
     set window($current_window,echange) 1
     set window($current_window,change) 1
 
-    if {$n!="norec"} {
-	macro::rec global SearchString SearchPos SearchDir findcase ReplaceString rconfirm
-	macro::rec set ReplaceString $ReplaceString
-	macro::rec set SearchString $SearchString
-	macro::rec set SearchDir    $SearchDir
-	macro::rec set findcase     $findcase
-	macro::rec set rconfirm     $rconfirm
-	macro::rec ReplaceIt -
-    }
-
     if {$findcase=="1"} {
 	set caset "-exact"
     } else {
@@ -291,14 +268,6 @@ proc ReplaceIt {n} {
 
 proc ReplaceAll {} {
     global SearchString SearchDir ReplaceString findcase window current_window
-
-    macro::rec global SearchString SearchDir findcase ReplaceString rconfirm
-    macro::rec set ReplaceString $ReplaceString
-    macro::rec set SearchString $SearchString
-    macro::rec set SearchDir    $SearchDir
-    macro::rec set findcase     $findcase
-    macro::rec set rconfirm     $rconfirm
-    macro::rec ReplaceAll
 
     set window($current_window,echange) 1
     set window($current_window,change) 1

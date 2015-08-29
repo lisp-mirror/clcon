@@ -22,7 +22,6 @@
 #? SaveAll                key-saveall       Control-F2
 #? Load                   key-load          F3
 #? Duplicate line         key-dupline       F4
-#? Record/Stop macro      key-newmacro      F5
 #? Find                   key-find          F7
 #? Find Again             key-searchagain   Alt-F7
 #? %lSearchSelection%        key-searchsel     F9
@@ -138,7 +137,6 @@ xbind Text $c(key-backspace) 		{ txt::backspace %W }
 xbind .text $c(key-save)		{ file::Save $window($current_window,info) -force }
 xbind  Text $c(key-load)  	        { file::Load file } 
 xbind  Text $c(key-dupline)	        { txt::dupline %W }
-xbind .text $c(key-newmacro) 	        { macro::new }
 xbind  Text $c(key-find)  		{ Find find }
 xbind  Text $c(key-searchsel) 		{ txt::searchsel %W }
 xbind .text $c(key-goto)		{ Goto_line_ask }

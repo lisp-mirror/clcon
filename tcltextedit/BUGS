@@ -1,11 +1,8 @@
 Todo:
- Add possibility to erase macros
- Add RPM support
  Add Config wizard
 
 Bugs:
  
 Continuing work:
- Update all commands so that they work with macros.
  Write help text
 

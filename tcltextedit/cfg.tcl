@@ -56,7 +56,6 @@ set cfglist "
 {key-saveall}           {Control-F2}
 {key-load}              {F3}
 {key-dupline}           {F4}
-{key-newmacro}          {F5}
 {key-find}              {F7}
 {key-searchsel}         {F9}
 {key-goto}		{F12}

@@ -164,13 +164,7 @@ $menu add command -label "Save All" -accelerator [gbn key-saveall ] -underline 4
 
 $menu add cascade -label "Recent..." -menu $menu.rcent -underline 0
 xmenu $menu.rcent 
-$menu add separator
-$menu add cascade -label "Net" -menu $menu.netmenu -underline 2 
 
-xmenu $menu.netmenu 
-$menu.netmenu add command -label "Open URL.." -underline 5 -command "file::Load http"
-$menu.netmenu  add command -label "Open FTP.." -underline 5 -command "file::Load ftp"
-$menu.netmenu  add command -label "Save As FTP.." -underline 5 -command { file::Save $window($current_window,info) }
 $menu add command -label "Execute" -underline 0 -command "exec::execute"
 $menu add separator
 $menu add command -label "Close" -accelerator [gbn key-closefile] -underline 0 -command { file::Close $current_window }
@@ -199,10 +193,6 @@ $menu add command -label "Find" -underline 0 -accelerator [gbn key-find ] -comma
 $menu add command -label "Replace" -underline 0 -command "Find replace"
 $menu add command -label "FindNext" -accelerator [gbn key-searchagain ] -underline 4 -command FindIt
 $menu add command -label "Goto line" -underline 0 -accelerator [gbn key-goto ] -command Goto_line_ask
-
-set menu .menu.macromenu
-xmenu $menu 
-.menu add cascade -label "Macro" -underline 0 -menu $menu 
 
 set menu .menu.windowmenu
 xmenu $menu 

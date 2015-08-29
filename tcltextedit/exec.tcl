@@ -21,8 +21,6 @@ namespace eval exec {
         set result ""
         set i 0
 
-        macro::rec exec::RunProgram "$cmd"
-
         c $cmd
 
         while {$i < [string length $cmd]} {

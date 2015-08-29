@@ -14,7 +14,6 @@ namespace eval  txt {
             }
 	}
         win::updateln
-        if {$A==""} { macro::rec "macro::key" $K } else { macro::rec "macro::key" $A }
     }
 
     proc copyfrom_clip {w} {
@@ -33,19 +32,16 @@ namespace eval  txt {
 
     proc undo { w } {
         c
-        macro::rec txt::undo $w
         $w undo
     }
 
     proc tagall { w } {
         c
-        macro::rec txt:tagall $w
         .text tag add sel 1.0 end
     }
 
     proc copy { w } {
         c
-        macro::rec txt::copy $w
         tk_textCopy $w
     }
 
@@ -53,7 +49,6 @@ namespace eval  txt {
         global window current_window
         c
         set window($current_window,change) 1
-        macro::rec txt::paste $w
         tk_textPaste $w
     }
 
@@ -61,7 +56,6 @@ namespace eval  txt {
         global window current_window
         c
         set window($current_window,change) 1
-        macro::rec txt::copycut $w
         tk_textCopy $w
         tk_textCut $w
     }
@@ -70,7 +64,6 @@ namespace eval  txt {
         global window current_window
         c
         set window($current_window,change) 1
-        macro::rec deleteline $w
         $w delete {insert linestart} {insert lineend}
         if {! [$w compare "insert+1 char" == end] } {
             $w delete insert "insert+1 char"
@@ -80,8 +73,6 @@ namespace eval  txt {
     proc texteval {w} {
         global window current_window
         c
-
-        macro::rec texteval $w
 
         if {[$w tag nextrange sel 1.0 end]!=""} {
             set exp [$w get sel.first sel.last]
@@ -98,7 +89,6 @@ namespace eval  txt {
         global window current_window
         c
         set window($current_window,change) 1
-        macro::rec deleol $w
         $w delete {insert} {insert wordend}
     }
 
@@ -106,7 +96,6 @@ namespace eval  txt {
         global window current_window
         c
         set window($current_window,change) 1
-        macro::rec deleow $w
         $w delete {insert} {insert wordend}
     }
 
@@ -114,7 +103,6 @@ namespace eval  txt {
         global window current_window
         c
         set window($current_window,change) 1
-        macro::rec dupline $w
         set s "[$w get {insert linestart} {insert lineend} ]\n"
         set po {insert linestart}
         $w insert "$po+1 line"  $s
@@ -123,7 +111,6 @@ namespace eval  txt {
     proc searchsel { w } {
         global SearchString SearchPos SearchDir findcase
         c
-        macro::rec searchsel $w
         set SearchString [$w get sel.first sel.last]
         set SearchPos {insert wordend}
         set findcase 0

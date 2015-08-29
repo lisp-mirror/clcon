@@ -222,9 +222,6 @@ set hold 0
 set findcase 0
 set SearchDir "forwards"
 set Text_Insert 1
-set macro_data ""
-set macro_rec 0
-set cu_macro 1
 set marknums 0
 set markon   0
 set undo_active 1
@@ -242,16 +239,14 @@ source $installdir/supertext.tcl
 source $installdir/mclistbox.tcl
 source $installdir/window.tcl
 source $installdir/help.tcl
-source $installdir/macro.tcl
 source $installdir/findreplace.tcl
 source $installdir/file.tcl
-source $installdir/ftp_lib.tcl
 source $installdir/cmds.tcl
 source $installdir/exec.tcl
 source $installdir/gui.tcl
 source $installdir/txt.tcl
 source $installdir/bindings.tcl
-source $installdir/speed.tcl
+#source $installdir/speed.tcl
 
 #------------------------------------------------------------------------------+
 
@@ -289,7 +284,6 @@ trace variable window w win::status_change
 #Focus on text
 
 updaterecent
-macro::update
 
 grab .
 
