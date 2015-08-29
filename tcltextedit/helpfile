@@ -1,0 +1,386 @@
+#?-Edit
+#?
+#? %2Abstract:%
+#? Description for all text edit functions
+#?
+#? %fblue%Function             Name in rc file            Default key binding %fblack% 
+#? Cut                    key-delete        Delete
+#? Copy                   key-copy          Control-Insert 
+#? Paste                  key-paste         Shift-Insert
+#? Copy And Cut           key-copycut       Control-Delete
+#? Delete line            key-delline       Control-Y
+#? %lEvaluate%               key-texteval      Control-E
+#? Delete to end of line  key-deltoeol      Control-T
+#? Delete to end of word  key-deltoeow      Control-W
+#? %LCopy_from...%           key-copyfromclip  Alt-Insert
+#? Tag all                key-tagall        Alt-A
+#? Next window            key-nextwin       Alt-N
+#? Previous window        key-prevwin       Alt-P
+#? Go to clipboard        key-clipboard     Alt-B
+#? Exit editor            key-exit          Alt-X
+#? Save                   key-save          F2
+#? SaveAll                key-saveall       Control-F2
+#? Load                   key-load          F3
+#? Duplicate line         key-dupline       F4
+#? Record/Stop macro      key-newmacro      F5
+#? Find                   key-find          F7
+#? Find Again             key-searchagain   Alt-F7
+#? %lSearchSelection%        key-searchsel     F9
+#? Goto line              key-goto          F12
+#? Save As                key-saveas        Alt-F2
+#? Close                  key-closefile     Alt-F3
+#? BackSpace              key-backspace     BackSpace
+#? %LUndo%                   key-undo          Control-Z
+#? 
+#?
+#? Related topics: %lRC%
+#?-Copy_from...
+#?
+#? When used, a file request is presented, and the user is asked
+#? to select a file.
+#? When selected the file will be loaded and inserted into the
+#? Clipboard
+#?
+#? Use Paste command to insert text into the current open file.
+#?
+#?-SearchSelection
+#?
+#? Mark the text you want to search for and 
+#? press the key combination for SearchSelection
+#?
+#?-Evaluate
+#?
+#? Mark the area you want to evaluate and press the key combination for evaluate.
+#? 
+#? %1Example.% 
+#? mark  1+2+3
+#? Hit Evaluate key combination
+#? and "1+2+3" is replaced with 6
+#?
+#?-RC
+#? 
+#? %2Abstract:%
+#? The configuration file is called rc, and it is
+#? located in $HOME/.tcltextedit/
+#? The rc file contains these items:
+#? 
+#? Color settings,
+#? Font settings,
+#? Key definitions,
+#? File types.
+#? And some parameters that the editor uses to keep track of different parameters.
+#?-RecentFiles
+#? 
+#? In the file->Recent.. menu you will find the last 
+#? 6 files you have accessed
+#?
+#? Just select one file and if it still exists it will be loaded into
+#? a new window.
+#?
+#?-About
+#?%2TCL TextEdit v0.9.x%
+#?
+#? %ptte.gif%
+#? 
+#? Created by Dennis Ehlin
+#? mail: hkc141i@tninet.se
+#? http://www.user.tninet.se/~hkc141i
+#?
+#? Related topics: %lDisclaimer% %lPromotion% 
+#?
+#?-Promotion
+#?
+#? Please feel free to use this logo at your homepage
+#?
+#? %pttenow.gif%
+#?
+#? Just copy the image "ttenow.gif " and insert the html code below where you want it
+#? The image is included in the distribution. 
+#?
+#? <A HREF="http://user.tninet.se/~hkc141i/edit.html">
+#? <IMG SRC="ttenow.gif" BORDER="0"
+#? ALT="Get TCL TextEdit now!!"></A>
+#?
+#?-Disclaimer
+#?
+#?%2TCL TextEdit v0.9.x%
+#?
+#?Copyright (c) 1997-1999 Dennis Ehlin
+#?
+#?Permission is hereby granted, free of charge, to any person obtaining a copy
+#?of this software and associated documentation files, to deal
+#?in the Software without restriction, including without limitation the rights
+#?to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#?copies of the Software, and to permit persons to whom the Software is
+#?furnished to do so, subject to the following conditions:
+#?
+#?The above copyright notice and this permission notice shall be included in
+#?all copies or substantial portions of the Software.
+#?
+#?THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#?IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#?FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+#?AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#?LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#?OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#?THE SOFTWARE
+#?
+#?-Problems?
+#?
+#? If you have any problems or if you have any ideas, dont hesitate to
+#? Send me a mail message.
+#? 
+#? You can find my mail address here %lAbout%
+#?
+#?-Execute
+#?  
+#? Executes the command entered in the input field
+#?
+#? %2Formating:%
+#? %%f  -  Current open file
+#? %%p  -  Path to current open file
+#?
+#? %2Example:%
+#? "xterm -e joe %%f &" 
+#? Starts an xterm with the editor joe and loads the current open file.
+#?
+#? 
+#?-File
+#?
+#? %2File Menu%
+#?
+#?   %2New file.%
+#?   Creates a new empty window.
+#?   If you change to another window without typing in anything in the new window it dissappears.
+#?
+#?   %2Open.%
+#?   Prompts the user for a file, and opens it in a new window.
+#?
+#?   %2Save.%
+#?   If the file allready has a filename it will be saved at the same location and filename.
+#?   If the file does not have a filename the user will be prompted for a filename. 
+#?
+#?   %2Save_As...%
+#?   Allways prompts the user for a filename before saving the file.
+#?
+#?   %2Save_All.%
+#?   Saves all open files, if a file is missing a filename the user will be prompted for a filename.
+#?
+#?   %2Recent.%
+#?     See %LRecentFiles%
+#?
+#?   %2Net.%
+#?     See %LNet%
+#?
+#?   %2Execute.%
+#?     See %LExecute%
+#?
+#?   %2Close.%
+#?   Closes the file in the current active window.
+#?   if the file is unsaved there will be a warning message.
+#?
+#?   %2Close All.%
+#?   Closes all open files.
+#?   if there are unsaved files there will be a warning message.
+#?
+#?   %2Exit.%
+#?   Exits the editor.
+#?   if the file is unsaved there will be a warning message.
+#?
+#?
+#?-Net
+#?
+#? %2Abstract%
+#? The Net menu contains 3 items Open URL,Open FTP, Save As FTP 
+#? 
+#? %2Open URL%
+#? Just enter the complete url including the filename and hit Ok.
+#? The file will be downloaded into a new edit window via the HTTP protocol.
+#?
+#? %2Open FTP%
+#? Just enter address,username,password and path+filename.
+#? If the save funtion is used after opening a file via ftp, the
+#? editor will try to upload the file via ftp with the same parameters 
+#? as it was opened with.
+#? 
+#? %2Save As FTP%
+#? 
+#?
+#?
+#?
+#? Related topics: %lFILE%
+#?-Find
+#?
+#? Enter the "string" you want to search for in the input box "Find what" and then push the "Find next" button.
+#? The next occurance of the "string" in the text will be marked, if you want to find the next occurance-
+#? push the "Find next" button once more.
+#?
+#? The match case makes the search case sensitive.
+#? The Up and Down radio buttons indicates in which direction the search will go.
+#?
+#? Note. The search allways starts from where the cursor is positioned.
+#?
+#? For the Grep function see %LGrep%
+#?
+#?-Grep
+#?
+#? Enter the "string" you want to search for in the input box "Find what" and then push the "Grep" button. 
+#? The editor will now search for all occurances of "string" in all open files.
+#? The result will be presented in a Listbox where you can navigate amongst the files and the occurances of "string"
+#?
+#?-Replace
+#?
+#? Enter the "string" you want to search for in the input box "Find what" and
+#? enter the "string2" that you wish to replace it with in the "Replace with" input box.
+#?  
+#? If you push the "Replace" button the editor will replace the next occurance of "string" with "string2".
+#? If you push the "Replace all" button the editor will replace all occurrances of "string" with "string2" in the current open file.
+#?
+#? If the "Confirm replace" checkbox is checked you will be prompted before the editor will replace anything.
+#?
+#? Related topics: %LFind%
+#?-FTP_package
+#?
+#?   tcl FTP package -- 
+#?  Created:	12/96 
+#?  Changed:    05/98                            
+#?  Version:    1.02
+#?
+#?   Copyright (C) 1996-1998, Steffen Traeger
+#?	EMAIL:	Steffen.Traeger@t-online.de
+#?	URL:	http://home.t-online.de/home/Steffen.Traeger
+#?
+#?   This package is free software; you can redistribute it and/or 
+#?   modify it. 
+#?   This library is distributed in the hope that it will be useful,
+#?   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#?   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#?
+#?  The description of the procedures are partly exerpted from RFC 959.
+#?   For more details see also RFC 959, RFC 1123, RFC 1579.
+#?
+#?-Mouse
+#?
+#? %2Popup menus:%
+#? Push right button anywhere in the text box and the "Edit" menu will appear.
+#? Push right button + shift and the Search menu will appear.
+#?
+#? %2Mark text%
+#? Push the left button at the begining of the text you want to mark, move
+#? the cursor to the end of the text you want to mark and release the button.
+#?
+#? Doubble clicking in the text will mark a whole word.
+#? Tripple clicking in the text will mark a whole line.
+#?
+#? %2Wheel mouse ?%
+#?
+#? TCltextEdit is prepared for wheel mouse but it must be enabled in X
+#?
+#? This is how I did it, but I cant garantee that it will work for you.
+#? I have a Logitech wheelmouse, and I use XFree86 Version 3.3.2.3.
+#? 
+#? This goes in to XF86Config under Section "Pointer"
+#?
+#?    Protocol    "intellimouse"
+#?    Device      "/dev/mouse"
+#?    ZAxisMapping 4 5
+#?
+#? Do not fiddle with these parameters if you're not sure of what you're doing.
+#?
+#?-StatusLine
+#?
+#? This is the status line, it is located just beneith the "text window"
+#?
+#? #1 Changed or Unchanged, Tells you if your text is saved or not.
+#? #2 Indicates which line the cursor is positioned at, [row.column].
+#? #3 The full name of the file in the active window.
+#? #4 Status text, tells you important information about the editor.
+#? #5 Push the left or right mouse button and rezise the window.
+#?
+#? %Pstatus.gif%
+#?
+#?-Help
+#? 
+#? You are looking at it.
+#?
+#? %2Navigation%
+#? 
+#? Press INDEX to get to the index page 
+#? Press BACK to go to the recently accessed page
+#? Press FORWARD to go to the page you were on when you pressed the BACK button
+#? To exit help choose anoter window in the Windows menu
+#?
+#? If you want to send me a message here is my mail address %lAbout%
+#?
+#?-Macros
+#?
+#? Tcltextedit has the ability to record and play macros.
+#? Macros are by default stored in $HOME/.tcltextedit/???.mac
+#? where ??? stands for the name of the macro.
+#? The macro files are plain tcl scripts, that makes it possible
+#? for any person with knowledge of tcl to customize your own macros.
+#?
+#? %2Recording:%
+#? You record macros by selecting the menu: Macro->Record Macro.
+#? When recording is activatef text appear in the status line telling
+#? you that the recording mode is active.
+#? 
+#? The just use the editor as usual and all your actions will be recorded.
+#? 
+#? To stop recording shoose: Macro->Stop recording, and a prompt will
+#? appear asking you to shoose a name for your macro.
+#? When you hit the Ok button your macro will be stored.
+#?
+#? Related topics: %lSPEEDBUTTONS%
+#? 
+#?-mclistbox.tcl
+#? Copyright (c) 1999, Bryan Oakley
+#? All Rights Reservered
+#?
+#? Bryan Oakley
+#? oakley@channelpoint.com
+#?
+#? mclistbox v1.02 March 30, 1999
+#?
+#? a multicolumn listbox written in pure tcl
+#?
+#? this code is freely distributable without restriction, but is 
+#? provided as-is with no waranty expressed or implied. 
+#?
+#?-Speedbuttons
+#?
+#? %2Abstract:%
+#? Speed buttons is the buttons just below the menu bar.
+#? All speed buttons is linked to a user defined macro.
+#?
+#? %2Adding:%
+#? To add a speed button "right-click" anywhere on the speed button bar and
+#? select Assign, and a list with all available macros will appear.
+#? Just select the macro you want to add and a button with that macros name
+#? will apear.
+#?
+#? %2Remove:%
+#? To remove a speed button "right-click" on the speed button you want to remov
+#? and select remove this.
+#?
+#? Related topics: %lMACROS%
+#?
+#?-Supertext.tcl
+#?
+#? Supertext.tcl v1.0b1 (Modified by Dennis Ehlin 990514)
+#?
+#? Copyright (c) 1998 Bryan Oakley
+#? All Rights Reserved
+#?
+#? this code is freely distributable, but is provided as-is with
+#? no waranty expressed or implied.
+#?
+#? send comments to oakley@channelpoint.com
+#?
+#?-Undo
+#?
+#? Tcltextedit has an Udo buffer, all windows has it's own undo buffer.
+#? 
+#? To use the undo function select undo in the Edit menu or use the key combination.
+#? The last thing that you modified will be unmodified.
+#?
