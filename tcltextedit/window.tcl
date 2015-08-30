@@ -246,7 +246,8 @@ namespace eval win {
 
         .status.l2 configure -text "Filename: $window($current_window,name) "
 
-        if {$window($current_window,change)==0} {
+        #if {$window($current_window,change)==0} {}
+        if { [.text edit modified] == 0 } {
             .status.l1 configure -foreground $c(color-statustext) -text  "Unchanged"
         } else {
             .status.l1 configure -foreground $c(color-statustextchanged) -text "Changed"
