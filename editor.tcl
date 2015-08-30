@@ -1,3 +1,21 @@
+## edit - opens a file/proc/var for reading/editing
+## 
+# Arguments:
+#   edit ?option value...? -- word
+#   word is file/proc/var name
+#   options are:
+#   -find searchstring
+#   -type proc or var or file
+#   -wrap wrap option for text widget
+#   -offset index to show
+#   BROKEN -attach interpreter - get data in that interpreter 
+#   type	proc/file/var
+#   options 
+# Returns:	nothing
+# Added by budden : -offset option, accepts index
+##
+
+
 # This will be an option
 # If true, we allow for only one editor window at a time, joungling frames in it
 # New window to the same place where old one was
@@ -5,67 +23,124 @@ proc SingleEditorWindow {} {
     return 1
 }
 
+# We canonicalize edit args to key and then
+# Store window into EditorReusableWindowDict by its key. 
+# And we store it in EditorWindowList for selection (ordered by usage history)
+
+# Reuse counter increments when we open a non-reusable window
+# This is required to know which window was opened earlier
+proc GenReuseCounter {} {
+    global ReuseCounter
+    if {![info exists ReuseCounter]} {
+        set ReuseCounter 0
+    }
+    return [incr ReuseCounter]
+}
+
+
+# This function increases ReuseCounter for non-reusable parameter sets
+# Take care to call it once for every parameter set.
+proc CanonicalizeEditArgs {word opts} {
+    set type [dict get $opts -type]
+    if {$type eq "file"} {
+        return [list $word -type $type]                
+    } else {
+        # never reuse procs, vars, errors
+        return [list $word -type $type -no [GenReuseCounter]]
+    }
+}
+
+
 # We have global variables to keep window list
-proc InitEditorWindowDict {} {
-    global EditorWindowDict
-    if {![info exists EditorWindowDict]} {
+proc InitEditorWindowLists {} {
+    global EditorMRUWinList
+    global EditorReusableWindowDict
+    if {![info exists EditorMRUWinList]} {
         global EditorWindowCounter
-        set EditorWindowDict {}
+        set EditorMRUWinList [list]
+        set EditorReusableWindowDict [dict create]
         set EditorWindowCounter 0
     }
 }
 
-InitEditorWindowDict
+InitEditorWindowLists
 
 proc GenEditorWindowName {} {
     variable ::tkcon::PRIV
-    global EditorWindowCounter 
-    set EditorWindowCounter [expr {$EditorWindowCounter + 1}]
-    return [string cat $PRIV(base).__edit $EditorWindowCounter]
+    global EditorWindowCounter
+    incr EditorWindowCounter
+    set result [string cat $PRIV(base).__edit $EditorWindowCounter]
+    return $result
 }
 
-# FIXME keep a bucket of windows for given ArgsToIdentifyWindow
-# Then fix HideAllEditorWindows also. 
-proc AddToWindowDict {w ArgsToIdentifyWindow} {
-    global EditorWindowDict
-    set i 0
-    if { [dict exists "$EditorWindowDict" $ArgsToIdentifyWindow ] } {
-        putd "Handling of duplicating editor args unimplemented!"
+# Store window name for buffer list window
+proc AddToWindowLists {key w} {
+    global EditorMRUWinList
+    global EditorReusableWindowDict
+    lappend EditorMRUWinList [list $key $w]
+    dict set EditorReusableWindowDict $key $w
+}
+
+# RuseOrCreateEditorWindow . Returns a window 
+proc FindOrMakeEditorWindow {word opts tail} {
+    global EditorReusableWindowDict
+    set key [CanonicalizeEditArgs $word $opts]
+    if { [dict exists $EditorReusableWindowDict $key] } {
+        return [dict get $EditorReusableWindowDict $key]
     }
-    dict set EditorWindowDict $ArgsToIdentifyWindow $w
-}
-
-# Find frame with the same args and let the user define
-# to use it or to create a new one. If user chosen to create new one,
-# return {}
-proc ReuseEditorWindow {ArgsToIdentifyWindow word opts} {
-    return {}
-}
-
-# Returns a new frame for new window
-proc MakeNewEditorWindowName {ArgsToIdentifyWindow word opts} {
+    # If not, create one
     set tw [GenEditorWindowName]
     set w $tw
-
-    # tw and w are now the same, but we will store frame name, not a window name
-    AddToWindowDict $w $ArgsToIdentifyWindow
+    EnsureEditorWindow $tw
+    AddToWindowLists $key $w
+    SetupEditorWindow $tw $w $word $opts $tail
     return $tw
 }
 
-
 proc HideAllEditorWindows {} {
-    global EditorWindowDict
-    dict for {k v} $EditorWindowDict {
-        set window $v
+    global EditorMRUWinList
+    foreach p $EditorMRUWinList {
+        set window [lindex $p 1]
         if {[winfo exists $window]} {
             wm withdraw $window
         }
     }
 }
 
+proc RemoveWindowFromLists {tw w} {
+    global EditorMRUWinList
+    global EditorReusableWindowDict
+    set i 0
+    foreach p $EditorMRUWinList {
+        set window [lindex $p 1]
+        if {$window eq $tw} {
+            set EditorMRUWinList [lreplace $EditorMRUWinList $i $i]
+            break
+        }
+        incr i
+    }
+    dict for {key window} $EditorReusableWindowDict {
+        if {$window eq $tw} {
+            set EditorReusableWindowDict [dict remove $EditorReusableWindowDict $key]
+            break
+        }
+    }
+}
+
+# close file (without saving for now) and open MRU 
+proc EditCloseFile {tw w} {
+    if {[winfo exists $tw]} {
+        wm withdraw $tw
+    }
+    puts "Saving file if omitted!" 
+    RemoveWindowFromLists $tw $w
+    destroy $w
+}
+
+
 # Initializes editor GUI
 # args are for error only
-proc InitEditorWindow {tw w ArgsToIdentifyWindow word opts args} {
+proc SetupEditorWindow {tw w word opts tail} {
     variable ::tkcon::PRIV
     variable ::tkcon::COLOR
     variable ::tkcon::OPT
@@ -76,7 +151,6 @@ proc InitEditorWindow {tw w ArgsToIdentifyWindow word opts args} {
         wm title $tw "$word - tkcon Edit"
     }
 
-    puts "w.text = $w.text"
     set txt [text $w.text]
     $w.text configure -wrap [dict get $opts -wrap] \
         -xscrollcommand [list $w.sx set] \
@@ -106,10 +180,13 @@ proc InitEditorWindow {tw w ArgsToIdentifyWindow word opts args} {
     $m add command -label "Append To..."  -underline 0 \
         -command [list ::tkcon::Save {} widget $w.text a+]
     $m add separator
-    $m add command -label "Dismiss" -underline 0 -accel $PRIV(ACC)w \
-        -command [list destroy $w]
-    bind $w <$PRIV(CTRL)w>		[list destroy $w]
-    bind $w <Alt-w>		[list destroy $w]
+
+    set CloseFile [list EditCloseFile $tw $w]
+    $m add command -label "Close" -accel "Control-w" -command $CloseFile
+    bind $w <Control-Key-w> $CloseFile
+    
+    set dismiss [list wm withdraw $tw]
+    $m add command -label "Hide editor window" -underline 0 -command $dismiss
     
     ## Edit Menu
     ##
@@ -167,18 +244,18 @@ proc InitEditorWindow {tw w ArgsToIdentifyWindow word opts args} {
                             [string trimleft [file extension $word] .]]
         }
         error*	{
-            $w.text insert 1.0 [join $args \n]
+            puts "tail = $tail"
+            $w.text insert 1.0 [join $tail \n]
             after idle [::tkcon::Highlight $w.text error]
         }
         default	{
-            $w.text insert 1.0 [join $args \n]
+            $w.text insert 1.0 [join $tail \n]
         }
     }
 }
 
 
 proc EnsureEditorWindow {tw} {
-    variable ::tkcon::PRIV
     if {![winfo exists $tw]} {
         toplevel $tw
         wm withdraw $tw
@@ -187,22 +264,13 @@ proc EnsureEditorWindow {tw} {
 }    
 
 
-## edit - opens a file/proc/var for reading/editing
-## 
-# Arguments:
-#   type	proc/file/var
-#   what	the actual name of the item
-# Returns:	nothing
-# Added by budden : -offset option, accepts index
-##
-proc edit {args} {
+# Parses line and returns list of {word opts tail}
+proc EditorParseArgs {args} {
     variable ::tkcon::PRIV
     variable ::tkcon::COLOR
     variable ::tkcon::OPT
 
-    HideAllEditorWindows
-    
-    set ArgsToIdentifyWindow $args
+    set args [lindex $args 0]
     
     set opts [dict create -find {} -type {} -attach {} -wrap {none} -offset {}]             
     while {[string match -* [lindex $args 0]]} {
@@ -212,19 +280,21 @@ proc edit {args} {
 	    -t*	{ dict set opts -type [lindex $args 1] }
 	    -w*	{ dict set opts -wrap [lindex $args 1] }
             -o* { dict set opts -offset [lindex $args 1] }
-	    #--	{ set args [lreplace $args 0 0]; break }
-            --	{ break }
+	    --	{ set args [lreplace $args 0 0]; break }
 	    default {return -code error "unknown option \"[lindex $args 0]\""}
 	}
 	set args [lreplace $args 0 1]
     }
-    # determine who we are dealing with
-    if {[llength [ dict get $opts -attach]]} {
-	foreach {app type} [ dict get $opts -attach] {break}
-    } else {
-	foreach {app type} [tkcon attach] {break}
-    }
 
+    # determine what interpreter we are dealing with (broken)
+    # if {[llength [ dict get $opts -attach]]} {
+    #     foreach {app type} [ dict get $opts -attach] {break}
+    # } else {
+    #     foreach {app type} [tkcon attach] {break}
+    # }
+    
+    foreach {app type} [tkcon attach] {break}
+    
     set word [lindex $args 0]
 
     if {[dict get $opts -type] == {}} {
@@ -240,20 +310,28 @@ proc edit {args} {
 	return -code error "unrecognized type '$word'"
     }
 
+    set tail $args
+
+    puts "tail = $tail"
+    
+    return [list $word $opts $tail]
+}
+
+# See docs at the beginning of file
+proc edit {args} {
+
+    set ParsedArgs [EditorParseArgs $args]
+
+    foreach {word opts tail} $ParsedArgs break
+    
     # In the future, tw will stand for window, w - for frame
     # Now they coincide
-     
-    # Find old edit window if there is one
-    set tw [::ReuseEditorWindow $ArgsToIdentifyWindow $word $opts]
-    set w $tw
 
-    # If not, create one
-    if {$tw eq {}} {
-        set tw [::MakeNewEditorWindowName $ArgsToIdentifyWindow $word $opts]
-        ::EnsureEditorWindow $tw
-        set w $tw
-        ::InitEditorWindow $tw $w $ArgsToIdentifyWindow $word $opts $args
-    }
+    HideAllEditorWindows
+    
+    # Find old edit window if there is one
+    set tw [FindOrMakeEditorWindow $word $opts $tail]
+    set w $tw
 
     wm deiconify $tw
         
