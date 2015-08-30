@@ -158,6 +158,7 @@ set installdir [file dirname [info script]]
 set home $installdir
 }
 
+# Number of windows available
 set numw 99
 source $installdir/cfg.tcl
 setup
@@ -171,15 +172,6 @@ set window($i,echange) "0"
 set window($i,extra) ""
 set window($i,temp) ""
 }
-set i 100
-set window($i,name) "ClipBoard"
-set window($i,info) ""
-set window($i,change) "0"
-set window($i,pos) "1.0"
-set window($i,echange) "0"
-set window($i,extra) ""
-set window($i,temp) "NoFile"
-
 
 set i 200
 set window($i,name) "FileList"

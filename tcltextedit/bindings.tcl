@@ -16,7 +16,6 @@
 #? Tag all                key-tagall        Alt-A
 #? Next window            key-nextwin       Alt-N
 #? Previous window        key-prevwin       Alt-P
-#? Go to clipboard        key-clipboard     Alt-B
 #? Exit editor            key-exit          Alt-X
 #? Save                   key-save          F2
 #? SaveAll                key-saveall       Control-F2

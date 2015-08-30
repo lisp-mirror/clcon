@@ -59,14 +59,8 @@ namespace eval win {
 
                 set current_window $n
 
-                #swap out the old file only if it's not the clipboard
+                #swap out the old file 
                 switch $lw {
-                    100 	{
-                        clipboard clear -displayof .text
-                        clipboard append -displayof .text  [.text get 0.1 "end-1 char"]
-                        .menu.file entryconfigure [.menu.file index "Save"] -state normal 
-                    }
-
                     200    {
                         .menu.file entryconfigure [.menu.file index "Save"] -state normal 
                     }
@@ -91,13 +85,6 @@ namespace eval win {
 
                 #swap in the new file only if it's not the clipboard
                 switch $n {
-                    100   {
-                        .text delete 1.0 end
-                        tk_textPaste .text
-                        .menu.file entryconfigure [.menu.file index "Save"] -state disabled
-                        win::update
-                        .menu.windowmenu entryconfigure [.menu.windowmenu index "View/Edit Clipboard"] -state disabled
-                    }                                              
                     200    {
                         UpdateFileList
                         .menu.file entryconfigure [.menu.file index "Save"] -state disabled
@@ -151,7 +138,6 @@ namespace eval win {
 
             set n $current_window
 
-            if {$n==100} {set n 1}
             if {$n==200} {set n 1}
             if {$n==300} {set n 1}
 
@@ -164,7 +150,7 @@ namespace eval win {
                 } 
                 if {$r>3} {
                     set n 1
-                    c "Break!!"
+                    error "Too many windows??"
                     break
                 }
             }
@@ -228,9 +214,6 @@ namespace eval win {
         .menu.windowmenu add separator
         .menu.windowmenu add command -label "Filelist" -underline 5 -command "win::activate 200"
         .menu.windowmenu add command -label "Help" -underline 0 -command "win::activate 300"
-        .menu.windowmenu add command -label "View/Edit Clipboard" -underline 5 -command "win::activate 100"
-
-
 
         #Make the current window disabled in the menu
         set n [lsearch [win::names] $current_window]

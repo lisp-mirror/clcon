@@ -50,7 +50,6 @@ set cfglist "
 {key-tagall}		{Alt-a|Alt-A}
 {key-nextwin}		{Alt-n|Alt-N}
 {key-prevwin}		{Alt-p|Alt-P}
-{key-clipboard}		{Alt-b|Alt-B}
 {key-exit}		{Alt-x|Alt-X}
 {key-save}              {F2}
 {key-saveall}           {Control-F2}
