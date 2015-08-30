@@ -224,7 +224,7 @@ namespace eval ::buli {
         set tbl $w.tf.tbl
         
         tablelist::tablelist $tbl -columns {20 ""} -stretch all -spacing 10
-        #$tbl resetsortinfo 
+        $tbl resetsortinfo 
 
         $tbl configure \
             -foreground \#000000 \
