@@ -20,7 +20,7 @@ Use two items on Console menubar item
 
 IDE Commands
 ------------
-Place dot (.) in the first position of the command to invoke named IDE command. Currently there are only two commands:
+Place dot (.) in the first position of the command to invoke named IDE command. Currently there are only a few commands:
 
 ```.insp*``` call inspector to inspect ```*``` (result of previous REPL evaluation)
 
