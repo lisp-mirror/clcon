@@ -83,7 +83,7 @@ namespace eval win {
                 }
 
 
-                #swap in the new file only if it's not the clipboard
+                #swap in the new file
                 switch $n {
                     200    {
                         UpdateFileList
@@ -150,7 +150,7 @@ namespace eval win {
                 } 
                 if {$r>3} {
                     set n 1
-                    error "Too many windows??"
+                    error "Budden: don't know what's the situation. Too many windows??"
                     break
                 }
             }

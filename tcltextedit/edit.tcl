@@ -163,6 +163,8 @@ set numw 99
 source $installdir/cfg.tcl
 setup
 
+# Budden: we will create text widgets lazily
+# and put them into window($i,text) 
 for {set i 1} {$i <100 } {incr i } {
 set window($i,name) "Untitled #$i"
 set window($i,info) ""
