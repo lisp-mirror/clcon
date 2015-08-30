@@ -15,16 +15,30 @@ namespace eval ::buli {
 
     catch {font create tkconfixed -family Courier -size -20}
 
-    proc InitData { EventAsList } {
+    proc InitData {} {
         variable data
         set data {}
     }
 
     # title -> key , DetailsCode -> w
+    # There is a design problem. We mix visual and non-visual
+    # activity while we don't know if visual component exists
+    # We recreate non-visual data at creation of visual control
+    # That seem to be a bad design. On the other hand, we would like
+    # to be able to change contents of visual component incrementally
+    # This was desired for error-browser and this can also be desired
+    # for buffer-list. E.g. we would like to remove deleted window
+    # without moving keyboard focus on the list. 
     proc AppendData {title w} {
         variable TitleListWindow
         variable tv
         variable data
+
+        if {!([info exists TitleListWindow]&&[winfo exists $TitleListWindow])} {
+            # There maybe no any Buffer List browser. Lets get out!
+            return
+        }
+
         set NewItem [dict create title $title w $w]
         lappend data $NewItem
 
@@ -40,24 +54,55 @@ namespace eval ::buli {
     }
 
     proc FillData {} {
-        global EditorMRUWinList
+        variable ::edt::EditorMRUWinList
         foreach p $EditorMRUWinList {
             foreach {key w} $p break
             AppendData $key $w
         }
     }
 
+    proc RefreshData {} {
+        variable TitleListWindow
+        if {[info exists TitleListWindow]&&[winfo exists $TitleListWindow]} {
+            ClearTitleList
+        }
+        InitData
+        FillData
+    }
+        
 
-    proc printClickedCell {w x y action} {
-        foreach {tbl x y} [tablelist::convEventFields $w $x $y] break
-        set row [$tbl containing $y]
-        puts "clicked on cell $row"
+    proc CellCmd {row action} {
+        variable ::edt::EditorMRUWinList
+        variable TitleListWindow
+        set p [lindex $EditorMRUWinList $row]
+        foreach {key w} $p break
+        switch -exact $action {
+            ShowBuffer {
+                ::edt::ShowExistingBuffer $w
+            }
+            HideListAndShowBuffer {
+                wm withdraw $TitleListWindow
+                ::edt::ShowExistingBuffer $w
+            }
+            CloseBuffer {
+                ::edt::EditCloseFile $w $w
+            }
+            default {
+                error "Unknown CellCmd"
+            }
+        }
     }
 
-    proc printKbdCell {w x y action} {
+    proc MouseCellCmd {w x y action} {
         foreach {tbl x y} [tablelist::convEventFields $w $x $y] break
-        puts $tbl
-        puts [$tbl index active]
+        set row [$tbl containing $y]
+        CellCmd $row $action
+    }
+
+    proc KbdCellCmd {w x y action} {
+        foreach {tbl x y} [tablelist::convEventFields $w $x $y] break
+        set row [$tbl index active]
+        CellCmd $row $action
     }
     
     proc ShowSelectedBuffer {tbl HideBufferList} {
@@ -70,7 +115,7 @@ namespace eval ::buli {
         # EventAsList is ignored
         variable tv
 
-        InitData {}
+        InitData 
         
         set w [PrepareGui1]
 
@@ -79,10 +124,10 @@ namespace eval ::buli {
         set bodytag [$w.tf.tbl bodytag]
         
         # wcb::callback $tbl before activate ::buli::DoOnSelect
-        bind $bodytag <space> {::buli::printKbdCell %W %x %y ShowBuffer}
-        bind $bodytag <Return> {::buli::printKbdCell %W %x %y HideListAndShowBuffer}
-        bind $bodytag <Delete> {::buli::printKbdCell %W %x %y CloseBuffer}
-        bind $bodytag <Double-Button-1> {::buli::printClickedCell %W %x %y HideListAndShowBuffer}
+        bind $bodytag <space> {::buli::KbdCellCmd %W %x %y ShowBuffer; break}
+        bind $bodytag <Return> {::buli::KbdCellCmd %W %x %y HideListAndShowBuffer; break}
+        bind $bodytag <Delete> {::buli::KbdCellCmd %W %x %y CloseBuffer; break}
+        bind $bodytag <Double-Button-1> {::buli::MouseCellCmd %W %x %y HideListAndShowBuffer; break}
         
         #    bind $w.tf.tbl <<TablelistCellUpdated>> [list DoOnSelect $w.tf.tbl]
         #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
@@ -117,18 +162,27 @@ namespace eval ::buli {
     }
 
 
+    proc CellCmdForActiveCell {tbl Cmd} {
+        CellCmd [$tbl index active] $Cmd
+    }
+
     proc TitleListBufferMenu {w menu} {
         set m [menu [::tkcon::MenuButton $menu "2.Buffer" buffer]]
-        $m add command -label "Activate" -accel "Return" -command [list ::buli::ShowSelectedBuffer $w.tf.tbl 0]
+        
+        set ActivateCmd "::buli::CellCmdForActiveCell $w.tf.tbl HideListAndShowBuffer"
+        $m add command -label "Activate" -accel "Return" -command $ActivateCmd
 
-        set CloseCmd "tk_messageBox -message 'Close'"
-        $m add command -label "close" -underline 0 -command $CloseCmd
+        set CloseCmd "::buli::CellCmdForActiveCell $w.tf.tbl CloseBuffer"
+        $m add command -label "Close buffer or file" -accel "Delete" -command $CloseCmd
     }
 
 
     proc ClearTitleList {} {
         variable TitleListWindow
-        [::buli::GetTitleListMenuTbl $TitleListWindow] delete 0 end
+        if {[winfo exists $TitleListWindow]} {
+            set tbl [::buli::GetTitleListMenuTbl $TitleListWindow]
+            $tbl delete 0 end
+        }
     }
 
         
@@ -170,7 +224,7 @@ namespace eval ::buli {
         set tbl $w.tf.tbl
         
         tablelist::tablelist $tbl -columns {20 ""} -stretch all -spacing 10
-        $tbl resetsortinfo 
+        #$tbl resetsortinfo 
 
         $tbl configure \
             -foreground \#000000 \

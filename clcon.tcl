@@ -202,7 +202,7 @@ proc ::tkcon::Init {args} {
 	cols		80
 	debugPrompt	{(level \#$level) debug [history nextid] > }
 	dead		{}
-	edit		edit
+	edit		::edt::edit
 	expandorder	{Pathname Variable Procname}
 	font		{}
 	history		48
