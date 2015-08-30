@@ -110,7 +110,7 @@ namespace eval ::erbr {
 
         # If we inserted first item, highlight it
         if {[llength $data] == 1} {
-            after idle [$tbl activate 0]
+            after idle "$tbl activate 0; $tbl selection set 0 0"
         }
         # InsertDataToShowOrBeep $w $EventAsList
     }
@@ -301,6 +301,7 @@ namespace eval ::erbr {
         set tbl $w.tf.tbl
         
         tablelist::tablelist $tbl -columns {20 ""} -stretch all -spacing 10
+        $tbl resetsortinfo 
 
         $tbl configure \
             -foreground \#000000 \
