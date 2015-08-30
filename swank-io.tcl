@@ -972,7 +972,7 @@ proc ::tkcon::EditFileAtOffset {filename offset} {
 # ARGS:	w	- text widget in which to expand str
 ## 
 proc ::tkcon::LispFindDefinition {w} {
-    set exp [::tkcon:BeginningOfLispSymbolRegexp dummy]
+    set exp [::tkcon::BeginningOfLispSymbolRegexp]
     set tmp [$w search -backwards -regexp $exp insert-1c limit-1c]
     if {[string compare {} $tmp]} {append tmp +2c} else {set tmp limit}
     set str [$w get $tmp insert]

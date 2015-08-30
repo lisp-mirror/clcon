@@ -5088,7 +5088,7 @@ proc ::tkcon::Expand {w {type ""}} {
     switch -glob $type {
         li* {
             # we might also want to pass current line to lisp 
-            set exp ::tkcon::BeginningOfLispSymbolRegexp
+            set exp [::tkcon::BeginningOfLispSymbolRegexp]
         }
         default { set exp "\[^\\\\\]\[\[ \t\n\r\\\{\"$\]" }
     }
