@@ -5783,9 +5783,10 @@ proc ::tkcon::AtSource {} {
 }
 tkcon::AtSource
 
-# it must work after toplevel window creation
+# it must work after toplevel window creation, or
+# unwanted toplevel windows arises 
 package require tablelist
 TkconSourceHere error-browser.tcl
-
+TkconSourceHere buffer-list.tcl
 
 package provide tkcon $::tkcon::VERSION
