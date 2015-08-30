@@ -123,7 +123,7 @@ xbind Text $c(key-delline)       { txt::deleteline %W }
 xbind Text $c(key-texteval)	{ txt::texteval %W }
 xbind Text $c(key-deltoeol)	{ txt::deleol %W }
 xbind Text $c(key-deleow)	{ txt::deleow %W }
-xbind .text $c(key-undo)              {txt::undo %W }
+#xbind .text $c(key-undo)              { txt::undo %W }
 xbind .text $c(key-copyfromclip) 	{ txt::copyfrom_clip %W }
 xbind  Text $c(key-tagall)		{ txt::tagall %W }
 xbind .text $c(key-nextwin)      	{ win::Next }

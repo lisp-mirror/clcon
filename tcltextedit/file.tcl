@@ -132,7 +132,7 @@ namespace eval file {
         set window($current_window,echange) 0
         set window($current_window,info) "file"
         .text delete 1.0 end
-        Supertext::reset $current_window
+        .text edit reset 
     }
 
 
@@ -200,7 +200,7 @@ namespace eval file {
             file {
                 if { [llength $inf]<2 } {set inf [FILELoadRequest $inf] }
                 set inf [DoLoadFile $inf]
-                Supertext::reset $current_window 
+                .text edit reset 
             }
 
         }
@@ -330,7 +330,7 @@ namespace eval file {
         set window($i,info) ""
         set window($i,echange) 0
         .text delete 1.0 end
-        Supertext::reset $i
+        .text edit reset
     }
 
 

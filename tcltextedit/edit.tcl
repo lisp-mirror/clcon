@@ -235,7 +235,7 @@ wm protocol   . WM_DELETE_WINDOW { file::eexit }
 wm geometry   . $c(geometry)
 
 
-source $installdir/supertext.tcl
+#source $installdir/supertext.tcl
 source $installdir/mclistbox.tcl
 source $installdir/window.tcl
 source $installdir/help.tcl

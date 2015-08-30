@@ -73,10 +73,10 @@ bind .wl <Button-3> speed::Side
 
 frame .wb -background $c(color-menubg)
 
-Supertext::text .text -yscrollcommand ".scrolly set"  -xscrollcommand ".scrollx set" \
+text .text -yscrollcommand ".scrolly set"  -xscrollcommand ".scrollx set" \
     -setgrid true -wrap none -background $c(color-editbg) -foreground $c(color-edittxt) \
     -exportselection 0 -borderwidth 2 -highlightthickness 0  -insertbackground $c(color-cursor) \
-    -font $c(font-editor) -borderwidth 1
+    -font $c(font-editor) -borderwidth 1 -undo 1
 
 scrollbar .scrolly -command ".text yview" -background $c(color-menubg) -activebackground $c(color-menuactive) -troughcolor $c(color-menubg)
 scrollbar .scrollx -command ".text xview" -orient horiz -background $c(color-menubg) -activebackground $c(color-menuactive) -troughcolor $c(color-menubg)
@@ -174,7 +174,7 @@ $menu add command -label "Exit" -accelerator [gbn key-exit] -underline 1 -comman
 set menu .menu.editmenu
 xmenu $menu 
 .menu add cascade -label "Edit" -underline 0 -menu $menu 
-$menu add command -label "Undo" -accelerator [gbn key-undo ] -underline 0 -command "txt::undo .text"
+# $menu add command -label "Undo" -accelerator [gbn key-undo ] -underline 0 -command "txt::undo .text"
 $menu add command -label "Copy" -accelerator [gbn key-copy] -underline 0 -command "txt::copy .text"
 $menu add command -label "Copy from..." -accelerator [gbn key-copyfromclip ] -underline 5 -command "txt::copyfrom_clip .text"
 $menu add command -label "Cut" -accelerator [gbn key-delete ] -underline 1 -command "txt::cut .text"
