@@ -26,6 +26,8 @@ Place dot (.) in the first position of the command to invoke named IDE command. 
 
 ```.tcsoh filename.tcl``` loads tcl file from directory where clcon.tcl script is located into main IDE tcl interpeter 
 
+```.f``` shows editor's buffer list. Coming soon: keyboard shortcut to call buffer list from any window.
+
 ```.help``` lists available IDE commands (no real help, sorry :) )
 
 Tcl escapes
