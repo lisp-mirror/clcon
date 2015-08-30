@@ -8,7 +8,7 @@ proc SingleEditorWindow {} {
 # We have global variables to keep window list
 proc InitEditorWindowDict {} {
     global EditorWindowDict
-    if {[info vars EditorWindowDict] eq ""} {
+    if {![info exists EditorWindowDict]} {
         global EditorWindowCounter
         set EditorWindowDict {}
         set EditorWindowCounter 0
@@ -32,7 +32,7 @@ proc AddToWindowDict {w ArgsToIdentifyWindow} {
     if { [dict exists "$EditorWindowDict" $ArgsToIdentifyWindow ] } {
         putd "Handling of duplicating editor args unimplemented!"
     }
-    dict append EditorWindowDict [list $ArgsToIdentifyWindow $w]
+    dict set EditorWindowDict $ArgsToIdentifyWindow $w
 }
 
 # Find frame with the same args and let the user define
@@ -56,7 +56,7 @@ proc MakeNewEditorWindowName {ArgsToIdentifyWindow word opts} {
 proc HideAllEditorWindows {} {
     global EditorWindowDict
     dict for {k v} $EditorWindowDict {
-        set window [lindex $v 1]
+        set window $v
         if {[winfo exists $window]} {
             wm withdraw $window
         }
