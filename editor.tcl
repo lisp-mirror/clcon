@@ -43,7 +43,9 @@ proc GenReuseCounter {} {
 proc CanonicalizeEditArgs {word opts} {
     set type [dict get $opts -type]
     if {$type eq "file"} {
-        return [list $word -type $type]                
+        return [list $word -type $type]
+    } elseif {$type eq "error"} {
+        return [list tcl_error -type $type -no [GenReuseCounter]]
     } else {
         # never reuse procs, vars, errors
         return [list $word -type $type -no [GenReuseCounter]]
