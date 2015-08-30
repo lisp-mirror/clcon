@@ -16,7 +16,9 @@ Code is completely portable and should run on other platforms too.
 - completion for lisp symbols and filenames in Repl
 - find source in Repl
 - command history
-- stub of swank-based inspector
+- swank-based inspector 
+- compilation error browser
+- editor buffer list
 - you can still run tcl code with special "escapes"
 
 ## Installation and startup 
