@@ -28,6 +28,10 @@ Place dot (.) in the first position of the command to invoke named IDE command. 
 
 ```.f``` shows editor's buffer list. Coming soon: keyboard shortcut to call buffer list from any window.
 
+```.history``` shows command history
+
+```.NNN``` where NNN is a decimal number re-runs command from history with that number
+
 ```.help``` lists available IDE commands (no real help, sorry :) )
 
 Tcl escapes
