@@ -181,6 +181,27 @@ namespace eval ::buli {
         $m add command -label "Close buffer or file" -accel "Delete" -command $CloseCmd
     }
 
+    proc TitleListWindowMenu {w menu} {
+        ## Window Menu
+        ##
+        set m [menu [::tkcon::MenuButton $menu "7.Window" window]]
+        set cmd [list ::clconcmd::bufferlist]
+	$m add command -label "Buffer list" -accel "Control-F12" \
+            -command $cmd -state disabled 
+        #bind $w <Control-Key-F12> $cmd
+        #
+        set cmd [list ::tkcon::FocusConsole]
+	$m add command -label "Console" -accel "Control-." \
+            -command $cmd
+        bind $w <Control-Key-period> $cmd
+        #
+        set cmd [list ::edt::ShowSomeEditor]
+        $m add command -label "Editor" -accel "Control-Shift-e" \
+            -command $cmd
+        bind $w <Control-Shift-E> $cmd
+        bind $w <Control-Shift-Key-Cyrillic_U> $cmd
+    }
+    
 
     proc ClearTitleList {} {
         variable TitleListWindow
@@ -222,6 +243,7 @@ namespace eval ::buli {
         
         TitleListFileMenu $w $menu
         TitleListBufferMenu $w $menu
+        TitleListWindowMenu $w $menu
 
         
         # --------------------------------- frames-----------------              

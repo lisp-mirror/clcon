@@ -35,6 +35,9 @@ namespace eval ::edt {
     # will split into global window counter and per window frame counter
     variable EditorWindowCounter
 
+    # last created editor window name. Window can be non-existent
+    variable SomeEditorWindowName
+    
     # This will be an option
     # If true, we allow for only one editor window at a time, joungling frames in it
     # New window to the same place where old one was
@@ -89,10 +92,24 @@ namespace eval ::edt {
     proc GenEditorWindowName {} {
         variable ::tkcon::PRIV
         variable EditorWindowCounter
+        variable SomeEditorWindowName
         incr EditorWindowCounter
         set result [string cat $PRIV(base).__edit $EditorWindowCounter]
+        set SomeEditorWindowName $result
         return $result
     }
+
+    proc ShowSomeEditor {} {
+        variable SomeEditorWindowName
+        if {[info exists SomeEditorWindowName]&& \
+                [winfo exists $SomeEditorWindowName]} {
+            wm deiconify $SomeEditorWindowName
+            focus $SomeEditorWindowName
+        } else {
+            bell
+        }
+    }
+    
 
     proc EncodeTypeForBufferList {type} {
         switch -exact $type {
@@ -277,7 +294,22 @@ namespace eval ::edt {
         $m add command -label "Send To [lindex $other 0]" \
             -command "::tkcon::EvalOther $other \
 		    eval \[$w.text get 1.0 end-1c\]"
+
+        ## Window Menu
+        ##
+        set m [menu [::tkcon::MenuButton $menu "7.Window" window]]
+        set cmd [list ::clconcmd::bufferlist]
+	$m add command -label "Buffer list" -underline 0 -accel "Control-F12" \
+            -command $cmd
+        bind $w <Control-Key-F12> $cmd
+        #
+        set cmd [list ::tkcon::FocusConsole]
+	$m add command -label "Console" -underline 0 -accel "Control-." \
+            -command $cmd
+        bind $w <Control-Key-period> $cmd
         
+        
+        # Layout
         grid $w.text - $w.sy -sticky news
         grid $w.sx - -sticky ew
         grid columnconfigure $w 0 -weight 1

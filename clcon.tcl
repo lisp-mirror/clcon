@@ -962,6 +962,15 @@ proc ::tkcon::GotoTab {con} {
     focus -force $con
 }
 
+proc ::tkcon::FocusConsole {} {
+    variable PRIV
+    set con $PRIV(console)
+    if {[winfo exists $con]} {
+        focus -force $con
+    }
+}
+
+
 proc ::tkcon::NewTab {{con {}}} {
     variable PRIV
     variable ATTACH
@@ -1758,12 +1767,17 @@ proc ::tkcon::InitMenus {w title} {
 
     ## Window Menu
     ##
-    set text $PRIV(console)
     foreach m [list [menu $w.window] [menu $w.pop.window]] {
         set cmd [list ::clconcmd::bufferlist]
 	$m add command -label "Buffer list" -underline 0 -accel "Control-F12" \
             -command $cmd
         bind TkConsole <Control-Key-F12> $cmd
+        #
+        set cmd [list ::edt::ShowSomeEditor]
+	$m add command -label "Editor" -underline 0 -accel "Control-Shift-e" \
+            -command $cmd
+        bind TkConsole <Control-Shift-E> $cmd
+        bind TkConsole <Control-Shift-Key-Cyrillic_U> $cmd
     }
     
     ## Help Menu
