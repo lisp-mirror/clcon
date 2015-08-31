@@ -13,8 +13,9 @@ Code is completely portable and should run on other platforms too.
 
 ## Current state
 - REPL with command history and history substitution
-- completion for lisp symbols and filenames in Repl
-- find source in Repl
+- debugger prototype (show condition, list frames, invoke restarts)
+- completion for lisp symbols and filenames in REPL
+- find source in REPL
 - swank-based inspector 
 - compilation error browser
 - editor buffer list
