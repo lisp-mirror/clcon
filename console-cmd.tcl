@@ -240,8 +240,13 @@ proc ::tkcon::EvalInSwankFromConsoleContinuation {w EventAsList cmd} {
 
     AddSlaveHistory $cmd
 
-    if { [::mprs::Car [lindex $EventAsList 1]] ne {:ok} } {
-        puts stderr "Something wrong: result is $EventAsList"        
+    set caadr [::mprs::Car [lindex $EventAsList 1]]
+    if { $caadr eq {:ok} } {
+        # normal return, do nothing
+    } elseif { $caadr eq {:abort} } {
+        set cadr [::mprs::Unleash [lindex $EventAsList 1]]
+        set explanation [::mprs::Unleash [lindex $cadr 1]]
+        puts stderr "Evaluation aborted at $explanation"
     }
 
     # No need to do output - it is done when :write-string was processed

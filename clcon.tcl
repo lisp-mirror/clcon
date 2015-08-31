@@ -5834,5 +5834,6 @@ tkcon::AtSource
 package require tablelist
 TkconSourceHere error-browser.tcl
 TkconSourceHere buffer-list.tcl
+TkconSourceHere ldbg.tcl
 
 package provide tkcon $::tkcon::VERSION
