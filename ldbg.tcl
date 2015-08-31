@@ -101,6 +101,20 @@ namespace eval ::ldbg {
         CellCmd $row $action
     }
 
+    # FIXME - this must be a code where e2 is a hyperlink to condition inspector
+    proc WriteDebuggerTitle {w} {
+        variable DebugEvent
+        set TitleListL [lindex $DebugEvent 3]
+        if {![::mprs::Consp $TitleListL]} {
+            error "I expected a cons: $TitleListL"
+        }
+        set TitleList [::mprs::Unleash $TitleListL]
+        set e1 [::mprs::Unleash [lindex $TitleList 0]]
+        set e2 [::mprs::Unleash [lindex $TitleList 1]]
+        ::tkcon::WritePassiveText $w "$e1\n" end
+        ::tkcon::WriteActiveText $w $e2 end "tk_messageBox -message {inspect condition}"
+    }
+    
     proc ExtractStackFrames { EventAsList } {
         set frames [lindex $EventAsList 5]
     }
@@ -117,7 +131,10 @@ namespace eval ::ldbg {
 
         set w [PrepareGui1]
 
-        set tbl $w.tf.tbl 
+        set tbl $w.tf.tbl
+
+        $w.title.text RoDelete 0.0 end
+        WriteDebuggerTitle $w.title.text
 
         set frames [ExtractStackFrames $EventAsList]
         FillData $frames
@@ -234,7 +251,9 @@ namespace eval ::ldbg {
             if {![::mprs::Consp $RestartL]} {
                 error "Expected cons: $RestartL"
             }
-            foreach {Short Long} [::mprs::Unleash $RestartL] {break}
+            set Restart [::mprs::Unleash $RestartL]
+            set Short [::mprs::Unleash [lindex $Restart 0]]
+            set Long [::mprs::Unleash [lindex $Restart 1]]
             if {$i < 10} {
                 set underlined 0
             } else {
@@ -296,8 +315,9 @@ namespace eval ::ldbg {
         toplevel $w -width [expr { 50 * $metrics }]
         wm withdraw $w
         
-        # title 
-        set word "Buffer list $w"
+        # title
+        set level [GetDebuggerLevel]
+        set word "Debugger level $level"
         wm title $w $word
 
         set DbgMainWindow $w
@@ -312,13 +332,25 @@ namespace eval ::ldbg {
         DbgMainWindowWindowMenu $w $menu
         DbgMainWindowRestartsMenu $w $menu
 
-        # --------------- frames, tablelist -----------------              
+        # --------------- frames, tablelist -----------------
+        # --------------- title (condition description) ------
+        frame $w.title
+        text $w.title.text -height 6
+        InitTextReadonly $w.title.text 1
+        scrollbar $w.title.sx -orient h -command [list $w.title.text xview]
+        scrollbar $w.title.sy -orient v -command [list $w.title.text yview]
+        ::insp::ConfigureTextFonts $w.title.text
+        $w.title.text configure \
+            -xscrollcommand [list $w.title.sx set] \
+            -yscrollcommand [list $w.title.sy set] 
 
+
+        # --------------- stack frames list -----------------
         frame $w.tf
         set tbl $w.tf.tbl
         
         tablelist::tablelist $tbl \
-            -columns {60 "Name" left} \
+            -columns {60 "Frame" left} \
             -stretch 0 -spacing 10 \
             -width 62
         $tbl resetsortinfo 
@@ -334,6 +366,14 @@ namespace eval ::ldbg {
         MakeBindings $w
         # -------------------------- layout -------------------
         
+        # now layout title elements in title
+        grid $w.title.text - $w.title.sy -sticky news
+        grid $w.title.sx - -sticky ew
+        grid columnconfigure $w.title 0 -weight 1
+        grid columnconfigure $w.title 1 -weight 1
+        grid rowconfigure $w.title 0 -weight 1
+
+        # stack frames list layout
         set f1 $w.tf
         scrollbar $f1.sy -orient v -command [list $tbl yview]
         $tbl configure -yscrollcommand [list $f1.sy set]
@@ -342,6 +382,7 @@ namespace eval ::ldbg {
         grid columnconfigure $f1 1 -weight 0
         grid rowconfigure $f1 0 -weight 1
 
+        pack $w.title -side top -fill x
         pack $f1 -fill both -expand 1
 
         $tbl selection anchor 0
