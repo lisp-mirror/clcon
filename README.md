@@ -12,10 +12,9 @@ Code is completely portable and should run on other platforms too.
 [See here](https://bitbucket.org/budden/clcon/wiki/Screenshots)
 
 ## Current state
-- REPL
+- REPL with command history and history substitution
 - completion for lisp symbols and filenames in Repl
 - find source in Repl
-- command history
 - swank-based inspector 
 - compilation error browser
 - editor buffer list
