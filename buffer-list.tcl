@@ -3,10 +3,6 @@
 ## bound to only one window. Sometimes we might try to use peering text widgets
 ## to clone some buffers to several windows, which is useful sometimes.
 
-proc ::clconcmd::f {} {
-    tkcon main ::buli::BufferListBox 
-}
-
 proc ::clconcmd::bufferlist {} {
     tkcon main ::buli::BufferListBox 
 }
@@ -48,12 +44,6 @@ namespace eval ::buli {
         set tbl $TitleListWindow.tf.tbl    
         $tbl insert end [list $name $type $path]
 
-        # If we inserted first item, highlight it
-        if {[llength $data] == 1} {
-            after idle "$tbl activate 0; $tbl selection set 0 0"
-            # ; $tbl selection anchor 0"
-            # after idle [$tbl activate 0]
-        }
     }
 
     proc FillData {} {
@@ -67,6 +57,25 @@ namespace eval ::buli {
         }
     }
 
+    proc HighlightCurrentlyVisibleBuffer {} {
+        variable EditorMRUWinList
+        variable data
+        variable TitleListWindow
+        set tw [::edt::CurrentlyVisibleBuffer]
+        if {$tw eq {}} return
+        set i 0
+        foreach d $data {
+            set w [dict get $d w]
+            set tbl $TitleListWindow.tf.tbl
+            if {$w eq $tw} {
+                after idle "$tbl activate $i; $tbl selection set $i $i"
+                return
+            }
+            incr i
+        }
+    }
+
+    
     proc RefreshData {} {
         variable TitleListWindow
         if {[info exists TitleListWindow]&&[winfo exists $TitleListWindow]} {
@@ -74,6 +83,7 @@ namespace eval ::buli {
         }
         InitData
         FillData
+        HighlightCurrentlyVisibleBuffer
     }
         
 
@@ -111,37 +121,23 @@ namespace eval ::buli {
         CellCmd $row $action
     }
     
-    proc ShowSelectedBuffer {tbl HideBufferList} {
-        tk_messageBox -message "ShowSelectedBuffer $tbl [$tbl index active]"        
-    }
-    
-
     # This is a contiuation assigned on reply on initialization request 
     proc BufferListBox { } {
         # EventAsList is ignored
 
-        InitData 
-       
+        InitData
+
         set w [PrepareGui1]
 
         set tbl $w.tf.tbl 
 
-        set bodytag [$w.tf.tbl bodytag]
-        
-        # wcb::callback $tbl before activate ::buli::DoOnSelect
-        bind $bodytag <space> {::buli::KbdCellCmd %W %x %y ShowBuffer; break}
-        bind $bodytag <Return> {::buli::KbdCellCmd %W %x %y HideListAndShowBuffer; break}
-        bind $bodytag <Delete> {::buli::KbdCellCmd %W %x %y CloseBuffer; break}
-        bind $bodytag <Double-Button-1> {::buli::MouseCellCmd %W %x %y HideListAndShowBuffer; break}
-        
-        #    bind $w.tf.tbl <<TablelistCellUpdated>> [list DoOnSelect $w.tf.tbl]
-        #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
-
         FillData
+        HighlightCurrentlyVisibleBuffer
         
         DoGoToTop $w
         
         focus $tbl
+        
         return
         
     }
@@ -194,6 +190,7 @@ namespace eval ::buli {
 	$m add command -label "Console" -accel "Control-." \
             -command $cmd
         bind $w <Control-Key-period> $cmd
+        bind $w <Control-Key-Cyrillic_yu> $cmd
         #
         set cmd [list ::edt::ShowSomeEditor]
         $m add command -label "Editor" -accel "Control-Shift-e" \
@@ -211,8 +208,23 @@ namespace eval ::buli {
         }
     }
 
+
+    proc MakeBindings {w} {
+        set bodytag [$w.tf.tbl bodytag]
         
-    # Make toplevel widget and its children 
+        # wcb::callback $tbl before activate ::buli::DoOnSelect
+        bind $bodytag <space> {::buli::KbdCellCmd %W %x %y ShowBuffer; break}
+        bind $bodytag <Return> {::buli::KbdCellCmd %W %x %y HideListAndShowBuffer; break}
+        bind $bodytag <Delete> {::buli::KbdCellCmd %W %x %y CloseBuffer; break}
+        bind $bodytag <Double-Button-1> {::buli::MouseCellCmd %W %x %y HideListAndShowBuffer; break}
+        
+        #    bind $w.tf.tbl <<TablelistCellUpdated>> [list DoOnSelect $w.tf.tbl]
+        #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
+    }
+
+    
+    # Make toplevel widget and its children
+    # Returns window
     proc PrepareGui1 {} {
         variable TitleListWindow
 
@@ -245,8 +257,7 @@ namespace eval ::buli {
         TitleListBufferMenu $w $menu
         TitleListWindowMenu $w $menu
 
-        
-        # --------------------------------- frames-----------------              
+        # --------------- frames, tablelist -----------------              
 
         frame $w.tf
         set tbl $w.tf.tbl
@@ -263,7 +274,12 @@ namespace eval ::buli {
         
 
         $tbl columnconfigure 0 -wrap true  
-        $tbl columnconfigure 2 -wrap true  
+        $tbl columnconfigure 2 -wrap true
+
+        # ------------------------------ bindings -------------
+        MakeBindings $w
+        
+        # -------------------------- layout -------------------
         
         set f1 $w.tf
         scrollbar $f1.sy -orient v -command [list $tbl yview]

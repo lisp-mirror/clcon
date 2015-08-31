@@ -962,12 +962,32 @@ proc ::tkcon::GotoTab {con} {
     focus -force $con
 }
 
+
+proc ::tkcon::FocusWindowByName {window {widget {}}} {
+    if {$window eq {}} {
+        bell
+    }
+    set code [catch {
+        wm deiconify $window
+        raise $window
+        if {$widget ne {}} {
+            focus $widget
+        } else {
+            focus $window
+        }
+    }]
+    if {$code} {
+        bell
+    }
+    return 
+}
+    
+
 proc ::tkcon::FocusConsole {} {
     variable PRIV
-    set con $PRIV(console)
-    if {[winfo exists $con]} {
-        focus -force $con
-    }
+    set w $PRIV(root)
+    set txt $PRIV(console)
+    FocusWindowByName $w $txt
 }
 
 
@@ -1771,13 +1791,13 @@ proc ::tkcon::InitMenus {w title} {
         set cmd [list ::clconcmd::bufferlist]
 	$m add command -label "Buffer list" -underline 0 -accel "Control-F12" \
             -command $cmd
-        bind TkConsole <Control-Key-F12> $cmd
+        bind $PRIV(root) <Control-Key-F12> $cmd
         #
         set cmd [list ::edt::ShowSomeEditor]
 	$m add command -label "Editor" -underline 0 -accel "Control-Shift-e" \
             -command $cmd
-        bind TkConsole <Control-Shift-E> $cmd
-        bind TkConsole <Control-Shift-Key-Cyrillic_U> $cmd
+        bind $PRIV(root) <Control-Shift-E> $cmd
+        bind $PRIV(root) <Control-Shift-Key-Cyrillic_U> $cmd
     }
     
     ## Help Menu

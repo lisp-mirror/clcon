@@ -35,9 +35,7 @@ namespace eval ::edt {
     # will split into global window counter and per window frame counter
     variable EditorWindowCounter
 
-    # last created editor window name. Window can be non-existent
-    variable SomeEditorWindowName
-    
+   
     # This will be an option
     # If true, we allow for only one editor window at a time, joungling frames in it
     # New window to the same place where old one was
@@ -92,7 +90,6 @@ namespace eval ::edt {
     proc GenEditorWindowName {} {
         variable ::tkcon::PRIV
         variable EditorWindowCounter
-        variable SomeEditorWindowName
         incr EditorWindowCounter
         set result [string cat $PRIV(base).__edit $EditorWindowCounter]
         set SomeEditorWindowName $result
@@ -100,16 +97,22 @@ namespace eval ::edt {
     }
 
     proc ShowSomeEditor {} {
-        variable SomeEditorWindowName
-        if {[info exists SomeEditorWindowName]&& \
-                [winfo exists $SomeEditorWindowName]} {
-            wm deiconify $SomeEditorWindowName
-            focus $SomeEditorWindowName
-        } else {
-            bell
-        }
+        set tw [CurrentlyVisibleBuffer]
+        ::tkcon::FocusWindowByName $tw
+        return 
     }
-    
+
+    # returns Window. When we use multiple frames, would return frame
+    proc CurrentlyVisibleBuffer {} {
+        variable EditorMRUWinList
+        foreach p $EditorMRUWinList {
+            set window [dict get $p w]
+            if {[winfo exists $window] && [winfo ismapped $window]} {
+                return $window
+            }
+        }
+        return {}
+    }
 
     proc EncodeTypeForBufferList {type} {
         switch -exact $type {
