@@ -799,18 +799,40 @@ proc ::tkcon::DoAfterCommand {} {
     set PRIV(event) [EvalSlave history nextid]
 }
 
+proc ::tkcon::FormFromHistory {FormWoPrefix} {
+    foreach {number length} [scan $FormWoPrefix "%d%n"] {break}
+    puts "number = $number"
+    if {$length != [string length $FormWoPrefix]} {
+        return {}
+    }
+    puts "Cauhgt"
+    set code [catch {EvalSlave history event $number} result]
+    if {!$code} {
+        return $result
+    }
+    return {}
+}
+
+
 proc ::tkcon::EvalTclEscape { w form } {
     # tcl escape: if lisp command starts from . , we (temporarily?) consider it as tcl escape
     # ... - tkcon main
-    # .. - just eval in slave interpreter
-    # . - add ::clconcmd:: to resolve clcon command
+    # .. - just eval in main interpreter 
+    # . - manage history or add ::clconcmd:: to resolve clcon command
 
     if {[string range $form 0 2] eq "..."} {
-        set form [string cat "tkcon main {" [string range $form 3 end] "}"]
+        set RealForm [string cat "tkcon main {" [string range $form 3 end] "}"]
     } elseif {[string range $form 0 1] eq ".."} {
-        set form [string range $form 2 end]
+        set RealForm [string range $form 2 end]
     } else {
-        set form [string cat "::clconcmd::" [string range $form 1 end]]
+        set FormWoPrefix [string range $form 1 end]
+        set ffh [FormFromHistory $FormWoPrefix]
+        if {$ffh ne ""} {
+            $w insert output $ffh\n stdin
+            set RealForm $ffh
+        } else {
+            set RealForm [string cat "::clconcmd::" [string range $form 1 end]]
+        }
     }
     # I believe this code is called in main interpreter
     # It seems that PRIV and OPT are only available in main interpreter
@@ -819,7 +841,7 @@ proc ::tkcon::EvalTclEscape { w form } {
     # It looks like error management is done by EvalAttached so we
     # don't need it
     
-    set res [::tkcon::EvalAttached $form]
+    set res [::tkcon::EvalAttached $RealForm]
     
     # this is lame but it works!
     # Correct code for working with results see in EvalAttached or something like this.
@@ -846,67 +868,59 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
     if {$cmd ne ""} {
 	set code 0
         
-	if {$OPT(subhistory)} {
-            # do nothing. In good time, take the code from EvalCmd
-	}
-	if {$code} {
-            # this should never happen in clcon, as we removed previous block
-	    $w insert output $cmd\n stderr
-	} else {
-	    ## We are about to evaluate the command, so move the limit
-	    ## mark to ensure that further <Return>s don't cause double
-	    ## evaluation of this command - for cases like the command
-	    ## has a vwait or something in it
-	    $w mark set limit end
+        ## We are about to evaluate the command, so move the limit
+        ## mark to ensure that further <Return>s don't cause double
+        ## evaluation of this command - for cases like the command
+        ## has a vwait or something in it
+        $w mark set limit end
 
-            set IsTcl [TclEscapeP $cmd]
-            if { $IsTcl } {
-                set code [catch {EvalTclEscape $w $cmd} res]
-            } else {
-                set code [catch {
-                    # FIXME. I suppose this is slow. How to use apply here? Budden
-                    EvalInSwankAsync $cmd \
-                        "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $cmd]"
-                } res]
-            }
+        set IsTcl [TclEscapeP $cmd]
+        if { $IsTcl } {
+            set code [catch {EvalTclEscape $w $cmd} res]
+        } else {
+            set code [catch {
+                # FIXME. I suppose this is slow. How to use apply here? Budden
+                EvalInSwankAsync $cmd \
+                    "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $cmd]"
+            } res]
+        }
 
-            # for tcl escape, subsequent lines are executed after a command
-            # for lisp, some of subsequent lines are executed after SENDING a command
-            # see EvalInSwankFromConsoleContinuation
-               
-            if {$code == 1} {
-                set PRIV(errorInfo) $::errorInfo
-                # was - "Socket-based errorInfo not available", but command can fail on tcl side
-            }
-	    if {![winfo exists $w]} {
-		# early abort - must be a deleted tab
-		return
-	    }
+        # for tcl escape, subsequent lines are executed after a command
+        # for lisp, some of subsequent lines are executed after SENDING a command
+        # see EvalInSwankFromConsoleContinuation
+        
+        if {$code == 1} {
+            set PRIV(errorInfo) $::errorInfo
+            # was - "Socket-based errorInfo not available", but command can fail on tcl side
+        }
+        if {![winfo exists $w]} {
+            # early abort - must be a deleted tab
+            return
+        }
 
-            
-            if { $IsTcl } {
-                # for lisp, we add to history when command returns
-                AddSlaveHistory $cmd
-            }
+        
+        if { $IsTcl } {
+            # for lisp, we add to history when command returns
+            AddSlaveHistory $cmd
+        }
 
-            if {$code} {
-		if {$OPT(hoterrors)} {
-		    set tag [UniqueTag $w]
-		    $w insert output $res [list stderr $tag] \n stdout
-		    $w tag bind $tag <Enter> \
-			    [list $w tag configure $tag -under 1]
-		    $w tag bind $tag <Leave> \
-                        [list $w tag configure $tag -under 0]
-		    $w tag bind $tag <ButtonRelease-1> \
-			    "if {!\[info exists tk::Priv(mouseMoved)\] || !\$tk::Priv(mouseMoved)} \
+        if {$code} {
+            if {$OPT(hoterrors)} {
+                set tag [UniqueTag $w]
+                $w insert output $res [list stderr $tag] \n stdout
+                $w tag bind $tag <Enter> \
+                    [list $w tag configure $tag -under 1]
+                $w tag bind $tag <Leave> \
+                    [list $w tag configure $tag -under 0]
+                $w tag bind $tag <ButtonRelease-1> \
+                    "if {!\[info exists tk::Priv(mouseMoved)\] || !\$tk::Priv(mouseMoved)} \
 			    {[list $OPT(edit) -attach [Attach] -type error -- $PRIV(errorInfo)]}"
-		} else {
-		    $w insert output $res\n stderr
-		}
-	    } elseif {$res ne ""} {
-		$w insert output $res stdout \n stdout
-	    }
-	}
+            } else {
+                $w insert output $res\n stderr
+            }
+        } elseif {$res ne ""} {
+            $w insert output $res stdout \n stdout
+        }
     }
 
     if { $IsTcl } {
