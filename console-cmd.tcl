@@ -82,6 +82,7 @@ proc ::tkcon::ExpandFormFromHistory {FormWoPrefix form} {
 }
 
 
+# Can throw errors!
 proc ::tkcon::EvalTclEscape { w NoOfDots RealForm form} {
     # Tcl Escape is classified already
     # tcl escape: if lisp command starts from . , we (temporarily?) consider it as tcl escape
@@ -102,16 +103,12 @@ proc ::tkcon::EvalTclEscape { w NoOfDots RealForm form} {
     # It seems that PRIV and OPT are only available in main interpreter
     # puts "EvalAttached = [interp alias ::tkcon::EvalAttached]"
     
-    # It looks like error management is done by EvalAttached so we
-    # don't need it
-    
+    # It looks like error management is done by caller
     set res [::tkcon::EvalAttached $RealForm]
     
     # this is lame but it works!
     # Correct code for working with results see in EvalAttached or something like this.
-    puts $res 
-
-    return 
+    return $res
 }
 
 # We either finished processing of command, or we get a error
@@ -129,7 +126,7 @@ proc ::tkcon::EndProcessingOfNonLispCommandOrError {w cmd code res} {
         return
     }
 
-    if {$code} {
+    if {$code == 1} {
         if {$OPT(hoterrors)} {
             set tag [UniqueTag $w]
             $w insert output $res [list stderr $tag] \n stdout
@@ -205,7 +202,7 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
     # For lisp, end of processing is executed after returning from a command
     # see EvalInSwankFromConsoleContinuation
 
-    if {$code == 1 || $NoOfDots ne 0} {
+    if {$code == 1 || $NoOfDots ne 0 && $NoOfDots ne {history}} {
         EndProcessingOfNonLispCommandOrError $w $cmd $code $result
     }
     
