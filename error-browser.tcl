@@ -318,7 +318,7 @@ namespace eval ::erbr {
         grid columnconfigure $f1 1 -weight 1
         grid rowconfigure $f1 0 -weight 1
 
-        pack $f1 -side top -fill x
+        pack $f1 -fill both -expand 1
 
         return $w    
     }

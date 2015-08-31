@@ -247,10 +247,10 @@ namespace eval ::buli {
         $tbl configure -yscrollcommand [list $f1.sy set]
         grid $tbl - $f1.sy -sticky news
         grid columnconfigure $f1 0 -weight 1
-        grid columnconfigure $f1 1 -weight 1
+        grid columnconfigure $f1 1 -weight 0
         grid rowconfigure $f1 0 -weight 1
 
-        pack $f1 -side top -fill x -expand 1
+        pack $f1 -fill both -expand 1
 
         $tbl selection anchor 0
 
