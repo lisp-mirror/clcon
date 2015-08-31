@@ -21,6 +21,11 @@ namespace eval ::edt {
     variable ReuseCounter
 
     # when we allow for several editor windows, this variable will be window-local
+    # Each element is a dict with keys and values:
+    # name - name of window
+    # type - type (file, var, proc, error)
+    # path - path to a file (with a name)
+    # w - window
     variable EditorMRUWinList
 
     # will always be global 
@@ -89,11 +94,39 @@ namespace eval ::edt {
         return $result
     }
 
+    proc EncodeTypeForBufferList {type} {
+        switch -exact $type {
+            file {return "f"}
+            proc {return "p"}
+            var {return "v"}
+            error {return "e"}
+            default {return "?"}
+        }
+    }
+
     # Store window name for buffer list window
     proc AddToWindowLists {key w} {
         variable EditorMRUWinList
         variable EditorReusableWindowDict
-        lappend EditorMRUWinList [list $key $w]
+
+        set word [lindex $key 0]
+        set options [lrange $key 1 end]
+        set type [dict get $options -type]
+        if {[dict exists $options -no]} {
+            set no [dict get $options -no]
+        } else {
+            set no ""
+        }
+
+        set ty [EncodeTypeForBufferList $type]
+
+        if {$type eq {file}} {
+            set name [lindex [file split $word] end]
+        } else {
+            set name "$word $no"
+        }
+        
+        lappend EditorMRUWinList [dict create name $name type $ty path $word w $w]
         dict set EditorReusableWindowDict $key $w
     }
 
@@ -116,7 +149,7 @@ namespace eval ::edt {
     proc HideAllEditorWindows {} {
         variable EditorMRUWinList
         foreach p $EditorMRUWinList {
-            set window [lindex $p 1]
+            set window [dict get $p w]
             if {[winfo exists $window]} {
                 wm withdraw $window
             }
@@ -128,7 +161,7 @@ namespace eval ::edt {
         variable EditorReusableWindowDict
         set i 0
         foreach p $EditorMRUWinList {
-            set window [lindex $p 1]
+            set window [dict get $p w]
             if {$window eq $tw} {
                 set EditorMRUWinList [lreplace $EditorMRUWinList $i $i]
                 break
@@ -278,7 +311,6 @@ namespace eval ::edt {
                                 [string trimleft [file extension $word] .]]
             }
             error*	{
-                puts "tail = $tail"
                 $w.text insert 1.0 [join $tail \n]
                 after idle [::tkcon::Highlight $w.text error]
             }

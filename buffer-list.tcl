@@ -7,10 +7,15 @@ proc ::clconcmd::f {} {
     tkcon main ::buli::BufferListBox 
 }
 
+proc ::clconcmd::bufferlist {} {
+    tkcon main ::buli::BufferListBox 
+}
+
 
 namespace eval ::buli {
+
+    # contents of widget separated from widget
     variable data
-    variable tv
     variable TitleListWindow
 
     catch {font create tkconfixed -family Courier -size -20}
@@ -20,7 +25,6 @@ namespace eval ::buli {
         set data {}
     }
 
-    # title -> key , DetailsCode -> w
     # There is a design problem. We mix visual and non-visual
     # activity while we don't know if visual component exists
     # We recreate non-visual data at creation of visual control
@@ -29,9 +33,8 @@ namespace eval ::buli {
     # This was desired for error-browser and this can also be desired
     # for buffer-list. E.g. we would like to remove deleted window
     # without moving keyboard focus on the list. 
-    proc AppendData {title w} {
+    proc AppendData {name type path w} {
         variable TitleListWindow
-        variable tv
         variable data
 
         if {!([info exists TitleListWindow]&&[winfo exists $TitleListWindow])} {
@@ -39,11 +42,11 @@ namespace eval ::buli {
             return
         }
 
-        set NewItem [dict create title $title w $w]
+        set NewItem [dict create name $name type $type path $path w $w]
         lappend data $NewItem
 
         set tbl $TitleListWindow.tf.tbl    
-        $tbl insert end [list $title]
+        $tbl insert end [list $name $type $path]
 
         # If we inserted first item, highlight it
         if {[llength $data] == 1} {
@@ -56,8 +59,11 @@ namespace eval ::buli {
     proc FillData {} {
         variable ::edt::EditorMRUWinList
         foreach p $EditorMRUWinList {
-            foreach {key w} $p break
-            AppendData $key $w
+            set name [dict get $p name]
+            set type [dict get $p type]
+            set path [dict get $p path]
+            set w [dict get $p w]
+            AppendData $name $type $path $w
         }
     }
 
@@ -75,7 +81,7 @@ namespace eval ::buli {
         variable ::edt::EditorMRUWinList
         variable TitleListWindow
         set p [lindex $EditorMRUWinList $row]
-        foreach {key w} $p break
+        set w [dict get $p w]
         switch -exact $action {
             ShowBuffer {
                 ::edt::ShowExistingBuffer $w
@@ -113,10 +119,9 @@ namespace eval ::buli {
     # This is a contiuation assigned on reply on initialization request 
     proc BufferListBox { } {
         # EventAsList is ignored
-        variable tv
 
         InitData 
-        
+       
         set w [PrepareGui1]
 
         set tbl $w.tf.tbl 
@@ -146,14 +151,14 @@ namespace eval ::buli {
         raise $w
     }
 
-    # Fills browser from data 
-    proc FillHeaders {tbl} {
-        variable data
-        foreach item $data {
-            set title [dict get $item {title}]
-            $tbl insert end [list $title]
-        }
-    }
+    # # Fills browser from data 
+    # proc FillHeaders {tbl} {
+    #     variable data
+    #     foreach item $data {
+    #         set title [dict get $item {title}]
+    #         $tbl insert end [list $title]
+    #     }
+    # }
 
     proc TitleListFileMenu {w menu} {
          set m [menu [::tkcon::MenuButton $menu "1.File" file]]
@@ -200,7 +205,8 @@ namespace eval ::buli {
             return $w
         }
 
-        toplevel $w
+        set metrics [font measure tkconfixed "w"]
+        toplevel $w -width [expr { 50 * $metrics }]
         wm withdraw $w
         
         # title 
@@ -223,7 +229,9 @@ namespace eval ::buli {
         frame $w.tf
         set tbl $w.tf.tbl
         
-        tablelist::tablelist $tbl -columns {20 ""} -stretch all -spacing 10
+        tablelist::tablelist $tbl \
+            -columns {20 "Name" 3 "Typ" 30 "Path"} \
+            -stretch 2 -spacing 10
         $tbl resetsortinfo 
 
         $tbl configure \
@@ -232,6 +240,7 @@ namespace eval ::buli {
         
 
         $tbl columnconfigure 0 -wrap true  
+        $tbl columnconfigure 2 -wrap true  
         
         set f1 $w.tf
         scrollbar $f1.sy -orient v -command [list $tbl yview]
@@ -241,7 +250,7 @@ namespace eval ::buli {
         grid columnconfigure $f1 1 -weight 1
         grid rowconfigure $f1 0 -weight 1
 
-        pack $f1 -side top -fill x
+        pack $f1 -side top -fill x -expand 1
 
         $tbl selection anchor 0
 
