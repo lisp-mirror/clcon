@@ -880,8 +880,6 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
     variable OPT
     variable PRIV
 
-    puts "Entering EvalKnownCommand with $cmd"
-    
     if {$cmd eq ""} {
         return
     }
@@ -956,6 +954,7 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
         # for lisp, we show prompt after end of evaluation
         DoAfterCommand
     }
+    return $res
 }
 
 

@@ -1491,7 +1491,8 @@ proc ::tkcon::Prompt {{pre {}} {post {}} {prompt {}}} {
     set i [$w index end-1c]
 
     if {$PRIV(SwankConnection) ne {}} {
-        $w insert end "CL-UsER>" prompt
+        $w insert end [EvalSlave history nextid] prompt
+        $w insert end " CL-UsER>" prompt
     } else {
         if {!$OPT(showstatusbar)} {
             if {$PRIV(appname) ne ""} {
