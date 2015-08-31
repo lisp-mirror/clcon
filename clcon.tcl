@@ -1597,7 +1597,7 @@ proc ::tkcon::InitMenus {w title} {
 	eval [list $PRIV(popup).[string tolower $m] entryconfigure $l] $args
     }
 
-    foreach m [list 1.File 2.Console 3.Edit 4.Interp 5.Prefs 6.History 7.Help] {
+    foreach m [list 1.File 2.Console 3.Edit 4.Interp 5.Prefs 6.History 7.Window 8.Help] {
  	set l [string tolower [string range $m 2 end]]
  	MenuButton $w $m $l
  	$w.pop add cascade -label $m -underline 0 -menu $w.pop.$l
@@ -1756,6 +1756,16 @@ proc ::tkcon::InitMenus {w title} {
 		-postcommand [list ::tkcon::HistoryMenu $m]
     }
 
+    ## Window Menu
+    ##
+    set text $PRIV(console)
+    foreach m [list [menu $w.window] [menu $w.pop.window]] {
+        set cmd [list ::clconcmd::bufferlist]
+	$m add command -label "Buffer list" -underline 0 -accel "Control-F12" \
+            -command $cmd
+        bind TkConsole <Control-Key-F12> $cmd
+    }
+    
     ## Help Menu
     ##
     foreach m [list [menu $w.help] [menu $w.pop.help]] {
