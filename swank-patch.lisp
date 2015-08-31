@@ -38,50 +38,6 @@
   (assert swank::*emacs-connection*)
   (setf (tcl-connection-p swank::*emacs-connection*) t))
 
-;(defvar *tcl-connection* nil "Tcl connection currently in use. Note that we initially planned to use one connection per tool, but it looks to contradict to SWANK/SLIME architecture. Will see")
-;(defun tcl-connection-p (connection)
-;  (gethash connection *tcl-connections*))
-
-#|(defun convert-object-to-tcl (object package)
-  "If possible, convert object to tcl commands. FIXME: use target"
-  (log-to-file "entered convert-object-to-tcl")
-  (swank::dcase object
-    ((:write-string string &optional target)
-     (log-to-file "processing write-string of ~S" string)
-     (assert (keywordp target))
-     (format nil "!puts target=~A;puts ~A"
-             target
-             (cl-tk:tcl-escape string))
-     )
-    (t
-     nil)))|#
-
-
-#|(defun convert-object-to-tcl-inner (x ou)
-  (format ou "{")
-  (etypecase x
-    (cons
-     (format ou "list")
-     (dolist (y x)
-       (format ou " ")
-       (convert-object-to-tcl-inner y ou)
-       )
-     )
-    (string
-     (format ou "~A\"" (cl-tk:tcl-escape x))
-     #| (map nil
-          (lambda (y)
-            (case y
-              ((#\\ #\")
-               (write-char #\\ ou)))
-            (write-char y ou))
-          x) |#)
-    (integer
-     (format ou "~D" x))
-    (symbol
-     (format ou "~A" x)))
-  (format ou "}")) |#
-
 (defun my-symbol-tcl-form (s ou)
   (let* ((package (symbol-package s))
          (package-string
