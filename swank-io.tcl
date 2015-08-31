@@ -799,40 +799,64 @@ proc ::tkcon::DoAfterCommand {} {
     set PRIV(event) [EvalSlave history nextid]
 }
 
-proc ::tkcon::FormFromHistory {FormWoPrefix} {
+# returns three values:
+# 1. number of dots afore or "history" if it is a history reference
+# 2. form cleared from dots
+# Errors: errs if incorrect prefix
+proc ::tkcon::ClassifyTclEscapes { form } {
+    if {[string range $form 0 0] ne "."} {
+        return [list 0 $form]
+    } elseif {[string range $form 0 3] eq "...."} {
+        error "Unknown 'dotted' command $form"
+    } elseif {[string range $form 0 2] eq "..."} {
+        return [list 3 [string range $form 3 end]]
+    } elseif {[string range $form 0 1] eq ".."} {
+        return [list 2 [string range $form 2 end]]
+    } else {
+        # Hence we have one dot only
+        set FormWoPrefix [string range $form 1 end]
+        foreach {number NumLength} [scan $FormWoPrefix "%d%n"] {break}
+        if {$NumLength == [string length $FormWoPrefix]} {
+            # it is a history reference
+            return [list "history" $FormWoPrefix]
+        } else {
+            return [list 1 $FormWoPrefix]
+        }
+    }
+}
+
+# Args: FormWoPrefix : form w/o dots, we know that it is a history substitution
+# Returns: If this form is a number, returns history event from that number
+proc ::tkcon::ExpandFormFromHistory {FormWoPrefix form} {
     foreach {number length} [scan $FormWoPrefix "%d%n"] {break}
-    puts "number = $number"
     if {$length != [string length $FormWoPrefix]} {
-        return {}
+        error "Internal error 75474"
     }
-    puts "Cauhgt"
     set code [catch {EvalSlave history event $number} result]
-    if {!$code} {
-        return $result
+
+    #Protect from recursion
+    foreach {kind2 FormWoPrefix2} [ClassifyTclEscapes $result] {break}
+    if {$kind2 eq {history}} {
+        error "Recursive history reference in command $form"
     }
-    return {}
+    return $result
 }
 
 
-proc ::tkcon::EvalTclEscape { w form } {
+proc ::tkcon::EvalTclEscape { w NoOfDots RealForm form} {
     # tcl escape: if lisp command starts from . , we (temporarily?) consider it as tcl escape
     # ... - tkcon main
     # .. - just eval in main interpreter 
     # . - manage history or add ::clconcmd:: to resolve clcon command
 
-    if {[string range $form 0 2] eq "..."} {
-        set RealForm [string cat "tkcon main {" [string range $form 3 end] "}"]
-    } elseif {[string range $form 0 1] eq ".."} {
-        set RealForm [string range $form 2 end]
+    if {$NoOfDots == 3} {
+        set RealForm [string cat "tkcon main {" $RealForm  "}"]
+    } elseif {$NoOfDots == 2} {
+        # ok
+    } elseif {$NoOfDots == 1} {
+        set RealForm [string cat "::clconcmd::" $RealForm]
     } else {
-        set FormWoPrefix [string range $form 1 end]
-        set ffh [FormFromHistory $FormWoPrefix]
-        if {$ffh ne ""} {
-            $w insert output $ffh\n stdin
-            set RealForm $ffh
-        } else {
-            set RealForm [string cat "::clconcmd::" [string range $form 1 end]]
-        }
+        error "Internal error 253525"
     }
     # I believe this code is called in main interpreter
     # It seems that PRIV and OPT are only available in main interpreter
@@ -850,12 +874,94 @@ proc ::tkcon::EvalTclEscape { w form } {
     return 
 }
 
+# Part of evaluation mechanism - we have command accepted from user.
+# Code is taken from EvalCmd
+proc ::tkcon::EvalKnownCommand { w cmd } {
+    variable OPT
+    variable PRIV
+
+    puts "Entering EvalKnownCommand with $cmd"
+    
+    if {$cmd eq ""} {
+        return
+    }
+
+    set code 0
+    
+    ## We are about to evaluate the command, so move the limit
+    ## mark to ensure that further <Return>s don't cause double
+    ## evaluation of this command - for cases like the command
+    ## has a vwait or something in it
+    $w mark set limit end
+
+    foreach {NoOfDots RealForm} [ClassifyTclEscapes $cmd] {break}
+    if {$NoOfDots eq {history}} {
+        set ffh [ExpandFormFromHistory $RealForm $cmd]
+        if {$ffh eq ""} {
+            error "Empty command after history expansion of $form"
+        }
+        $w insert output $ffh\n stdin
+        set code [catch [EvalKnownCommand $w $ffh] res]
+        if {!$code} {
+            return $res
+        }
+    } elseif { $NoOfDots ne 0 } {
+        set code [catch {EvalTclEscape $w $NoOfDots $RealForm $cmd} res]
+    } else {
+        set code [catch {
+            # FIXME. I suppose this is slow. How to use apply here? Budden
+            EvalInSwankAsync $RealForm \
+                "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $RealForm]"
+        } res]
+    }
+
+    # for tcl escape, subsequent lines are executed after a command
+    # for lisp, some of subsequent lines are executed after SENDING a command
+    # see EvalInSwankFromConsoleContinuation
+    
+    if {$code == 1} {
+        set PRIV(errorInfo) $::errorInfo
+        # was - "Socket-based errorInfo not available", but command can fail on tcl side
+    }
+    if {![winfo exists $w]} {
+        # early abort - must be a deleted tab
+        return
+    }
+
+    
+    if { $NoOfDots ne 0 } {
+        # for lisp, we add to history when command returns
+        AddSlaveHistory $cmd
+    }
+
+    if {$code} {
+        if {$OPT(hoterrors)} {
+            set tag [UniqueTag $w]
+            $w insert output $res [list stderr $tag] \n stdout
+            $w tag bind $tag <Enter> \
+                [list $w tag configure $tag -under 1]
+            $w tag bind $tag <Leave> \
+                [list $w tag configure $tag -under 0]
+            $w tag bind $tag <ButtonRelease-1> \
+                "if {!\[info exists tk::Priv(mouseMoved)\] || !\$tk::Priv(mouseMoved)} \
+			    {[list $OPT(edit) -attach [Attach] -type error -- $PRIV(errorInfo)]}"
+        } else {
+            $w insert output $res\n stderr
+        }
+    } elseif {$res ne ""} {
+        $w insert output $res stdout \n stdout
+    }
+
+    if { $NoOfDots ne 0 } {
+        # for lisp, we show prompt after end of evaluation
+        DoAfterCommand
+    }
+}
+
 
 ## Clone of ::tkcon::Eval (see clcon.tcl) and ::tkcon::EvalCmd
 # Some code is lost while copying... 
 proc ::tkcon::EvalInSwankFromConsole { w } {
-    variable OPT
-    variable PRIV
     
     set cmd [CmdGet $w]
     # we do not split commands
@@ -865,68 +971,8 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
     #Code from EvalCmd follows
 
     $w mark set output end
-    if {$cmd ne ""} {
-	set code 0
-        
-        ## We are about to evaluate the command, so move the limit
-        ## mark to ensure that further <Return>s don't cause double
-        ## evaluation of this command - for cases like the command
-        ## has a vwait or something in it
-        $w mark set limit end
 
-        set IsTcl [TclEscapeP $cmd]
-        if { $IsTcl } {
-            set code [catch {EvalTclEscape $w $cmd} res]
-        } else {
-            set code [catch {
-                # FIXME. I suppose this is slow. How to use apply here? Budden
-                EvalInSwankAsync $cmd \
-                    "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $cmd]"
-            } res]
-        }
-
-        # for tcl escape, subsequent lines are executed after a command
-        # for lisp, some of subsequent lines are executed after SENDING a command
-        # see EvalInSwankFromConsoleContinuation
-        
-        if {$code == 1} {
-            set PRIV(errorInfo) $::errorInfo
-            # was - "Socket-based errorInfo not available", but command can fail on tcl side
-        }
-        if {![winfo exists $w]} {
-            # early abort - must be a deleted tab
-            return
-        }
-
-        
-        if { $IsTcl } {
-            # for lisp, we add to history when command returns
-            AddSlaveHistory $cmd
-        }
-
-        if {$code} {
-            if {$OPT(hoterrors)} {
-                set tag [UniqueTag $w]
-                $w insert output $res [list stderr $tag] \n stdout
-                $w tag bind $tag <Enter> \
-                    [list $w tag configure $tag -under 1]
-                $w tag bind $tag <Leave> \
-                    [list $w tag configure $tag -under 0]
-                $w tag bind $tag <ButtonRelease-1> \
-                    "if {!\[info exists tk::Priv(mouseMoved)\] || !\$tk::Priv(mouseMoved)} \
-			    {[list $OPT(edit) -attach [Attach] -type error -- $PRIV(errorInfo)]}"
-            } else {
-                $w insert output $res\n stderr
-            }
-        } elseif {$res ne ""} {
-            $w insert output $res stdout \n stdout
-        }
-    }
-
-    if { $IsTcl } {
-        # for lisp, we show prompt after end of evaluation
-        DoAfterCommand
-    }
+    EvalKnownCommand $w $cmd
 }
 
 
