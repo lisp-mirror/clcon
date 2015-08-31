@@ -232,7 +232,6 @@ namespace eval ::buli {
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
         set w $PRIV(base).buliTlv
-        puts $w
         if {[winfo exists $w]} {
             ClearTitleList
             return $w

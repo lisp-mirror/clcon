@@ -201,7 +201,7 @@ namespace eval ::edt {
         if {[winfo exists $tw]} {
             wm withdraw $tw
         }
-        puts "Saving file if omitted!" 
+        putd "Saving file if omitted!" 
         RemoveWindowFromLists $tw $w
         destroy $w
         UpdateMRUAndBufferList {}
@@ -217,7 +217,7 @@ namespace eval ::edt {
     # Hides editor window. 
     # If EditorMRUWinList is empty, destroys it
     proc HideEditorWindow {tw} {
-        puts "Normally hiding editor windows assumes closing all files. We are wrong"
+        putd "Normally hiding editor windows assumes closing all files. We are wrong"
         wm withdraw $tw
         after idle "::edt::MaybeDestroyEditorWindow $tw"
     }
@@ -425,7 +425,7 @@ namespace eval ::edt {
     # Reorganizes windows according to their usage order
     # Refreshes buffer list. LastUsedTw can be {} when deleting window!
     proc UpdateMRUAndBufferList {LastUsedTw} {
-        puts "We should have reordered windows here"
+        putd "We should have reordered windows here"
         after idle ::buli::RefreshData
     }
     
