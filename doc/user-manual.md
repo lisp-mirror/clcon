@@ -99,7 +99,9 @@ Not supported, neither in lisp, nor in tcl. Don't try them
 
 Also Read tkcon manual
 ----------------------
-Manual is [here](http://tkcon.sourceforge.net/docs/index.html)
+clcon is fork of tkcon. Many of tkcon's functionality is destroyed, but some still work (and will work in the future). 
+tkcon's manual is [here](http://tkcon.sourceforge.net/docs/index.html)
+It can also be found in ActiveTCL help file.
  
 ## What if I want to contribute
 Read issues
