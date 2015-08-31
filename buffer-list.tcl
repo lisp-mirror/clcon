@@ -230,8 +230,9 @@ namespace eval ::buli {
         set tbl $w.tf.tbl
         
         tablelist::tablelist $tbl \
-            -columns {20 "Name" 3 "Typ" 30 "Path"} \
-            -stretch 2 -spacing 10
+            -columns {20 "Name" left 3 "Typ" left 30 "Path" left} \
+            -stretch 2 -spacing 10 \
+            -width 35
         $tbl resetsortinfo 
 
         $tbl configure \
