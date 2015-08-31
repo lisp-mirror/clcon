@@ -20,6 +20,10 @@
 # 
 
 
+proc ::clconcmd::history {} {
+    tkcon main history
+}
+
 proc ::tkcon::TclEscapeP { cmd } {
     if {[string index $cmd 0] eq "."} {
         return 1
@@ -69,9 +73,7 @@ proc ::tkcon::ExpandFormFromHistory {FormWoPrefix form} {
     if {$length != [string length $FormWoPrefix]} {
         error "Internal error 75474"
     }
-    puts "about to call EvalSlave history event.. $number"
     set result [EvalSlave history event $number]
-    puts "EvalSlave history event returned.. $number"
 
     #Protect from recursion
     foreach {kind2 FormWoPrefix2} [ClassifyTclEscapes $result] {break}
@@ -83,18 +85,18 @@ proc ::tkcon::ExpandFormFromHistory {FormWoPrefix form} {
 
 
 # Can throw errors!
-proc ::tkcon::EvalTclEscape { w NoOfDots RealForm form} {
+proc ::tkcon::EvalTclEscape { w TclEscapeKind RealForm form} {
     # Tcl Escape is classified already
     # tcl escape: if lisp command starts from . , we (temporarily?) consider it as tcl escape
     # ... - tkcon main
     # .. - just eval in main interpreter 
     # . - manage history or add ::clconcmd:: to resolve clcon command
 
-    if {$NoOfDots == 3} {
+    if {$TclEscapeKind == 3} {
         set RealForm [string cat "tkcon main {" $RealForm  "}"]
-    } elseif {$NoOfDots == 2} {
+    } elseif {$TclEscapeKind == 2} {
         # ok
-    } elseif {$NoOfDots == 1} {
+    } elseif {$TclEscapeKind == 1} {
         set RealForm [string cat "::clconcmd::" $RealForm]
     } else {
         error "Internal error 253525"
@@ -177,10 +179,10 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
         return {}
     }
     
-    foreach {NoOfDots RealForm} $ClassifiedCommand {break}
+    foreach {TclEscapeKind RealForm} $ClassifiedCommand {break}
 
     set code [catch {
-        if {$NoOfDots eq {history}} {
+        if {$TclEscapeKind eq {history}} {
             set ffh [ExpandFormFromHistory $RealForm $cmd]
             if {$ffh eq ""} {
                 error "Empty command after history expansion of $form"
@@ -188,8 +190,8 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
             $w insert output $ffh\n stdin
             set res [EvalKnownCommand $w $ffh]
             return $res
-        } elseif { $NoOfDots ne 0 } {
-            set res [EvalTclEscape $w $NoOfDots $RealForm $cmd]
+        } elseif { $TclEscapeKind ne 0 } {
+            set res [EvalTclEscape $w $TclEscapeKind $RealForm $cmd]
             return $res
         } else {
             # FIXME. I suppose this is slow. How to use apply here? Budden
@@ -202,7 +204,7 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
     # For lisp, end of processing is executed after returning from a command
     # see EvalInSwankFromConsoleContinuation
 
-    if {$code == 1 || $NoOfDots ne 0 && $NoOfDots ne {history}} {
+    if {$code == 1 || $TclEscapeKind ne 0 && $TclEscapeKind ne {history}} {
         EndProcessingOfNonLispCommandOrError $w $cmd $code $result
     }
     
