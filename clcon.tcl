@@ -148,7 +148,7 @@ TkconSourceHere rotext.tcl
 TkconSourceHere swank-connection.tcl
 TkconSourceHere swank-io.tcl
 TkconSourceHere console-cmd.tcl
-
+TkconSourceHere slimv-clcon.tcl
 
 
 ## ::tkcon::Init - inits tkcon
