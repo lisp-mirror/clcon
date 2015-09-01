@@ -23,3 +23,21 @@ Hide Window и потом опять defun - не должно ломаться.
 ============
 ..asdfasdfasdfasdfasdadsf
 Появляется браузер ошибок. Гиперссывлка в ней должна нажиматься
+
+
+Отладчик проверяем
+==================
+
+(defun test-debugger-1 ()
+  (let ((l (length (swank:list-threads))))
+   (defun compute-fixnum-power-of-2 (x)
+    (with-simple-restart (nil "Give up on computing 2^~D." x)
+      (let ((result 1))
+        (dotimes (i x result)
+          (setq result (* 2 result))
+          (unless (fixnump result)
+            (error "Power of 2 is too large."))))))
+   (eval '(compute-fixnum-power-of-2 100500))
+   (print "This should be printed after returning from a debugger")
+   (assert (= l (length (swank:list-threads))))
+  ))
