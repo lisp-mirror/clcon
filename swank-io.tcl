@@ -360,6 +360,8 @@ proc ::mprs::ContinuationExistsP {ContinuationId} {
 ## We know continuiation exists. Runs its continuation synchronously. 
 proc ::mprs::RunContinuation {ContinuationId EventAsList} {
     variable ContinuationsDict
+    # If we get error here, we trying to call continuation which was not sheduled or
+    # which was lost
     set Continuation [dict get $ContinuationsDict $ContinuationId]
     dict unset ContinuationsDict $ContinuationId
     apply $Continuation $EventAsList
