@@ -65,23 +65,21 @@ namespace eval ::ldbg {
         InitData
         FillData
     }
-        
+
+    proc ViewLocals {row} {
+        set OnReply "puts \$EventAsList"
+        ::tkcon::EvalInSwankAsync \
+            "(swank:frame-locals-and-catch-tags $row)" \
+            $OnReply 0 [GetDebuggerThreadId]
+    }
 
     proc CellCmd {row action} {
         variable ::edt::EditorMRUWinList
         variable DbgMainWindow
         set p [lindex $EditorMRUWinList $row]
-        set w [dict get $p w]
         switch -exact $action {
-            ShowBuffer {
-                ::edt::ShowExistingBuffer $w
-            }
-            HideListAndShowBuffer {
-                wm withdraw $DbgMainWindow
-                ::edt::ShowExistingBuffer $w
-            }
-            CloseBuffer {
-                ::edt::EditCloseFile $w $w
+            ViewLocals {
+                ViewLocals $row
             }
             default {
                 error "Unknown CellCmd"
@@ -167,10 +165,10 @@ namespace eval ::ldbg {
     proc DbgMainWindowBufferMenu {w menu} {
         set m [menu [::tkcon::MenuButton $menu "2.Buffer" buffer]]
         
-        set ActivateCmd "::buli::CellCmdForActiveCell $w.tf.tbl HideListAndShowBuffer"
+        set ActivateCmd "::ldbg::CellCmdForActiveCell $w.tf.tbl HideListAndShowBuffer"
         $m add command -label "Activate" -accel "Return" -command $ActivateCmd
 
-        set CloseCmd "::buli::CellCmdForActiveCell $w.tf.tbl CloseBuffer"
+        set CloseCmd "::ldbg::CellCmdForActiveCell $w.tf.tbl CloseBuffer"
         $m add command -label "Close buffer or file" -accel "Delete" -command $CloseCmd
     }
 
@@ -286,11 +284,11 @@ namespace eval ::ldbg {
     proc MakeBindings {w} {
         set bodytag [$w.tf.tbl bodytag]
         
-        # wcb::callback $tbl before activate ::buli::DoOnSelect
-        bind $bodytag <space> {::buli::KbdCellCmd %W %x %y ShowBuffer; break}
-        bind $bodytag <Return> {::buli::KbdCellCmd %W %x %y HideListAndShowBuffer; break}
-        bind $bodytag <Delete> {::buli::KbdCellCmd %W %x %y CloseBuffer; break}
-        bind $bodytag <Double-Button-1> {::buli::MouseCellCmd %W %x %y HideListAndShowBuffer; break}
+        # wcb::callback $tbl before activate ::ldbg::DoOnSelect
+        bind $bodytag <space> {::ldbg::KbdCellCmd %W %x %y ViewLocals; break}
+        bind $bodytag <Return> {::ldbg::KbdCellCmd %W %x %y HideListAndShowBuffer; break}
+        bind $bodytag <Delete> {::ldbg::KbdCellCmd %W %x %y CloseBuffer; break}
+        bind $bodytag <Double-Button-1> {::ldbg::MouseCellCmd %W %x %y HideListAndShowBuffer; break}
         
         #    bind $w.tf.tbl <<TablelistCellUpdated>> [list DoOnSelect $w.tf.tbl]
         #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
@@ -305,7 +303,7 @@ namespace eval ::ldbg {
         # ---------------------------- make toplevel window DbgMainWindow -----------    
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
-        set w $PRIV(base).buliTlv
+        set w $PRIV(base).ldbgTlv
         if {[winfo exists $w]} {
             ClearStackFramesTableList
             return $w
