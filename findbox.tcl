@@ -93,7 +93,8 @@ proc ::tkcon::Find {w str args} {
     if {![info exists case]} { lappend opts -nocase }
     if {$str eq ""} { return }
     $w mark set findmark 1.0
-    while {[set ix [eval $w search $opts -count numc -- \
+    set InternalWidget [RoTextGetInternalWidget $w]
+    while {[set ix [eval $InternalWidget search $opts -count numc -- \
 			[list $str] findmark end]] ne ""} {
 	$w tag add find $ix ${ix}+${numc}c
 	$w mark set findmark ${ix}+1c
