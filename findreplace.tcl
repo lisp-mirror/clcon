@@ -334,6 +334,8 @@ proc CancelFind {text w} {
     destroy $w
 }
 
+# text is a text widget to operate on.
+# typ can be "replace" or... not "replace"
 proc Find {text typ} {
     global SearchString SearchDir ReplaceString findcase rconfirm c
     c
