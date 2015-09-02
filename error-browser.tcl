@@ -238,7 +238,7 @@ namespace eval ::erbr {
         $m add command -label "1.Copy" -under 0 -command [list tk_textCopy $tbl] -state disabled
     #     $m add separator
 
-        $m add command -label "2.Find" -under 0 -command [list ::erbr::TableListFindbox $tbl] -accel "Control-F" -state disabled
+        $m add command -label "2.Find" -under 0 -command [list ::erbr::TableListFindbox $tbl] -accel "Control-F" 
         bind $w <Control-Key-f> [list ::erbr::TableListFindbox $tbl]
         bind $w <Control-Key-Cyrillic_a> [list ::erbr::TableListFindbox $tbl]
     }    
