@@ -1,6 +1,6 @@
 # Unsorted code borrowed from tcltextedit.
 
-if {$debug_messages==2} {
+if { $::tkcon::OPT(putd-enabled) == 1 } {
     catch {destroy .logger}
     toplevel .logger
     wm title .logger "Logg"
@@ -10,9 +10,7 @@ if {$debug_messages==2} {
 }
 
 proc c {args} {
-    global debug_messages
-
-    if {$debug_messages!=0} {
+    if { $::tkcon::OPT(putd-enabled) == 1 } {
 
         set result ""
 
@@ -21,7 +19,8 @@ proc c {args} {
 
 	} else { set result "Root --> $args"  }
 
-	if {$debug_messages==2} {
+	# if {$debug_messages==2} Make putd-enabled allow for 2? 
+        if { 1 == 1 } { 
             .logger.text insert end $result
             .logger.text see end
 	} else { puts stdout $result}
