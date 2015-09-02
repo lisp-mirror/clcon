@@ -1,10 +1,19 @@
-## This is just pure tcl/tk application
+# Compilation error browser. To see it in action, execute in console:
+# (clco::compile-file-for-tcl "/s2/clcon/err.lisp" nil) 
 ## 
 
-#package require wcb
-
-#source [file join [file dirname [info script]] rotext.tcl]
-
+# Example of message: 
+# (:return
+#  (:ok
+#   (:compilation-result
+#    ((:message "The function was called with one argument, but wants exactly zero." :severity :warning :location
+#               (:location ... ... nil)
+#               :references nil)
+#     (:message "undefined variable: xxx" :severity :warning :location
+#               (:location ... ... nil)
+#               :references nil :source-context "--> PROGN SB-IMPL::%DEFUN MULTIPLE-VALUE-PROG1 PROGN \n==>\n  (BLOCK CLCO::BAR CLCO::XXX (CLCO::BAR 75))\n"))
+#    nil 0.009999999776482582 t "/s2/clcon/err.fasl"))
+#  15)
 
 proc ::clconcmd::erbr {} {
     tkcon main ::erbr::SwankBrowseErrors1 {'defun}
