@@ -144,7 +144,6 @@ proc ::clconcmd::tcsoh {filename} {
     tkcon main TkconSourceHere $filename
 }
 
-TkconSourceHere tcltextedit-unsorted.tcl
 TkconSourceHere rotext.tcl
 TkconSourceHere swank-connection.tcl
 TkconSourceHere swank-io.tcl
@@ -1740,8 +1739,14 @@ proc ::tkcon::InitMenus {w title} {
 	$m add command -label "Paste" -underline 0 -accel $PRIV(ACC)v \
 		 -command [list ::tkcon::Paste $text]
 	$m add separator
+
+        set cmd [list ::fndrpl::Find $text "find"]
 	$m add command -label "Find"  -underline 0 -accel $PRIV(ACC)F \
-            -command [list ::tkcon::FindBox $text]
+            -command [list ::fndrpl::Find $text "find"]
+
+        set cmd [list ::fndrpl::FindIt $text "find"]
+	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd 
+        bind $text <F3> $cmd
     }
 
     ## Interp Menu
@@ -4476,9 +4481,10 @@ proc ::tkcon::Bindings {} {
     bind $PRIV(root) <<TkCon_Close>>	{ ::tkcon::Destroy }
     bind $PRIV(root) <<TkCon_About>>	{ ::tkcon::About }
 
-    bind $PRIV(root) <<TkCon_Find>>	{ ::tkcon::FindBox $::tkcon::PRIV(console) }
-    bind $PRIV(root) <Control-Key-f>	{ ::tkcon::FindBox $::tkcon::PRIV(console) }
-    bind $PRIV(root) <Control-Key-Cyrillic_a>	{ ::tkcon::FindBox $::tkcon::PRIV(console) }
+    set cmd { ::fndrpl::Find $::tkcon::PRIV(console) "find"}
+    bind $PRIV(root) <<TkCon_Find>>	$cmd
+    bind $PRIV(root) <Control-Key-f>	$cmd
+    bind $PRIV(root) <Control-Key-Cyrillic_a> $cmd
     
     bind $PRIV(root) <<TkCon_Slave>>	{
 	::tkcon::Attach {}
@@ -5740,5 +5746,7 @@ package require tablelist
 TkconSourceHere error-browser.tcl
 TkconSourceHere buffer-list.tcl
 TkconSourceHere ldbg.tcl
+TkconSourceHere tcltextedit-unsorted.tcl
+TkconSourceHere findreplace.tcl
 
 package provide tkcon $::tkcon::VERSION

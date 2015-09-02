@@ -31,3 +31,12 @@ proc c {args} {
 proc tkTextSetCursor {text index} {
     $text mark set insert $index
 }
+
+
+proc powin {w relativeTo} {
+    set y [winfo y $relativeTo]
+    #set x [expr [winfo x .] + ([winfo width .]/2)  - ($wid/2) ]
+    set x [expr [winfo x $relativeTo] + ([winfo width $relativeTo]/2)  - (200) ]
+    wm geometry $w "=+$x+$y" 
+    c [winfo width $w]
+}
