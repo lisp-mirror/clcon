@@ -205,6 +205,52 @@ namespace eval ::ldbg {
         set Restarts [::mprs::Unleash $RestartsL]
     }
 
+    # Responce to :debug-activate, stolen from slimv
+    proc DebugActivate { EventAsList } {
+        puts "DebugActivate may go wrong"
+        variable ::slimv::debug_active
+        variable ::slimv::debug_activated
+        variable ::slimv::current_thread
+        variable ::slimv::Ssldb_level
+        set ::slimv::debug_active 1
+        set ::slimv::debug_activated 1
+        set ::slimv::current_thread [::mprs::Unleash [lindex $EventAsList 1]]
+        set ::slimv::Ssldb_level [::mprs::Unleash [lindex $EventAsList 2]]
+        set ::slimv::frame_locals [dict create]
+        return ''
+    }
+
+
+    # See swank::sldb-loop to identify interface
+    # swank -> tcl : debug
+    # swank -> tcl : debug-activate
+    # loop
+    #   wait for swank <- tcl: either emacs-rex (evaluate it)
+    #   or for sldb-return
+    #   if sldb-return then return from loop
+    #     conditions in sldb are just reported
+    # swank -> tcl debug-return
+    # tcl -> swank sldb-return
+    # when (> level 1)
+    #  (send-event (current-thread) `(:sldb-return ,level))
+
+    # Responce to :debug-return, stolen from slimv and melted with our
+    # normal continuation-based responce processing 
+    proc DebugReturn { EventAsList ContinuationId } {
+        puts "DebugReturn may go wrong"
+        variable ::slimv::debug_active
+        variable ::slimv::Ssldb_level
+        #vim.command('let s:sldb_level=-1')
+        #retval = retval + '; Quit to level ' + r[2] + '\n' + get_prompt()
+        set level [::mprs::Unleash [lindex $EventAsList 2]]
+        puts "; Quit to level $level"
+        set ::slimv::Ssldb_level $level
+        if {$ContinuationId ne ""} {
+            ::mprs::RunContinuation $ContinuationId $EventAsList
+        }
+    }
+        
+    
 
     proc GetDebuggerThreadId {} {
         variable DebugEvent

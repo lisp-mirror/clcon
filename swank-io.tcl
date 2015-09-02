@@ -325,6 +325,10 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
         eval [Unleash [lindex $EventAsList 1]]
     } elseif { $Head eq ":debug" } {
         ::ldbg::ldbg $EventAsList
+    } elseif { $Head eq ":debug-activate" } {
+        ::ldbg::DebugActivate $EventAsList
+    } elseif { $Head eq ":debug-return" } {
+        ::ldbg::DebugReturn $EventAsList $ContinuationId
     } elseif { [ContinuationExistsP $ContinuationId ] == 1 } {
         # we should have generated event which would evaluate continuation later.
         # but what we will do with sync events then?
