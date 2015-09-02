@@ -334,6 +334,14 @@ proc CancelFind {text w} {
     destroy $w
 }
 
+proc InitFindVars {} {
+    global SearchDir
+    set SearchDir "forwards"
+}
+
+InitFindVars
+
+
 # text is a text widget to operate on.
 # typ can be "replace" or... not "replace"
 proc Find {text typ} {
@@ -349,7 +357,7 @@ proc Find {text typ} {
     frame $find.l.f
     frame $find.l.f.f1
     label $find.l.f.f1.label -text "Find what:" -width 11  
-    xentry $find.l.f.f1.entry  -textvariable SearchString -width 30 
+    entry $find.l.f.f1.entry  -textvariable SearchString -width 30 
     pack $find.l.f.f1.label $find.l.f.f1.entry -side left
 
     $find.l.f.f1.entry selection range 0 end
@@ -357,7 +365,7 @@ proc Find {text typ} {
     if {$typ=="replace"} {
         frame $find.l.f.f2
         label $find.l.f.f2.label2 -text "Replace with:" -width 11
-        xentry $find.l.f.f2.entry2  -textvariable ReplaceString -width 30
+        entry $find.l.f.f2.entry2  -textvariable ReplaceString -width 30
         pack $find.l.f.f2.label2 $find.l.f.f2.entry2 -side left
 
         pack $find.l.f.f1 $find.l.f.f2 -side top
@@ -369,13 +377,13 @@ proc Find {text typ} {
 
 
     frame $find.f2
-    xbutton $find.f2.button1 -text "Find Next" -command "FindIt $text" -width 10 -height 1 -underline 5
-    xbutton $find.f2.button9 -text "Find everywhere" -command "destroy $find; GrepIt $text"  -width 10 -underline 0
-    xbutton $find.f2.button2 -text "Cancel" -command "CancelFind $text $find" -width 10 -underline 0
+    button $find.f2.button1 -text "Find Next" -command "FindIt $text" -width 10 -height 1 -underline 5
+    button $find.f2.button9 -text "Find everywhere" -command "destroy $find; GrepIt $text"  -width 10 -underline 0
+    button $find.f2.button2 -text "Cancel" -command "CancelFind $text $find" -width 10 -underline 0
 
     if {$typ=="replace"} {
-        xbutton $find.f2.button3 -text "Replace" -command "ReplaceIt $text -" -width 10 -height 1 -underline 0
-        xbutton $find.f2.button4 -text "Replace All" -command "ReplaceAll $text" -width 10 -height 1 -underline 8
+        button $find.f2.button3 -text "Replace" -command "ReplaceIt $text -" -width 10 -height 1 -underline 0
+        button $find.f2.button4 -text "Replace All" -command "ReplaceAll $text" -width 10 -height 1 -underline 8
         pack $find.f2.button3 $find.f2.button4 $find.f2.button2  -pady 4
     } else {
         pack $find.f2.button1 $find.f2.button9 $find.f2.button2  -pady 4
@@ -428,11 +436,11 @@ proc Goto_line_ask {text} {
     pack $gow.fr1 $gow.fr2 -side left
 
     label $gow.fr1.lab -text "Goto line number:"
-    xentry $gow.fr1.ent 
+    entry $gow.fr1.ent 
     pack $gow.fr1.lab $gow.fr1.ent -side left -pady 10 -padx 10
 
-    xbutton $gow.fr2.ok -text Ok -width 10 -command "Goto_line $text $gow"
-    xbutton $gow.fr2.can -text Cancel -width 10 -command "focus $text;destroy $gow"
+    button $gow.fr2.ok -text Ok -width 10 -command "Goto_line $text $gow"
+    button $gow.fr2.can -text Cancel -width 10 -command "focus $text;destroy $gow"
     pack $gow.fr2.ok $gow.fr2.can -side top -padx 10 -pady 5
 
     focus $gow.fr1.ent
@@ -440,7 +448,7 @@ proc Goto_line_ask {text} {
     bind $gow.fr1.ent <Return> "Goto_line $text $gow"
     bind $gow.fr1.ent <KP_Enter> "Goto_line $gow"
     bind $gow.fr1.ent <Escape> "focus $text ; destroy $gow"
-    powin $gow
+    # powin $gow
     grab $gow
 }                                          
 
@@ -450,7 +458,8 @@ proc Goto_line {text w} {
     if {[catch {expr $value} err]} {
         return }
     tkTextSetCursor $text $value.0
-    win::updateln
+    ### Proc to update line number in status line
+    #win::updateln
     focus $text
     destroy $w
 }       

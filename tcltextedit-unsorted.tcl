@@ -27,3 +27,7 @@ proc c {args} {
 
     }
 }
+
+proc tkTextSetCursor {text index} {
+    $text mark set insert $index
+}
