@@ -8,6 +8,12 @@ proc ProcExistsP p {
     return uplevel 1 [expr {[lsearch -exact $SimilarProcs $p] >= 0}]
 }
 
+# Some functionality does not work after renaming. E.g. search.
+# For this, you should extract original widget and invoke code on the
+# original widget. You get original widget with RoTextGetInternalWidget
+proc RoTextGetInternalWidget {pathName} {
+    return $pathName.ro-INtErNaL
+}
 
 ## SetTextReadonly pathName ReadOnlyP
 # This function should be called once for every text
@@ -29,7 +35,8 @@ proc ProcExistsP p {
 # 
 # Result: returns pathName
 # Side effect: makes text readonly.
-# Creates widget $pathname.ro-In
+# Creates widget $pathname.ro-IntErNaL which can be extracted by call
+# RoTextGetInternalWidget pathName
 proc InitTextReadonly { pathName ReadonlyP } {
 
     rename $pathName $pathName.ro-INtErNaL
