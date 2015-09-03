@@ -66,8 +66,16 @@ namespace eval ::ldbg {
         FillData
     }
 
+    proc ExpandLocals {row EventAsList} {
+        variable DbgMainWindow
+        if {[info exists DbgMainWindow]&&[winfo exists $DbgMainWindow]} {
+            set tbl [::ldbg::GetDbgMainWindowMenuTbl $DbgMainWindow]
+            puts [$tbl insertchildlist $row end [list [list "AAA"] [list "BBB"]]]
+        }
+    }
+    
     proc ViewLocals {row} {
-        set OnReply "puts \$EventAsList"
+        set OnReply "::ldbg::ExpandLocals $row \$EventAsList"
         ::tkcon::EvalInSwankAsync \
             "(swank:frame-locals-and-catch-tags $row)" \
             $OnReply 0 [GetDebuggerThreadId]
@@ -278,6 +286,18 @@ namespace eval ::ldbg {
             {} 0 $thread
         after idle destroy $DbgMainWindow
     }
+
+    proc Abort {w} {
+        variable DebugEvent
+        variable Restarts
+        variable DbgMainWindow
+        set thread [GetDebuggerThreadId]
+        set level [GetDebuggerLevel]
+        ::tkcon::EvalInSwankAsync \
+            "(swank:sldb-abort)" \
+            {} 0 $thread
+        after idle destroy $DbgMainWindow
+    }
     
     
     ## ::tkcon::HistoryMenu - dynamically build the menu for attached interpreters
@@ -321,11 +341,10 @@ namespace eval ::ldbg {
     proc ClearStackFramesTableList {} {
         variable DbgMainWindow
         if {[winfo exists $DbgMainWindow]} {
-            set tbl [::buli::GetDbgMainWindowMenuTbl $DbgMainWindow]
+            set tbl [::ldbg::GetDbgMainWindowMenuTbl $DbgMainWindow]
             $tbl delete 0 end
         }
     }
-
 
     proc MakeBindings {w} {
         set bodytag [$w.tf.tbl bodytag]
@@ -334,7 +353,7 @@ namespace eval ::ldbg {
         bind $bodytag <space> {::ldbg::KbdCellCmd %W %x %y ViewLocals; break}
         bind $bodytag <Return> {::ldbg::KbdCellCmd %W %x %y HideListAndShowBuffer; break}
         bind $bodytag <Delete> {::ldbg::KbdCellCmd %W %x %y CloseBuffer; break}
-        bind $bodytag <Double-Button-1> {::ldbg::MouseCellCmd %W %x %y HideListAndShowBuffer; break}
+        bind $bodytag <Double-Button-1> {::ldbg::MouseCellCmd %W %x %y ViewLocals; break}
         
         #    bind $w.tf.tbl <<TablelistCellUpdated>> [list DoOnSelect $w.tf.tbl]
         #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
@@ -358,7 +377,8 @@ namespace eval ::ldbg {
         set metrics [font measure tkconfixed "w"]
         toplevel $w -width [expr { 50 * $metrics }]
         wm withdraw $w
-        
+
+     
         # title
         set level [GetDebuggerLevel]
         set word "Debugger level $level"
@@ -408,6 +428,7 @@ namespace eval ::ldbg {
 
         # ------------------------------ bindings -------------
         MakeBindings $w
+        wm protocol $w WM_DELETE_WINDOW "::ldbg::Abort $w"
         # -------------------------- layout -------------------
         
         # now layout title elements in title
