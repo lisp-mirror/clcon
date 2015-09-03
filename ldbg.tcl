@@ -70,7 +70,18 @@ namespace eval ::ldbg {
         variable DbgMainWindow
         if {[info exists DbgMainWindow]&&[winfo exists $DbgMainWindow]} {
             set tbl [::ldbg::GetDbgMainWindowMenuTbl $DbgMainWindow]
-            puts [$tbl insertchildlist $row end [list [list "AAA"] [list "BBB"]]]
+            $tbl delete [$tbl childkeys $row]
+
+            set okList [::mprs::Unleash [lindex $EventAsList 1]]
+            if {[::mprs::Unleash [lindex $okList 0]] ne {:ok}} {
+                error "Something wrong with the debugger: error showing locals"
+            }
+            set LocalsAndX [::mprs::Unleash [lindex $okList 1]]
+            set Locals [::mprs::Unleash [lindex $LocalsAndX 0]]
+            foreach Local $Locals {
+                $tbl insertchildren $row end [list [::mprs::Unleash $Local]]
+            }
+            puts "What is second LocalsAndX? See slimv"        
         }
     }
     
