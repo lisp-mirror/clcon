@@ -78,23 +78,21 @@
 
 namespace eval ::fndrpl {
     variable glb
-    variable c
+    # variable c
     variable window
-    variable SearchString
-    variable SearchPos
+    variable SearchString            ""
+    variable SearchPos               "0.0"
     variable SearchDir               "forwards"
-    variable findcase
-
-    ПРОИНИЦИАЛИЗИРУЙ МЯ (см.чем проинициализировано в исходном месте)
-    
-    variable current_window
+    variable findcase                0 
+    variable current_window          # 1
     variable greps
     variable r
-    variable ReplaceString
+    variable ReplaceString           ""
     variable rconfirm
 
     proc greplist { text greps } {
-        variable glb c window
+        variable glb
+        variable window
 
         set glb .glb
         catch { destroy $glb }
@@ -163,7 +161,14 @@ namespace eval ::fndrpl {
     }
 
     proc GrepIt {text} {
-        variable SearchString SearchPos SearchDir findcase current_window window glb greps
+        variable SearchString
+        variable SearchPos
+        variable SearchDir
+        variable findcase
+        variable current_window
+        variable window
+        variable glb
+        variable greps
 
         c $SearchString $SearchPos $SearchDir $findcase
 
@@ -249,6 +254,8 @@ namespace eval ::fndrpl {
             if {$SearchPos != ""} {
                 $text see $SearchPos
 
+                $text tag remove sel 0.0 end
+
                 if {$SearchDir == "forwards"} {
                     tkTextSetCursor $text "$SearchPos+$leng char"        
                 } else { tkTextSetCursor $text $SearchPos }
@@ -287,7 +294,13 @@ namespace eval ::fndrpl {
 
 
     proc ReplaceIt {text n} {
-        variable SearchString SearchDir ReplaceString findcase window current_window rconfirm
+        variable SearchString
+        variable SearchDir
+        variable ReplaceString
+        variable findcase
+        variable window
+        variable current_window
+        variable rconfirm
 
         set SearchPos insert
         c 
@@ -336,7 +349,12 @@ namespace eval ::fndrpl {
     }
 
     proc ReplaceAll {text} {
-        variable SearchString SearchDir ReplaceString findcase window current_window
+        variable SearchString
+        variable SearchDir
+        variable ReplaceString
+        variable findcase
+        variable window
+        variable current_window
 
         set window($current_window,echange) 1
         set window($current_window,change) 1
@@ -356,7 +374,11 @@ namespace eval ::fndrpl {
     # text is a text widget to operate on.
     # typ can be "replace" or... not "replace", say, "find"
     proc Find {text typ} {
-        variable SearchString SearchDir ReplaceString findcase rconfirm c
+        variable SearchString
+        variable SearchDir
+        variable ReplaceString
+        variable findcase
+        variable rconfirm
         c
         set find .find
         catch {destroy $find}
@@ -368,7 +390,7 @@ namespace eval ::fndrpl {
         frame $find.l.f
         frame $find.l.f.f1
         label $find.l.f.f1.label -text "Find what:" -width 11  
-        entry $find.l.f.f1.entry  -textvariable SearchString -width 30 
+        entry $find.l.f.f1.entry  -textvariable ::fndrpl::SearchString -width 30 
         pack $find.l.f.f1.label $find.l.f.f1.entry -side left
 
         $find.l.f.f1.entry selection range 0 end
@@ -376,14 +398,15 @@ namespace eval ::fndrpl {
         if {$typ=="replace"} {
             frame $find.l.f.f2
             label $find.l.f.f2.label2 -text "Replace with:" -width 11
-            entry $find.l.f.f2.entry2 -textvariable ReplaceString -width 30
+            entry $find.l.f.f2.entry2 -textvariable ::fndrpl::ReplaceString -width 30
             pack $find.l.f.f2.label2 $find.l.f.f2.entry2 -side left
 
             pack $find.l.f.f1 $find.l.f.f2 -side top
             bind $find.l.f.f2.entry2 <Return> "::fndrpl::ReplaceIt $text -" 
         } elseif {$typ=="find"} {
             pack $find.l.f.f1
-            bind $find.l.f.f1.entry <Return> "::fndrpl::FindIt $text"
+            #            bind $find.l.f.f1.entry <Return> "::fndrpl::FindIt $text"
+            bind $find <Return> "::fndrpl::FindIt $text"
             bind $find <F3> "::fndrpl::FindIt $text"
         } else {
             error "Wrong typ $typ"
@@ -406,8 +429,8 @@ namespace eval ::fndrpl {
 
         frame $find.l.f4
         frame $find.l.f4.f3 -borderwidth 2 -relief groove
-        radiobutton $find.l.f4.f3.up -text "Up" -underline 0 -variable SearchDir -value "backwards" 
-        radiobutton $find.l.f4.f3.down -text "Down"  -underline 0  -variable SearchDir -value "forwards" 
+        radiobutton $find.l.f4.f3.up -text "Up" -underline 0 -variable ::fndrpl::SearchDir -value "backwards" 
+        radiobutton $find.l.f4.f3.down -text "Down"  -underline 0  -variable ::fndrpl::SearchDir -value "forwards" 
         pack $find.l.f4.f3.up $find.l.f4.f3.down -side left 
 
 

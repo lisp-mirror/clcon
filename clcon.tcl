@@ -1744,7 +1744,7 @@ proc ::tkcon::InitMenus {w title} {
 	$m add command -label "Find"  -underline 0 -accel $PRIV(ACC)F \
             -command [list ::fndrpl::Find $text "find"]
 
-        set cmd [list ::fndrpl::FindIt $text "find"]
+        set cmd [list ::fndrpl::FindIt $text]
 	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd 
         bind $text <F3> $cmd
     }
