@@ -1,13 +1,23 @@
 package require Tk
 package require tablelist
+# TkconSourceHere util.tcl
 
 
 proc EnsurePopulated {tbl row} {
-    if {[$tbl childcount $row] == 0} {
-        $tbl insertchild $row 0 {another row}
-        $tbl insertchild $row 0 {row 2}
-        $tbl insertchild $row 0 {row 1}
-        #$tbl insertchildlist $row 0 {{row 1} {row 2} {another row}}
+    set name [$tbl rowcget $row -name]
+    if {$name eq "a"} {
+        if {[$tbl childcount $row] == 0} {
+            puts "EnsurePopulated $tbl $row works"
+            set r [$tbl insertchild $row end {row 1}]
+            $tbl rowconfigure $r -name "c1"
+            #
+            set r [$tbl insertchild $row end {row 2}]
+            $tbl rowconfigure $r -name "c2"
+            #
+            set r [$tbl insertchild $row end {another row}]
+            $tbl rowconfigure $r -name "c3"
+            #$tbl insertchildlist $row 0 {{row 1} {row 2} {another row}}
+        }
     }
 }
         
@@ -53,7 +63,7 @@ proc GetSearchStateIncrement {SearchState} {
 # TkconSourceHere utils.tcl
 # SearchState is a [dict continueP {0|1} startFrom {}|key direction {forwards}|{backwards}]
 # Returns list of two values: 1. 0-found,1-not found; 2-new SearchState            
-proc TreeSearchText {tbl SearchState} {
+proc TreeSearchText {tbl SearchState EnsurePopulatedCmd} {
     set continueP [dict get $SearchState -continueP]
     set startFrom [dict get $SearchState -startFrom]
     set searchString [dict get $SearchState -searchStringQ]
@@ -61,6 +71,9 @@ proc TreeSearchText {tbl SearchState} {
     for {set i [expr $startFrom + $increment * $continueP]} \
         {0 <= $i && $i <= [$tbl index end]} \
         {incr i $increment} {
+            if {$EnsurePopulatedCmd ne {}} {
+                eval [list $EnsurePopulatedCmd $tbl $i]
+            }
             set celltext [$tbl get $i]
             if {[regexp -nocase $searchString [lindex $celltext 0]]} {
                 after idle TreeSetTo .w.t $i
@@ -75,19 +88,27 @@ proc TreeSearchText {tbl SearchState} {
 # Orphan code which reports that key is not found. Write TreeSearchOuter around? 
 #    tk_messageBox -parent $tbl -message "key not found: $searchString"
 
+proc MakeTestTableList {} {
 
-toplevel .w
+    destroy .w
 
-tablelist::tablelist .w.t -columns {0 "First Column" 0 "Another column"} -stretch all -background white -stretch all -expandcommand expandCmd
-.w.t resetsortinfo
+    update
+    
+    toplevel .w
 
+    tablelist::tablelist .w.t -columns {0 "First Column" 0 "Another column"} -stretch all -background white -stretch all -expandcommand expandCmd
+    .w.t resetsortinfo
 
-pack .w.t -fill both -expand yes
-set data "tree1"
-.w.t insertchildlist root end $data
-.w.t collapse end
-# .w.t expand end
-set data "tree0"
-.w.t insertchildlist root end $data
+    pack .w.t -fill both -expand yes
+    set data "tree1"
+    set row [.w.t insertchild root end $data]
+    .w.t rowconfigure $row -name "a"
+    
+    .w.t collapse $row
 
-wm deiconify .w
+    set data "tree0"
+    set row [.w.t insertchild root end $data]
+    .w.t rowconfigure $row -name "b"
+    
+    wm deiconify .w
+}
