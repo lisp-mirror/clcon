@@ -144,6 +144,7 @@ proc ::clconcmd::tcsoh {filename} {
     tkcon main TkconSourceHere $filename
 }
 
+TkconSourceHere util.tcl
 TkconSourceHere rotext.tcl
 TkconSourceHere swank-connection.tcl
 TkconSourceHere swank-io.tcl

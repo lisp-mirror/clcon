@@ -36,7 +36,7 @@ namespace eval ::ldbg {
         lappend StackFrameHeaders $NewItem
 
         set tbl $DbgMainWindow.tf.tbl    
-        $tbl insert end [list $name]
+        $tbl insertchildren root end [list $name]
 
     }
 
@@ -354,6 +354,8 @@ namespace eval ::ldbg {
         if {[winfo exists $DbgMainWindow]} {
             set tbl [::ldbg::GetDbgMainWindowMenuTbl $DbgMainWindow]
             $tbl delete 0 end
+            $tbl insertchildlist root end "tree"
+            $tbl collapse 0
         }
     }
 
@@ -362,9 +364,9 @@ namespace eval ::ldbg {
         
         # wcb::callback $tbl before activate ::ldbg::DoOnSelect
         bind $bodytag <space> {::ldbg::KbdCellCmd %W %x %y ViewLocals; break}
-        bind $bodytag <Return> {::ldbg::KbdCellCmd %W %x %y HideListAndShowBuffer; break}
-        bind $bodytag <Delete> {::ldbg::KbdCellCmd %W %x %y CloseBuffer; break}
-        bind $bodytag <Double-Button-1> {::ldbg::MouseCellCmd %W %x %y ViewLocals; break}
+        #bind $bodytag <Return> {::ldbg::KbdCellCmd %W %x %y HideListAndShowBuffer; break}
+        #bind $bodytag <Delete> {::ldbg::KbdCellCmd %W %x %y CloseBuffer; break}
+        #bind $bodytag <Double-Button-1> {::ldbg::MouseCellCmd %W %x %y ViewLocals; break}
         
         #    bind $w.tf.tbl <<TablelistCellUpdated>> [list DoOnSelect $w.tf.tbl]
         #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
