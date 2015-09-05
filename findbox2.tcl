@@ -1,13 +1,18 @@
-
-
-# text is a text widget to operate on.
-# typ can be "replace" or... not "replace", say, "find"
-proc ::fndrpl::Find {text FndOrRpl} {
+# Consider this as a part of findreplace.tcl
+# area is a widget to operate on. Currently text or tablelist,
+# type of widget is specified by AreaType, can be "text" or "tablelist"
+# FndOrRepl can be "replace" or... not "replace", say, "find"
+# EnsurePopulatedCmd is relevant for AreaType eq "tablelist" only
+proc ::fndrpl::Find {area AreaType FndOrRpl EnsurePopulatedCmd} {
     variable SearchString
     variable SearchDir
     variable ReplaceString
     variable findcase
     variable rconfirm
+    variable TreeSearchState
+
+    unset -nocomplain TreeSearchState
+    
     c
     set find .find
     catch {destroy $find}
@@ -25,31 +30,47 @@ proc ::fndrpl::Find {text FndOrRpl} {
     $find.l.f.f1.entry selection range 0 end
 
     if {$FndOrRpl=="replace"} {
+        if {$AreaType=="text"} {
+            # later make similar to "find" case.
+        } else {
+            error "Unsupported AreaType $AreaType"
+        }
+    } elseif {$FndOrRpl=="find"} {
+        if {$AreaType=="text"} {
+            set SearchCmd "::fndrpl::FindIt $area"
+        } elseif {$AreaType=="tablelist"} {
+            set SearchCmd "::fndrpl::TreeSearchTextOuter $area $EnsurePopulatedCmd \$tmpContinueP"
+        } else {
+            error "Unknown $AreaType"
+        }
+    } else {
+        error "Wrong FndOrRpl $FndOrRpl"
+    }
+
+
+    if {$FndOrRpl=="replace"} {
         frame $find.l.f.f2
         label $find.l.f.f2.label2 -text "Replace with:" -width 11
         entry $find.l.f.f2.entry2 -textvariable ::fndrpl::ReplaceString -width 30
         pack $find.l.f.f2.label2 $find.l.f.f2.entry2 -side left
 
         pack $find.l.f.f1 $find.l.f.f2 -side top
-        bind $find.l.f.f2.entry2 <Return> "::fndrpl::ReplaceIt $text -" 
+        bind $find.l.f.f2.entry2 <Return> "::fndrpl::ReplaceIt $area -" 
     } elseif {$FndOrRpl=="find"} {
         pack $find.l.f.f1
-        #            bind $find.l.f.f1.entry <Return> "::fndrpl::FindIt $text"
-        bind $find <Return> "::fndrpl::FindIt $text"
-        bind $find <F3> "::fndrpl::FindIt $text"
-    } else {
-        error "Wrong FndOrRpl $FndOrRpl"
+        bind $find <Return> "set tmpContinueP 0; $SearchCmd"
+        bind $find <F3>     "set tmpContinueP 1; $SearchCmd"
     }
-
-    frame $find.f2
-    button $find.f2.button1 -text "Find Next" -command "::fndrpl::FindIt $text" -width 10 -height 1 
     
-    button $find.f2.button9 -text "Find allwindows" -command "destroy $find; ::fndrpl::GrepIt $text"  -width 10 -underline 0 -state disabled 
-    button $find.f2.button2 -text "Cancel" -command "::fndrpl::CancelFind $text $find" -width 10 -underline 0
+    frame $find.f2
+    button $find.f2.button1 -text "Find Next" -command "set tmpContinueP {}; $SearchCmd" -width 10 -height 1 
+    
+    button $find.f2.button9 -text "Find allwindows" -command "destroy $find; ::fndrpl::GrepIt $area"  -width 10 -underline 0 -state disabled 
+    button $find.f2.button2 -text "Cancel" -command "::fndrpl::CancelFind $area $find" -width 10 -underline 0
 
     if {$FndOrRpl=="replace"} {
-        button $find.f2.button3 -text "Replace" -command "::fndrpl::ReplaceIt $text -" -width 10 -height 1 -underline 0
-        button $find.f2.button4 -text "Replace All" -command "::fndrpl::ReplaceAll $text" -width 10 -height 1 -underline 8
+        button $find.f2.button3 -text "Replace" -command "::fndrpl::ReplaceIt $area -" -width 10 -height 1 -underline 0
+        button $find.f2.button4 -text "Replace All" -command "::fndrpl::ReplaceAll $area" -width 10 -height 1 -underline 8
         pack $find.f2.button3 $find.f2.button4 $find.f2.button2  -pady 4
     } else {
         pack $find.f2.button1 $find.f2.button9 $find.f2.button2  -pady 4
@@ -93,5 +114,12 @@ proc ::fndrpl::Find {text FndOrRpl} {
     focus $find.l.f.f1.entry
     grab $find
 
-    powin $find $text
+    powin $find $area
 }
+
+        
+    
+    
+    
+    
+                             

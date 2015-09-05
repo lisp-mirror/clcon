@@ -90,6 +90,8 @@ namespace eval ::fndrpl {
     variable r
     variable ReplaceString           ""
     variable rconfirm
+    # TreeSearchState is set after first search. Cleaned before opening a dialog box.
+    variable TreeSearchState        
 
     proc greplist { text greps } {
         variable glb
@@ -228,8 +230,6 @@ namespace eval ::fndrpl {
         variable SearchString
         variable findcase
 
-        puts "findcase = $findcase"
-        
         set SearchState [dict create                       \
                              -startFrom     insert         \
                              -direction     $SearchDir     \
@@ -443,10 +443,45 @@ namespace eval ::fndrpl {
         #win::updateln
         focus $text
         destroy $w
-    }       
+    }
 
 
+    proc TreeSearchTextOuter {tablelist EnsurePopulatedCmd {continueP {}}} {
+        variable SearchString
+        variable SearchDir
+        variable findcase
+        variable TreeSearchState
+        set searchStringQ [QuoteStringForRegexp $SearchString]
+
+        if {$continueP ne {}} {
+            set RealContinueP $continueP
+        } elseif {[info exists TreeSearchState]} { 
+            set RealContinueP 1
+        } else {
+            set RealContinueP 0
+        }
+
+        # If direction changed, this is not a continue
+        if {[info exists TreeSearchState] && \
+                [dict get $TreeSearchState -direction] != $SearchDir} {
+            set RealContinueP 0
+        }
+
+        set TreeSearchState                                                       \
+            [dict create                                                          \
+                 -continueP                           $RealContinueP              \
+                 -startFrom                           [$tablelist index anchor]   \
+                 -direction                           $SearchDir                  \
+                 -searchStringQ                       $searchStringQ              \
+                 -findcase                            $findcase                   \
+                ]
+        foreach {found $TreeSearchState} \
+            [::srchtblst::TreeSearchText $tablelist $TreeSearchState $EnsurePopulatedCmd] {
+                break
+            }
+        
+        if {!$found} {
+            tk_messageBox -title "Find" -message "Search string not found"
+        }
+    }
 }
-
-
-

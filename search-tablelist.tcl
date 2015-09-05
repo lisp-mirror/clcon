@@ -77,7 +77,7 @@ namespace eval ::srchtblst {
         return $result
     }
 
-    
+
     # Interactive search in existing items of a tree
     # Does not try to expand subtrees (is this a TODO?)
     # Args: tbl - tablelist widget
@@ -96,7 +96,9 @@ namespace eval ::srchtblst {
                     eval [list $EnsurePopulatedCmd $tbl $i]
                 }
                 set celltext [$tbl get $i]
-                if {[$CmdWithCaseOption $searchString [lindex $celltext 0]]} {
+                set cmd [string cat $CmdWithCaseOption " " [list $searchString [lindex $celltext 0]]]
+                # puts "cmd=$cmd"
+                if {[eval $cmd]} {
                     after idle ::srchtblst::TreeSetTo $tbl $i
                     dict set SearchState -continueP 1
                     dict set SearchState -startFrom $i
