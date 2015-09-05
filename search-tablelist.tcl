@@ -1,6 +1,14 @@
 package require Tk
 package require tablelist
 # TkconSourceHere util.tcl
+# SearchState is a dict:
+#    -continueP
+#       1 - if this is a continuation of search, 0 otherwise
+#    -startFrom {}|key
+#       {} - start from current position, key - start from that position
+#    -direction {forwards}|{backwards}
+#    -findcase 
+#       1 - case sensitive, 0 - insensitive
 
 namespace eval ::srchtblst {
 
@@ -37,10 +45,11 @@ namespace eval ::srchtblst {
 
     proc MakeDefaultSearchState {tbl searchString} {
         return [dict create                                                       \
-                    -continueP 0                                                  \
-                    -startFrom [$tbl index anchor]                                \
-                    -direction "forwards"                                         \
+                    -continueP     0                                              \
+                    -startFrom     [$tbl index anchor]                            \
+                    -direction     "forwards"                                     \
                     -searchStringQ [QuoteStringForRegexp $searchString]           \
+                    -findcase      0                                              \
                    ]
     }
 
@@ -56,19 +65,30 @@ namespace eval ::srchtblst {
         return $increment
     }
 
+    proc SearchStateTableListCmdWithCaseOption {SearchState} {
+        set findcase [dict get $SearchState -findcase]
+        if {$findcase eq "1"} {
+            set result "regexp"
+        } elseif {$findcase eq "0"} {
+            set result "regexp -nocase"
+        } else {
+            error "wrong findcase $findcase"
+        }
+        return $result
+    }
+
+    
     # Interactive search in existing items of a tree
     # Does not try to expand subtrees (is this a TODO?)
     # Args: tbl - tablelist widget
     # Feature: shows only once per cell
-    # package require tk
-    # TkconSourceHere utils.tcl
-    # SearchState is a [dict continueP {0|1} startFrom {}|key direction {forwards}|{backwards}]
     # Returns list of two values: 1. 0-found,1-not found; 2-new SearchState            
     proc TreeSearchText {tbl SearchState EnsurePopulatedCmd} {
         set continueP [dict get $SearchState -continueP]
         set startFrom [dict get $SearchState -startFrom]
         set searchString [dict get $SearchState -searchStringQ]
         set increment [GetSearchStateIncrement $SearchState]
+        set CmdWithCaseOption [SearchStateTableListCmdWithCaseOption $SearchState]
         for {set i [expr $startFrom + $increment * $continueP]} \
             {0 <= $i && $i <= [$tbl index end]} \
             {incr i $increment} {
@@ -76,7 +96,7 @@ namespace eval ::srchtblst {
                     eval [list $EnsurePopulatedCmd $tbl $i]
                 }
                 set celltext [$tbl get $i]
-                if {[regexp -nocase $searchString [lindex $celltext 0]]} {
+                if {[$CmdWithCaseOption $searchString [lindex $celltext 0]]} {
                     after idle ::srchtblst::TreeSetTo $tbl $i
                     dict set SearchState -continueP 1
                     dict set SearchState -startFrom $i
@@ -116,8 +136,10 @@ namespace eval ::srchtblst {
 
     proc TableListExample {} {
         MakeTestTableList
+        set state [MakeDefaultSearchState .w.t "t"]
+        dict set state -findcase 1
         foreach {result state} [TreeSearchText \
-                                    .w.t [MakeDefaultSearchState .w.t "t"] \
+                                    .w.t $state \
                                     ::srchtblst::EnsurePopulated] {break}
         tk_messageBox -message $state
         TreeSearchText .w.t $state ::srchtblst::EnsurePopulated
