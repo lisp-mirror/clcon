@@ -5753,5 +5753,6 @@ TkconSourceHere buffer-list.tcl
 TkconSourceHere ldbg.tcl
 TkconSourceHere tcltextedit-unsorted.tcl
 TkconSourceHere findreplace.tcl
+TkconSourceHere findbox2.tcl
 
 package provide tkcon $::tkcon::VERSION
