@@ -151,14 +151,13 @@ namespace eval ::fndrpl {
             set win [lindex $greps [expr $po * 3]]
             set pos [lindex $greps [expr $po * 3+1]]
             set str [lindex $greps [expr $po * 3+2]]
-
+            
             win::activate $win
             $text see $pos
             $text tag delete sel
             tkTextSetCursor $text $pos
             $text tag add sel $pos "$pos + [string length $str] char"
         }
-
     }
 
     # Was not updated to namespace. Unlikely to work
@@ -225,16 +224,27 @@ namespace eval ::fndrpl {
     ################################# Find proc #################################
 
     proc FindIt {text} {
-        variable SearchString
         variable SearchDir
+        variable SearchString
+        set SearchState [dict create                   \
+                             -startFrom insert         \
+                             -direction $SearchDir     \
+                             -searchStringQ $SearchString]
+        FindItInner $text $SearchState
+    }
+
+    # Returns two values:
+    # 1) 0 if not found, 1 if found
+    # 2) new SearchState
+    # Side effects: moves insert, changes selection
+    # ContinueP is irrelevant for text search, but we insert
+    # ContinueP 1 in resulting searchstate.
+    proc FindItInner {text SearchState} {
         variable findcase
 
-        set SearchPos insert
-
-        putd $SearchString
-        putd $SearchPos
-        putd $SearchDir
-        putd $findcase
+        set SearchPos [dict get $SearchState -startFrom]
+        set SearchString [dict get $SearchState -searchStringQ]
+        set SearchDir [dict get $SearchState -direction]
 
         if {$SearchString!=""} {
 
