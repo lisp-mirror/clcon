@@ -87,7 +87,7 @@ cl-user package is assumed for all interaction. If you change package, consequen
 [See here](https://bitbucket.org/budden/clcon/src/default/doc/)
 
 ## License
-MIT (or BSD) license (see tkcon's copyright)
+MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
 Is in tracker
