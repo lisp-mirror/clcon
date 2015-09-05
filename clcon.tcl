@@ -69,6 +69,10 @@ proc ::clconcmd::help {} {
     puts $result2
 }
 
+proc ::clconcmd::history {} {
+    history
+}
+
 # Initialize the ::tkcon namespace
 #
 namespace eval ::tkcon {
