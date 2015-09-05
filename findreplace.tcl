@@ -226,11 +226,24 @@ namespace eval ::fndrpl {
     proc FindIt {text} {
         variable SearchDir
         variable SearchString
-        set SearchState [dict create                   \
-                             -startFrom insert         \
-                             -direction $SearchDir     \
-                             -searchStringQ $SearchString]
-        FindItInner $text $SearchState
+        variable findcase
+
+        puts "findcase = $findcase"
+        
+        set SearchState [dict create                       \
+                             -startFrom     insert         \
+                             -direction     $SearchDir     \
+                             -searchStringQ $SearchString  \
+                             -findcase      $findcase      \
+                        ]
+
+        foreach {found NewState} [FindItInner $text $SearchState] {break}
+        
+        if {$found} {
+            return
+        } else {
+            tk_messageBox -parent $text -title "Find" -message "Search string not found"
+        }
     }
 
     # Returns two values:
@@ -240,11 +253,11 @@ namespace eval ::fndrpl {
     # ContinueP is irrelevant for text search, but we insert
     # ContinueP 1 in resulting searchstate.
     proc FindItInner {text SearchState} {
-        variable findcase
 
         set SearchPos [dict get $SearchState -startFrom]
         set SearchString [dict get $SearchState -searchStringQ]
         set SearchDir [dict get $SearchState -direction]
+        set findcase [dict get $SearchState -findcase]
 
         if {$SearchString!=""} {
 
@@ -274,8 +287,12 @@ namespace eval ::fndrpl {
 
                 $text tag add sel $SearchPos  "$SearchPos+$leng char"
 
+                dict set SearchState -continueP 1
+                dict set SearchState -startFrom $SearchPos
+                return [list 1 $SearchState]
+
             } else {
-                bgerror "End of document reached"
+                return [list 0 $SearchState]
             }
 
         }
@@ -403,7 +420,7 @@ namespace eval ::fndrpl {
         frame $find.l
         frame $find.l.f
         frame $find.l.f.f1
-        label $find.l.f.f1.label -text "Find what:" -width 11  
+        label $find.l.f.f1.label -text "1.Find what:" -width 11 -underline 0
         entry $find.l.f.f1.entry  -textvariable ::fndrpl::SearchString -width 30 
         pack $find.l.f.f1.label $find.l.f.f1.entry -side left
 
@@ -443,24 +460,32 @@ namespace eval ::fndrpl {
 
         frame $find.l.f4
         frame $find.l.f4.f3 -borderwidth 2 -relief groove
-        radiobutton $find.l.f4.f3.up -text "Up" -underline 0 -variable ::fndrpl::SearchDir -value "backwards" 
-        radiobutton $find.l.f4.f3.down -text "Down"  -underline 0  -variable ::fndrpl::SearchDir -value "forwards" 
+        radiobutton $find.l.f4.f3.up -text "2.Up" -underline 0 -variable ::fndrpl::SearchDir -value "backwards" 
+        radiobutton $find.l.f4.f3.down -text "Down"  -variable ::fndrpl::SearchDir -value "forwards" 
         pack $find.l.f4.f3.up $find.l.f4.f3.down -side left 
 
 
         if {$typ=="replace"} {
             frame $find.l.f4.f
             set rconfirm 1
-            checkbutton $find.l.f4.f.cbox1 -text "Match case" -variable findcase -underline 0
-            checkbutton $find.l.f4.f.cbox2 -text "Confirm replace"  -variable rconfirm -underline 0
+            checkbutton $find.l.f4.f.cbox1 -text "3.Match case" -variable ::fndrpl::findcase -underline 0
+            checkbutton $find.l.f4.f.cbox2 -text "Confirm replace"  -variable ::fndrpl::rconfirm -underline 0
             pack $find.l.f4.f.cbox1 $find.l.f4.f.cbox2 -side top -padx 0 -fill x
             pack $find.l.f4.f $find.l.f4.f3 -side left -padx 10
         } else {
 
-            checkbutton $find.l.f4.cbox1 -text "Match case" -variable findcase -underline 0
-            pack $find.l.f4.cbox1 $find.l.f4.f3 -side left -padx 10
+            checkbutton $find.l.f4.cbox1 -text "3.Match case" -variable ::fndrpl::findcase -underline 0
+            pack $find.l.f4.f3 -side left -padx 10
+            pack $find.l.f4.cbox1 -side left -padx 10
         }
 
+        if {$typ=="replace"} {
+            puts "Bindings for alt-letter are not created for Replace"
+        } else {
+            bind $find <Alt-Key-1> "focus $find.l.f.f1.entry"
+            bind $find <Alt-Key-2> "focus $find.l.f4.f3.up"
+            bind $find <Alt-Key-3> "focus $find.l.f4.cbox1"
+        }
 
         pack $find.l.f
         pack $find.l.f4 -pady 11
