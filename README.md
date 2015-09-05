@@ -12,7 +12,7 @@ Code is completely portable and should run on other platforms too.
 [See here](https://bitbucket.org/budden/clcon/wiki/Screenshots)
 
 ## Project goals
-- Simple, lightweight, embeddable CL IDE for using CL as an application expansion scripting language
+- Simple, lightweight, embeddable CL IDE for using CL as an application exptension scripting language
 - Simple, one-click installable CL environment for beginners
 
 ## Current state
