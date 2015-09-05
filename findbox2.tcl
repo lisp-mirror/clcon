@@ -2,7 +2,7 @@
 
 # text is a text widget to operate on.
 # typ can be "replace" or... not "replace", say, "find"
-proc ::fndrpl::Find {text typ} {
+proc ::fndrpl::Find {text FndOrRpl} {
     variable SearchString
     variable SearchDir
     variable ReplaceString
@@ -24,7 +24,7 @@ proc ::fndrpl::Find {text typ} {
 
     $find.l.f.f1.entry selection range 0 end
 
-    if {$typ=="replace"} {
+    if {$FndOrRpl=="replace"} {
         frame $find.l.f.f2
         label $find.l.f.f2.label2 -text "Replace with:" -width 11
         entry $find.l.f.f2.entry2 -textvariable ::fndrpl::ReplaceString -width 30
@@ -32,13 +32,13 @@ proc ::fndrpl::Find {text typ} {
 
         pack $find.l.f.f1 $find.l.f.f2 -side top
         bind $find.l.f.f2.entry2 <Return> "::fndrpl::ReplaceIt $text -" 
-    } elseif {$typ=="find"} {
+    } elseif {$FndOrRpl=="find"} {
         pack $find.l.f.f1
         #            bind $find.l.f.f1.entry <Return> "::fndrpl::FindIt $text"
         bind $find <Return> "::fndrpl::FindIt $text"
         bind $find <F3> "::fndrpl::FindIt $text"
     } else {
-        error "Wrong typ $typ"
+        error "Wrong FndOrRpl $FndOrRpl"
     }
 
     frame $find.f2
@@ -47,7 +47,7 @@ proc ::fndrpl::Find {text typ} {
     button $find.f2.button9 -text "Find allwindows" -command "destroy $find; ::fndrpl::GrepIt $text"  -width 10 -underline 0 -state disabled 
     button $find.f2.button2 -text "Cancel" -command "::fndrpl::CancelFind $text $find" -width 10 -underline 0
 
-    if {$typ=="replace"} {
+    if {$FndOrRpl=="replace"} {
         button $find.f2.button3 -text "Replace" -command "::fndrpl::ReplaceIt $text -" -width 10 -height 1 -underline 0
         button $find.f2.button4 -text "Replace All" -command "::fndrpl::ReplaceAll $text" -width 10 -height 1 -underline 8
         pack $find.f2.button3 $find.f2.button4 $find.f2.button2  -pady 4
@@ -63,7 +63,7 @@ proc ::fndrpl::Find {text typ} {
     pack $find.l.f4.f3.up $find.l.f4.f3.down -side left 
 
 
-    if {$typ=="replace"} {
+    if {$FndOrRpl=="replace"} {
         frame $find.l.f4.f
         set rconfirm 1
         checkbutton $find.l.f4.f.cbox1 -text "3.Match case" -variable ::fndrpl::findcase -underline 0
@@ -77,7 +77,7 @@ proc ::fndrpl::Find {text typ} {
         pack $find.l.f4.cbox1 -side left -padx 10
     }
 
-    if {$typ=="replace"} {
+    if {$FndOrRpl=="replace"} {
         puts "Bindings for alt-letter are not created for Replace"
     } else {
         bind $find <Alt-Key-1> "focus $find.l.f.f1.entry"
