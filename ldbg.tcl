@@ -182,16 +182,12 @@ namespace eval ::ldbg {
         CellCmd [$tbl index active] $Cmd
     }
 
-    proc DbgMainWindowBufferMenu {w menu} {
-        set m [menu [::tkcon::MenuButton $menu "2.Buffer" buffer]]
-        
-        set ActivateCmd "::ldbg::CellCmdForActiveCell $w.tf.tbl HideListAndShowBuffer"
-        $m add command -label "Activate" -accel "Return" -command $ActivateCmd
-
-        set CloseCmd "::ldbg::CellCmdForActiveCell $w.tf.tbl CloseBuffer"
-        $m add command -label "Close buffer or file" -accel "Delete" -command $CloseCmd
+    proc DbgMainWindowEditMenu {w menu} {
+        set m [menu [::tkcon::MenuButton $menu "2.Edit" edit]]
+    
+        # set cmd ::srchtblst::
     }
-
+    
     proc DbgMainWindowWindowMenu {w menu} {
         ## Window Menu
         ##
@@ -406,7 +402,7 @@ namespace eval ::ldbg {
         $w configure -menu $menu
         
         # TitleListFileMenu $w $menu
-        DbgMainWindowBufferMenu $w $menu
+        DbgMainWindowEditMenu $w $menu
         DbgMainWindowWindowMenu $w $menu
         DbgMainWindowRestartsMenu $w $menu
 
