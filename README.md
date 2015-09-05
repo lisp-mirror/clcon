@@ -11,6 +11,10 @@ Code is completely portable and should run on other platforms too.
 ## Screenshots
 [See here](https://bitbucket.org/budden/clcon/wiki/Screenshots)
 
+## Project goals
+- Simple, lightweight, embeddable CL IDE for using CL as an application expansion scripting language
+- Simple, one-click installable CL environment for beginners
+
 ## Current state
 - REPL with command history and history substitution
 - debugger prototype (show condition, list frames, invoke restarts)
