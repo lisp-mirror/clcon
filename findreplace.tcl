@@ -25,6 +25,7 @@
 #?%2TCL TextEdit v0.9.x%
 #?
 #?Copyright (c) 1997-1999 Dennis Ehlin
+#?Copyright (c) 2015 Denis Budyak
 #?
 #?Permission is hereby granted, free of charge, to any person obtaining a copy
 #?of this software and associated documentation files, to deal
@@ -160,6 +161,7 @@ namespace eval ::fndrpl {
 
     }
 
+    # Was not updated to namespace. Unlikely to work
     proc GrepIt {text} {
         variable SearchString
         variable SearchPos
@@ -293,6 +295,7 @@ namespace eval ::fndrpl {
 
 
 
+    # Was not updated to namespace. Unlikely to work
     proc ReplaceIt {text n} {
         variable SearchString
         variable SearchDir
@@ -348,6 +351,7 @@ namespace eval ::fndrpl {
         }
     }
 
+    # Was not updated to namespace. Unlikely to work
     proc ReplaceAll {text} {
         variable SearchString
         variable SearchDir
@@ -415,7 +419,7 @@ namespace eval ::fndrpl {
         frame $find.f2
         button $find.f2.button1 -text "Find Next" -command "::fndrpl::FindIt $text" -width 10 -height 1 
         
-        button $find.f2.button9 -text "Find everywhere" -command "destroy $find; ::fndrpl::GrepIt $text"  -width 10 -underline 0
+        button $find.f2.button9 -text "Find allwindows" -command "destroy $find; ::fndrpl::GrepIt $text"  -width 10 -underline 0 -state disabled 
         button $find.f2.button2 -text "Cancel" -command "::fndrpl::CancelFind $text $find" -width 10 -underline 0
 
         if {$typ=="replace"} {

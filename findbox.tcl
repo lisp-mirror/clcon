@@ -1,5 +1,6 @@
 # An attempt of generic Findbox facility
 # Based on ::tkcon::FindBox
+# DEPRECATED - use findreplace.tcl instead
 
 ## Copyright (c) 1995-2011 Jeffrey Hobbs, jeff(a)hobbs(.)org
 ## source standard_disclaimer.tcl
