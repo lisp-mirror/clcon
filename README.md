@@ -16,14 +16,16 @@ Code is completely portable and should run on other platforms too.
 - Simple, one-click installable CL environment for beginners
 
 ## Current state
+Overall state and quality is "working prototype"
 - REPL with command history and history substitution
-- debugger prototype (show condition, list frames, invoke restarts)
+- debugger prototype (show condition, list frames, view locals, invoke restarts)
 - completion for lisp symbols and filenames in REPL
 - find source in REPL
 - swank-based inspector 
 - compilation error browser
 - editor buffer list
 - you can still run tcl code with special "escapes"
+- prototypes of "Find" and "Find next" commands for text and treeview
 
 ## Installation and startup 
 You need:
