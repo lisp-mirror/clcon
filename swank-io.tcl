@@ -93,7 +93,7 @@ proc ::tkcon::myerror {text} {
 # Can call inner event loop, but no async events are processed.
 # If some async event handler is on the stack already and sheduled events,
 # we can't help it. 
-proc ::tkcon::EvalInSwankSync {lispcode} {
+proc ::tkcon::EvalInSwankSync {lispcode {window {}}} {
     #proc ::tkcon::FormatSwankRexEvalMessageInner {cmd ThreadDesignator ContinuationCounter} 
     variable SWANKIsInSyncMode
     variable SWANKSyncContinuation
@@ -101,9 +101,11 @@ proc ::tkcon::EvalInSwankSync {lispcode} {
         myerror "::tkcon::EvalInSwankSync is not reenterable"
     }
     set SWANKIsInSyncMode 1
+    if {$window ne {}} grab $window
     try {
         return [::mprs::EvalInSwankSyncInner $lispcode]
     } finally {
+        if {$window ne {}} grab release $window
         mprs::DeleteSyncEventsFromTheQueue
         set SWANKSyncContinuation {}
         set SWANKIsInSyncMode 0
