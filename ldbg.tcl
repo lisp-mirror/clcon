@@ -119,6 +119,16 @@ namespace eval ::ldbg {
         FillData
     }
 
+    # Example of Local:
+    # :name snumber :id n0 :value s0 
+    proc InsertLocalIntoTree {tbl RowName Local} {
+        puts $Local
+        set varname [::mprs::Unleash [dict get $Local {:name}]]
+        set varvalue [::mprs::Unleash [dict get $Local {:value}]]
+        set contents "$varname = $varvalue"
+        $tbl insertchildren $RowName end [list $contents]
+    }
+
     proc InsertLocalsForFrameIntoTree {RowName EventAsList} {
         variable DbgMainWindow
         if {[info exists DbgMainWindow]&&[winfo exists $DbgMainWindow]} {
@@ -132,7 +142,7 @@ namespace eval ::ldbg {
             set LocalsAndX [::mprs::Unleash [lindex $okList 1]]
             set Locals [::mprs::Unleash [lindex $LocalsAndX 0]]
             foreach Local $Locals {
-                $tbl insertchildren $RowName end [list [::mprs::Unleash $Local]]
+                InsertLocalIntoTree $tbl $RowName [::mprs::Unleash $Local]
             }
             puts "What is second LocalsAndX? See slimv"        
         }
