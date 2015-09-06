@@ -445,7 +445,7 @@ namespace eval ::fndrpl {
         destroy $w
     }
 
-
+    # async command - does not return
     proc TreeSearchTextOuter {tablelist EnsurePopulatedCmd {continueP {}}} {
         variable SearchString
         variable SearchDir
@@ -476,14 +476,10 @@ namespace eval ::fndrpl {
                  -findcase                            $findcase                   \
                 ]
 
-        puts "EnsurePopulatedCmd = $EnsurePopulatedCmd"
-        foreach {found $TreeSearchState} \
-            [::srchtblst::TreeSearchText $tablelist $TreeSearchState $EnsurePopulatedCmd] {
-                break
+        ::srchtblst::TreeSearchText $tablelist $TreeSearchState $EnsurePopulatedCmd {
+            if {!$found} {
+                tk_messageBox -title "Find" -message "Search string not found" -parent $tablelist
             }
-        
-        if {!$found} {
-            tk_messageBox -title "Find" -message "Search string not found"
         }
     }
 }

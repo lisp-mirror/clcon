@@ -85,18 +85,23 @@ namespace eval ::srchtblst {
 
 
     # Interactive search in existing items of a tree
-    # Does not try to expand subtrees (is this a TODO?)
+    # Async command, does not return
+    # Tries to expand subtrees. To disable, pass ProcedureNop as EnsurePopulatedCmd
     # Args: tbl - tablelist widget
     # Feature: shows only once per cell
-    # Returns list of two values: 1. 0-found,1-not found; 2-new SearchState            
-    proc TreeSearchText {tbl SearchState EnsurePopulatedCmd} {
+    # Applies continuation with arguments bound:
+    # tablelist: widget
+    # found: 1=found, 0=not found;
+    # SearchState: new SearchState            
+    proc TreeSearchText {tbl SearchState EnsurePopulatedCmd ContinuationBody} {
         set continueP [dict get $SearchState -continueP]
         set startFrom [dict get $SearchState -startFrom]
         set searchString [dict get $SearchState -searchStringQ]
         set increment [GetSearchStateIncrement $SearchState]
         set CmdWithCaseOption [SearchStateTableListCmdWithCaseOption $SearchState]
+        set lambda [list {tablelist found SearchState} $ContinuationBody]
         for {set i [expr $startFrom + $increment * $continueP]} \
-            {0 <= $i && $i <= [$tbl index end]} \
+            {0 <= $i && $i < [$tbl index end]} \
             {incr i $increment} {
                 if {$EnsurePopulatedCmd ne {}} {
                     eval [list $EnsurePopulatedCmd $tbl $i]
@@ -108,10 +113,12 @@ namespace eval ::srchtblst {
                     after idle ::srchtblst::TreeSetTo $tbl $i
                     dict set SearchState -continueP 1
                     dict set SearchState -startFrom $i
-                    return [list 1 $SearchState]
+                    apply $lambda $tbl 1 $SearchState
+                    return
                 }
             }
-        return [list 0 $SearchState]
+        apply $lambda $tbl 0 $SearchState
+        return
     }
 
     # Orphan code which reports that key is not found. Write TreeSearchOuter around? 
@@ -142,14 +149,23 @@ namespace eval ::srchtblst {
         wm deiconify .w
     }
 
-    proc TableListExample {} {
+    proc TableListTest1 {} {
         MakeTestTableList
         set state [MakeDefaultSearchState .w.t "t"]
         dict set state -findcase 1
-        foreach {result state} [TreeSearchText \
-                                    .w.t $state \
-                                    ::srchtblst::EnsurePopulated] {break}
-        tk_messageBox -message $state
-        TreeSearchText .w.t $state ::srchtblst::EnsurePopulated
+        ::srchtblst::TreeSearchText .w.t $state ::srchtblst::EnsurePopulated {
+            tk_messageBox -message $SearchState
+            if {!$found} {error "TableListTest1 failure 1"}
+            ::srchtblst::TreeSearchText .w.t $SearchState ::srchtblst::EnsurePopulated {
+                if {!$found} {error "TableListTest1 failure 2"}
+                after idle after idle destroy .w
+            }
+        }
+    }
+
+    # Opens a FindBox. You can work with it
+    proc TableListExample {} {
+        MakeTestTableList
+        ::fndrpl::OpenFindBox .w.t "tablelist" "find" ::srchtblst::EnsurePopulated 
     }
 }
