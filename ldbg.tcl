@@ -57,11 +57,11 @@ namespace eval ::ldbg {
 
     # Insert stack frame into StackFrameHeaders
     # variable and into tablelist. 
-    # name - text to display
+    # contents - text to display
     # type - irrelevant
     # frameNo - number of frame
     # Adds item to StackFrameHeaders:
-    proc AppendData {name type frameNo} {
+    proc AppendData {contents type frameNo} {
         variable DbgMainWindow
         variable StackFrameHeaders
 
@@ -72,7 +72,7 @@ namespace eval ::ldbg {
         set RowName [FrameNumberToRowName $frameNo]
         
         set NewItem [dict create            \
-                         name $name         \
+                         contents $contents         \
                          type $type         \
                          frameNo $frameNo   \
                          RowName $RowName   \
@@ -81,7 +81,7 @@ namespace eval ::ldbg {
         lappend StackFrameHeaders $NewItem
 
         set tbl $DbgMainWindow.tf.tbl    
-        set row [$tbl insertchild root end [list $name]]
+        set row [$tbl insertchild root end [list $contents]]
 
         $tbl rowconfigure $row -name $RowName
         $tbl collapse $row
@@ -97,9 +97,9 @@ namespace eval ::ldbg {
             set frame [::mprs::Unleash $lframe]
             # (frameid text &optional (:restartable ?))
             set frameNo [lindex $frame 0]
-            set name [::mprs::Unleash [lindex $frame 1]]
+            set contents [::mprs::Unleash [lindex $frame 1]]
             set type 0
-            AppendData $name $type $frameNo
+            AppendData $contents $type $frameNo
         }
     }
 
