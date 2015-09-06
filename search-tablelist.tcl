@@ -85,24 +85,47 @@ namespace eval ::srchtblst {
 
 
     # Continuation for TreeSearchText
-    proc TreeSearchTextC1 {CurName lambda tbl SearchState EnsurePopulatedCmd ContinuationBody} {
-        set searchString [dict get $SearchState -searchStringQ]
-        set CmdWithCaseOption [SearchStateTableListCmdWithCaseOption $SearchState]
-        set celltext [$tbl get $CurName]
-        set cmd [string cat $CmdWithCaseOption " " [list $searchString [lindex $celltext 0]]]
-        puts "about to test row at $CurName = [$tbl index $CurName]"
-        if {[eval $cmd]} {
-            # found 
-            ::srchtblst::TreeSetTo $tbl $CurName
-            dict set SearchState -continueP 1
-            dict set SearchState -startFrom $CurName
-            apply $lambda $tbl 1 $SearchState
+    # kind=1 - first call (from TreeSearchText)
+    # kind=0 - subsequent calls (loop iterations)
+    proc TreeSearchTextC1 {kind CurName lambda tbl SearchState EnsurePopulatedCmd ContinuationBody} {
+        if {$kind == 0} { # not the first loop iteration
+            set CurName [$tbl rowcget $CurName -name]
+            set searchString [dict get $SearchState -searchStringQ]
+            set CmdWithCaseOption [SearchStateTableListCmdWithCaseOption $SearchState]
+            set celltext [$tbl get $CurName]
+            set cmd [string cat $CmdWithCaseOption " " [list $searchString [lindex $celltext 0]]]
+            puts "about to test row at $CurName = [$tbl index $CurName]"
+            if {[eval $cmd]} {
+                # found 
+                ::srchtblst::TreeSetTo $tbl $CurName
+                dict set SearchState -continueP 1
+                dict set SearchState -startFrom $CurName
+                apply $lambda $tbl 1 $SearchState
+                return
+            } else {
+                set index [$tbl index $CurName]
+                set increment [GetSearchStateIncrement $SearchState]
+                set i [expr $index + $increment ]
+                if {0 <= $i && $i < [$tbl index end]} {
+                    after idle [list ::srchtblst::TreeSearchTextC1 0 $i $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
+                    return
+                }
+                apply $lambda $tbl 0 $SearchState
+                return
+            }
+        } else { # hence $kind=1 - first call
+            set i [$tbl index $CurName]
+            puts "i=$i, end = [$tbl index end]"
+            if {0 <= $i && $i < [$tbl index end]} {
+                set CurName [$tbl rowcget $i -name]
+                if {$EnsurePopulatedCmd ne {}} {
+                    eval [list $EnsurePopulatedCmd $tbl $CurName]
+                }
+                after idle [list ::srchtblst::TreeSearchTextC1 0 $CurName $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
+                return 
+            }
+            apply $lambda $tbl 0 $SearchState
             return
-        } else {
-            set index [$tbl index $CurName]
-            set increment [GetSearchStateIncrement $SearchState]
-            set i [expr $index + $increment ]
-            after idle [list ::srchtblst::TreeSearchTextC1 $i $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
         }
     }
 
@@ -130,15 +153,7 @@ namespace eval ::srchtblst {
         set startFrom [$tbl index $startFrom]
         puts "TreeSearchTextInner: startFrom = $startFrom, continueP = $continueP"
         set i [expr $startFrom + $increment * $continueP]
-        if {0 <= $i && $i < [$tbl index end]} {
-            set CurName [$tbl rowcget $i -name]
-            if {$EnsurePopulatedCmd ne {}} {
-                eval [list $EnsurePopulatedCmd $tbl $CurName]
-            }
-            after idle [list ::srchtblst::TreeSearchTextC1 $CurName $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
-            return 
-        }
-        apply $lambda $tbl 0 $SearchState
+        ::srchtblst::TreeSearchTextC1 1 $i $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody 
         return
     }
 
