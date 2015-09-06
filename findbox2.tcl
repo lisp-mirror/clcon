@@ -3,7 +3,7 @@
 # type of widget is specified by AreaType, can be "text" or "tablelist"
 # FndOrRepl can be "replace" or... not "replace", say, "find"
 # EnsurePopulatedCmd is relevant for AreaType eq "tablelist" only
-proc ::fndrpl::Find {area AreaType FndOrRpl EnsurePopulatedCmd} {
+proc ::fndrpl::OpenFindBox {area AreaType FndOrRpl EnsurePopulatedCmd} {
     variable SearchString
     variable SearchDir
     variable ReplaceString

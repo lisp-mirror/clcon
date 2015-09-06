@@ -1745,7 +1745,7 @@ proc ::tkcon::InitMenus {w title} {
 		 -command [list ::tkcon::Paste $text]
 	$m add separator
 
-        set cmd [list ::fndrpl::Find $text "text" "find" {}]
+        set cmd [list ::fndrpl::OpenFindBox $text "text" "find" {}]
 	$m add command -label "Find"  -underline 0 -accel $PRIV(ACC)F \
             -command $cmd
 
@@ -4486,7 +4486,7 @@ proc ::tkcon::Bindings {} {
     bind $PRIV(root) <<TkCon_Close>>	{ ::tkcon::Destroy }
     bind $PRIV(root) <<TkCon_About>>	{ ::tkcon::About }
 
-    set cmd { ::fndrpl::Find $::tkcon::PRIV(console) "text" "find" {}}
+    set cmd { ::fndrpl::OpenFindBox $::tkcon::PRIV(console) "text" "find" {}}
     bind $PRIV(root) <<TkCon_Find>>	$cmd
     bind $PRIV(root) <Control-Key-f>	$cmd
     bind $PRIV(root) <Control-Key-Cyrillic_a> $cmd
