@@ -24,21 +24,67 @@ namespace eval ::ldbg {
         set StackFrameHeaders {}
     }
 
-    proc AppendData {name type path w} {
+    # Creates a tablelist -name row option value for a frame number
+    proc FrameNumberToRowName {n} {
+        string cat "fr" $n
+    }
+
+    # Args:
+    # RowName - -name option from tablelist row
+    # Returns:
+    # index of item in StackFrameHeaders with that RowName
+    proc GetStackFrameHeaderIndexByRowName {RowName} {
+        variable StackFrameHeaders
+        set i 0 
+        foreach h $StackFrameHeaders {
+            if {[dict get $h RowName] eq $RowName} {
+                return $i
+            }
+            incr i
+        }
+        error "GetStackFrameHeaderIndexByRowName failed at $RowName"
+    }
+    
+    proc FrameListEnsurePopulated {tbl row} {
+        variable StackFrameHeaders
+        set RowName [$tbl rowcget $row -name]
+        if {[regexp "^fr" $RowName]} {
+            set i [GetStackFrameHeaderIndexByRowName $RowName]
+            set item [lindex $StackFrameHeaders $i]
+            puts "Populate frame $item"
+        }
+    }
+
+    # Insert stack frame into StackFrameHeaders
+    # variable and into tablelist. 
+    # name - text to display
+    # type - irrelevant
+    # frameNo - number of frame
+    # Adds item to StackFrameHeaders:
+    proc AppendData {name type frameNo} {
         variable DbgMainWindow
         variable StackFrameHeaders
 
         if {!([info exists DbgMainWindow]&&[winfo exists $DbgMainWindow])} {
-            # There maybe no any Buffer List browser. Lets get out!
             return
         }
 
-        set NewItem [dict create name $name type $type path $path w $w]
+        set RowName [FrameNumberToRowName $frameNo]
+        
+        set NewItem [dict create            \
+                         name $name         \
+                         type $type         \
+                         frameNo $frameNo   \
+                         RowName $RowName   \
+                        ]
+        
         lappend StackFrameHeaders $NewItem
 
         set tbl $DbgMainWindow.tf.tbl    
-        $tbl insertchildren root end [list $name]
+        set row [$tbl insertchild root end [list $name]]
 
+        $tbl rowconfigure $row -name $RowName
+        $tbl collapse $row
     }
 
     proc FillData { frames } {
@@ -50,11 +96,10 @@ namespace eval ::ldbg {
             }
             set frame [::mprs::Unleash $lframe]
             # (frameid text &optional (:restartable ?))
-            set w [lindex $frame 0]
+            set frameNo [lindex $frame 0]
             set name [::mprs::Unleash [lindex $frame 1]]
-            set path $frame
-            set type "."
-            AppendData $name $type $path $w
+            set type 0
+            AppendData $name $type $frameNo
         }
     }
 
@@ -195,7 +240,7 @@ namespace eval ::ldbg {
         bind $bodytag <Control-Key-Cyrillic_es> $cmd
         bind $bodytag <Control-Key-Insert> $cmd
         
-        set cmd [list ::fndrpl::OpenFindBox $tbl "tablelist" "find" "ProcedureNop"]
+        set cmd [list ::fndrpl::OpenFindBox $tbl "tablelist" "find" "::ldbg::FrameListEnsurePopulated"]
 	$m add command -label "Find"  -accel "Control-f" \
             -command $cmd
         

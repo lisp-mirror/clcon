@@ -65,8 +65,10 @@ proc ::fndrpl::OpenFindBox {area AreaType FndOrRpl EnsurePopulatedCmd} {
     frame $find.f2
     button $find.f2.button1 -text "Find Next" -command "set tmpContinueP {}; $SearchCmd" -width 10 -height 1 
     
-    button $find.f2.button9 -text "Find allwindows" -command "destroy $find; ::fndrpl::GrepIt $area"  -width 10 -underline 0 -state disabled 
-    button $find.f2.button2 -text "Cancel" -command "::fndrpl::CancelFind $area $find" -width 10 -underline 0
+    button $find.f2.button9 -text "Find allwindows" -command "destroy $find; ::fndrpl::GrepIt $area"  -width 10 -underline 0 -state disabled
+
+    # Cancel is disabled due to issue 41
+    button $find.f2.button2 -text "Cancel" -command "::fndrpl::CancelFind $area $find" -width 10 -underline 0 -state disabled
 
     if {$FndOrRpl=="replace"} {
         button $find.f2.button3 -text "Replace" -command "::fndrpl::ReplaceIt $area -" -width 10 -height 1 -underline 0
