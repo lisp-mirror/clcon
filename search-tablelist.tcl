@@ -35,12 +35,18 @@ namespace eval ::srchtblst {
         EnsurePopulated $tbl $row
     }
 
-    proc TreeSetTo {tbl index} {
-        $tbl see $index
-        $tbl selection clear 0 end
+    proc TreeSetTo2 {tbl index} {
         $tbl selection anchor $index
         $tbl activate $index
         $tbl selection set $index $index
+    }
+    
+    
+    # Some actions are delayed to after idle
+    proc TreeSetTo {tbl index} {
+        $tbl selection clear 0 end
+        $tbl see $index
+        after idle "::srchtblst::TreeSetTo2 $tbl $index"
     }    
 
     proc MakeDefaultSearchState {tbl searchString} {
