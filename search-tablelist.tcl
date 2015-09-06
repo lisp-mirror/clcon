@@ -88,9 +88,18 @@ namespace eval ::srchtblst {
     # kind=1 - first call (from TreeSearchText)
     # kind=0 - subsequent calls (loop iterations)
     proc TreeSearchTextC1 {kind CurName lambda tbl SearchState EnsurePopulatedCmd ContinuationBody} {
-        if {$kind == 0} { # not the first loop iteration
+        if {![winfo exists $tbl]} {
+            return
+        }
+        if {$kind == 1} { # first loop iteration
+            set i [$tbl index $CurName]
+            puts "i=$i, end = [$tbl index end]"
+        } else { # not the first loop iteration - will move to next/previous row
             # Coerce name to text
             set CurName [$tbl rowcget $CurName -name]
+            if {$CurName eq {}} {
+                error "unnamed row in a table"
+            }
             set searchString [dict get $SearchState -searchStringQ]
             set CmdWithCaseOption [SearchStateTableListCmdWithCaseOption $SearchState]
             set celltext [$tbl get $CurName]
@@ -98,7 +107,7 @@ namespace eval ::srchtblst {
             puts "about to test row at $CurName = [$tbl index $CurName]"
             if {[eval $cmd]} {
                 # found 
-                ::srchtblst::TreeSetTo $tbl $CurName
+                TreeSetTo $tbl $CurName
                 dict set SearchState -continueP 1
                 dict set SearchState -startFrom $CurName
                 apply $lambda $tbl 1 $SearchState
@@ -108,27 +117,21 @@ namespace eval ::srchtblst {
                 set increment [GetSearchStateIncrement $SearchState]
                 set i [expr $index + $increment ]
                 puts "incremented i by $increment to be $i"
-                if {0 <= $i && $i < [$tbl index end]} {
-                    after idle [list ::srchtblst::TreeSearchTextC1 0 $i $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
-                    return
-                }
-                apply $lambda $tbl 0 $SearchState
-                return
             }
-        } else { # hence $kind=1 - first call
-            set i [$tbl index $CurName]
-            puts "i=$i, end = [$tbl index end]"
-            if {0 <= $i && $i < [$tbl index end]} {
-                set CurName [$tbl rowcget $i -name]
-                if {$EnsurePopulatedCmd ne {}} {
-                    eval [list $EnsurePopulatedCmd $tbl $CurName]
-                }
-                after idle [list ::srchtblst::TreeSearchTextC1 0 $CurName $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
-                return 
-            }
-            apply $lambda $tbl 0 $SearchState
-            return
         }
+
+        if {0 <= $i && $i < [$tbl index end]} {
+            set CurName [$tbl rowcget $i -name]
+            if {$EnsurePopulatedCmd ne {}} {
+                #puts "About to EnsurePopulatedCmd $CurName"
+                eval [list $EnsurePopulatedCmd $tbl $CurName]
+            }
+            #after idle [list puts "About to continue search"]
+            after idle [list ::srchtblst::TreeSearchTextC1 0 $CurName $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
+            return 
+            }
+        apply $lambda $tbl 0 $SearchState
+        return
     }
 
     # Interactive search in existing items of a tree
