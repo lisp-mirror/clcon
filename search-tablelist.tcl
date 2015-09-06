@@ -89,6 +89,7 @@ namespace eval ::srchtblst {
     # kind=0 - subsequent calls (loop iterations)
     proc TreeSearchTextC1 {kind CurName lambda tbl SearchState EnsurePopulatedCmd ContinuationBody} {
         if {$kind == 0} { # not the first loop iteration
+            # Coerce name to text
             set CurName [$tbl rowcget $CurName -name]
             set searchString [dict get $SearchState -searchStringQ]
             set CmdWithCaseOption [SearchStateTableListCmdWithCaseOption $SearchState]
@@ -106,6 +107,7 @@ namespace eval ::srchtblst {
                 set index [$tbl index $CurName]
                 set increment [GetSearchStateIncrement $SearchState]
                 set i [expr $index + $increment ]
+                puts "incremented i by $increment to be $i"
                 if {0 <= $i && $i < [$tbl index end]} {
                     after idle [list ::srchtblst::TreeSearchTextC1 0 $i $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
                     return
@@ -142,10 +144,6 @@ namespace eval ::srchtblst {
     # !!!Searches in first column only!!!
     proc TreeSearchText {tbl SearchState EnsurePopulatedCmd ContinuationBody} {
         set startFrom [dict get $SearchState -startFrom]
-        TreeSearchTextInner $startFrom $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody
-    }
-        
-    proc TreeSearchTextInner {startFrom tbl SearchState EnsurePopulatedCmd ContinuationBody} {
         set continueP [dict get $SearchState -continueP]
         set increment [GetSearchStateIncrement $SearchState]
         set lambda [list {tablelist found SearchState} $ContinuationBody]
