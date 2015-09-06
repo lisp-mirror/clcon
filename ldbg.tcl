@@ -19,13 +19,14 @@ namespace eval ::ldbg {
 
     # dictionary of StackFrameHeaders being filled. Key is frame id (integer).
     # used to avoid sending several events of that kind. Resending is now a error.
-    variable StackFrameHeadersBeingFilled  [dict create]
+    variable StackFrameHeadersBeingFilled 
 
     catch {font create tkconfixed -family Courier -size -20}
 
     proc InitData {} {
         variable StackFrameHeaders
         set StackFrameHeaders {}
+        set StackFrameHeadersBeingFilled  [dict create]
     }
 
     # Creates a tablelist -name row option value for a frame number
