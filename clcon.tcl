@@ -1648,9 +1648,9 @@ proc ::tkcon::InitMenus {w title} {
 	$m add command -label "1.Load File" -underline 0 -command ::tkcon::Load
 	$m add cascade -label "2.Save ..."  -underline 0 -menu $m.save
 	$m add separator
-	$m add command -label "Quit" -command exit
+	$m add command -label "3.Quit" -command exit
 	$m add separator
-	$m add command -label "3.Reload some of IDE sources" -underline 0 \
+	$m add command -label "4.Reload some of IDE sources" -underline 0 \
 	    -command ::tkcon::ReloadSomeIDESources
         
 
