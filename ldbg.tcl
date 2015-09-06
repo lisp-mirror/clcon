@@ -151,9 +151,12 @@ namespace eval ::ldbg {
     proc GetAndInsertLocals {tbl RowName} {
         variable DbgMainWindow
         set grabber [TitleOfErrorBrowser $DbgMainWindow]
-        set FrameNo [RowNameToFrameNo $RowName] 
-        set OnReply "::ldbg::InsertLocalsForFrameIntoTree $RowName \$EventAsList; grab release $grabber"
-        grab $grabber
+        set FrameNo [RowNameToFrameNo $RowName]
+
+        #set OnReply "::ldbg::InsertLocalsForFrameIntoTree $RowName \$EventAsList; grab release $grabber"
+        # grab $grabber
+
+        set OnReply "::ldbg::InsertLocalsForFrameIntoTree $RowName \$EventAsList"
         ::tkcon::EvalInSwankAsync \
             "(swank:frame-locals-and-catch-tags $FrameNo)" \
             $OnReply 0 [GetDebuggerThreadId]
