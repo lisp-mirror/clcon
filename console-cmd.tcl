@@ -194,7 +194,8 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
             set res [EvalTclEscape $w $TclEscapeKind $RealForm $cmd]
             return $res
         } else {
-            # FIXME. I suppose this is slow. How to use apply here? Budden
+            # FIXME. I suppose this is slow. How to use apply here?
+            # tip: grep apply in the whole project
             set res [EvalInSwankAsync $RealForm \
                          "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $RealForm]"]
             return $res
