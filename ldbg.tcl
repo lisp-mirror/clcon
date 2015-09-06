@@ -17,6 +17,10 @@ namespace eval ::ldbg {
     variable DbgMainWindow
     variable StackFrameHeaders
 
+    # dictionary of StackFrameHeaders being filled. Key is frame id (integer).
+    # used to avoid sending several events of that kind. Resending is now a error.
+    variable StackFrameHeadersBeingFilled  [dict create]
+
     catch {font create tkconfixed -family Courier -size -20}
 
     proc InitData {} {
@@ -52,13 +56,16 @@ namespace eval ::ldbg {
         dict get $item FrameNo
     }        
     
-    proc FrameListEnsurePopulated {tbl row} {
+    proc FrameListEnsurePopulated {tbl row {contBody ProcedureNop}} {
         variable StackFrameHeaders
         set RowName [$tbl rowcget $row -name]
         if {[regexp {^fr[0-9]*$} $RowName]} {
             set i [GetStackFrameHeaderIndexByRowName $RowName]
             set item [lindex $StackFrameHeaders $i]
-            GetAndInsertLocals $tbl $RowName
+            GetAndInsertLocals $tbl $RowName $contBody
+        } else {
+            set lambda [list {} $contBody]
+            apply $lambda
         }
     }
 
@@ -132,37 +139,52 @@ namespace eval ::ldbg {
         $tbl rowconfigure $row -name $name
     }
 
-    proc InsertLocalsForFrameIntoTree {RowName EventAsList} {
+    # contBody is a body of a parameterless continuation
+    proc InsertLocalsForFrameIntoTree {RowName EventAsList contBody} {
         variable DbgMainWindow
+        variable StackFrameHeadersBeingFilled
+        puts "Entered InsertLocalsForFrameIntoTree with contBody = $contBody"
         if {[info exists DbgMainWindow]&&[winfo exists $DbgMainWindow]} {
             set tbl [::ldbg::GetDbgMainWindowMenuTbl $DbgMainWindow]
-            $tbl delete [$tbl childkeys $RowName]
+            if {![llength [$tbl childkeys $RowName]]} {
 
-            set okList [::mprs::Unleash [lindex $EventAsList 1]]
-            if {[::mprs::Unleash [lindex $okList 0]] ne {:ok}} {
-                error "Something wrong with the debugger: error showing locals"
+                set okList [::mprs::Unleash [lindex $EventAsList 1]]
+                if {[::mprs::Unleash [lindex $okList 0]] ne {:ok}} {
+                    error "Something wrong with the debugger: error showing locals"
+                }
+                set LocalsAndX [::mprs::Unleash [lindex $okList 1]]
+                set Locals [::mprs::Unleash [lindex $LocalsAndX 0]]
+                set i 0
+                foreach Local $Locals {
+                    InsertLocalIntoTree $tbl $RowName $i [::mprs::Unleash $Local]
+                    incr i
+                }
+                puts "What is second LocalsAndX? See slimv"
             }
-            set LocalsAndX [::mprs::Unleash [lindex $okList 1]]
-            set Locals [::mprs::Unleash [lindex $LocalsAndX 0]]
-            set i 0
-            foreach Local $Locals {
-                InsertLocalIntoTree $tbl $RowName $i [::mprs::Unleash $Local]
-                incr i
-            }
-            puts "What is second LocalsAndX? See slimv"        
+            set lambda [list {} $contBody]
+            set FrameNo [RowNameToFrameNo $RowName]
+            dict unset StackFrameHeadersBeingFilled $FrameNo
+            puts "InsertLocalsForFrameIntoTree: about to apply $lambda"
+            apply $lambda
         }
     }
-    
-    proc GetAndInsertLocals {tbl RowName} {
+
+    # contBody is a body of a parameterless continuation
+    proc GetAndInsertLocals {tbl RowName contBody} {
         variable DbgMainWindow
+        variable StackFrameHeadersBeingFilled
+        puts "Entered GetAndInsertLocals"
         set grabber [TitleOfErrorBrowser $DbgMainWindow]
         set FrameNo [RowNameToFrameNo $RowName]
+        if {[dict exists $StackFrameHeadersBeingFilled $FrameNo]} {
+            error "Achtung! Second call to GetAndInsertLocals with contBody = $contBody"
+        }
+        dict append StackFrameHeadersBeingFilled $FrameNo 1
 
-        
-        #set OnReply "::ldbg::InsertLocalsForFrameIntoTree $RowName \$EventAsList; grab release $grabber"
+        #set OnReply "::ldbg::InsertLocalsForFrameIntoTree $RowName \$EventAsList $contBody; grab release $grabber"
         # grab $grabber
 
-        set OnReply "::ldbg::InsertLocalsForFrameIntoTree $RowName \$EventAsList"
+        set OnReply "::ldbg::InsertLocalsForFrameIntoTree $RowName \$EventAsList [list $contBody]"
         ::tkcon::EvalInSwankAsync \
             "(swank:frame-locals-and-catch-tags $FrameNo)" \
             $OnReply 0 [GetDebuggerThreadId]
@@ -266,7 +288,6 @@ namespace eval ::ldbg {
         set cmd "::tablelist_util::CopyCurrentCell $tbl"
 	$m add command -label "Copy"  -accel "Control-C" \
             -command $cmd
-
         
         bind $bodytag <Control-Key-c> $cmd
         bind $bodytag <Control-Key-Cyrillic_es> $cmd

@@ -22,7 +22,6 @@ namespace eval ::srchtblst {
         set name [$tbl rowcget $row -name]
         if {$name eq "a"} {
             if {[$tbl childcount $row] == 0} {
-                #puts "EnsurePopulated $tbl $row works"
                 set r [$tbl insertchild $row end {row 1}]
                 $tbl rowconfigure $r -name "c1"
                 #
@@ -47,11 +46,13 @@ namespace eval ::srchtblst {
         $tbl selection anchor $index
         $tbl activate $index
         $tbl selection set $index $index
+        puts "Leaving TreeSetTo2"
     }
     
     
     # Some actions are delayed to after idle
     proc TreeSetTo {tbl index} {
+        puts "Entering TreeSetTo"
         $tbl selection clear 0 end
         $tbl see $index
         after idle "::srchtblst::TreeSetTo2 $tbl $index"
@@ -133,7 +134,7 @@ namespace eval ::srchtblst {
             set ContinuationCall \
                 [list "::srchtblst::TreeSearchTextC1" 0 $CurName $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
             if {$EnsurePopulatedCmd ne {}} {
-                #puts "About to EnsurePopulatedCmd $CurName"
+                puts "About to EnsurePopulatedCmd $CurName"
                 set call [list $EnsurePopulatedCmd $tbl $CurName $ContinuationCall]
                 # puts $call
                 eval $call
