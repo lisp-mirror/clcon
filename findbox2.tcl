@@ -14,7 +14,7 @@ proc ::fndrpl::OpenFindBox {area AreaType FndOrRpl EnsurePopulatedCmd} {
     unset -nocomplain TreeSearchState
     
     c
-    set find .find
+    set find $area.find
     catch {destroy $find}
     toplevel $find
     wm title $find "Find"
