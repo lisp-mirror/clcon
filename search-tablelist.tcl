@@ -12,7 +12,13 @@ package require tablelist
 
 namespace eval ::srchtblst {
 
-    proc EnsurePopulated {tbl row} {
+    # Sample EnsurePopulated proc.
+    # Args:
+    # tbl - tablelist
+    # row - row id
+    # ContinuationBody - body of a function with two params {tbl row}
+    # function is called when population is finished
+    proc ExampleEnsurePopulated {tbl row ContinuationBody} {
         set name [$tbl rowcget $row -name]
         if {$name eq "a"} {
             if {[$tbl childcount $row] == 0} {
@@ -28,11 +34,13 @@ namespace eval ::srchtblst {
                 #$tbl insertchildlist $row 0 {{row 1} {row 2} {another row}}
             }
         }
+        set lambda [list {tbl row} $ContinuationBody]
+        apply $lambda $tbl $row
     }
     
 
-    proc expandCmd {tbl row} {
-        EnsurePopulated $tbl $row
+    proc ExampleExpandCmd {tbl row} {
+        ExampleEnsurePopulated $tbl $row ProcedureNop
     }
 
     proc TreeSetTo2 {tbl index} {
@@ -119,27 +127,34 @@ namespace eval ::srchtblst {
                 puts "incremented i by $increment to be $i"
             }
         }
-
+        
         if {0 <= $i && $i < [$tbl index end]} {
             set CurName [$tbl rowcget $i -name]
+            set ContinuationCall \
+                [list "::srchtblst::TreeSearchTextC1" 0 $CurName $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
             if {$EnsurePopulatedCmd ne {}} {
                 #puts "About to EnsurePopulatedCmd $CurName"
-                eval [list $EnsurePopulatedCmd $tbl $CurName]
+                set call [list $EnsurePopulatedCmd $tbl $CurName $ContinuationCall]
+                # puts $call
+                eval $call
+            } else {
+                eval $ContinuationCall
             }
-            #after idle [list puts "About to continue search"]
-            after idle [list ::srchtblst::TreeSearchTextC1 0 $CurName $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
-            return 
-            }
-        apply $lambda $tbl 0 $SearchState
+        } else { # hence out of index range
+            apply $lambda $tbl 0 $SearchState
+        }
         return
     }
 
     # Interactive search in existing items of a tree
-    # Async command, does not return
-    # Tries to expand subtrees. To disable, pass ProcedureNop as EnsurePopulatedCmd
+    # Async command, does not return. Calls ContinuationBody instead
+    # Tries to expand subtrees with EnsurePopulatedCmd, where EnsurePopulatedCmd
+    # is like ExampleEnsurePopulated.
+    # To disable populating, try passing {} as EnsurePopulatedCmd
+    #
     # Args: tbl - tablelist widget
     # Feature: shows only once per cell
-    # Applies continuation with arguments bound:
+    # After Search is finished, applies continuation with arguments bound:
     # tablelist: widget
     # found: 1=found, 0=not found;
     # SearchState: new SearchState
@@ -169,7 +184,7 @@ namespace eval ::srchtblst {
         
         toplevel .w
 
-        tablelist::tablelist .w.t -columns {0 "First Column" 0 "Another column"} -stretch all -background white -stretch all -expandcommand ::srchtblst::expandCmd
+        tablelist::tablelist .w.t -columns {0 "First Column" 0 "Another column"} -stretch all -background white -stretch all -expandcommand ::srchtblst::ExampleExpandCmd
         .w.t resetsortinfo
 
         pack .w.t -fill both -expand yes
@@ -196,10 +211,10 @@ namespace eval ::srchtblst {
         MakeTestTableList
         set state [MakeDefaultSearchState .w.t "t"]
         dict set state -findcase 1
-        ::srchtblst::TreeSearchText .w.t $state ::srchtblst::EnsurePopulated {
+        ::srchtblst::TreeSearchText .w.t $state ::srchtblst::ExampleEnsurePopulated {
             puts "SearchState = $SearchState"
             if {!$found} {error "TableListTest1 failure 1"} else {puts "found 1"}
-            ::srchtblst::TreeSearchText .w.t $SearchState ::srchtblst::EnsurePopulated {
+            ::srchtblst::TreeSearchText .w.t $SearchState ::srchtblst::ExampleEnsurePopulated {
                 if {!$found} {error "TableListTest1 failure 2"} else {puts "found 2"}
                 # after idle after idle destroy .w
             }
@@ -209,6 +224,6 @@ namespace eval ::srchtblst {
     # Opens a FindBox. You can work with it
     proc TableListExample {} {
         MakeTestTableList
-        ::fndrpl::OpenFindBox .w.t "tablelist" "find" ::srchtblst::EnsurePopulated 
+        ::fndrpl::OpenFindBox .w.t "tablelist" "find" ::srchtblst::ExampleEnsurePopulated 
     }
 }
