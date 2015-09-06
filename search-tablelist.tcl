@@ -90,7 +90,7 @@ namespace eval ::srchtblst {
         set CmdWithCaseOption [SearchStateTableListCmdWithCaseOption $SearchState]
         set celltext [$tbl get $CurName]
         set cmd [string cat $CmdWithCaseOption " " [list $searchString [lindex $celltext 0]]]
-        # puts "cmd=$cmd"
+        puts "about to test row at $CurName = [$tbl index $CurName]"
         if {[eval $cmd]} {
             # found 
             ::srchtblst::TreeSetTo $tbl $CurName
@@ -102,7 +102,7 @@ namespace eval ::srchtblst {
             set index [$tbl index $CurName]
             set increment [GetSearchStateIncrement $SearchState]
             set i [expr $index + $increment ]
-            after idle [list ::srchtblst::TreeSearchTextInner $i $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
+            after idle [list ::srchtblst::TreeSearchTextC1 $i $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
         }
     }
 
@@ -128,6 +128,7 @@ namespace eval ::srchtblst {
         set lambda [list {tablelist found SearchState} $ContinuationBody]
         # Coerce key (which can be a name) to index
         set startFrom [$tbl index $startFrom]
+        puts "TreeSearchTextInner: startFrom = $startFrom, continueP = $continueP"
         set i [expr $startFrom + $increment * $continueP]
         if {0 <= $i && $i < [$tbl index end]} {
             set CurName [$tbl rowcget $i -name]
