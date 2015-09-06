@@ -148,14 +148,17 @@ proc ::clconcmd::tcsoh {filename} {
     tkcon main TkconSourceHere $filename
 }
 
-TkconSourceHere util.tcl
-TkconSourceHere rotext.tcl
-TkconSourceHere swank-connection.tcl
-TkconSourceHere swank-io.tcl
-TkconSourceHere console-cmd.tcl
-TkconSourceHere slimv-clcon.tcl
-TkconSourceHere findbox.tcl
+proc ::tkcon::ReloadSomeIDESources1 {} {
+    TkconSourceHere util.tcl
+    TkconSourceHere rotext.tcl
+    TkconSourceHere swank-connection.tcl
+    TkconSourceHere swank-io.tcl
+    TkconSourceHere console-cmd.tcl
+    TkconSourceHere slimv-clcon.tcl
+    TkconSourceHere findbox.tcl
+}
 
+::tkcon::ReloadSomeIDESources1
 
 ## ::tkcon::Init - inits tkcon
 #
@@ -1642,11 +1645,14 @@ proc ::tkcon::InitMenus {w title} {
     ##
     foreach m [list [menu $w.file -disabledforeground $COLOR(disabled)] \
 	    [menu $w.pop.file -disabledforeground $COLOR(disabled)]] {
-	$m add command -label "Load File" -underline 0 -command ::tkcon::Load
-	$m add cascade -label "Save ..."  -underline 0 -menu $m.save
+	$m add command -label "1.Load File" -underline 0 -command ::tkcon::Load
+	$m add cascade -label "2.Save ..."  -underline 0 -menu $m.save
 	$m add separator
-	$m add command -label "Quit" -underline 0 -accel $PRIV(ACC)q \
-	    -command exit
+	$m add command -label "Quit" -command exit
+	$m add separator
+	$m add command -label "3.Reload some of IDE sources" -underline 0 \
+	    -command ::tkcon::ReloadSomeIDESources
+        
 
 	## Save Menu
 	##
@@ -3516,9 +3522,12 @@ proc tkcon_gets args {
     return $data
 }
 
+proc ::tkcon::ReloadSomeIDESources2 {} {
+    TkconSourceHere editor.tcl
+    TkconSourceHere inspector.tcl
+}
 
-TkconSourceHere editor.tcl
-TkconSourceHere inspector.tcl
+::tkcon::ReloadSomeIDESources2 
 
 interp alias {} ::more {} ::edit
 interp alias {} ::less {} ::edit
@@ -4395,12 +4404,15 @@ proc lremove {args} {
     return $l
 }
 
-if { $::tkcon::ENABLE_UNKNOWN == 1 } {
-    TkconSourceHere tkcon-unknown.tcl
-} elseif { $::tkcon::ENABLE_UNKNOWN == -1 } {
-    TkconSourceHere tkcon-unknown-mini.tcl
+proc ::tkcon::ReloadSomeIDESources3 {} {
+    if { $::tkcon::ENABLE_UNKNOWN == 1 } {
+        TkconSourceHere tkcon-unknown.tcl
+    } elseif { $::tkcon::ENABLE_UNKNOWN == -1 } {
+        TkconSourceHere tkcon-unknown-mini.tcl
+    }
 }
 
+::tkcon::ReloadSomeIDESources3
 
 
 proc ::tkcon::Bindings {} {
@@ -5745,16 +5757,28 @@ proc ::tkcon::AtSource {} {
 }
 tkcon::AtSource
 
-# it must work after toplevel window creation, or
-# unwanted toplevel windows arises 
 package require tablelist
-TkconSourceHere tablelist_util.tcl
-TkconSourceHere search-tablelist.tcl
-TkconSourceHere error-browser.tcl
-TkconSourceHere buffer-list.tcl
-TkconSourceHere ldbg.tcl
-TkconSourceHere tcltextedit-unsorted.tcl
-TkconSourceHere findreplace.tcl
-TkconSourceHere findbox2.tcl
+
+proc ::tkcon::ReloadSomeIDESources4 {} {                                    
+    # it must work after toplevel window creation, or
+    # unwanted toplevel windows arises 
+    TkconSourceHere tablelist_util.tcl
+    TkconSourceHere search-tablelist.tcl
+    TkconSourceHere error-browser.tcl
+    TkconSourceHere buffer-list.tcl
+    TkconSourceHere ldbg.tcl
+    TkconSourceHere tcltextedit-unsorted.tcl
+    TkconSourceHere findreplace.tcl
+    TkconSourceHere findbox2.tcl
+}
+
+::tkcon::ReloadSomeIDESources4
+
+proc ::tkcon::ReloadSomeIDESources {} {
+    ReloadSomeIDESources1
+    ReloadSomeIDESources2
+    ReloadSomeIDESources3
+    ReloadSomeIDESources4
+}
 
 package provide tkcon $::tkcon::VERSION
