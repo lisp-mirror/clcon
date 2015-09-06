@@ -5748,6 +5748,8 @@ tkcon::AtSource
 # it must work after toplevel window creation, or
 # unwanted toplevel windows arises 
 package require tablelist
+TkconSourceHere tablelist_util.tcl
+TkconSourceHere search-tablelist.tcl
 TkconSourceHere error-browser.tcl
 TkconSourceHere buffer-list.tcl
 TkconSourceHere ldbg.tcl

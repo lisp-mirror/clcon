@@ -184,6 +184,29 @@ namespace eval ::ldbg {
 
     proc DbgMainWindowEditMenu {w menu} {
         set m [menu [::tkcon::MenuButton $menu "2.Edit" edit]]
+        set tbl [GetDbgMainWindowMenuTbl $w ]
+        set bodytag [$tbl bodytag]
+        set cmd "::tablelist_util::CopyCurrentCell $tbl"
+	$m add command -label "Copy"  -accel "Control-C" \
+            -command $cmd
+
+        
+        bind $bodytag <Control-Key-c> $cmd
+        bind $bodytag <Control-Key-Cyrillic_es> $cmd
+        bind $bodytag <Control-Key-Insert> $cmd
+        
+        set cmd [list ::fndrpl::OpenFindBox $tbl "tablelist" "find" "ProcedureNop"]
+	$m add command -label "Find"  -accel "Control-f" \
+            -command $cmd
+        
+        bind $bodytag <Control-Key-f>	   $cmd
+        bind $bodytag <Control-Key-Cyrillic_a> $cmd
+        
+
+        set cmd [list ::fndrpl::FindIt $tbl]
+	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd -state disabled
+        #bind $tbl <F3> $cmd
+        
     
         # set cmd ::srchtblst::
     }
@@ -349,7 +372,7 @@ namespace eval ::ldbg {
     proc ClearStackFramesTableList {} {
         variable DbgMainWindow
         if {[winfo exists $DbgMainWindow]} {
-            set tbl [::ldbg::GetDbgMainWindowMenuTbl $DbgMainWindow]
+            set tbl [GetDbgMainWindowMenuTbl $DbgMainWindow]
             $tbl delete 0 end
             $tbl insertchildlist root end "tree"
             $tbl collapse 0
@@ -357,7 +380,8 @@ namespace eval ::ldbg {
     }
 
     proc MakeBindings {w} {
-        set bodytag [$w.tf.tbl bodytag]
+        set tbl [GetDbgMainWindowMenuTbl $w]
+        set bodytag [$tbl bodytag]
         
         # wcb::callback $tbl before activate ::ldbg::DoOnSelect
         bind $bodytag <space> {::ldbg::KbdCellCmd %W %x %y ViewLocals; break}
@@ -396,16 +420,6 @@ namespace eval ::ldbg {
 
         set DbgMainWindow $w
 
-        # ----------------------------------- menu -------------------
-        
-        set menu [menu $w.mbar]
-        $w configure -menu $menu
-        
-        # TitleListFileMenu $w $menu
-        DbgMainWindowEditMenu $w $menu
-        DbgMainWindowWindowMenu $w $menu
-        DbgMainWindowRestartsMenu $w $menu
-
         # --------------- frames, tablelist -----------------
         # --------------- title (condition description) ------
         frame $w.title
@@ -435,6 +449,17 @@ namespace eval ::ldbg {
         
 
         $tbl columnconfigure 0 -wrap true  
+
+        # ----------------------------------- menu bar -------------------
+        
+        set menu [menu $w.mbar]
+        $w configure -menu $menu
+        # Menu items created later as they refer to window contents
+        
+        # TitleListFileMenu $w $menu
+        DbgMainWindowEditMenu $w $menu
+        DbgMainWindowWindowMenu $w $menu
+        DbgMainWindowRestartsMenu $w $menu
 
         # ------------------------------ bindings -------------
         MakeBindings $w

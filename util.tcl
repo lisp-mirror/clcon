@@ -11,6 +11,9 @@ proc CountOccurancesOfSubstring {substring string} {
     return [llength [regexp -all -inline (?=$substring) $string]]
 }
 
+proc ProcedureNop {args} {
+}
+
 # tests
 # puts [CountOccurancesOfSubstring "a" "babab"]
 # 2

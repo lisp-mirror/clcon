@@ -475,6 +475,8 @@ namespace eval ::fndrpl {
                  -searchStringQ                       $searchStringQ              \
                  -findcase                            $findcase                   \
                 ]
+
+        puts "EnsurePopulatedCmd = $EnsurePopulatedCmd"
         foreach {found $TreeSearchState} \
             [::srchtblst::TreeSearchText $tablelist $TreeSearchState $EnsurePopulatedCmd] {
                 break
