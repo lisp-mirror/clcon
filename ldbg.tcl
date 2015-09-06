@@ -55,7 +55,7 @@ namespace eval ::ldbg {
     proc FrameListEnsurePopulated {tbl row} {
         variable StackFrameHeaders
         set RowName [$tbl rowcget $row -name]
-        if {[regexp "^fr" $RowName]} {
+        if {[regexp {^fr[0-9]*$} $RowName]} {
             set i [GetStackFrameHeaderIndexByRowName $RowName]
             set item [lindex $StackFrameHeaders $i]
             GetAndInsertLocals $tbl $RowName
@@ -119,14 +119,17 @@ namespace eval ::ldbg {
         FillData
     }
 
+    # number - is a serial number of a local amongst locals of that frame
     # Example of Local:
-    # :name snumber :id n0 :value s0 
-    proc InsertLocalIntoTree {tbl RowName Local} {
+    # :name snumber :id n0 :value s0
+    proc InsertLocalIntoTree {tbl ParentRowName number Local} {
         puts $Local
         set varname [::mprs::Unleash [dict get $Local {:name}]]
         set varvalue [::mprs::Unleash [dict get $Local {:value}]]
         set contents "$varname = $varvalue"
-        $tbl insertchildren $RowName end [list $contents]
+        set row [$tbl insertchildren $ParentRowName end [list $contents]]
+        set name [string cat $ParentRowName "_" $number]
+        $tbl rowconfigure $row -name $name
     }
 
     proc InsertLocalsForFrameIntoTree {RowName EventAsList} {
@@ -141,8 +144,10 @@ namespace eval ::ldbg {
             }
             set LocalsAndX [::mprs::Unleash [lindex $okList 1]]
             set Locals [::mprs::Unleash [lindex $LocalsAndX 0]]
+            set i 0
             foreach Local $Locals {
-                InsertLocalIntoTree $tbl $RowName [::mprs::Unleash $Local]
+                InsertLocalIntoTree $tbl $RowName $i [::mprs::Unleash $Local]
+                incr i
             }
             puts "What is second LocalsAndX? See slimv"        
         }
@@ -153,6 +158,7 @@ namespace eval ::ldbg {
         set grabber [TitleOfErrorBrowser $DbgMainWindow]
         set FrameNo [RowNameToFrameNo $RowName]
 
+        
         #set OnReply "::ldbg::InsertLocalsForFrameIntoTree $RowName \$EventAsList; grab release $grabber"
         # grab $grabber
 
