@@ -144,7 +144,7 @@ namespace eval ::ldbg {
     proc InsertLocalsForFrameIntoTree {RowName EventAsList contBody} {
         variable DbgMainWindow
         variable StackFrameHeadersBeingFilled
-        puts "Entered InsertLocalsForFrameIntoTree with contBody = $contBody"
+        # puts "Entered InsertLocalsForFrameIntoTree with contBody = $contBody"
         if {[info exists DbgMainWindow]&&[winfo exists $DbgMainWindow]} {
             set tbl [::ldbg::GetDbgMainWindowMenuTbl $DbgMainWindow]
             if {![llength [$tbl childkeys $RowName]]} {
@@ -165,7 +165,7 @@ namespace eval ::ldbg {
             set lambda [list {} $contBody]
             set FrameNo [RowNameToFrameNo $RowName]
             dict unset StackFrameHeadersBeingFilled $FrameNo
-            puts "InsertLocalsForFrameIntoTree: about to apply $lambda"
+            # puts "InsertLocalsForFrameIntoTree: about to apply $lambda"
             apply $lambda
         }
     }
@@ -174,7 +174,7 @@ namespace eval ::ldbg {
     proc GetAndInsertLocals {tbl RowName contBody} {
         variable DbgMainWindow
         variable StackFrameHeadersBeingFilled
-        puts "Entered GetAndInsertLocals"
+        # puts "Entered GetAndInsertLocals"
         set grabber [TitleOfErrorBrowser $DbgMainWindow]
         set FrameNo [RowNameToFrameNo $RowName]
         if {[dict exists $StackFrameHeadersBeingFilled $FrameNo]} {
