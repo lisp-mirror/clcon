@@ -99,7 +99,6 @@ namespace eval ::srchtblst {
             {0 <= $i && $i <= [$tbl index end]} \
             {incr i $increment} {
                 if {$EnsurePopulatedCmd ne {}} {
-                    puts "EnsurePopulatedCmd = $EnsurePopulatedCmd"
                     eval [list $EnsurePopulatedCmd $tbl $i]
                 }
                 set celltext [$tbl get $i]
