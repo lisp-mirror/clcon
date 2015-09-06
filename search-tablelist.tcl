@@ -46,13 +46,13 @@ namespace eval ::srchtblst {
         $tbl selection anchor $index
         $tbl activate $index
         $tbl selection set $index $index
-        puts "Leaving TreeSetTo2"
+        #putd "Leaving TreeSetTo2"
     }
     
     
     # Some actions are delayed to after idle
     proc TreeSetTo {tbl index} {
-        puts "Entering TreeSetTo"
+        #putd "Entering TreeSetTo"
         $tbl selection clear 0 end
         $tbl see $index
         after idle "::srchtblst::TreeSetTo2 $tbl $index"
@@ -102,7 +102,7 @@ namespace eval ::srchtblst {
         }
         if {$kind == 1} { # first loop iteration
             set i [$tbl index $CurName]
-            puts "i=$i, end = [$tbl index end]"
+            putd "i=$i, end = [$tbl index end]"
         } else { # not the first loop iteration - will move to next/previous row
             # Coerce name to text
             set CurName [$tbl rowcget $CurName -name]
@@ -113,7 +113,7 @@ namespace eval ::srchtblst {
             set CmdWithCaseOption [SearchStateTableListCmdWithCaseOption $SearchState]
             set celltext [$tbl get $CurName]
             set cmd [string cat $CmdWithCaseOption " " [list $searchString [lindex $celltext 0]]]
-            puts "about to test row at $CurName = [$tbl index $CurName]"
+            putd "about to test row at $CurName = [$tbl index $CurName]"
             if {[eval $cmd]} {
                 # found 
                 TreeSetTo $tbl $CurName
@@ -125,7 +125,7 @@ namespace eval ::srchtblst {
                 set index [$tbl index $CurName]
                 set increment [GetSearchStateIncrement $SearchState]
                 set i [expr $index + $increment ]
-                puts "incremented i by $increment to be $i"
+                putd "incremented i by $increment to be $i"
             }
         }
         
@@ -134,9 +134,9 @@ namespace eval ::srchtblst {
             set ContinuationCall \
                 [list "after" "idle" [list "::srchtblst::TreeSearchTextC1" 0 $CurName $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]]
             if {$EnsurePopulatedCmd ne {}} {
-                puts "About to EnsurePopulatedCmd $CurName"
+                putd "About to EnsurePopulatedCmd $CurName"
                 set call [list $EnsurePopulatedCmd $tbl $CurName $ContinuationCall]
-                # puts $call
+                # putd $call
                 eval $call
             } else {
                 eval $ContinuationCall
@@ -168,7 +168,7 @@ namespace eval ::srchtblst {
         set lambda [list {tablelist found SearchState} $ContinuationBody]
         # Coerce key (which can be a name) to index
         set startFrom [$tbl index $startFrom]
-        puts "TreeSearchTextInner: startFrom = $startFrom, continueP = $continueP"
+        putd "TreeSearchTextInner: startFrom = $startFrom, continueP = $continueP"
         set i [expr $startFrom + $increment * $continueP]
         ::srchtblst::TreeSearchTextC1 1 $i $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody 
         return
@@ -213,7 +213,7 @@ namespace eval ::srchtblst {
         set state [MakeDefaultSearchState .w.t "t"]
         dict set state -findcase 1
         ::srchtblst::TreeSearchText .w.t $state ::srchtblst::ExampleEnsurePopulated {
-            puts "SearchState = $SearchState"
+            putd "SearchState = $SearchState"
             if {!$found} {error "TableListTest1 failure 1"} else {puts "found 1"}
             ::srchtblst::TreeSearchText .w.t $SearchState ::srchtblst::ExampleEnsurePopulated {
                 if {!$found} {error "TableListTest1 failure 2"} else {puts "found 2"}
