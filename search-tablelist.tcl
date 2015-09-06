@@ -84,6 +84,28 @@ namespace eval ::srchtblst {
     }
 
 
+    # Continuation for TreeSearchText
+    proc TreeSearchTextC1 {CurName lambda tbl SearchState EnsurePopulatedCmd ContinuationBody} {
+        set searchString [dict get $SearchState -searchStringQ]
+        set CmdWithCaseOption [SearchStateTableListCmdWithCaseOption $SearchState]
+        set celltext [$tbl get $CurName]
+        set cmd [string cat $CmdWithCaseOption " " [list $searchString [lindex $celltext 0]]]
+        # puts "cmd=$cmd"
+        if {[eval $cmd]} {
+            # found 
+            ::srchtblst::TreeSetTo $tbl $CurName
+            dict set SearchState -continueP 1
+            dict set SearchState -startFrom $CurName
+            apply $lambda $tbl 1 $SearchState
+            return
+        } else {
+            set index [$tbl index $CurName]
+            set increment [GetSearchStateIncrement $SearchState]
+            set i [expr $index + $increment ]
+            after idle [list ::srchtblst::TreeSearchTextInner $i $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
+        }
+    }
+
     # Interactive search in existing items of a tree
     # Async command, does not return
     # Tries to expand subtrees. To disable, pass ProcedureNop as EnsurePopulatedCmd
@@ -92,31 +114,29 @@ namespace eval ::srchtblst {
     # Applies continuation with arguments bound:
     # tablelist: widget
     # found: 1=found, 0=not found;
-    # SearchState: new SearchState            
+    # SearchState: new SearchState
+    # Items must be named
+    # !!!Searches in first column only!!!
     proc TreeSearchText {tbl SearchState EnsurePopulatedCmd ContinuationBody} {
-        set continueP [dict get $SearchState -continueP]
         set startFrom [dict get $SearchState -startFrom]
-        set searchString [dict get $SearchState -searchStringQ]
+        TreeSearchTextInner $startFrom $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody
+    }
+        
+    proc TreeSearchTextInner {startFrom tbl SearchState EnsurePopulatedCmd ContinuationBody} {
+        set continueP [dict get $SearchState -continueP]
         set increment [GetSearchStateIncrement $SearchState]
-        set CmdWithCaseOption [SearchStateTableListCmdWithCaseOption $SearchState]
         set lambda [list {tablelist found SearchState} $ContinuationBody]
-        for {set i [expr $startFrom + $increment * $continueP]} \
-            {0 <= $i && $i < [$tbl index end]} \
-            {incr i $increment} {
-                if {$EnsurePopulatedCmd ne {}} {
-                    eval [list $EnsurePopulatedCmd $tbl $i]
-                }
-                set celltext [$tbl get $i]
-                set cmd [string cat $CmdWithCaseOption " " [list $searchString [lindex $celltext 0]]]
-                # puts "cmd=$cmd"
-                if {[eval $cmd]} {
-                    after idle ::srchtblst::TreeSetTo $tbl $i
-                    dict set SearchState -continueP 1
-                    dict set SearchState -startFrom $i
-                    apply $lambda $tbl 1 $SearchState
-                    return
-                }
+        # Coerce key (which can be a name) to index
+        set startFrom [$tbl index $startFrom]
+        set i [expr $startFrom + $increment * $continueP]
+        if {0 <= $i && $i < [$tbl index end]} {
+            set CurName [$tbl rowcget $i -name]
+            if {$EnsurePopulatedCmd ne {}} {
+                eval [list $EnsurePopulatedCmd $tbl $CurName]
             }
+            after idle [list ::srchtblst::TreeSearchTextC1 $CurName $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
+            return 
+        }
         apply $lambda $tbl 0 $SearchState
         return
     }
@@ -136,11 +156,17 @@ namespace eval ::srchtblst {
         .w.t resetsortinfo
 
         pack .w.t -fill both -expand yes
+
         set data "tree1"
         set row [.w.t insertchild root end $data]
         .w.t rowconfigure $row -name "a"
         
         .w.t collapse $row
+
+        set data "---"
+        set row [.w.t insertchild root end $data]
+        .w.t rowconfigure $row -name "aa"
+        
 
         set data "tree0"
         set row [.w.t insertchild root end $data]
@@ -154,11 +180,11 @@ namespace eval ::srchtblst {
         set state [MakeDefaultSearchState .w.t "t"]
         dict set state -findcase 1
         ::srchtblst::TreeSearchText .w.t $state ::srchtblst::EnsurePopulated {
-            tk_messageBox -message $SearchState
-            if {!$found} {error "TableListTest1 failure 1"}
+            puts "SearchState = $SearchState"
+            if {!$found} {error "TableListTest1 failure 1"} else {puts "found 1"}
             ::srchtblst::TreeSearchText .w.t $SearchState ::srchtblst::EnsurePopulated {
-                if {!$found} {error "TableListTest1 failure 2"}
-                after idle after idle destroy .w
+                if {!$found} {error "TableListTest1 failure 2"} else {puts "found 2"}
+                # after idle after idle destroy .w
             }
         }
     }
