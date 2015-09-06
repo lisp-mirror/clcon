@@ -16,7 +16,7 @@ namespace eval ::srchtblst {
     # Args:
     # tbl - tablelist
     # row - row id
-    # ContinuationBody - body of a function with two params {tbl row}
+    # ContinuationBody - body of a parameterless function
     # function is called when population is finished
     proc ExampleEnsurePopulated {tbl row ContinuationBody} {
         set name [$tbl rowcget $row -name]
@@ -34,8 +34,8 @@ namespace eval ::srchtblst {
                 #$tbl insertchildlist $row 0 {{row 1} {row 2} {another row}}
             }
         }
-        set lambda [list {tbl row} $ContinuationBody]
-        apply $lambda $tbl $row
+        set lambda [list {} $ContinuationBody]
+        apply $lambda
     }
     
 
