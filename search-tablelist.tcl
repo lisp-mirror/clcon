@@ -132,7 +132,7 @@ namespace eval ::srchtblst {
         if {0 <= $i && $i < [$tbl index end]} {
             set CurName [$tbl rowcget $i -name]
             set ContinuationCall \
-                [list "::srchtblst::TreeSearchTextC1" 0 $CurName $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]
+                [list "after" "idle" [list "::srchtblst::TreeSearchTextC1" 0 $CurName $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]]
             if {$EnsurePopulatedCmd ne {}} {
                 puts "About to EnsurePopulatedCmd $CurName"
                 set call [list $EnsurePopulatedCmd $tbl $CurName $ContinuationCall]
