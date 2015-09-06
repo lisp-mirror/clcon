@@ -44,6 +44,13 @@ namespace eval ::ldbg {
         }
         error "GetStackFrameHeaderIndexByRowName failed at $RowName"
     }
+
+    proc RowNameToFrameNo {RowName} {
+        variable StackFrameHeaders
+        set i [GetStackFrameHeaderIndexByRowName $RowName]
+        set item [lindex $StackFrameHeaders $i]
+        dict get $item FrameNo
+    }        
     
     proc FrameListEnsurePopulated {tbl row} {
         variable StackFrameHeaders
@@ -51,7 +58,7 @@ namespace eval ::ldbg {
         if {[regexp "^fr" $RowName]} {
             set i [GetStackFrameHeaderIndexByRowName $RowName]
             set item [lindex $StackFrameHeaders $i]
-            puts "Populate frame $item"
+            GetAndInsertLocals $tbl $RowName
         }
     }
 
@@ -59,9 +66,9 @@ namespace eval ::ldbg {
     # variable and into tablelist. 
     # contents - text to display
     # type - irrelevant
-    # frameNo - number of frame
+    # FrameNo - number of frame
     # Adds item to StackFrameHeaders:
-    proc AppendData {contents type frameNo} {
+    proc AppendData {contents type FrameNo} {
         variable DbgMainWindow
         variable StackFrameHeaders
 
@@ -69,12 +76,12 @@ namespace eval ::ldbg {
             return
         }
 
-        set RowName [FrameNumberToRowName $frameNo]
+        set RowName [FrameNumberToRowName $FrameNo]
         
         set NewItem [dict create            \
                          contents $contents         \
                          type $type         \
-                         frameNo $frameNo   \
+                         FrameNo $FrameNo   \
                          RowName $RowName   \
                         ]
         
@@ -96,10 +103,10 @@ namespace eval ::ldbg {
             }
             set frame [::mprs::Unleash $lframe]
             # (frameid text &optional (:restartable ?))
-            set frameNo [lindex $frame 0]
+            set FrameNo [::mprs::Unleash [lindex $frame 0]]
             set contents [::mprs::Unleash [lindex $frame 1]]
             set type 0
-            AppendData $contents $type $frameNo
+            AppendData $contents $type $FrameNo
         }
     }
 
@@ -112,11 +119,11 @@ namespace eval ::ldbg {
         FillData
     }
 
-    proc ExpandLocals {row EventAsList} {
+    proc InsertLocalsForFrameIntoTree {RowName EventAsList} {
         variable DbgMainWindow
         if {[info exists DbgMainWindow]&&[winfo exists $DbgMainWindow]} {
             set tbl [::ldbg::GetDbgMainWindowMenuTbl $DbgMainWindow]
-            $tbl delete [$tbl childkeys $row]
+            $tbl delete [$tbl childkeys $RowName]
 
             set okList [::mprs::Unleash [lindex $EventAsList 1]]
             if {[::mprs::Unleash [lindex $okList 0]] ne {:ok}} {
@@ -125,16 +132,20 @@ namespace eval ::ldbg {
             set LocalsAndX [::mprs::Unleash [lindex $okList 1]]
             set Locals [::mprs::Unleash [lindex $LocalsAndX 0]]
             foreach Local $Locals {
-                $tbl insertchildren $row end [list [::mprs::Unleash $Local]]
+                $tbl insertchildren $RowName end [list [::mprs::Unleash $Local]]
             }
             puts "What is second LocalsAndX? See slimv"        
         }
     }
     
-    proc ViewLocals {row} {
-        set OnReply "::ldbg::ExpandLocals $row \$EventAsList"
+    proc GetAndInsertLocals {tbl RowName} {
+        variable DbgMainWindow
+        set grabber [TitleOfErrorBrowser $DbgMainWindow]
+        set FrameNo [RowNameToFrameNo $RowName] 
+        set OnReply "::ldbg::InsertLocalsForFrameIntoTree $RowName \$EventAsList; grab release $grabber"
+        grab $grabber
         ::tkcon::EvalInSwankAsync \
-            "(swank:frame-locals-and-catch-tags $row)" \
+            "(swank:frame-locals-and-catch-tags $FrameNo)" \
             $OnReply 0 [GetDebuggerThreadId]
     }
 
@@ -142,9 +153,11 @@ namespace eval ::ldbg {
         variable ::edt::EditorMRUWinList
         variable DbgMainWindow
         set p [lindex $EditorMRUWinList $row]
+        set tbl [GetDbgMainWindowMenuTbl $DbgMainWindow]
+        set RowName [$tbl rowcget $row -name]
         switch -exact $action {
-            ViewLocals {
-                ViewLocals $row
+            GetAndInsertLocals {
+                GetAndInsertLocals $tbl $RowName
             }
             default {
                 error "Unknown CellCmd"
@@ -419,8 +432,9 @@ namespace eval ::ldbg {
         if {[winfo exists $DbgMainWindow]} {
             set tbl [GetDbgMainWindowMenuTbl $DbgMainWindow]
             $tbl delete 0 end
-            $tbl insertchildlist root end "tree"
-            $tbl collapse 0
+            #$tbl insertchildlist root end "tree"
+            #$tbl rowconfigure 0 -name "TreeRoot"
+            #$tbl collapse 0
         }
     }
 
@@ -429,10 +443,10 @@ namespace eval ::ldbg {
         set bodytag [$tbl bodytag]
         
         # wcb::callback $tbl before activate ::ldbg::DoOnSelect
-        bind $bodytag <space> {::ldbg::KbdCellCmd %W %x %y ViewLocals; break}
+        #bind $bodytag <space> {::ldbg::KbdCellCmd %W %x %y GetAndInsertLocals; break}
         #bind $bodytag <Return> {::ldbg::KbdCellCmd %W %x %y HideListAndShowBuffer; break}
         #bind $bodytag <Delete> {::ldbg::KbdCellCmd %W %x %y CloseBuffer; break}
-        #bind $bodytag <Double-Button-1> {::ldbg::MouseCellCmd %W %x %y ViewLocals; break}
+        #bind $bodytag <Double-Button-1> {::ldbg::MouseCellCmd %W %x %y GetAndInsertLocals; break}
         
         #    bind $w.tf.tbl <<TablelistCellUpdated>> [list DoOnSelect $w.tf.tbl]
         #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
@@ -485,7 +499,9 @@ namespace eval ::ldbg {
         tablelist::tablelist $tbl \
             -columns {60 "Frame" left} \
             -stretch 0 -spacing 10 \
-            -width 62
+            -width 62   \
+            -expandcommand "::ldbg::FrameListEnsurePopulated"
+        
         $tbl resetsortinfo 
 
         $tbl configure \
@@ -541,8 +557,8 @@ namespace eval ::ldbg {
     }
 
     proc TitleOfErrorBrowser {w} {
-        set f1 $w.pane.title
-        return $w.pane.title.text
+        set f1 $w.title
+        return $w.title.text
     }
 }
 
