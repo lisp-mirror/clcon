@@ -3,3 +3,4 @@ syntax: glob
 *.fasl
 alt/*
 xlam/*
+tk_samples/*
