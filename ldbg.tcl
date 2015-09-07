@@ -14,11 +14,12 @@ namespace eval ::ldbg {
     # list of leashed lists of two elements - short and long name of a restart
     variable Restarts 
     
-    variable DbgMainWindow
+    variable MainWindow
+
     variable StackFrameHeaders
 
-    # dictionary of StackFrameHeaders being filled. Key is frame id (integer).
-    # Value is a list of continuation bodies to call after filling.
+    # dictionary of StackFrameHeaders being filled.
+    # dictionary $FrameNo -> [list of continuation bodies to call after filling]
     variable StackFrameHeadersBeingFilled 
 
     catch {font create tkconfixed -family Courier -size -20}
@@ -58,13 +59,13 @@ namespace eval ::ldbg {
         dict get $item FrameNo
     }        
     
-    proc FrameListEnsurePopulated {tbl row {contBody ProcedureNop}} {
+    proc FramesTablelistEnsurePopulated {tbl row {contBody ProcedureNop}} {
         variable StackFrameHeaders
         set RowName [$tbl rowcget $row -name]
         if {[regexp {^fr[0-9]*$} $RowName]} {
             set i [GetStackFrameHeaderIndexByRowName $RowName]
             set item [lindex $StackFrameHeaders $i]
-            GetAndInsertLocals $tbl $RowName $contBody
+            GetAndInsertLocsNTags $tbl $RowName $contBody
         } else {
             set lambda [list {} $contBody]
             apply $lambda
@@ -78,10 +79,10 @@ namespace eval ::ldbg {
     # FrameNo - number of frame
     # Adds item to StackFrameHeaders:
     proc AppendData {contents type FrameNo} {
-        variable DbgMainWindow
+        variable MainWindow
         variable StackFrameHeaders
 
-        if {!([info exists DbgMainWindow]&&[winfo exists $DbgMainWindow])} {
+        if {!([info exists MainWindow]&&[winfo exists $MainWindow])} {
             return
         }
 
@@ -96,7 +97,7 @@ namespace eval ::ldbg {
         
         lappend StackFrameHeaders $NewItem
 
-        set tbl $DbgMainWindow.tf.tbl    
+        set tbl $MainWindow.tf.tbl    
         set row [$tbl insertchild root end [list [string cat $FrameNo " " $contents]]]
 
         $tbl rowconfigure $row -name $RowName
@@ -120,8 +121,8 @@ namespace eval ::ldbg {
     }
 
     proc RefreshData {} {
-        variable DbgMainWindow
-        if {[info exists DbgMainWindow]&&[winfo exists $DbgMainWindow]} {
+        variable MainWindow
+        if {[info exists MainWindow]&&[winfo exists $MainWindow]} {
             ClearStackFramesTableList
         }
         InitData
@@ -144,12 +145,12 @@ namespace eval ::ldbg {
     # contBody is a body of a parameterless continuation
     # IT IS IGNORED, as we now store continuations in
     # StackFrameHeadersBeingFilled
-    proc InsertLocalsForFrameIntoTree {RowName EventAsList contBody} {
-        variable DbgMainWindow
+    proc InsertLocsNTagsForFrameIntoTree {RowName EventAsList contBody} {
+        variable MainWindow
         variable StackFrameHeadersBeingFilled
-        # puts "Entered InsertLocalsForFrameIntoTree with contBody = $contBody"
-        if {[info exists DbgMainWindow]&&[winfo exists $DbgMainWindow]} {
-            set tbl [::ldbg::GetDbgMainWindowMenuTbl $DbgMainWindow]
+        # puts "Entered InsertLocsNTagsForFrameIntoTree with contBody = $contBody"
+        if {[info exists MainWindow]&&[winfo exists $MainWindow]} {
+            set tbl [::ldbg::GetFramesTablelist $MainWindow]
             if {![llength [$tbl childkeys $RowName]]} {
                 set okList [::mprs::Unleash [lindex $EventAsList 1]]
                 if {[::mprs::Unleash [lindex $okList 0]] ne {:ok}} {
@@ -190,11 +191,11 @@ namespace eval ::ldbg {
     }
 
     # contBody is a body of a parameterless continuation
-    proc GetAndInsertLocals {tbl RowName contBody} {
-        variable DbgMainWindow
+    proc GetAndInsertLocsNTags {tbl RowName contBody} {
+        variable MainWindow
         variable StackFrameHeadersBeingFilled
-        # puts "Entered GetAndInsertLocals"
-        set grabber [TitleOfErrorBrowser $DbgMainWindow]
+        # puts "Entered GetAndInsertLocsNTags"
+        set grabber [GetTitleTextWidget $MainWindow]
         set FrameNo [RowNameToFrameNo $RowName]
 
         # If we now are filling already, post our continuation after
@@ -212,10 +213,7 @@ namespace eval ::ldbg {
             dict append StackFrameHeadersBeingFilled $FrameNo [list $contBody]
         }
 
-        #set OnReply "::ldbg::InsertLocalsForFrameIntoTree $RowName \$EventAsList $contBody; grab release $grabber"
-        # grab $grabber
-
-        set OnReply "::ldbg::InsertLocalsForFrameIntoTree $RowName \$EventAsList [list $contBody]"
+        set OnReply "::ldbg::InsertLocsNTagsForFrameIntoTree $RowName \$EventAsList [list $contBody]"
         ::tkcon::EvalInSwankAsync \
             "(swank:frame-locals-and-catch-tags $FrameNo)" \
             $OnReply 0 [GetDebuggerThreadId]
@@ -223,13 +221,13 @@ namespace eval ::ldbg {
 
     proc CellCmd {row action} {
         variable ::edt::EditorMRUWinList
-        variable DbgMainWindow
+        variable MainWindow
         set p [lindex $EditorMRUWinList $row]
-        set tbl [GetDbgMainWindowMenuTbl $DbgMainWindow]
+        set tbl [GetFramesTablelist $MainWindow]
         set RowName [$tbl rowcget $row -name]
         switch -exact $action {
-            GetAndInsertLocals {
-                GetAndInsertLocals $tbl $RowName
+            GetAndInsertLocsNTags {
+                GetAndInsertLocsNTags $tbl $RowName
             }
             default {
                 error "Unknown CellCmd"
@@ -312,9 +310,9 @@ namespace eval ::ldbg {
         CellCmd [$tbl index active] $Cmd
     }
 
-    proc DbgMainWindowEditMenu {w menu} {
+    proc MakeMainWindowEditMenu {w menu} {
         set m [menu [::tkcon::MenuButton $menu "2.Edit" edit]]
-        set tbl [GetDbgMainWindowMenuTbl $w ]
+        set tbl [GetFramesTablelist $w ]
         set bodytag [$tbl bodytag]
         set cmd "::tablelist_util::CopyCurrentCell $tbl"
 	$m add command -label "Copy"  -accel "Control-C" \
@@ -324,7 +322,7 @@ namespace eval ::ldbg {
         bind $bodytag <Control-Key-Cyrillic_es> $cmd
         bind $bodytag <Control-Key-Insert> $cmd
         
-        set cmd [list ::fndrpl::OpenFindBox $tbl "tablelist" "find" "::ldbg::FrameListEnsurePopulated"]
+        set cmd [list ::fndrpl::OpenFindBox $tbl "tablelist" "find" "::ldbg::FramesTablelistEnsurePopulated"]
 	$m add command -label "Find"  -accel "Control-f" \
             -command $cmd
         
@@ -340,7 +338,7 @@ namespace eval ::ldbg {
         # set cmd ::srchtblst::
     }
     
-    proc DbgMainWindowWindowMenu {w menu} {
+    proc MakeMainWindowWindowMenu {w menu} {
         ## Window Menu
         ##
         set m [menu [::tkcon::MenuButton $menu "7.Window" window]]
@@ -438,25 +436,25 @@ namespace eval ::ldbg {
     proc InvokeRestart {i} {
         variable DebugEvent
         variable Restarts
-        variable DbgMainWindow
+        variable MainWindow
         set thread [GetDebuggerThreadId]
         set level [GetDebuggerLevel]
         ::tkcon::EvalInSwankAsync \
             "(swank:invoke-nth-restart-for-emacs $level $i)" \
             {} 0 $thread
-        after idle destroy $DbgMainWindow
+        after idle destroy $MainWindow
     }
 
     proc Abort {w} {
         variable DebugEvent
         variable Restarts
-        variable DbgMainWindow
+        variable MainWindow
         set thread [GetDebuggerThreadId]
         set level [GetDebuggerLevel]
         ::tkcon::EvalInSwankAsync \
             "(swank:sldb-abort)" \
             {} 0 $thread
-        after idle destroy $DbgMainWindow
+        after idle destroy $MainWindow
     }
     
     
@@ -491,7 +489,7 @@ namespace eval ::ldbg {
         }
     }
     
-    proc DbgMainWindowRestartsMenu {w menu} {
+    proc MakeMainWindowRestartsMenu {w menu} {
         variable ::tkcon::COLOR
         set m [::tkcon::MenuButton $menu "4.Restarts" restarts]
         menu $m -disabledforeground $::tkcon::COLOR(disabled) \
@@ -499,9 +497,9 @@ namespace eval ::ldbg {
     }
 
     proc ClearStackFramesTableList {} {
-        variable DbgMainWindow
-        if {[winfo exists $DbgMainWindow]} {
-            set tbl [GetDbgMainWindowMenuTbl $DbgMainWindow]
+        variable MainWindow
+        if {[winfo exists $MainWindow]} {
+            set tbl [GetFramesTablelist $MainWindow]
             $tbl delete 0 end
             #$tbl insertchildlist root end "tree"
             #$tbl rowconfigure 0 -name "TreeRoot"
@@ -510,7 +508,7 @@ namespace eval ::ldbg {
     }
 
     proc MakeBindings {w} {
-        set tbl [GetDbgMainWindowMenuTbl $w]
+        set tbl [GetFramesTablelist $w]
         set bodytag [$tbl bodytag]
         
         # wcb::callback $tbl before activate ::ldbg::DoOnSelect
@@ -527,9 +525,9 @@ namespace eval ::ldbg {
     # Make toplevel widget and its children
     # Returns window
     proc PrepareGui1 {} {
-        variable DbgMainWindow
+        variable MainWindow
 
-        # ---------------------------- make toplevel window DbgMainWindow -----------    
+        # ---------------------------- make toplevel window MainWindow -----------    
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
         set w $PRIV(base).ldbgTlv
@@ -548,7 +546,7 @@ namespace eval ::ldbg {
         set word "Debugger level $level"
         wm title $w $word
 
-        set DbgMainWindow $w
+        set MainWindow $w
 
         # --------------- frames, tablelist -----------------
         # --------------- title (condition description) ------
@@ -571,7 +569,7 @@ namespace eval ::ldbg {
             -columns {60 "Frame" left} \
             -stretch 0 -spacing 10 \
             -width 62   \
-            -expandcommand "::ldbg::FrameListEnsurePopulated"
+            -expandcommand "::ldbg::FramesTablelistEnsurePopulated"
         
         $tbl resetsortinfo 
 
@@ -589,9 +587,9 @@ namespace eval ::ldbg {
         # Menu items created later as they refer to window contents
         
         # TitleListFileMenu $w $menu
-        DbgMainWindowEditMenu $w $menu
-        DbgMainWindowWindowMenu $w $menu
-        DbgMainWindowRestartsMenu $w $menu
+        MakeMainWindowEditMenu $w $menu
+        MakeMainWindowWindowMenu $w $menu
+        MakeMainWindowRestartsMenu $w $menu
 
         # ------------------------------ bindings -------------
         MakeBindings $w
@@ -622,12 +620,12 @@ namespace eval ::ldbg {
         return $w    
     }
 
-    # Returns tablelist by main error browser window
-    proc GetDbgMainWindowMenuTbl {w} {
+    # Returns tablelist where frames live
+    proc GetFramesTablelist {w} {
         return $w.tf.tbl
     }
 
-    proc TitleOfErrorBrowser {w} {
+    proc GetTitleTextWidget {w} {
         set f1 $w.title
         return $w.title.text
     }
