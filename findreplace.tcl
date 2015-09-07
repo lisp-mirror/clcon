@@ -470,7 +470,7 @@ namespace eval ::fndrpl {
         set TreeSearchState                                                       \
             [dict create                                                          \
                  -continueP                           $RealContinueP              \
-                 -startFrom                           [$tablelist index anchor]   \
+                 -startFrom                           [$tablelist index active]   \
                  -direction                           $SearchDir                  \
                  -searchStringQ                       $searchStringQ              \
                  -findcase                            $findcase                   \

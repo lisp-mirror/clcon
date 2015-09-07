@@ -101,11 +101,11 @@ proc ::tkcon::EvalInSwankSync {lispcode {window {}}} {
         myerror "::tkcon::EvalInSwankSync is not reenterable"
     }
     set SWANKIsInSyncMode 1
-    if {$window ne {}} grab $window
+    if {$window ne {}} {grab $window}
     try {
         return [::mprs::EvalInSwankSyncInner $lispcode]
     } finally {
-        if {$window ne {}} grab release $window
+        if {$window ne {}} {grab release $window}
         mprs::DeleteSyncEventsFromTheQueue
         set SWANKSyncContinuation {}
         set SWANKIsInSyncMode 0

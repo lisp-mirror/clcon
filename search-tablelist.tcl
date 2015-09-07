@@ -42,26 +42,10 @@ namespace eval ::srchtblst {
         ExampleEnsurePopulated $tbl $row ProcedureNop
     }
 
-    proc TreeSetTo2 {tbl index} {
-        $tbl selection anchor $index
-        $tbl activate $index
-        $tbl selection set $index $index
-        #putd "Leaving TreeSetTo2"
-    }
-    
-    
-    # Some actions are delayed to after idle
-    proc TreeSetTo {tbl index} {
-        #putd "Entering TreeSetTo"
-        $tbl selection clear 0 end
-        $tbl see $index
-        after idle "::srchtblst::TreeSetTo2 $tbl $index"
-    }    
-
     proc MakeDefaultSearchState {tbl searchString} {
         return [dict create                                                       \
                     -continueP     0                                              \
-                    -startFrom     [$tbl index anchor]                            \
+                    -startFrom     [$tbl index active]                            \
                     -direction     "forwards"                                     \
                     -searchStringQ [QuoteStringForRegexp $searchString]           \
                     -findcase      0                                              \
@@ -116,7 +100,7 @@ namespace eval ::srchtblst {
             putd "about to test row at $CurName = [$tbl index $CurName]"
             if {[eval $cmd]} {
                 # found 
-                TreeSetTo $tbl $CurName
+                ::tablelist_util::TreeSetTo $tbl $CurName
                 dict set SearchState -continueP 1
                 dict set SearchState -startFrom $CurName
                 apply $lambda $tbl 1 $SearchState

@@ -10,5 +10,22 @@ namespace eval ::tablelist_util {
         set txt [$tbl cellcget active -text]
         clipboard append $txt
     }
+
+    proc TreeSetTo2 {tbl index} {
+        $tbl selection anchor $index
+        $tbl activate $index
+        $tbl selection set $index $index
+        #putd "Leaving TreeSetTo2"
+    }
+    
+    
+    # Some actions are delayed to after idle
+    proc TreeSetTo {tbl index} {
+        #putd "Entering TreeSetTo"
+        $tbl selection clear 0 end
+        $tbl see $index
+        #after idle "::srchtblst::TreeSetTo2 $tbl $index"
+        TreeSetTo2 $tbl $index
+    }    
 }
     

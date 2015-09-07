@@ -171,7 +171,6 @@ namespace eval ::ldbg {
                 dict unset StackFrameHeadersBeingFilled $FrameNo
                 foreach cont $conts {
                     set lambda [list {} $cont]
-                    puts "InsertLocalsForFrameIntoTree: about to apply $lambda"
                     apply $lambda
                 }
             }
@@ -606,7 +605,7 @@ namespace eval ::ldbg {
         pack $w.title -side top -fill x
         pack $f1 -fill both -expand 1
 
-        $tbl selection anchor 0
+        ::tablelist_util::TreeSetTo $tbl 0
 
         return $w    
     }

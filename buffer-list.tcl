@@ -290,7 +290,7 @@ namespace eval ::buli {
 
         pack $f1 -fill both -expand 1
 
-        $tbl selection anchor 0
+        ::tablelist_util::TreeSetTo $tbl 0
 
         return $w    
     }
