@@ -18,13 +18,14 @@ namespace eval ::ldbg {
     variable StackFrameHeaders
 
     # dictionary of StackFrameHeaders being filled. Key is frame id (integer).
-    # used to avoid sending several events of that kind. Resending is now a error.
+    # Value is a list of continuation bodies to call after filling.
     variable StackFrameHeadersBeingFilled 
 
     catch {font create tkconfixed -family Courier -size -20}
 
     proc InitData {} {
         variable StackFrameHeaders
+        variable StackFrameHeadersBeingFilled
         set StackFrameHeaders {}
         set StackFrameHeadersBeingFilled  [dict create]
     }
@@ -96,7 +97,7 @@ namespace eval ::ldbg {
         lappend StackFrameHeaders $NewItem
 
         set tbl $DbgMainWindow.tf.tbl    
-        set row [$tbl insertchild root end [list $contents]]
+        set row [$tbl insertchild root end [list [string cat $FrameNo " " $contents]]]
 
         $tbl rowconfigure $row -name $RowName
         $tbl collapse $row
@@ -141,6 +142,8 @@ namespace eval ::ldbg {
     }
 
     # contBody is a body of a parameterless continuation
+    # IT IS IGNORED, as we now store continuations in
+    # StackFrameHeadersBeingFilled
     proc InsertLocalsForFrameIntoTree {RowName EventAsList contBody} {
         variable DbgMainWindow
         variable StackFrameHeadersBeingFilled
@@ -162,11 +165,16 @@ namespace eval ::ldbg {
                 }
                 puts "What is second LocalsAndX? See slimv"
             }
-            set lambda [list {} $contBody]
             set FrameNo [RowNameToFrameNo $RowName]
-            dict unset StackFrameHeadersBeingFilled $FrameNo
-            # puts "InsertLocalsForFrameIntoTree: about to apply $lambda"
-            apply $lambda
+            if {[dict exists $StackFrameHeadersBeingFilled $FrameNo]} {
+                set conts [dict get $StackFrameHeadersBeingFilled $FrameNo]
+                dict unset StackFrameHeadersBeingFilled $FrameNo
+                foreach cont $conts {
+                    set lambda [list {} $cont]
+                    puts "InsertLocalsForFrameIntoTree: about to apply $lambda"
+                    apply $lambda
+                }
+            }
         }
     }
 
@@ -177,10 +185,21 @@ namespace eval ::ldbg {
         # puts "Entered GetAndInsertLocals"
         set grabber [TitleOfErrorBrowser $DbgMainWindow]
         set FrameNo [RowNameToFrameNo $RowName]
+
+        # If we now are filling already, post our continuation after
+        # continuations which were sheduled already
+        # Note that order of events can change, but at least
+        # we will not lose any continuation
         if {[dict exists $StackFrameHeadersBeingFilled $FrameNo]} {
-            error "Achtung! Second call to GetAndInsertLocals with contBody = $contBody"
+            set curvalue [dict get $StackFrameHeadersBeingFilled $FrameNo]
+            set newvalue [lappend curvalue $contBody]
+            dict set StackFrameHeadersBeingFilled $FrameNo $newvalue
+            # Do nothing 
+            return
+            #
+        } else {
+            dict append StackFrameHeadersBeingFilled $FrameNo [list $contBody]
         }
-        dict append StackFrameHeadersBeingFilled $FrameNo 1
 
         #set OnReply "::ldbg::InsertLocalsForFrameIntoTree $RowName \$EventAsList $contBody; grab release $grabber"
         # grab $grabber
