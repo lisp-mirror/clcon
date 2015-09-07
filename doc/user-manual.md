@@ -73,49 +73,41 @@ Place two dots (..) to pass arbitrary tcl command to tcl interpreter. E.g. this 
 
 Debugger
 --------
-You fall into a debugger when something happens, e.g. you divide at zero. You see the stack. 
+You fall into a debugger when something unusual happens, e.g. you divide at zero. You see the stack. 
 Open stack frames and watch locals. Possible actions in a debugger:
 
 ###View a condition
-
 Condition is similar to 'exception' or 'error' in other languages. You see printed representation 
 of a condition in an upper part of the debugger window. Press at highlighted text and you can inspect
 a condition with an inspector.
 
-View stack
-==========
+###View stack
 Stack frames are expandable. As you expand frame, you see local variables and catch tags (catch tag is like "catch" or "on error" 
 construct in other languages).
 
 Note: in SBCL, local variable names sometimes are wiped away by compiler. See SBCL manual on how to enable variable names.
 
-Inspect stack contents
-======================
+###Inspect stack contents
 You can press \<Return\> or double click on a frame or local. For frame, debugger would try to find source of a function. 
 For local variables, inspector would appear. 
 
-Invoke restarts 
-===============
+###Invoke restarts 
 Restart is a way to leave debugger and continue program execution. Usually there are 
 several ways to leave a debugger, they are listed at `Restarts` menu. One of them is default
 and marked with an asteric `*`. If you close debugger window with a cross or by pressing `Alt-F4`,
 default restart will be invoked. 
 
-TODO: Eval in frame
-===================
-Immediate or "eval in frame" is normal in debuggers. Just wait for the next release or send a patch :) 
+###TODO: Eval in frame
+Immediate or "eval in frame" is usually present in debuggers. Just wait for the next release or send a patch :) 
 
-Stepping
-========
-SBCL supports stepping, but it is not done yet and this can be hard to do
+###Stepping, watches
+SBCL supports stepping, but it is not done yet and this can be hard to do. Watches are useless without stepping.
 
-Breakpoints
-===========
+###Breakpoints
 Just insert [break](http://www.lispworks.com/documentation/lw60/CLHS/Body/f_break.htm) at appropriate place to enter debugger.
 Lisp allows you to recompile separate functions without restarting a program, so this is not too inconvinient.
 
-Tracing (debug messages)
-========================
+###Tracing (debug messages)
 If you want to print debug messages as your code runs, use [trace](http://www.lispworks.com/documentation/lw60/CLHS/Body/m_tracec.htm).
 
 Also you can just insert calls to [some of printing functions](http://www.lispworks.com/documentation/lw60/CLHS/Body/f_wr_pr.htm) 
