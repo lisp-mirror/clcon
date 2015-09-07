@@ -20,7 +20,7 @@ Overall state and quality is "working prototype".
 Features demonstrated are: 
 
 - REPL with command history and history substitution
-- debugger prototype (show condition, list frames, view locals, invoke restarts)
+- Debugger (inspect stack and locals, goto source, invoke restarts, search)
 - completion for lisp symbols and filenames in REPL
 - find source in REPL
 - swank-based inspector 
