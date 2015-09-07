@@ -86,8 +86,7 @@ namespace eval ::ldbg {
             regexp {^([a-z]+)([0-9]+)$} $a2 dummy x2type x2no
             switch -exact $x2type {
                 "lo" {
-                    set locals {[dict get $frameItem locals]}
-                    set localItem {[dict get $locals $x2no]}
+                    set localItem [dict get $frameItem $x2no]
                     return [list "Local" $localItem $frameItem]
                 }
                 "ct" {
@@ -174,7 +173,9 @@ namespace eval ::ldbg {
     # :name snumber :id n0 :value s0
     # local will have RowName = frNN_loMM, where NN is frameNo, MM is localNo
     proc InsertLocalIntoTree {tbl ParentRowName localNo Local} {
-        puts $Local
+        variable StackFrameHeaders
+        set ParentFrameNo [RowNameToFrameNo $ParentRowName]
+        dict set StackFrameHeaders $ParentFrameNo $localNo $Local
         set varname [::mprs::Unleash [dict get $Local {:name}]]
         set varvalue [::mprs::Unleash [dict get $Local {:value}]]
         set contents "$varname = $varvalue"
@@ -203,8 +204,9 @@ namespace eval ::ldbg {
                 if {[::mprs::Consp $LocalsL]} {
                     set Locals [::mprs::Unleash $LocalsL]
                     set i 0
-                    foreach Local $Locals {
-                        InsertLocalIntoTree $tbl $RowName $i [::mprs::Unleash $Local]
+                    foreach LocalL $Locals {
+                        set Local [::mprs::Unleash $LocalL]
+                        InsertLocalIntoTree $tbl $RowName $i $Local
                         incr i
                     }
                 }
