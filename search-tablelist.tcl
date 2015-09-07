@@ -192,12 +192,12 @@ namespace eval ::srchtblst {
         wm deiconify .w
     }
 
-    proc TableListTest1 {} {
+    # Must pring "found 1" and "found 2"
+    proc TestFnMan1 {} {
         MakeTestTableList
         set state [MakeDefaultSearchState .w.t "t"]
         dict set state -findcase 1
         ::srchtblst::TreeSearchText .w.t $state ::srchtblst::ExampleEnsurePopulated {
-            putd "SearchState = $SearchState"
             if {!$found} {error "TableListTest1 failure 1"} else {puts "found 1"}
             ::srchtblst::TreeSearchText .w.t $SearchState ::srchtblst::ExampleEnsurePopulated {
                 if {!$found} {error "TableListTest1 failure 2"} else {puts "found 2"}
@@ -206,8 +206,8 @@ namespace eval ::srchtblst {
         }
     }
 
-    # Opens a FindBox. You can work with it
-    proc TableListExample {} {
+    # Opens a FindBox. You can work with it and see if it works fine
+    proc TestFnMan2 {} {
         MakeTestTableList
         ::fndrpl::OpenFindBox .w.t "tablelist" "find" ::srchtblst::ExampleEnsurePopulated 
     }
