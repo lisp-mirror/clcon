@@ -60,5 +60,21 @@ proc ::mprs::Cadr {x} {
     }
 }
 
-# test
-::mprs::AssertEq [::mprs::Car [::mprs::Cadr {l:return {l:ok s(format\\ destination\\ control-string\\ &rest\\ format-arguments) } n160 }]] :ok
+# tests
+proc ::mprs::TestFnAutoCons1 {} {
+    ::mprs::AssertEq [::mprs::Car [::mprs::Cadr {l:return {l:ok s(format\\ destination\\ control-string\\ &rest\\ format-arguments) } n160 }]] :ok
+}
+
+proc ::mprs::TestFnAutoCons2 {} {
+    set leashed {l:return {l:ok {ly{COMMON-LISP NIL} {lstrap-errors } } } n118 }
+    set EventAsList [Unleash $leashed]
+    set oklist [Unleash [lindex $EventAsList 1]]
+    set okListData [Unleash [lindex $oklist 1]]
+    set localsL [lindex $okListData 1]
+    set trapsL [lindex $okListData 2]
+    AssertEq [Consp $localsL] 0
+    AssertEq [Consp $trapsL] 1
+    set traps [Unleash $trapsL]
+    set trap0 [Unleash [lindex $traps 0]]
+    AssertEq $trap0 "trap-errors"
+}
