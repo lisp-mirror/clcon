@@ -195,6 +195,7 @@ proc ::tkcon::Init {args} {
 	stdout		\#0000FF
 	stderr		\#FF0000
         debug_string    \#888888
+        ldbg_frame_bg   \#F8F8D0
     } {
 	if {![info exists COLOR($key)]} { set COLOR($key) $default }
     }

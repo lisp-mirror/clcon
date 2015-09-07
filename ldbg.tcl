@@ -121,6 +121,7 @@ namespace eval ::ldbg {
     proc InsertFrameIntoTree {contents type FrameNo} {
         variable MainWindow
         variable StackFrameHeaders
+        variable ::tkcon::COLOR
 
         if {!([info exists MainWindow]&&[winfo exists $MainWindow])} {
             return
@@ -142,7 +143,7 @@ namespace eval ::ldbg {
         set tbl $MainWindow.tf.tbl    
         set row [$tbl insertchild root end [list [string cat $FrameNo " " $contents]]]
 
-        $tbl rowconfigure $row -name $RowName
+        $tbl rowconfigure $row -name $RowName -background $::tkcon::COLOR(ldbg_frame_bg)
         $tbl collapse $row
     }
 
@@ -280,8 +281,9 @@ namespace eval ::ldbg {
 
     proc EditFrameSource {tbl RowName} {
         set FrameNo [RowNameToFrameNo $RowName]
-        ::tkcon::EvalInSwankAsync                                     \
-            "(clcon-server:ldbg-edit-frame-source-location $FrameNo)" \
+        set TblForLisp [::tkcon::QuoteLispObjToString $tbl]
+        ::tkcon::EvalInSwankAsync                                                   \
+            "(clcon-server:ldbg-edit-frame-source-location $FrameNo $TblForLisp)"   \
             {} 0 [GetDebuggerThreadId]
     }
     
@@ -392,6 +394,16 @@ namespace eval ::ldbg {
         CellCmd [$tbl index active] $Cmd
     }
 
+    proc MakeMainWindowStackMenu {w menu} {
+        set m [menu [::tkcon::MenuButton $menu "1.Stack" stack]]
+        set tbl [GetFramesTablelist $w ]
+        set cmd "::ldbg::CellCmdForActiveCell $tbl RowDblClick"
+        $m add command -label "Edit source/inspect local" -accel "Return" -command $cmd
+        #
+        set cmd "::ldbg::InspectCurrentCondition"
+        $m add command -label "1.Inspect current condition" -underline 0 -command $cmd
+    }
+    
     proc MakeMainWindowEditMenu {w menu} {
         set m [menu [::tkcon::MenuButton $menu "2.Edit" edit]]
         set tbl [GetFramesTablelist $w ]
@@ -426,7 +438,7 @@ namespace eval ::ldbg {
         set m [menu [::tkcon::MenuButton $menu "7.Window" window]]
         set cmd [list ::clconcmd::bufferlist]
 	$m add command -label "Buffer list" -accel "Control-F12" \
-            -command $cmd -state disabled 
+            -command $cmd 
         #bind $w <Control-Key-F12> $cmd
         #
         set cmd [list ::tkcon::FocusConsole]
@@ -701,6 +713,7 @@ namespace eval ::ldbg {
         # Menu items created later as they refer to window contents
         
         # TitleListFileMenu $w $menu
+        MakeMainWindowStackMenu $w $menu
         MakeMainWindowEditMenu $w $menu
         MakeMainWindowWindowMenu $w $menu
         MakeMainWindowRestartsMenu $w $menu

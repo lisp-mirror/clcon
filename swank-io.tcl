@@ -653,6 +653,7 @@ proc ::tkcon::OuterNewSwank {} {
 #}
 
 
+# Pass something to lisp, quoted. Lame!
 proc ::tkcon::QuoteLispObjToString {str} {
     putd "We must quote string $str better!"
     return [string cat "\"" $str "\""]    

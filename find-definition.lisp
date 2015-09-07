@@ -51,7 +51,8 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
         (t ; something wrong with location
          (print-just-line stream printed-dspec :index index))))))
 
-(defun write-code-to-pass-to-loc (stream loc)
+(defun write-code-to-pass-to-loc (stream loc &key (mode :text))
+  "Writes code which would help to pass to location. If mode = :text we will insert the code into text widget. If mode = :eval we will eval the code in the context where $w contains some widget"
   (multiple-value-bind (file offset)
       (parse-location-into-file-and-pos loc)
     (cond
@@ -60,8 +61,12 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
              (offset-2 (format nil "{0.0+ ~A chars}" offset)))
          (format stream "tkcon::EditFileAtOffset ~A ~A" escaped-file offset-2)))
       (t
-       (print-just-line stream "Unable to locate to definition")
-       ))))
+       (ecase mode
+         (:text 
+          (print-just-line stream "Unable to locate to definition"))
+         (:eval
+          (format stream "tk_messageBox -parent $w -message {Unable to locate to definition}")
+       ))))))
   
 
 (defun server-lookup-definition (text)
@@ -93,13 +98,13 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
 ;;     (let ((exp (macroexpand original-exp lexenv)))
 ;;       (handler-bind "))
 
-(defun ldbg-edit-frame-source-location (frame-id)
-  "We have frame id. Make IDE to open that location"
+(defun ldbg-edit-frame-source-location (frame-id parent)
+  "We have frame id. Make IDE to open that location. Parent is a widget. If we unable to locate to source, we will issue a message with this widget as a parent"
   (let ((location (swank:frame-source-location frame-id)))
     (when location
       (let ((code (with-output-to-string (ou)
-                    (write-code-to-pass-to-loc ou location))))
-        (eval-in-tcl code)
+                    (write-code-to-pass-to-loc ou location :mode :eval))))
+        (eval-in-tcl (format nil "set w ~A; ~A" parent code))
         ))))
 
 
