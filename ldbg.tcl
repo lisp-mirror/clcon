@@ -151,19 +151,31 @@ namespace eval ::ldbg {
         if {[info exists DbgMainWindow]&&[winfo exists $DbgMainWindow]} {
             set tbl [::ldbg::GetDbgMainWindowMenuTbl $DbgMainWindow]
             if {![llength [$tbl childkeys $RowName]]} {
-
                 set okList [::mprs::Unleash [lindex $EventAsList 1]]
                 if {[::mprs::Unleash [lindex $okList 0]] ne {:ok}} {
                     error "Something wrong with the debugger: error showing locals"
                 }
-                set LocalsAndX [::mprs::Unleash [lindex $okList 1]]
-                set Locals [::mprs::Unleash [lindex $LocalsAndX 0]]
-                set i 0
-                foreach Local $Locals {
-                    InsertLocalIntoTree $tbl $RowName $i [::mprs::Unleash $Local]
-                    incr i
+                # lact =  LocalsAndCatchTags
+                set lact [::mprs::Unleash [lindex $okList 1]]
+                set LocalsL [lindex $lact 0]
+                set CatchTagsL [lindex $lact 1]
+                if {[::mprs::Consp $LocalsL]} {
+                    set Locals [::mprs::Unleash $LocalsL]
+                    set i 0
+                    foreach Local $Locals {
+                        InsertLocalIntoTree $tbl $RowName $i [::mprs::Unleash $Local]
+                        incr i
+                    }
                 }
-                puts "What is second LocalsAndX? See slimv"
+                if {[::mprs::Consp $CatchTagsL]} {
+                    set CatchTags [::mprs::Unleash $CatchTagsL]
+                    set i 0
+                    foreach CatchTag $CatchTags {
+                        #InsertLocalIntoTree $tbl $RowName $i [::mprs::Unleash $Local]
+                        puts "We have CatchTag $CatchTag"
+                        incr i
+                    }
+                }
             }
             set FrameNo [RowNameToFrameNo $RowName]
             if {[dict exists $StackFrameHeadersBeingFilled $FrameNo]} {
