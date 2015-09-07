@@ -47,11 +47,11 @@
     (declare (ignorable package package-string))
     (cond
       ((member s '(nil t))
-       (format ou "yCOMMON-LISP:~A"
+       (format ou "yCOMMON-LISP:~A "
                (cl-tk:tcl-escape name)))
       (t
        (warn "Do we really need to pass symbol ~S?" s)
-       (format ou "sERROR-IN-LISP--MY-SYMBOL-TCL-FORM"
+       (format ou "sERROR-IN-LISP--MY-SYMBOL-TCL-FORM "
                )))))
   
 
