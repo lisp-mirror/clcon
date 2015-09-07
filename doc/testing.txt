@@ -53,6 +53,10 @@ Hide Window и потом опять defun - не должно ломаться.
 =========
 (catch 'trap-errors (handler-bind ((error #'identity)) (break)))
 
+Список ошибок компиляции
+========================
+(clco::compile-file-for-tcl "/s2/clcon/err.lisp" nil) 
+
 Соглашение об именах
 ====================
 Функции для автоматизированного тестирования должны иметь префикс TestFnAuto
