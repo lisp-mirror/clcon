@@ -24,14 +24,23 @@ Source: ([cons.tcl](../cons.tcl)).
 ###::mprs::Consp###
 `::mprs::Consp $LeashedDataFromLisp` - check if the object is a cons
 
+###::mprs::Null###
+`::mprs::Null $LeashedDataFromLisp` - check if the object is a nil
+
+###::mprs::Null###
+`::mprs::Null $LeashedDataFromLisp` - check if the object is a symbol.
+For now, we can send only two symbols: `t` and `nil`. `t` has leashed form of
+`yCOMMON-LISP:T` while nil have form of `yCOMMON-LISP:NIL`
+
 ###::mprs::TypeTag###
 Extract type tag of lisp atom. 
 Tags:
 
 - `:` - keyword
-- `y` - other symbol 
+- `y` - other symbol (only t and nil can pass for now)
 - `s` - string
 - `n` - number
+- <no specific tag> - list. List have no specific type tag. Don't try to test it. Use Consp or Null to deal with leashed lists.
 
 ###::mprs::Unleash###
 Extracts data from leashed string. Lisp object converted to tcl as follows:

@@ -8,6 +8,8 @@ proc ::mprs::TypeTag {x} {
 # removes type tag of element so that it looks more like tcl data
 # for nested structures, you also need to call Unleash for every element.
 # See ::mprs::UnleashListOfAtoms
+# Note. Nil will not be unleashed to list of zero length. 
+# If you not sure your list have elements, use Null afore. 
 proc ::mprs::Unleash {x} {
     set tt [TypeTag $x]
     if { $tt eq "\{" } {
@@ -26,6 +28,7 @@ proc ::mprs::Unleash {x} {
     }
 }
 
+
 # list is tagged with l or {l . Returns its elements Unleashed. Will work correctly only if all
 # elements are atoms
 proc ::mprs::UnleashListOfAtoms {typedlist} {
@@ -36,14 +39,31 @@ proc ::mprs::UnleashListOfAtoms {typedlist} {
 
 ## minial testing facility
 # tests are runned when code is loading (horrible!)
-proc ::mprs::AssertEq {x y} {
+proc ::mprs::AssertEq {x y {note {}}} {
     if {! ($x eq $y)} {
-        ::tkcon::myerror "Assertion failure: $x eq $y"
+        ::tkcon::myerror "Assertion failure:$note: $x eq $y"
+    }
+}
+
+proc ::mprs::SymbolP {x} {
+    if {[TypeTag $x] eq "y"} {
+        return 1
+    } else {
+        return 0
     }
 }
 
 proc ::mprs::Consp {x} {
     string match {[l\\\{]} [TypeTag $x]
+}
+
+# Returns 1, if leashed object is null
+proc ::mprs::Null {x} {
+    if {$x eq "yCOMMON-LISP:NIL"} {
+        return 1
+    } else {
+        return 0
+    }
 }
 
 proc ::mprs::Car {x} {
@@ -66,13 +86,18 @@ proc ::mprs::TestFnAutoCons1 {} {
 }
 
 proc ::mprs::TestFnAutoCons2 {} {
-    set leashed {l:return {l:ok {ly{COMMON-LISP NIL} {lstrap-errors } } } n118 }
+    set leashed {l:return {l:ok {lyCOMMON-LISP:NIL {lstrap-errors } } } n118 }
     set EventAsList [Unleash $leashed]
-    set oklist [Unleash [lindex $EventAsList 1]]
+    set oklistL [lindex $EventAsList 1]
+    AssertEq [Consp $oklistL] 1 "okListData must be a list"
+    set oklist [Unleash $oklistL]
     set okListData [Unleash [lindex $oklist 1]]
-    set localsL [lindex $okListData 1]
-    set trapsL [lindex $okListData 2]
-    AssertEq [Consp $localsL] 0
+    AssertEq [llength $okListData] 2 "okListData must have length 2"
+    set localsL [lindex $okListData 0] 
+    set trapsL [lindex $okListData 1]
+    AssertEq [Consp $localsL] 0 "localsL must not be a list"
+    AssertEq [Null $localsL] 1 "localsL must not be null"
+    AssertEq [SymbolP $localsL] 1
     AssertEq [Consp $trapsL] 1
     set traps [Unleash $trapsL]
     set trap0 [Unleash [lindex $traps 0]]
