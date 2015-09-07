@@ -140,8 +140,9 @@ namespace eval ::ldbg {
         
         dict set StackFrameHeaders $FrameNo $NewItem
 
-        set tbl $MainWindow.tf.tbl    
-        set row [$tbl insertchild root end [list [string cat $FrameNo " " $contents]]]
+        set tbl $MainWindow.tf.tbl
+        set prefix [format "%2d" $FrameNo]
+        set row [$tbl insertchild root end [list [string cat $prefix ": " $contents]]]
 
         $tbl rowconfigure $row -name $RowName -background $::tkcon::COLOR(ldbg_frame_bg)
         $tbl collapse $row
@@ -151,7 +152,7 @@ namespace eval ::ldbg {
         # FIXME frames must be a variable?
         set FramesAsList [::mprs::Unleash $frames]
         foreach lframe $FramesAsList {
-            if {![::mprs::Consp $lframe]} {
+            if {![::mprs::Consp $lframe]} { 
                 error "I thought that frame $lframe must be a cons"
             }
             set frame [::mprs::Unleash $lframe]
