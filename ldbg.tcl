@@ -179,6 +179,19 @@ namespace eval ::ldbg {
         $tbl rowconfigure $row -name $name
     }
 
+    # LocalsL is a leashed list of locals
+    proc InsertLocalsOfOneFrameIntoTree {tbl FrameRowName LocalsL} {
+        if {[::mprs::Consp $LocalsL]} {
+            set Locals [::mprs::Unleash $LocalsL]
+            set i 0
+            foreach LocalL $Locals {
+                set Local [::mprs::Unleash $LocalL]
+                InsertLocalIntoTree $tbl $FrameRowName $i $Local
+                incr i
+            }
+        }
+    }
+
     # Simplified clone of InsertLocalIntoTree
     # Args: CatchTag is an unleashed catch tag name
     # There seem to be a bug in swank: catch tag is not qualified with package name? 
@@ -192,10 +205,19 @@ namespace eval ::ldbg {
         $tbl rowconfigure $row -name $name
     }
     
+    proc InsertCatchTagsOfOneFrameIntoTree {tbl FrameRowName CatchTagsL} {
+        if {[::mprs::Consp $CatchTagsL]} {
+            set CatchTags [::mprs::Unleash $CatchTagsL]
+            set i 0
+            foreach CatchTagL $CatchTags {
+                # CatchTag is just a string
+                set CatchTag [::mprs::Unleash $CatchTagL]
+                InsertCatchTagIntoTree $tbl $FrameRowName $i $CatchTag
+                incr i
+            }
+        }
+    }
 
-    # contBody is a body of a parameterless continuation
-    # IT IS IGNORED, as we now store continuations in
-    # StackFrameHeadersBeingFilled
     proc InsertLocsNTagsForFrameIntoTree {RowName EventAsList} {
         variable MainWindow
         variable StackFrameHeadersBeingFilled
@@ -209,26 +231,9 @@ namespace eval ::ldbg {
                 # lact =  LocalsAndCatchTags
                 set lact [::mprs::Unleash [lindex $okList 1]]
                 set LocalsL [lindex $lact 0]
+                InsertLocalsOfOneFrameIntoTree $tbl $RowName $LocalsL
                 set CatchTagsL [lindex $lact 1]
-                if {[::mprs::Consp $LocalsL]} {
-                    set Locals [::mprs::Unleash $LocalsL]
-                    set i 0
-                    foreach LocalL $Locals {
-                        set Local [::mprs::Unleash $LocalL]
-                        InsertLocalIntoTree $tbl $RowName $i $Local
-                        incr i
-                    }
-                }
-                if {[::mprs::Consp $CatchTagsL]} {
-                    set CatchTags [::mprs::Unleash $CatchTagsL]
-                    set i 0
-                    foreach CatchTagL $CatchTags {
-                        # CatchTag is just a string
-                        set CatchTag [::mprs::Unleash $CatchTagL]
-                        InsertCatchTagIntoTree $tbl $RowName $i $CatchTag
-                        incr i
-                    }
-                }
+                InsertCatchTagsOfOneFrameIntoTree $tbl $RowName $CatchTagsL
             }
             set FrameNo [RowNameToFrameNo $RowName]
             if {[dict exists $StackFrameHeadersBeingFilled $FrameNo]} {
