@@ -85,6 +85,7 @@ proc ::tkcon::myerror {text} {
     puts stderr "myerror: $text" 
     tk_messageBox -title "myerror" -message $text
     idebug break
+    idebug off
 }
 
 # e.g. .puts [::tkcon::EvalInSwankSync {(swank:simple-completions "sw" '"COMMON-LISP-USER")}]
