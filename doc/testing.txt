@@ -48,3 +48,7 @@ Hide Window и потом опять defun - не должно ломаться.
 ::srchtblst::TableListTest1 - должен напечатать found1, found2
 ::srchtblst::TableListExample - просто должен правильно работать
 В отладчике поиск по дереву должен правильно работать
+
+Катч-теги
+=========
+(catch 'trap-errors (handler-bind ((error #'identity)) (break)))

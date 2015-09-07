@@ -46,36 +46,11 @@
 #?THE SOFTWARE
 #?
 #
-#?-Find
-#?
-#? Enter the "string" you want to search for in the input box "Find what" and then push the "Find next" button.
-#? The next occurance of the "string" in the text will be marked, if you want to find the next occurance-
-#? push the "Find next" button once more.
-#?
-#? The match case makes the search case sensitive.
-#? The Up and Down radio buttons indicates in which direction the search will go.
-#?
-#? Note. The search allways starts from where the cursor is positioned.
-#?
-#? For the Grep function see %LGrep%
-#?
-#?-Grep
-#?
-#? Enter the "string" you want to search for in the input box "Find what" and then push the "Grep" button. 
-#? The editor will now search for all occurances of "string" in all open files.
-#? The result will be presented in a Listbox where you can navigate amongst the files and the occurances of "string"
-#?
-#?-Replace
-#?
-#? Enter the "string" you want to search for in the input box "Find what" and
-#? enter the "string2" that you wish to replace it with in the "Replace with" input box.
-#?  
-#? If you push the "Replace" button the editor will replace the next occurance of "string" with "string2".
-#? If you push the "Replace all" button the editor will replace all occurrances of "string" with "string2" in the current open file.
-#?
-#? If the "Confirm replace" checkbox is checked you will be prompted before the editor will replace anything.
-#?
-#? Related topics: %LFind%
+# Current state
+# Find: works for text and tablelist
+# Find next: seem to work
+# Grep: untested, must not work, but code is kept for a future
+# Replace: untested, must not work, but code is kept for a future
 
 namespace eval ::fndrpl {
     variable glb
