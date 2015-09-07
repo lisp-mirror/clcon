@@ -39,13 +39,20 @@
   (setf (tcl-connection-p swank::*emacs-connection*) t))
 
 (defun my-symbol-tcl-form (s ou)
+  "We expected to send t and nil only. Otherwise warn and send garbage"
   (let* ((package (symbol-package s))
          (package-string
           (if package (package-name package) "NIL"))
          (name (symbol-name s)))
-    (format ou "y{~A ~A} "
-            (cl-tk:tcl-escape package-string)
-            (cl-tk:tcl-escape name))))
+    (declare (ignorable package package-string))
+    (cond
+      ((member s '(nil t))
+       (format ou "yCOMMON-LISP:~A"
+               (cl-tk:tcl-escape name)))
+      (t
+       (warn "Do we really need to pass symbol ~S?" s)
+       (format ou "sERROR-IN-LISP--MY-SYMBOL-TCL-FORM"
+               )))))
   
 
 (defun my-tcl-form (val ou level)
