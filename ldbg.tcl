@@ -118,7 +118,7 @@ namespace eval ::ldbg {
     # type - irrelevant
     # FrameNo - number of frame
     # Adds item to StackFrameHeaders:
-    proc AppendData {contents type FrameNo} {
+    proc InsertFrameIntoTree {contents type FrameNo} {
         variable MainWindow
         variable StackFrameHeaders
 
@@ -146,7 +146,7 @@ namespace eval ::ldbg {
         $tbl collapse $row
     }
 
-    proc FillData { frames } {
+    proc InsertSeveralFramesIntoTree { frames } {
         # FIXME frames must be a variable?
         set FramesAsList [::mprs::Unleash $frames]
         foreach lframe $FramesAsList {
@@ -158,7 +158,7 @@ namespace eval ::ldbg {
             set FrameNo [::mprs::Unleash [lindex $frame 0]]
             set contents [::mprs::Unleash [lindex $frame 1]]
             set type 0
-            AppendData $contents $type $FrameNo
+            InsertFrameIntoTree $contents $type $FrameNo
         }
     }
 
@@ -168,7 +168,7 @@ namespace eval ::ldbg {
             ClearStackFramesTableList
         }
         InitData
-        FillData
+        InsertSeveralFramesIntoTree {}
     }
 
     # localNo - is a zero-based serial number of a local amongst locals of that frame
@@ -284,7 +284,6 @@ namespace eval ::ldbg {
 
     proc EditFrameSource {tbl RowName} {
         set FrameNo [RowNameToFrameNo $RowName]
-        puts $FrameNo
         ::tkcon::EvalInSwankAsync                                     \
             "(clcon-server:ldbg-edit-frame-source-location $FrameNo)" \
             {} 0 [GetDebuggerThreadId]
@@ -370,7 +369,7 @@ namespace eval ::ldbg {
         WriteDebuggerTitle $w.title.text
 
         set frames [ExtractStackFrames $EventAsList]
-        FillData $frames
+        InsertSeveralFramesIntoTree $frames
         #HighlightCurrentlyVisibleBuffer
         
         DoGoToTop $w
