@@ -109,6 +109,7 @@ Lisp allows you to recompile separate functions without restarting a program, so
 
 ###Tracing (debug messages)
 If you want to print debug messages as your code runs, use [trace](http://www.lispworks.com/documentation/lw60/CLHS/Body/m_tracec.htm).
+Specific CL implementations usually have extensions for trace, read your Lisp's manual!
 
 Also you can just insert calls to [some of printing functions](http://www.lispworks.com/documentation/lw60/CLHS/Body/f_wr_pr.htm) 
 into your function and recompile it. 
