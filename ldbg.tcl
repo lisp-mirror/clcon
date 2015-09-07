@@ -16,6 +16,7 @@ namespace eval ::ldbg {
     
     variable MainWindow
 
+    # dictionary $FrameNo -> Item, see 
     variable StackFrameHeaders
 
     # dictionary of StackFrameHeaders being filled.
@@ -27,7 +28,7 @@ namespace eval ::ldbg {
     proc InitData {} {
         variable StackFrameHeaders
         variable StackFrameHeadersBeingFilled
-        set StackFrameHeaders {}
+        set StackFrameHeaders [dict create]
         set StackFrameHeadersBeingFilled  [dict create]
     }
 
@@ -40,32 +41,21 @@ namespace eval ::ldbg {
     # RowName - -name option from tablelist row
     # Returns:
     # index of item in StackFrameHeaders with that RowName
-    proc GetStackFrameHeaderIndexByRowName {RowName} {
-        variable StackFrameHeaders
-        set i 0 
-        foreach h $StackFrameHeaders {
-            if {[dict get $h RowName] eq $RowName} {
-                return $i
-            }
-            incr i
-        }
-        error "GetStackFrameHeaderIndexByRowName failed at $RowName"
-    }
-
     proc RowNameToFrameNo {RowName} {
         variable StackFrameHeaders
-        set i [GetStackFrameHeaderIndexByRowName $RowName]
-        set item [lindex $StackFrameHeaders $i]
-        dict get $item FrameNo
-    }        
-    
+        dict for {frameNo item} $StackFrameHeaders {
+            if {[dict get $item RowName] eq $RowName} {
+                return $frameNo
+            }
+        }
+        error "RowNameToFrameNo: failed at $RowName"
+    }
+
     proc FramesTablelistEnsurePopulated {tbl row {contBody ProcedureNop}} {
         variable StackFrameHeaders
         set RowName [$tbl rowcget $row -name]
         if {[regexp {^fr[0-9]*$} $RowName]} {
-            set i [GetStackFrameHeaderIndexByRowName $RowName]
-            set item [lindex $StackFrameHeaders $i]
-            GetAndInsertLocsNTags $tbl $RowName $contBody
+            GetAndInsertLocsNTags $tbl $RowName $contBody 
         } else {
             set lambda [list {} $contBody]
             apply $lambda
@@ -95,7 +85,7 @@ namespace eval ::ldbg {
                          RowName $RowName   \
                         ]
         
-        lappend StackFrameHeaders $NewItem
+        dict set StackFrameHeaders $FrameNo $NewItem
 
         set tbl $MainWindow.tf.tbl    
         set row [$tbl insertchild root end [list [string cat $FrameNo " " $contents]]]
