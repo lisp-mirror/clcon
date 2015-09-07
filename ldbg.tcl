@@ -175,6 +175,7 @@ namespace eval ::ldbg {
     # Example of Local:
     # :name snumber :id n0 :value s0
     # local will have RowName = frNN_loMM, where NN is frameNo, MM is localNo
+    # See also: InsertCatchTagIntoTree
     proc InsertLocalIntoTree {tbl ParentRowName localNo Local} {
         variable StackFrameHeaders
         set ParentFrameNo [RowNameToFrameNo $ParentRowName]
@@ -186,6 +187,20 @@ namespace eval ::ldbg {
         set name [string cat $ParentRowName "_lo" $localNo]
         $tbl rowconfigure $row -name $name
     }
+
+    # Simplified clone of InsertLocalIntoTree
+    # Args: CatchTag is an unleashed catch tag name
+    # There seem to be a bug in swank: catch tag is not qualified with package name? 
+    proc InsertCatchTagIntoTree {tbl ParentRowName catchTagNo CatchTag} {
+        variable StackFrameHeaders
+        set ParentFrameNo [RowNameToFrameNo $ParentRowName]
+        dict set StackFrameHeaders $ParentFrameNo "CatchTags" $catchTagNo $CatchTag
+        set contents "\[Catch tag\] $CatchTag"
+        set row [$tbl insertchildren $ParentRowName end [list $contents]]
+        set name [string cat $ParentRowName "_ct" $catchTagNo]
+        $tbl rowconfigure $row -name $name
+    }
+    
 
     # contBody is a body of a parameterless continuation
     # IT IS IGNORED, as we now store continuations in
@@ -216,9 +231,10 @@ namespace eval ::ldbg {
                 if {[::mprs::Consp $CatchTagsL]} {
                     set CatchTags [::mprs::Unleash $CatchTagsL]
                     set i 0
-                    foreach CatchTag $CatchTags {
-                        #InsertLocalIntoTree $tbl $RowName $i [::mprs::Unleash $Local]
-                        puts "We have CatchTag $CatchTag"
+                    foreach CatchTagL $CatchTags {
+                        # CatchTag is just a string
+                        set CatchTag [::mprs::Unleash $CatchTagL]
+                        InsertCatchTagIntoTree $tbl $RowName $i $CatchTag
                         incr i
                     }
                 }
