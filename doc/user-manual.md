@@ -76,8 +76,8 @@ Debugger
 You fall into a debugger when something happens, e.g. you divide at zero. You see the stack. 
 Open stack frames and watch locals. Possible actions in a debugger:
 
-View a condition
-================
+###View a condition
+
 Condition is similar to 'exception' or 'error' in other languages. You see printed representation 
 of a condition in an upper part of the debugger window. Press at highlighted text and you can inspect
 a condition with an inspector.
