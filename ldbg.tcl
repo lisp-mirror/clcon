@@ -60,11 +60,12 @@ namespace eval ::ldbg {
     #     -- Frame - it is a frame
     #     -- CatchTag - it is a catch tag
     #     -- Nothing - separator, root, etc
+    #  - for a local - number of the local
     #  - item of the row
     #  - parent item of the row if appropriate
     # if it is a local,
     # "CatchTag" if it is a catch tag
-    proc RowToItem {tbl row} {
+    proc RowToItemInfo {tbl row} {
         variable StackFrameHeaders
         set RowName [$tbl rowcget $row -name]
         set path [regexp -all -inline {[[:alnum:]]+} $RowName]
@@ -87,7 +88,7 @@ namespace eval ::ldbg {
             switch -exact $x2type {
                 "lo" {
                     set localItem [dict get $frameItem "Locals" $x2no]
-                    return [list "Local" $localItem $frameItem]
+                    return [list "Local" $x2no $localItem $frameItem]
                 }
                 "ct" {
                     error "Wow! I'm not written!"
@@ -234,6 +235,7 @@ namespace eval ::ldbg {
         }
     }
 
+
     # contBody is a body of a parameterless continuation
     proc GetAndInsertLocsNTags {tbl RowName contBody} {
         variable MainWindow
@@ -263,6 +265,14 @@ namespace eval ::ldbg {
             $OnReply 0 [GetDebuggerThreadId]
     }
 
+    proc RowDblClick {tbl RowName} {
+        set ItemInfo [RowToItemInfo $tbl $RowName]
+        set type [lindex $ItemInfo 0]
+        if {$type eq "Local"} {
+            LocalInspectValue $tbl $RowName
+        }
+    }            
+    
     proc CellCmd {row action} {
         variable ::edt::EditorMRUWinList
         variable MainWindow
@@ -272,6 +282,9 @@ namespace eval ::ldbg {
         switch -exact $action {
             GetAndInsertLocsNTags {
                 GetAndInsertLocsNTags $tbl $RowName
+            }
+            RowDblClick {
+                RowDblClick $tbl $RowName
             }
             default {
                 error "Unknown CellCmd"
@@ -471,6 +484,26 @@ namespace eval ::ldbg {
         variable DebugEvent
         return [::mprs::Unleash [lindex $DebugEvent 2]]
     }
+
+    # Invokes inspector on local variable value
+    # Args: RowName of variable entry
+    proc LocalInspectValue {tbl RowName} {
+        set ItemInfo [RowToItemInfo $tbl $RowName]
+        set type [lindex $ItemInfo 0]
+        if {$type ne "Local"} {
+            error "LocalInspectValue: not a local"
+        }
+        set LocalNo [lindex $ItemInfo 1]
+        set LocalItem [lindex $ItemInfo 2]
+        set FrameItem [lindex $ItemInfo 3]
+        set FrameNo [dict get $FrameItem "FrameNo"]
+        set thread [GetDebuggerThreadId]
+        #
+        ::tkcon::EvalInSwankAsync                           \
+            "(swank:inspect-frame-var $FrameNo $LocalNo)"   \
+            "::insp::SwankInspect1 \$EventAsList"           \
+            0 $thread
+    }
     
     
     # (:emacs-rex
@@ -552,8 +585,9 @@ namespace eval ::ldbg {
     }
 
     proc DoOnSelect {tbl row} {
-        puts [RowToItem $tbl $row]
+        #puts [RowToItemInfo $tbl $row]
     }
+
 
     proc MakeBindings {w} {
         set tbl [GetFramesTablelist $w]
@@ -561,9 +595,9 @@ namespace eval ::ldbg {
         
         wcb::callback $tbl before activate ::ldbg::DoOnSelect
         #bind $bodytag <space> {::ldbg::KbdCellCmd %W %x %y GetAndInsertLocals; break}
-        #bind $bodytag <Return> {::ldbg::KbdCellCmd %W %x %y HideListAndShowBuffer; break}
+        bind $bodytag <Return> {::ldbg::KbdCellCmd %W %x %y RowDblClick; break}
         #bind $bodytag <Delete> {::ldbg::KbdCellCmd %W %x %y CloseBuffer; break}
-        #bind $bodytag <Double-Button-1> {::ldbg::MouseCellCmd %W %x %y GetAndInsertLocals; break}
+        bind $bodytag <Double-Button-1> {::ldbg::MouseCellCmd %W %x %y RowDblClick; break}
         
         #    bind $w.tf.tbl <<TablelistCellUpdated>> [list DoOnSelect $w.tf.tbl]
         #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
