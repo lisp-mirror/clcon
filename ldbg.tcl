@@ -162,15 +162,6 @@ namespace eval ::ldbg {
         }
     }
 
-    proc RefreshData {} {
-        variable MainWindow
-        if {[info exists MainWindow]&&[winfo exists $MainWindow]} {
-            ClearStackFramesTableList
-        }
-        InitData
-        InsertSeveralFramesIntoTree {}
-    }
-
     # localNo - is a zero-based serial number of a local amongst locals of that frame
     # Example of Local:
     # :name snumber :id n0 :value s0
