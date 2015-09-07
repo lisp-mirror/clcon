@@ -41,3 +41,10 @@ Hide Window и потом опять defun - не должно ломаться.
    (print "This should be printed after returning from a debugger")
    (assert (= l (length (swank:list-threads))))
   ))
+
+
+Поиск в дереве
+==============
+::srchtblst::TableListTest1 - должен напечатать found1, found2
+::srchtblst::TableListExample - просто должен правильно работать
+В отладчике поиск по дереву должен правильно работать
