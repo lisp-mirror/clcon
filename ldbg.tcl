@@ -51,6 +51,55 @@ namespace eval ::ldbg {
         error "RowNameToFrameNo: failed at $RowName"
     }
 
+    # Get data from StackFrameHeaders associated with the row.
+    # Args: tablelist and row key in any form
+    # Result: 
+    # list of the following elements:
+    #  - kind of the frame:
+    #     -- Local - it is a local
+    #     -- Frame - it is a frame
+    #     -- CatchTag - it is a catch tag
+    #     -- Nothing - separator, root, etc
+    #  - item of the row
+    #  - parent item of the row if appropriate
+    # if it is a local,
+    # "CatchTag" if it is a catch tag
+    proc RowToItem {tbl row} {
+        variable StackFrameHeaders
+        set RowName [$tbl rowcget $row -name]
+        set path [regexp -all -inline {[[:alnum:]]+} $RowName]
+        while {1} {
+            # this is a tagbody
+            set pathLen [llength $path]
+            if {$pathLen == 0} break
+            set a1 [lindex $path 0]
+            set frameNo {}
+            regexp {^fr([0-9]+)$} $a1 dummy frameNo
+            if {$frameNo eq {}} break
+            set frameItem [dict get $StackFrameHeaders $frameNo]
+            if {$pathLen == 1} {
+                return [list "Frame" $frameItem]
+            }
+            set a2 [lindex $path 1]
+            set x2type {}
+            set x2no {}
+            regexp {^([a-z]+)([0-9]+)$} $a2 dummy x2type x2no
+            switch -exact $x2type {
+                "lo" {
+                    set locals {[dict get $frameItem locals]}
+                    set localItem {[dict get $locals $x2no]}
+                    return [list "Local" $localItem $frameItem]
+                }
+                "ct" {
+                }
+                default {
+                    break
+                }
+            }
+        }
+        error "wrong RowName $RowName"
+    }
+
     proc FramesTablelistEnsurePopulated {tbl row {contBody ProcedureNop}} {
         variable StackFrameHeaders
         set RowName [$tbl rowcget $row -name]
@@ -119,16 +168,17 @@ namespace eval ::ldbg {
         FillData
     }
 
-    # number - is a serial number of a local amongst locals of that frame
+    # localNo - is a zero-based serial number of a local amongst locals of that frame
     # Example of Local:
     # :name snumber :id n0 :value s0
-    proc InsertLocalIntoTree {tbl ParentRowName number Local} {
+    # local will have RowName = frNN_loMM, where NN is frameNo, MM is localNo
+    proc InsertLocalIntoTree {tbl ParentRowName localNo Local} {
         puts $Local
         set varname [::mprs::Unleash [dict get $Local {:name}]]
         set varvalue [::mprs::Unleash [dict get $Local {:value}]]
         set contents "$varname = $varvalue"
         set row [$tbl insertchildren $ParentRowName end [list $contents]]
-        set name [string cat $ParentRowName "_" $number]
+        set name [string cat $ParentRowName "_lo" $localNo]
         $tbl rowconfigure $row -name $name
     }
 
@@ -497,11 +547,15 @@ namespace eval ::ldbg {
         }
     }
 
+    proc DoOnSelect {tbl row} {
+        puts [RowToItem $tbl $row]
+    }
+
     proc MakeBindings {w} {
         set tbl [GetFramesTablelist $w]
         set bodytag [$tbl bodytag]
         
-        # wcb::callback $tbl before activate ::ldbg::DoOnSelect
+        wcb::callback $tbl before activate ::ldbg::DoOnSelect
         #bind $bodytag <space> {::ldbg::KbdCellCmd %W %x %y GetAndInsertLocals; break}
         #bind $bodytag <Return> {::ldbg::KbdCellCmd %W %x %y HideListAndShowBuffer; break}
         #bind $bodytag <Delete> {::ldbg::KbdCellCmd %W %x %y CloseBuffer; break}
@@ -605,7 +659,7 @@ namespace eval ::ldbg {
         pack $w.title -side top -fill x
         pack $f1 -fill both -expand 1
 
-        ::tablelist_util::TreeSetTo $tbl 0
+        #::tablelist_util::TreeSetTo $tbl 0
 
         return $w    
     }
