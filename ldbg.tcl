@@ -329,7 +329,7 @@ namespace eval ::ldbg {
         set e1 [::mprs::Unleash [lindex $TitleList 0]]
         set e2 [::mprs::Unleash [lindex $TitleList 1]]
         ::tkcon::WritePassiveText $w "$e1\n" end
-        ::tkcon::WriteActiveText $w $e2 end "tk_messageBox -message {inspect condition}"
+        ::tkcon::WriteActiveText $w $e2 end "::ldbg::InspectCurrentCondition"
     }
     
     proc ExtractStackFrames { EventAsList } {
@@ -518,7 +518,14 @@ namespace eval ::ldbg {
             "::insp::SwankInspect1 \$EventAsList"           \
             0 $thread
     }
-    
+
+    proc InspectCurrentCondition {} {
+        set thread [GetDebuggerThreadId]                    
+        ::tkcon::EvalInSwankAsync                           \
+            " (swank:inspect-current-condition)"            \
+            "::insp::SwankInspect1 \$EventAsList"           \
+            0 $thread
+    }      
     
     # (:emacs-rex
     #  (swank:invoke-nth-restart-for-emacs 1 2)
