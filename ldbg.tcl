@@ -91,6 +91,7 @@ namespace eval ::ldbg {
                     return [list "Local" $localItem $frameItem]
                 }
                 "ct" {
+                    error "Wow! I'm not written!"
                 }
                 default {
                     break
@@ -185,10 +186,9 @@ namespace eval ::ldbg {
     # contBody is a body of a parameterless continuation
     # IT IS IGNORED, as we now store continuations in
     # StackFrameHeadersBeingFilled
-    proc InsertLocsNTagsForFrameIntoTree {RowName EventAsList contBody} {
+    proc InsertLocsNTagsForFrameIntoTree {RowName EventAsList} {
         variable MainWindow
         variable StackFrameHeadersBeingFilled
-        # puts "Entered InsertLocsNTagsForFrameIntoTree with contBody = $contBody"
         if {[info exists MainWindow]&&[winfo exists $MainWindow]} {
             set tbl [::ldbg::GetFramesTablelist $MainWindow]
             if {![llength [$tbl childkeys $RowName]]} {
@@ -253,7 +253,7 @@ namespace eval ::ldbg {
             dict append StackFrameHeadersBeingFilled $FrameNo [list $contBody]
         }
 
-        set OnReply "::ldbg::InsertLocsNTagsForFrameIntoTree $RowName \$EventAsList [list $contBody]"
+        set OnReply "::ldbg::InsertLocsNTagsForFrameIntoTree $RowName \$EventAsList"
         ::tkcon::EvalInSwankAsync \
             "(swank:frame-locals-and-catch-tags $FrameNo)" \
             $OnReply 0 [GetDebuggerThreadId]
