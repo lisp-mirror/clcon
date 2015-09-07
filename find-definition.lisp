@@ -65,7 +65,7 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
   
 
 (defun server-lookup-definition (text)
-  "Returns a string which must be evaluated in tcl to print hypertext menu of links"
+  "text is a name of a lisp object which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
   (let* ((dspecs-and-locations
           (swank-find-definitions-for-clcon text))
          (l (length dspecs-and-locations)))
@@ -81,6 +81,26 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
                (t
                 (let ((link-text (prin1-to-string dspec)))
                   (write-one-dspec-and-location link-text loc ou)))))))))))
+
+
+;; (:location (:file "/home/denis/setup/sbcl-1.2.7/src/code/eval.lisp")
+;;  (:position 4849)
+;;  (:snippet "(defun simple-eval-in-lexenv (original-exp lexenv)
+;;   (declare (optimize (safety 1)))
+;;   ;; (aver (lexenv-simple-p lexenv))
+;;   (incf *eval-calls*)
+;;   (sb!c:with-compiler-error-resignalling
+;;     (let ((exp (macroexpand original-exp lexenv)))
+;;       (handler-bind "))
+
+(defun ldbg-edit-frame-source-location (frame-id)
+  "We have frame id. Make IDE to open that location"
+  (let ((location (swank:frame-source-location frame-id)))
+    (when location
+      (let ((code (with-output-to-string (ou)
+                    (write-code-to-pass-to-loc ou location))))
+        (eval-in-tcl code)
+        ))))
 
 
 

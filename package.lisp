@@ -5,6 +5,9 @@
   (:use :cl :swank)
   (:export #:note-this-is-tcl-connection
            #:log-to-file
-           #:server-lookup-definition)
+           #:ldbg-edit-frame-source-location
+           #:server-lookup-definition
+           #:eval-in-tcl
+           )
   )
 

@@ -265,12 +265,26 @@ namespace eval ::ldbg {
             $OnReply 0 [GetDebuggerThreadId]
     }
 
+
+    proc EditFrameSource {tbl RowName} {
+        set FrameNo [RowNameToFrameNo $RowName]
+        puts $FrameNo
+        ::tkcon::EvalInSwankAsync                                     \
+            "(clcon-server:ldbg-edit-frame-source-location $FrameNo)" \
+            {} 0 [GetDebuggerThreadId]
+    }
+    
     proc RowDblClick {tbl RowName} {
         set ItemInfo [RowToItemInfo $tbl $RowName]
         set type [lindex $ItemInfo 0]
-        if {$type eq "Local"} {
-            LocalInspectValue $tbl $RowName
-        }
+        switch -exact $type {
+            "Local" {
+                LocalInspectValue $tbl $RowName
+            }
+            "Frame" {
+                EditFrameSource $tbl $RowName
+            }
+        } 
     }            
     
     proc CellCmd {row action} {
