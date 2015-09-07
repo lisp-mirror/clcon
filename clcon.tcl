@@ -1523,13 +1523,25 @@ proc ::tkcon::ConstrainBuffer {w size} {
 proc ::tkcon::Prompt {{pre {}} {post {}} {prompt {}}} {
     variable OPT
     variable PRIV
+    global IDEBUG
 
     set w $PRIV(console)
     if {![winfo exists $w]} { return }
     if {$pre ne ""} { $w insert end $pre stdout }
     set i [$w index end-1c]
 
-    if {$PRIV(SwankConnection) ne {}} {
+    
+    # budden: check for debugging is my code. This was not needed in tkcon,
+    # but I've changed way tkcon work and things are bit out of
+    # my control. idebug works, and I will not study why.
+    # If it works, I just print an appropriate prompt
+
+    if {[info exists IDEBUG]} {
+        set debugging $IDEBUG(debugging)
+    } else {
+        set debugging 0
+    }
+    if {$PRIV(SwankConnection) ne {} && !$debugging } {
         $w insert end [EvalSlave history nextid] prompt
         $w insert end " CL-UsER>" prompt
     } else {
