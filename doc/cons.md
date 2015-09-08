@@ -19,7 +19,7 @@ To pass lisp data from tcl to lisp, we use strings and add special quoting for u
 Encodes lisp data into a "leashed" string. 
 
 ## Tcl functions ##
-Source: ([cons.tcl](../cons.tcl)). 
+Source: [cons.tcl](../cons.tcl). 
 
 ###::mprs::Consp###
 `::mprs::Consp $LeashedDataFromLisp` - check if the object is a cons
