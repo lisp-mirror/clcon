@@ -1770,7 +1770,7 @@ proc ::tkcon::InitMenus {w title} {
 
         set cmd [list ::fndrpl::FindIt $text]
 	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd 
-        bind $text <F3> $cmd
+        bind TkConsole <F3> $cmd
     }
 
     ## Interp Menu
