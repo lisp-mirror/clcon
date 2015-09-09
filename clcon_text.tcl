@@ -3,6 +3,19 @@ package require snit
 
 namespace eval ::clcon_text {
     # from snit FAQ
+    
+    # If -readonly option == 1, this makes text widget readonly,
+    # keeping an ability to receive focus
+    # and a visible cursor for keyboard navigation.
+    # Readonly text
+    # text can still be manipulated with
+    # RoInsert, RoDelete, RoReplace
+    #
+    # If -readonly option == 0, widget can be operated normally, and
+    # adds RoInsert, RoDelete, RoReplace subprocedures (or how
+    # they are called here in tcl) are available too
+    # If -send_to_lisp options is set, all text modifications are
+    # sent to lisp (to be implemented)
     ::snit::widgetadaptor clcon_text {
         option -readonly -default 0
         option -send_to_lisp -default 0
@@ -12,35 +25,63 @@ namespace eval ::clcon_text {
             # Apply any options passed at creation time.
             $self configurelist $args
         }
-        # Disable the text widget's insert and delete methods, to
+        # Maybe disable the text widget's insert and delete methods, to
         # make this readonly.
         method insert {args} {
             if {![$self cget -readonly]} {
-                $hull insert $args
+                set result [eval $hull insert $args]
+                if {[$self cget -send_to_lisp]} {
+                    puts "Sending to lisp: i $args"                    
+                }
+                return $result
             }
         }
-        method delete {args} {}
-        method replace {args} {}
-        # Enable ins and del as synonyms, so the program can insert and
-        # delete.
-        delegate method RoInsert to hull as insert
-        delegate method RoDelete to hull as delete
-        delegate method RoReplace to hull as replace
+        method delete {args} {
+            if {![$self cget -readonly]} {
+                set result [eval $hull delete $args]
+                if {[$self cget -send_to_lisp]} {
+                    puts "Sending to lisp: d $args"
+                }
+                return $result
+            }
+        }
+        method replace {args} {
+            if {![$self cget -readonly]} {
+                set result [eval $hull replace $args]
+                if {[$self cget -send_to_lisp]} {
+                    puts "Sending to lisp: r $args"
+                }
+                return $result
+            }
+        }
+        # Enable synonyms, so the program can operate on text
         # Pass all other methods and options to the real text widget, so
         # that the remaining behavior is as expected.
+        method RoInsert {args} {
+            set result [eval $hull insert $args]
+            if {[$self cget -send_to_lisp]} {
+                puts "Sending to lisp: i $args"                    
+            }
+            return $result
+        }
+        method RoDelete {args} {
+            set result [eval $hull delete $args]
+            if {[$self cget -send_to_lisp]} {
+                puts "Sending to lisp: d $args"
+            }
+            return $result
+        }
+        method RoReplace {args} {
+            set result [eval $hull replace $args]
+            if {[$self cget -send_to_lisp]} {
+                puts "Sending to lisp: r $args"
+            }
+            return $result
+        }
         delegate method * to hull
         delegate option * to hull
     }
 
-    ## Utility
-    # May be messed up by namespace issues and
-    # May go wrong if $p contains pattern special characters
-    proc ProcExistsP p {
-        error "I'm untested yet"
-        set SimilarProcs [info procs $p]
-        puts "SimilarProcs ($p) = $SimilarProcs"
-        return uplevel 1 [expr {[lsearch -exact $SimilarProcs $p] >= 0}]
-    }
 
     # Some functionality does not work after renaming. E.g. search.
     # For this, you should extract original widget and invoke code on the
@@ -49,13 +90,8 @@ namespace eval ::clcon_text {
         return $pathName.ro-INtErNaL
     }
 
-
-    proc DestroyTextReadonlyInfrastructure { pathName } {
-        global $pathName.SendToLisp
-        unset $pathName.SendToLisp
-        rename $pathName {}
-    }
-
+}
+    
     ## SetTextReadonly pathName ReadOnlyP
     # This function should be called once for every text
     # widget we create in clcon
@@ -78,78 +114,13 @@ namespace eval ::clcon_text {
     # Side effect: makes text readonly.
     # Creates widget $pathname.ro-IntErNaL which can be extracted by call
     # RoTextGetInternalWidget pathName
-    proc InitTextReadonly { pathName ReadonlyP } {
-
-        rename $pathName $pathName.ro-INtErNaL
-
-        # if 1, we will send all editions to lisp.
-        global $pathName.SendToLisp
-        set $pathName.SendToLisp 0
-
-        bind $pathName <Destroy> "+DestroyTextReadonlyInfrastructure $pathName"
-
-        if {$ReadonlyP} {
-            set widget_proc_body_pattern {
-                switch -exact -- [lindex $args 0] {
-                    insert {}
-                    delete {}
-                    replace {}
-                    RoInsert {
-                        return [eval <pathName>.ro-INtErNaL insert [lrange $args 1 end]]
-                    }
-                    RoDelete {
-                        return [eval <pathName>.ro-INtErNaL delete [lrange $args 1 end]]
-                    }
-                    RoReplace {
-                        return [eval <pathName>.ro-INtErNaL replace [lrange $args 1 end]]
-                    }
-                    ReadonlyP {
-                        return 1
-                    }
-                    default { 
-                        return [eval <pathName>.ro-INtErNaL $args] 
-                    }
-                }
-            }
-        } else {
-            # for not ReadonlyP widgets, both insert and RoInsert will work
-            set widget_proc_body_pattern {
-                global <pathName>.SendToLisp
-                switch -exact -- [lindex $args 0] {
-                    insert - 
-                    RoInsert {
-                        if {${<pathName>.SendToLisp}} { puts $args }
-                        return [eval <pathName>.ro-INtErNaL insert [lrange $args 1 end]]
-                    }
-                    delete -
-                    RoDelete {
-                        if {${<pathName>.SendToLisp}} { puts $args }
-                        return [eval <pathName>.ro-INtErNaL delete [lrange $args 1 end]]
-                    }
-                    replace -
-                    RoReplace {
-                        if {${<pathName>.SendToLisp}} { puts $args }
-                        return [eval <pathName>.ro-INtErNaL replace [lrange $args 1 end]]
-                    }
-                    ReadonlyP {
-                        return 0
-                    }
-                    default { 
-                        return [eval <pathName>.ro-INtErNaL $args] 
-                    }
-                }
-            }
-        }
-        set widget_proc_body [regsub -all <pathName> $widget_proc_body_pattern $pathName]
-        proc $pathName {args} $widget_proc_body
-
-        return $pathName
-    }
-
-}
 ######################## Example ################################
-# text .text
-# InitTextReadonly .text 1
+
+#  # Initialization (readonly set to 1)
+# ::clcon_text::clcon_text .text -readonly 1
+#  # Changing readonly after creation
+# .text configure -readonly 0
+# .text configure -readonly 1
     
 # .text insert 0.0 "this line will be ignored"
 
@@ -157,8 +128,7 @@ namespace eval ::clcon_text {
 #     .text RoInsert end "line $x\n"
 # }
 
-# text .text2
-# InitTextReadonly .text2 0
+# ::clcon_text::clcon_text .text2
 # .text2 insert end "Line inserted by 'insert'\n"
 # .text2 RoInsert end "Line inserted by 'RoInsert'\n"
 
