@@ -68,11 +68,20 @@ proc InitTextReadonly { pathName ReadonlyP } {
         # for not ReadonlyP widgets, both insert and RoInsert will work
         set widget_proc_body_pattern {
             switch -exact -- [lindex $args 0] {
+                insert {
+                    return [eval <pathName>.ro-INtErNaL insert [lrange $args 1 end]]
+                }
                 RoInsert {
                     return [eval <pathName>.ro-INtErNaL insert [lrange $args 1 end]]
                 }
+                delete {
+                    return [eval <pathName>.ro-INtErNaL delete [lrange $args 1 end]]
+                }
                 RoDelete {
                     return [eval <pathName>.ro-INtErNaL delete [lrange $args 1 end]]
+                }
+                replace {
+                    return [eval <pathName>.ro-INtErNaL replace [lrange $args 1 end]]
                 }
                 RoReplace {
                     return [eval <pathName>.ro-INtErNaL replace [lrange $args 1 end]]
