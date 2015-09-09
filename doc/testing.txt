@@ -13,10 +13,10 @@ print M-. должно появиться три гиперссылки
 Тесты редактора
 ===============
 Close file с определинем defun и потом опять выбираем defun - работатьь должно
-defun M-., и потом опять defun M-. , а потом ..puts $EditorReusableWindowDict - файл с defun должен быть в списке один раз.
+defun M-., и потом опять defun M-. , а потом ..puts $::edt::EditorReusableWindowDict - файл с defun должен быть в списке один раз.
 Hide Window и потом опять defun - не должно ломаться.
-
-Крестик - пока ломается.
+Крестик - и потом опять defun - то же
+Поиск должен работать, f3 должно работать.
 
 
 Тесты ошибок
@@ -27,7 +27,7 @@ Hide Window и потом опять defun - не должно ломаться.
 
 Отладчик проверяем
 ==================
-
+В slime:
 (defun test-debugger-1 ()
   (let ((l (length (swank:list-threads))))
    (defun compute-fixnum-power-of-2 (x)
@@ -41,17 +41,20 @@ Hide Window и потом опять defun - не должно ломаться.
    (print "This should be printed after returning from a debugger")
    (assert (= l (length (swank:list-threads))))
   ))
-
+далее запускаем это же из clcon. выбираем restart "give-up", должно напечататься
+"This should be printed after returning from a debugger"
+Если закрываем крестиком (abort), то не должно напечататься.
 
 Поиск в дереве
 ==============
-::srchtblst::TableListTest1 - должен напечатать found1, found2
-::srchtblst::TableListExample - просто должен правильно работать
+..::srchtblst::TestFnMan1 - должен напечатать found1, found2
+..::srchtblst::TestFnMan2 - просто должен правильно работать
 В отладчике поиск по дереву должен правильно работать
 
 Катч-теги
 =========
 (catch 'trap-errors (handler-bind ((error #'identity)) (break)))
+в первом кадре стека дожен показываться catch tag.
 
 Список ошибок компиляции
 ========================

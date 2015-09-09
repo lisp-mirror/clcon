@@ -2,7 +2,7 @@ package require snit
 
 
 namespace eval ::clcon_text {
-    # from snit FAQ
+    # Widget based on example from snit FAQ
     
     # If -readonly option == 1, this makes text widget readonly,
     # keeping an ability to receive focus
@@ -82,13 +82,6 @@ namespace eval ::clcon_text {
         delegate option * to hull
     }
 
-
-    # Some functionality does not work after renaming. E.g. search.
-    # For this, you should extract original widget and invoke code on the
-    # original widget. You get original widget with RoTextGetInternalWidget
-    proc RoTextGetInternalWidget {pathName} {
-        return $pathName.ro-INtErNaL
-    }
 
 }
     
