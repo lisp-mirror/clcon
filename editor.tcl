@@ -231,14 +231,15 @@ namespace eval ::edt {
         variable ::tkcon::OPT
 
         if {[string length $word] > 20} {
-            wm title $tw "[string range $word 0 16]... - tkcon Edit"
+            wm title $tw "[string range $word 0 16]... - Edit $w.text"
         } else {
-            wm title $tw "$word - tkcon Edit"
+            wm title $tw "$word - Edit $w.text"
         }
 
         wm protocol $tw WM_DELETE_WINDOW "::edt::HideEditorWindow $tw"
         
         set txt [text $w.text]
+        InitTextReadonly $txt 0
         $w.text configure -wrap [dict get $opts -wrap] \
             -xscrollcommand [list $w.sx set] \
             -yscrollcommand [list $w.sy set] \

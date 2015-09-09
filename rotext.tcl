@@ -15,6 +15,13 @@ proc RoTextGetInternalWidget {pathName} {
     return $pathName.ro-INtErNaL
 }
 
+
+proc DestroyTextReadonlyInfrastructure { pathName } {
+    global $pathName.SendToLisp
+    unset $pathName.SendToLisp
+    rename $pathName {}
+}
+
 ## SetTextReadonly pathName ReadOnlyP
 # This function should be called once for every text
 # widget we create in clcon
@@ -40,6 +47,12 @@ proc RoTextGetInternalWidget {pathName} {
 proc InitTextReadonly { pathName ReadonlyP } {
 
     rename $pathName $pathName.ro-INtErNaL
+
+    # if 1, we will send all editions to lisp.
+    global $pathName.SendToLisp
+    set $pathName.SendToLisp 0
+
+    bind $pathName <Destroy> "+DestroyTextReadonlyInfrastructure $pathName"
 
     if {$ReadonlyP} {
         set widget_proc_body_pattern {
@@ -67,23 +80,21 @@ proc InitTextReadonly { pathName ReadonlyP } {
     } else {
         # for not ReadonlyP widgets, both insert and RoInsert will work
         set widget_proc_body_pattern {
+            global <pathName>.SendToLisp
             switch -exact -- [lindex $args 0] {
-                insert {
-                    return [eval <pathName>.ro-INtErNaL insert [lrange $args 1 end]]
-                }
+                insert - 
                 RoInsert {
+                    if {${<pathName>.SendToLisp}} { puts $args }
                     return [eval <pathName>.ro-INtErNaL insert [lrange $args 1 end]]
                 }
-                delete {
-                    return [eval <pathName>.ro-INtErNaL delete [lrange $args 1 end]]
-                }
+                delete -
                 RoDelete {
+                    if {${<pathName>.SendToLisp}} { puts $args }
                     return [eval <pathName>.ro-INtErNaL delete [lrange $args 1 end]]
                 }
-                replace {
-                    return [eval <pathName>.ro-INtErNaL replace [lrange $args 1 end]]
-                }
+                replace -
                 RoReplace {
+                    if {${<pathName>.SendToLisp}} { puts $args }
                     return [eval <pathName>.ro-INtErNaL replace [lrange $args 1 end]]
                 }
                 ReadonlyP {
