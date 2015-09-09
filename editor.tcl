@@ -445,7 +445,7 @@ namespace eval ::edt {
         
         HideAllEditorWindows
         wm deiconify $tw
-        focus -force $w.text
+        focus $w.text.t
         UpdateMRUAndBufferList $tw
     }
 
