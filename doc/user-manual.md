@@ -71,6 +71,12 @@ Place two dots (..) to pass arbitrary tcl command to tcl interpreter. E.g. this 
 ..tk_messageBox -title "clcon" -message "Wow, it works!" -parent $::tkcon::PRIV(console)
 ```
 
+Opening files for editing
+-------------------------
+There's no way to do that from the menu now. Use
+```..::edt::edit <filename>```
+Press Ctrl-F3 to complete filename (at least it will work undex *nix).
+
 Debugger
 --------
 You fall into a debugger when something unusual happens, e.g. you divide at zero. You see the stack. 
