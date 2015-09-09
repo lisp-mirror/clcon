@@ -29,50 +29,38 @@ namespace eval ::clcon_text {
         # make this readonly.
         method insert {args} {
             if {![$self cget -readonly]} {
-                set result [eval $hull insert $args]
-                if {[$self cget -send_to_lisp]} {
-                    puts "Sending to lisp: i $args"                    
-                }
-                return $result
+                $self RoInsert {*}$args
             }
         }
         method delete {args} {
             if {![$self cget -readonly]} {
-                set result [eval $hull delete $args]
-                if {[$self cget -send_to_lisp]} {
-                    puts "Sending to lisp: d $args"
-                }
-                return $result
+                $self RoDelete {*}$args
             }
         }
         method replace {args} {
             if {![$self cget -readonly]} {
-                set result [eval $hull replace $args]
-                if {[$self cget -send_to_lisp]} {
-                    puts "Sending to lisp: r $args"
-                }
-                return $result
+                $self RoReplace {*}$args
             }
         }
         # Enable synonyms, so the program can operate on text
         # Pass all other methods and options to the real text widget, so
         # that the remaining behavior is as expected.
         method RoInsert {args} {
-            set result [eval $hull insert $args]
+            set result [$hull insert {*}$args]
             if {[$self cget -send_to_lisp]} {
                 puts "Sending to lisp: i $args"                    
             }
             return $result
         }
         method RoDelete {args} {
-            set result [eval $hull delete $args]
+            set result [$hull delete {*}$args]
             if {[$self cget -send_to_lisp]} {
                 puts "Sending to lisp: d $args"
             }
             return $result
         }
         method RoReplace {args} {
-            set result [eval $hull replace $args]
+            set result [$hull replace {*}$args]
             if {[$self cget -send_to_lisp]} {
                 puts "Sending to lisp: r $args"
             }
