@@ -151,6 +151,7 @@ proc ::clconcmd::tcsoh {filename} {
 proc ::tkcon::ReloadSomeIDESources1 {} {
     TkconSourceHere util.tcl
     TkconSourceHere rotext.tcl
+    TkconSourceHere clcon_text.tcl
     TkconSourceHere swank-connection.tcl
     TkconSourceHere swank-io.tcl
     TkconSourceHere console-cmd.tcl
