@@ -21,7 +21,7 @@ namespace eval ::clcon_text {
         option -send_to_lisp -default 0
         constructor {args} {
             # Create the text widget; turn off its insert cursor
-            installhull using text
+            installhull using ctext
             # Apply any options passed at creation time.
             $self configurelist $args
         }
