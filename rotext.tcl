@@ -1,13 +1,3 @@
-## Utility
-# May be messed up by namespace issues and
-# May go wrong if $p contains pattern special characters
-proc ProcExistsP p {
-    error "I'm untested yet"
-    set SimilarProcs [info procs $p]
-    puts "SimilarProcs ($p) = $SimilarProcs"
-    return uplevel 1 [expr {[lsearch -exact $SimilarProcs $p] >= 0}]
-}
-
 # Some functionality does not work after renaming. E.g. search.
 # For this, you should extract original widget and invoke code on the
 # original widget. You get original widget with RoTextGetInternalWidget
