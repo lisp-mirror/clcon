@@ -314,7 +314,7 @@ proc ::insp::EditMenu {w menu text} {
     $m add separator
 
     $m add command -label "Find" -under 0 \
-	-command [list ::tkcon::FindBox $text]
+	-command [list ::fndrpl::OpenFindBox $text "text" "find" {}]
     bind $w <Control-Key-f>             [list ::tkcon::Findbox $text]
     bind $w <Control-Key-Cyrillic_a>             [list ::tkcon::Findbox $text]
 }    

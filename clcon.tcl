@@ -156,7 +156,8 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
     TkconSourceHere swank-io.tcl
     TkconSourceHere console-cmd.tcl
     TkconSourceHere slimv-clcon.tcl
-    TkconSourceHere findbox.tcl
+    TkconSourceHere findreplace.tcl
+    TkconSourceHere findbox2.tcl
 }
 
 ::tkcon::ReloadSomeIDESources1
@@ -5782,8 +5783,6 @@ proc ::tkcon::ReloadSomeIDESources4 {} {
     TkconSourceHere buffer-list.tcl
     TkconSourceHere ldbg.tcl
     TkconSourceHere tcltextedit-unsorted.tcl
-    TkconSourceHere findreplace.tcl
-    TkconSourceHere findbox2.tcl
 }
 
 ::tkcon::ReloadSomeIDESources4

@@ -291,7 +291,7 @@ namespace eval ::edt {
             -command [list tk_textPaste $text]
         $m add separator
         $m add command -label "Find" -under 0 \
-            -command [list ::tkcon::FindBox $text]
+            -command [list ::fndrpl::OpenFindBox $text "text" "find" {}]
         
         ## Send To Menu
         ## 
@@ -359,6 +359,7 @@ namespace eval ::edt {
         }
         $w.text edit reset
         $w.text edit modified 0
+        $w.text mark set insert 0.0
     }
 
 
