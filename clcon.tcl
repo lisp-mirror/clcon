@@ -5776,10 +5776,10 @@ proc ::tkcon::ReloadSomeIDESources4 {} {
     # it must work after toplevel window creation, or
     # unwanted toplevel windows arises 
     TkconSourceHere tablelist_util.tcl
-    TkconSourceHere search-tablelist.tcl
-    TkconSourceHere error-browser.tcl
-    TkconSourceHere buffer-list.tcl
-    TkconSourceHere ldbg.tcl
+    TkconSourceHere search-tablelist.srchtblst.tcl
+    TkconSourceHere error-browser.erbr.tcl
+    TkconSourceHere buffer-list.buli.tcl
+    TkconSourceHere lisp-debugger.ldbg.tcl
     TkconSourceHere tcltextedit-unsorted.tcl
 }
 
