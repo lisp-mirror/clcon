@@ -274,7 +274,40 @@ namespace eval ::fndrpl {
     }
 
 
+    ## OldTkconFind - code from tkcon searches in text widget $w for $str and highlights it
+    ## If $str is empty, it just deletes any highlighting
+    # ARGS: w	- text widget
+    #	str	- string to search for
+    #	-case	TCL_BOOLEAN	whether to be case sensitive	DEFAULT: 0
+    #	-regexp	TCL_BOOLEAN	whether to use $str as pattern	DEFAULT: 0
+    ##
+    proc OldTkconFind {w str args} {
+        $w tag remove find 1.0 end
+        set truth {^(1|yes|true|on)$}
+        set opts  {}
+        foreach {key val} $args {
+            switch -glob -- $key {
+                -c* { if {[regexp -nocase $truth $val]} { set case 1 } }
+                -r* { if {[regexp -nocase $truth $val]} { lappend opts -regexp } }
+                default { return -code error "Unknown option $key" }
+            }
+        }
+        if {![info exists case]} { lappend opts -nocase }
+        if {$str eq ""} { return }
+        $w mark set findmark 1.0
+        # set InternalWidget [RoTextGetInternalWidget $w]
+        set InternalWidget $w
+        while {[set ix [eval $InternalWidget search $opts -count numc -- \
+                            [list $str] findmark end]] ne ""} {
+            $w tag add find $ix ${ix}+${numc}c
+            $w mark set findmark ${ix}+1c
+        }
+        $w tag configure find -background $::tkcon::COLOR(blink)
+        catch {$w see find.first}
+        return [expr {[llength [$w tag ranges find]]/2}]
+    }
 
+    
     proc question {text} {
         variable r
         set q .question

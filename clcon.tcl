@@ -3295,7 +3295,7 @@ proc tkcon {cmd args} {
 	}
 	fi* {
 	    ## 'find' string
-	    ::tkcon::Find $PRIV(console) $args
+	    ::fndrpl::OldTkconFind $PRIV(console) $args
 	}
 	fo* {
 	    ## 'font' ?fontname? - gets/sets the font of the console

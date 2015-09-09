@@ -467,7 +467,7 @@ namespace eval ::edt {
         ShowExistingBuffer $w
        
         if {[string compare [dict get $opts -find] {}]} {
-            ::tkcon::Find $w.text [dict get $opts -find] -case 1
+            ::fndrpl::OldTkconFind $w.text [dict get $opts -find] -case 1
         }
         if {[dict get $opts -offset] ne {}} {
             $w.text mark set insert [dict get $opts -offset]
