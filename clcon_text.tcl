@@ -73,28 +73,6 @@ namespace eval ::clcon_text {
 
 }
     
-    ## SetTextReadonly pathName ReadOnlyP
-    # This function should be called once for every text
-    # widget we create in clcon
-    #
-    # If ReadonlyP == 1, this makes text widget readonly,
-    # keeping an ability to receive focus
-    # and a visible cursor for navigation.
-    # After making text readonly,
-    # text can still be manipulated with
-    # RoInsert, RoDelete, RoReplace
-    #
-    # If ReadonlyP == 0 keeps widget read-write and
-    # adds RoInsert, RoDelete, RoReplace subprocedures (or how
-    # they are called here in tcl)
-    #
-    # If SetTextReadonly is not called, you get normal text,
-    # but Ro* procs will not work. So WriteActiveText would err.
-    # 
-    # Result: returns pathName
-    # Side effect: makes text readonly.
-    # Creates widget $pathname.ro-IntErNaL which can be extracted by call
-    # RoTextGetInternalWidget pathName
 ######################## Example ################################
 
 #  # Initialization (readonly set to 1)
