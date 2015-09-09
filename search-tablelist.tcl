@@ -118,7 +118,7 @@ namespace eval ::srchtblst {
             set ContinuationCall \
                 [list "after" "idle" [list "::srchtblst::TreeSearchTextC1" 0 $CurName $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]]
             if {$EnsurePopulatedCmd ne {}} {
-                putd "About to EnsurePopulatedCmd $CurName"
+                putd "About to EnsurePopulatedCmd $EnsurePopulatedCmd $CurName"
                 set call [list $EnsurePopulatedCmd $tbl $CurName $ContinuationCall]
                 # putd $call
                 eval $call
