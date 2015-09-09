@@ -223,7 +223,7 @@ namespace eval ::edt {
     }
     
 
-    # Initializes editor GUI
+    # Initializes editor GUI, loads text
     # args are for error only
     proc SetupEditorWindow {tw w word opts tail} {
         variable ::tkcon::PRIV
@@ -238,8 +238,11 @@ namespace eval ::edt {
 
         wm protocol $tw WM_DELETE_WINDOW "::edt::HideEditorWindow $tw"
         
+        #set txt [::clcon_text::clcon_text $w.text]
+        #$w.text configure -send_to_lisp 1
+
         set txt [text $w.text]
-        InitTextReadonly $txt 0
+        
         $w.text configure -wrap [dict get $opts -wrap] \
             -xscrollcommand [list $w.sx set] \
             -yscrollcommand [list $w.sy set] \
