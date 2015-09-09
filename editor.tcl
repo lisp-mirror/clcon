@@ -354,6 +354,8 @@ namespace eval ::edt {
                 $w.text insert 1.0 [join $tail \n]
             }
         }
+        $w.text edit reset
+        $w.text edit modified 0
     }
 
 
