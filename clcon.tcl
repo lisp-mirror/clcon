@@ -2904,27 +2904,6 @@ proc ::tkcon::Highlight {w type} {
 
     switch -exact $type {
 	"error" { HighlightError $w }
-	"tcl" - "test" {
-	    if {[winfo class $w] != "Ctext"} { return }
-
-	    foreach {app type} [tkcon attach] {break}
-	    set cmds [::tkcon::EvalOther $app $type info commands]
-
-	    set classes [list \
-		 [list comment ClassForRegexp "^\\s*#\[^\n\]*" $COLOR(stderr)] \
-		 [list var     ClassWithOnlyCharStart "\$" $COLOR(stdout)] \
-		 [list syntax  ClassForSpecialChars "\[\]{}\"" $COLOR(prompt)] \
-		 [list command Class $cmds $COLOR(proc)] \
-		]
-
-	    # Remove all highlight classes from a widget
-	    ctext::clearHighlightClasses $w
-	    foreach class $classes {
-		foreach {cname ctype cptn ccol} $class break
-		ctext::addHighlight$ctype $w $cname $ccol $cptn
-	    }
-	    $w highlight 1.0 end
-	}
     }
 }
 

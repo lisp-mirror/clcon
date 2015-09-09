@@ -240,6 +240,7 @@ namespace eval ::edt {
         
         set txt [::clcon_text::clcon_text $w.text]
         $w.text configure -send_to_lisp 1
+        ::ctext::clearHighlightClasses $w.text
 
         # set txt [text $w.text]
         
