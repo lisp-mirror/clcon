@@ -678,8 +678,7 @@ namespace eval ::ldbg {
         # --------------- frames, tablelist -----------------
         # --------------- title (condition description) ------
         frame $w.title
-        text $w.title.text -height 6
-        InitTextReadonly $w.title.text 1
+        ::clcon_text::clcon_text $w.title.text -height 6 -readonly 1
         scrollbar $w.title.sx -orient h -command [list $w.title.text xview]
         scrollbar $w.title.sy -orient v -command [list $w.title.text yview]
         ::insp::ConfigureTextFonts $w.title.text

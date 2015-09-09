@@ -182,9 +182,7 @@ namespace eval ::erbr {
         wm title $w "Error details"
         frame $w.body
         set text $w.body.text
-        text $text
-
-        InitTextReadonly $text 1
+        ::clcon_text::clcon_text $text -readonly 1
 
         ConfigureTextFonts $text
         $text configure -yscrollcommand [list $w.body.sy set] 

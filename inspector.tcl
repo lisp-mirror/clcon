@@ -230,8 +230,7 @@ proc ::insp::PrepareGui1 {} {
 # making title frame
     frame $w.title
     # height 2 - for magic numbers
-    text $w.title.text -height 2
-    InitTextReadonly $w.title.text 1
+    ::clcon_text::clcon_text $w.title.text -height 2 -readonly 1
     scrollbar $w.title.sx -orient h -command [list $w.title.text xview]
     scrollbar $w.title.sy -orient v -command [list $w.title.text yview]
     ConfigureTextFonts $w.title.text
@@ -241,8 +240,7 @@ proc ::insp::PrepareGui1 {} {
         
 # make body frame    
     frame $w.body
-    text $w.body.text
-    InitTextReadonly $w.body.text 1
+    ::clcon_text::clcon_text $w.body.text -readonly 1
 
     ConfigureTextFonts $w.body.text
     $w.body.text configure \
