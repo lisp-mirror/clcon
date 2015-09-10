@@ -18,7 +18,10 @@ namespace eval ::clcon_text {
     # sent to lisp (to be implemented)
     ::snit::widgetadaptor clcon_text {
         option -readonly -default 0
+        # Send all editions to lisp
         option -send_to_lisp -default 0
+        # Input is put into a special queue instead of applying to widget
+        option -queue_input -default 0
         constructor {args} {
             # Create the text widget; turn off its insert cursor
             installhull using ctext
@@ -28,17 +31,17 @@ namespace eval ::clcon_text {
         # Maybe disable the text widget's insert and delete methods, to
         # make this readonly.
         method insert {args} {
-            if {![$self cget -readonly]} {
+            if {!$options(-readonly)} {
                 $self RoInsert {*}$args
             }
         }
         method delete {args} {
-            if {![$self cget -readonly]} {
+            if {!$options(-readonly)} {
                 $self RoDelete {*}$args
             }
         }
         method replace {args} {
-            if {![$self cget -readonly]} {
+            if {!$options(-readonly)} {
                 $self RoReplace {*}$args
             }
         }
