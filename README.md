@@ -3,10 +3,12 @@
 ## What's that
 **clcon** is a cross-platform Common Lisp IDE under construction.
 
-Supported lisp implementation:
+Supported lisp implementation(s):
+
 - SBCL
 
 Supported platforms: 
+
 - Debian 8 (32 bit) at x86 processor
 - Windows 7 (32 bit)
 - as of 2015-09-11, reported by pcchange90 to run on windows 7(64 bit) and sbcl(x86,not amd64)
@@ -101,4 +103,4 @@ cl-user package is assumed for all interaction. If you change package, consequen
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-Is in tracker
+Is in tracker. Current activity is to adapt [oduvanchik](https://bitbucket.org/budden/oduvanchik) (Russian for dandelion, formerly known as  hemlock, but transformated spiritually) to be an editor's backend. We hope to keep oduvanchik's editor buffer in sync with clcon's editor text widget so that we could run lisp mode commands on it and do syntax highlighting on text widget without implementing this functionality. Ability to run on Windows can be temporarily lost in course of this activity as oduvanchik is Xlib-dependent (now). 
