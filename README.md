@@ -1,12 +1,17 @@
 # README #
 
 ## What's that
-**clcon** is a cross-platform Common Lisp IDE under construction. Supported platforms: 
+**clcon** is a cross-platform Common Lisp IDE under construction.
 
+Supported lisp implementation:
+- SBCL
+
+Supported platforms: 
 - Debian 8 (32 bit) at x86 processor
 - Windows 7 (32 bit)
+- as of 2015-09-11, reported by pcchange90 to run on windows 7(64 bit) and sbcl(x86,not amd64)
 
-Code is completely portable and should run on other platforms too. 
+Code is completely platform-independent and should run on other platforms too. Also it might run on other lisp implmentations, though I don't remember. Give it a try :) 
 
 ## Screenshots
 [See here](https://bitbucket.org/budden/clcon/wiki/Screenshots)
@@ -47,14 +52,19 @@ To load server-side code to lisp, use
 ```
 #!lisp
 (push "path/to/clcon-server-source/" asdf:*central-registry*)
+;in windows you can write like this:
+;(push "C:/xxx/xxx/clcon/" asdf:*central-registry*)
 (asdf:load-system :clcon-server)
 (swank:create-server :port 4009 :dont-close t)
 ```
 
 After that, start IDE
+Unix:
 ```
 wish clcon.tcl
-``` 
+```
+Windows: double click clcon.tcl
+
 It should start up the IDE and connect automatically to swank. 
 Then type in expression like 
 
@@ -77,13 +87,15 @@ and result should be printed at clcon.
 
 cl-user package is assumed for all interaction. If you change package, consequences are undefined.
 
-## User manual 
-[User manual is here](https://bitbucket.org/budden/clcon/src/default/doc/user-manual.md)
+## Documentation
 
-[Wiki](https://bitbucket.org/budden/clcon/wiki/) contains screenshots, but otherwise is not very useful. 
+[User manual](https://bitbucket.org/budden/clcon/src/default/doc/user-manual.md)
 
-## Developers manual 
-[See here](https://bitbucket.org/budden/clcon/src/default/doc/)
+[Wiki](https://bitbucket.org/budden/clcon/wiki/) - contains screenshots, but otherwise is not very useful. 
+
+[FAQ](https://bitbucket.org/budden/clcon/src/default/doc/FAQ.md)
+
+[Docs directory, including some of the above](https://bitbucket.org/budden/clcon/src/default/doc/)
 
 ## License
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
