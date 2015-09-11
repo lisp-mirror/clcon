@@ -13,7 +13,8 @@
     set a 5
     showVar a
     
-Покажет ```sV:a=5```
+Напечатает
+```sV:a=5```
 
 
 search-tablelist.srchtblst.tcl [../search-tablelist.srchtblst.tcl](../search-tablelist.srchtblst.tcl)
