@@ -273,10 +273,14 @@ namespace eval ::ldbg {
             dict append StackFrameHeadersBeingFilled $FrameNo [list $contBody]
         }
 
-        set OnReply "::ldbg::InsertLocsNTagsForFrameIntoTree $RowName \$EventAsList"
-        ::tkcon::EvalInSwankAsync \
-            "(swank:frame-locals-and-catch-tags $FrameNo)" \
-            $OnReply 0 [GetDebuggerThreadId]
+        # apply - canonical example of metaprogramming
+        # We use subst to take care of vars from current scope
+        # Vars which will be available at evaluation time are protected
+        # escaping \$
+        set lispCmd "(swank:frame-locals-and-catch-tags $FrameNo)"
+        ::tkcon::EvalInSwankAsync $lispCmd [subst -nocommands {
+            ::ldbg::InsertLocsNTagsForFrameIntoTree $RowName \$EventAsList
+        }] 0 [GetDebuggerThreadId]
     }
 
 
