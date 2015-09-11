@@ -12,22 +12,22 @@
 search-tablelist.srchtblst.tcl [../search-tablelist.srchtblst.tcl](../search-tablelist.srchtblst.tcl)
 ---
 
-TestFnMan1:
+### TestFnMan1
 
 1. Создаём тело продолжения и сразу передаём в качестве параметра ContinuationBody:
 
-    ... { if {!$found} {error "TableListTest1 failure 2"} else {puts "found 2"}  
-          }
+    ```... { if {!$found} {error "TableListTest1 failure 2"} else {puts "found 2"}  
+          }```
 
 Тело ссылается на параметры, к-рые будут доступны в момент исполнеия.
 
 2. Формируем lambda-выражение
     
-    set lambda [list {tablelist found SearchState} $ContinuationBody]
+    ```set lambda [list {tablelist found SearchState} $ContinuationBody]```
 
 3. Вызываем apply с фактическими параметрами
     
-    apply $lambda $tbl 0 $SearchState
+    ```apply $lambda $tbl 0 $SearchState```
 
 Этот случай прост тем, что тело продолжения не зависит от локальных переменных и не требует подстановок. 
 
