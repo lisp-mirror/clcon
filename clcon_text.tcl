@@ -22,8 +22,8 @@ namespace eval ::clcon_text {
         option -send_to_lisp -default 0
         # Input is put into a special queue instead of applying to widget
         # This might be instance variable, but we need it in wrappers
-        option -freezed -default 0
-        # It is private. Don't use it
+        option -private_freezed -default 0
+        # It is private. Don't write to it
         option -private_freezed_events_queue [list]
 
         constructor {args} {
@@ -55,16 +55,32 @@ namespace eval ::clcon_text {
         }
 
         method RememberEvent {script} {
-            lappend $options(-private_freezed_events_queue) $script
+            set q $options(-private_freezed_events_queue)
+            #puts "Remembering script $script"
+            lappend q $script
+            $self configure -private_freezed_events_queue $q
+            #puts "[llength $q] events remembered]" 
         }
+
+        method Freeze {} {
+            ::mprs::AssertEq $options(-private_freezed) 0 "Freeze: must be unfreezed"
+            $self configure -private_freezed 1
+        }
+       
         method Unfreeze {} {
-            set script [lindex $options(-private_freezed_events_queue) 0]
-            ::mprs::AssertEq $options(-freezed) 1 "Unfreeze: must be freezed"
+            set q $options(-private_freezed_events_queue)
+            set script [lindex $q 0]
+            set q [lrange $q 1 end]
+            $self configure -private_freezed_events_queue $q
+            ::mprs::AssertEq $options(-private_freezed) 1 "Unfreeze: must be freezed"
             if {$script ne {}} {
+                #puts "Unfreeze: about to eval $script"
                 eval $script
+            }
+            if {[llength $q]} {
                 after 50 event generate $win <<UnfreezeNext>>
             } else {
-                set $options(-freezed) 0
+                set $options(-private_freezed) 0
             }
         }
 
@@ -82,7 +98,7 @@ namespace eval ::clcon_text {
     proc InitOneBindingOfFreezableText {ev} {
         set body [bind Text $ev]
         set Template {
-            if {[%W cget -freezed]} {
+            if {[%W cget -private_freezed]} {
                 %W RememberEvent {<<<<OldEventBody>>>>}
             } else {
                 <<<<OldEventBody>>>>
