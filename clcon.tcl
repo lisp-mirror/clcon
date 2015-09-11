@@ -3515,8 +3515,8 @@ proc tkcon_gets args {
 }
 
 proc ::tkcon::ReloadSomeIDESources2 {} {
-    TkconSourceHere editor.tcl
-    TkconSourceHere inspector.tcl
+    TkconSourceHere editor.edt.tcl
+    TkconSourceHere inspector.insp.tcl
 }
 
 ::tkcon::ReloadSomeIDESources2 
