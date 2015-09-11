@@ -137,6 +137,32 @@ pathName index index возвращает индекс в форме line.char .
 План
 ----
 1. Блокировка буфера редактирования с записью сообщений в очередь - без лиспа.
+
+На данный момент выяснили: 
+>..bindtags .__edit3.text
+.__edit3.text Snit::clcon_text::clcon_text.__edit3.text Ctext .__edit3 all
+>..foreach tag [bindtags .__edit3.text] { bind $tag }
+>..foreach tag [bindtags .__edit3.text] { puts [bind $tag] }
+<Destroy>
+<Destroy>
+
+>..foreach tag [bindtags .__edit3.text.t] { puts [bind $tag] }
+<Destroy>
+<KeyRelease-Return> <Configure>
+<Shift-Button-5> <Shift-Button-4> <Button-5> <Button-4> <Shift-MouseWheel> <MouseWheel> <B2-Motion> <Button-2> <Control-Key-h> <Meta-Key-Delete> <Meta-Key-BackSpace> <Meta-Key-greater> <Meta-Key-less> <Meta-Key-f> <Meta-Key-d> <Meta-Key-b> <<Redo>> <<Undo>> <Control-Key-t> <Control-Key-o> <Control-Key-k> <Control-Key-d> <Key-KP_Enter> <Key-Escape> <Control-Key> <Meta-Key> <Alt-Key> <Key> <Key-Insert> <<PasteSelection>> <<Clear>> <<Paste>> <<Copy>> <<Cut>> <<SelectNone>> <<SelectAll>> <Shift-Key-Select> <Control-Shift-Key-space> <Key-Select> <Control-Key-space> <Key-BackSpace> <Key-Delete> <Key-Return> <Control-Key-i> <Control-Shift-Key-Tab> <Control-Key-Tab> <Shift-Key-Tab> <Key-Tab> <Control-Shift-Key-End> <Control-Key-End> <Control-Shift-Key-Home> <Control-Key-Home> <<SelectLineEnd>> <<LineEnd>> <<SelectLineStart>> <<LineStart>> <Control-Key-Next> <Control-Key-Prior> <Shift-Key-Next> <Key-Next> <Shift-Key-Prior> <Key-Prior> <<SelectNextPara>> <<SelectPrevPara>> <<SelectNextWord>> <<SelectPrevWord>> <<NextPara>> <<PrevPara>> <<NextWord>> <<PrevWord>> <<SelectNextLine>> <<SelectPrevLine>> <<SelectNextChar>> <<SelectPrevChar>> <<NextLine>> <<PrevLine>> <<NextChar>> <<PrevChar>> <Control-Button-1> <ButtonRelease-1> <B1-Enter> <B1-Leave> <Triple-Shift-Button-1> <Double-Shift-Button-1> <Shift-Button-1> <Triple-Button-1> <Double-Button-1> <B1-Motion> <Button-1>
+<Control-Key-period> <Control-Key-F12> <Control-Key-w>
+<<PrevWindow>> <<NextWindow>> <Key-F10> <Alt-Key>
+
+Т.е., часть биндингов относится к ctext, а часть - к его t. Наверное, можно обернуть. 
+
+План действий:
+1. Переходим обратно на text.
+2. Извлекаем все биндинги из text
+3. Оборачиваем кажды из них в заморозчик и называем FreezableText
+4. В конструкторе FreezableText с помощью bindtags подменяет биндинги для конкретного экземпляра clcon_text с Text на FreezableText
+
+
+
 2. Зеркалить один буфер из tcl в видимый одуванчик. Попутно везде смотрим в лиспе на многопоточность и реентерабельность. 
 3. Автоотступ
 4. Раскраска

@@ -21,9 +21,9 @@ namespace eval ::clcon_text {
         # Send all editions to lisp
         option -send_to_lisp -default 0
         # Input is put into a special queue instead of applying to widget
+        # This might be instance variable, but we need it in wrappers
         option -queue_input -default 0
         constructor {args} {
-            # Create the text widget; turn off its insert cursor
             installhull using ctext
             # Apply any options passed at creation time.
             $self configurelist $args
