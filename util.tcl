@@ -30,6 +30,14 @@ proc showVar {name} {
 }
 
 
+proc SubstituteSingleValueInListVarKeyEq {listVariable old new} {
+    upvar 1 $listVariable var
+    set idx [lsearch -exact $var $old]
+    if {$idx >= 0} {
+        set var [lreplace $var $idx $idx [list $new]]
+    }
+}
+
 
 # tests
 # puts [CountOccurancesOfSubstring "a" "babab"]

@@ -31,7 +31,9 @@ namespace eval ::clcon_text {
             # Apply any options passed at creation time.
             $self configurelist $args
             # Set FreezableText tags at first place (maybe should have placed to other place)
-            bindtags $win "FreezableText [bindtags $win]"
+            set CurrentBindTags [bindtags $win]
+            set NewBindTags [SubstituteSingleValueInListVarKeyEq CurrentBindTags Text FreezableText]
+            bindtags $win $NewBindTags
             bind $win <<UnfreezeNext>> "$self Unfreeze"
         }
 
@@ -65,6 +67,7 @@ namespace eval ::clcon_text {
         method Freeze {} {
             ::mprs::AssertEq $options(-private_freezed) 0 "Freeze: must be unfreezed"
             $self configure -private_freezed 1
+            puts "FIXME: text can be pasted via menu bar"
         }
        
         method Unfreeze {} {
@@ -80,7 +83,7 @@ namespace eval ::clcon_text {
             if {[llength $q]} {
                 after 50 event generate $win <<UnfreezeNext>>
             } else {
-                set $options(-private_freezed) 0
+                $self configure -private_freezed 0
             }
         }
 
@@ -107,7 +110,7 @@ namespace eval ::clcon_text {
             break 
         }
         set ExpandedBody [regsub -all <<<<OldEventBody>>>> $Template $body]
-        showVar ExpandedBody
+        #showVar ExpandedBody
         bind FreezableText $ev $ExpandedBody
     }
 
@@ -118,12 +121,14 @@ namespace eval ::clcon_text {
         foreach ev [bind Text] {
             InitOneBindingOfFreezableText $ev
         }
+        return
     }
 
-    InitOneBindingOfFreezableText <Key-Return>
+    # InitOneBindingOfFreezableText <Key-Return>
+    InitBindingsOfFreezableText
     
 }
-     
+
 ######################## Example ################################
 
 #  # Initialization (readonly set to 1)
