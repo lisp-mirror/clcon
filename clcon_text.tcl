@@ -1,5 +1,5 @@
+package require Tk
 package require snit
-
 
 namespace eval ::clcon_text {
     # Widget based on example from snit FAQ
@@ -25,84 +25,87 @@ namespace eval ::clcon_text {
         option -freezed -default 0
         # It is private. Don't use it
         option -private_freezed_events_queue [list]
+
         constructor {args} {
             installhull using text
             # Apply any options passed at creation time.
             $self configurelist $args
             # Set FreezableText tags at first place (maybe should have placed to other place)
             bindtags $win "FreezableText [bindtags $win]"
+            bind $win <<UnfreezeNext>> "$self Unfreeze"
         }
+
         # Maybe disable the text widget's insert and delete methods, to
         # make this readonly.
-        method insert {args} {
-            if {!$options(-readonly)} {
-                $self RoInsert {*}$args
-            }
-        }
-        method delete {args} {
-            if {!$options(-readonly)} {
-                $self RoDelete {*}$args
-            }
-        }
-        method replace {args} {
-            if {!$options(-readonly)} {
-                $self RoReplace {*}$args
-            }
-        }
+        method insert {args} { if {!$options(-readonly)} { $self RoInsert {*}$args }}
+        method delete {args} { if {!$options(-readonly)} { $self RoDelete {*}$args }}
+        method replace {args} { if {!$options(-readonly)} { $self RoReplace {*}$args }}
+
         # Enable synonyms, so the program can operate on text
         # Pass all other methods and options to the real text widget, so
         # that the remaining behavior is as expected.
-        method RoInsert {args} {
-            set result [$hull insert {*}$args]
-            if {[$self cget -send_to_lisp]} {
-                puts "Sending to lisp: i $args"                    
-            }
-            return $result
+        method RoInsert {args} { set result [$hull insert {*}$args]
+            MaybeSendToLisp $self i $args; return $result
         }
-        method RoDelete {args} {
-            set result [$hull delete {*}$args]
-            if {[$self cget -send_to_lisp]} {
-                puts "Sending to lisp: d $args"
-            }
-            return $result
+        method RoDelete {args} { set result [$hull delete {*}$args]
+            MaybeSendToLisp $self d $args; return $result
         }
-        method RoReplace {args} {
-            set result [$hull replace {*}$args]
-            if {[$self cget -send_to_lisp]} {
-                puts "Sending to lisp: r $args"
-            }
-            return $result
+        method RoReplace {args} { set result [$hull replace {*}$args]
+            MaybeSendToLisp $self r $args; return $result
         }
+
+        method RememberEvent {script} {
+            lappend $options(-private_freezed_events_queue) $script
+        }
+        method Unfreeze {} {
+            set script [lindex $options(-private_freezed_events_queue) 0]
+            ::mprs::AssertEq $options(-freezed) 1 "Unfreeze: must be freezed"
+            if {$script ne {}} {
+                eval $script
+                after 50 event generate $win <<UnfreezeNext>>
+            } else {
+                set $options(-freezed) 0
+            }
+        }
+
         # Enqueue into associated event list
         delegate method * to hull
         delegate option * to hull
     }
-}
 
-proc InitOneBindingOfFreezableText {ev} {
-    set body [bind Text $ev]
-    set m {$34545}
-    showVar m
-    showVar body
-    set Template {
-        if {[%W cget -freezed]} {
-            %W RememberEvent {<<<<OldEventBody>>>>}
-        } else {
-            <<<<OldEventBody>>>>
+    proc MaybeSendToLisp {clcon_text type arglist} {
+        if {[$clcon_text cget -send_to_lisp]} {
+            puts "::clcon_text::MaybeSendToLisp: $clcon_text $type $args"
         }
-        # FIXME - remove that later!
-        break 
     }
-    set ExpandedBody [regsub -all <<<<OldEventBody>>>> $Template $body]
-    showVar ExpandedBody
-    bind FreezableText $ev $ExpandedBody
-}
+
+    proc InitOneBindingOfFreezableText {ev} {
+        set body [bind Text $ev]
+        set Template {
+            if {[%W cget -freezed]} {
+                %W RememberEvent {<<<<OldEventBody>>>>}
+            } else {
+                <<<<OldEventBody>>>>
+            }
+        # FIXME - remove that later!
+            break 
+        }
+        set ExpandedBody [regsub -all <<<<OldEventBody>>>> $Template $body]
+        showVar ExpandedBody
+        bind FreezableText $ev $ExpandedBody
+    }
+
+        
 
 # Fills FreezableText bindtag with wrapped bindings of Text
-proc InitBindingsOfFreezableText {} {
-    foreach ev [bind Text] {
-        InitOneBindingOfFreezableText $ev
+    proc InitBindingsOfFreezableText {} {
+        foreach ev [bind Text] {
+            InitOneBindingOfFreezableText $ev
+        }
     }
+
+    InitOneBindingOfFreezableText <Key-Return>
+    
 }
      
 ######################## Example ################################
