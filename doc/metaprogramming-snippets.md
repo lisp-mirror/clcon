@@ -7,6 +7,13 @@
     proc showVar {name} {
         puts "sV:$name=[uplevel 1 [string cat {format %s $} $name]]"
     }
+    
+Например:
+
+    set a 5
+    showVar a
+    
+Покажет ```sV:a=5```
 
 
 search-tablelist.srchtblst.tcl [../search-tablelist.srchtblst.tcl](../search-tablelist.srchtblst.tcl)
