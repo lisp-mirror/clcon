@@ -1,21 +1,40 @@
+# ::clcon_text::clcon_text Widget based on example from snit FAQ
+# Options:
+#   -readonly
+#   -send_to_lisp
+# Subcommands
+#   pathName Freeze
+#   pathName Unfreeze
+#
+# If -readonly option == 1, this makes text widget readonly,
+# keeping an ability to receive focus
+# and a visible cursor for keyboard navigation.
+# Readonly text
+# text can still be altered with
+# RoInsert, RoDelete, RoReplace
+#
+# If -readonly option == 0, widget can be operated normally.
+# RoInsert, RoDelete, RoReplace subprocedures still work. (or how
+#
+#
+# If -send_to_lisp options is set, all text modifications are
+# sent to lisp (to be implemented)
+#
+# Freeze/unfreeze - utility for synchronous buffer modifications.
+#
+# pathName Freeze
+#
+#  - makes widget to collect all events it receives instead of processing them
+# pathName Unfreeze
+#
+#  - makes event to process all delayed event.
+# Denis Budyak 2015
+# #include <MIT License>
+
 package require Tk
 package require snit
 
 namespace eval ::clcon_text {
-    # Widget based on example from snit FAQ
-    
-    # If -readonly option == 1, this makes text widget readonly,
-    # keeping an ability to receive focus
-    # and a visible cursor for keyboard navigation.
-    # Readonly text
-    # text can still be manipulated with
-    # RoInsert, RoDelete, RoReplace
-    #
-    # If -readonly option == 0, widget can be operated normally, and
-    # adds RoInsert, RoDelete, RoReplace subprocedures (or how
-    # they are called here in tcl) are available too
-    # If -send_to_lisp options is set, all text modifications are
-    # sent to lisp (to be implemented)
     ::snit::widgetadaptor clcon_text {
         option -readonly -default 0
         # Send all editions to lisp
@@ -98,39 +117,46 @@ namespace eval ::clcon_text {
         }
     }
 
-    proc InitOneBindingOfFreezableText {ev} {
-        set body [bind Text $ev]
+    proc WrapEventScriptForFreezedText {script} {
         set Template {
             if {[%W cget -private_freezed]} {
                 %W RememberEvent {<<<<OldEventBody>>>>}
+                break 
             } else {
                 <<<<OldEventBody>>>>
             }
-        # FIXME - remove that later!
-            break 
         }
-        set ExpandedBody [regsub -all <<<<OldEventBody>>>> $Template $body]
-        #showVar ExpandedBody
-        bind FreezableText $ev $ExpandedBody
+        regsub -all <<<<OldEventBody>>>> $Template $script
     }
 
+    proc WrapBindingFromTextToFreezableText {ev} {
+        set script [bind Text $ev]
+        set script2 [WrapEventScriptForFreezedText $script]
+        bind FreezableText $ev $script2
+    }
         
 
 # Fills FreezableText bindtag with wrapped bindings of Text
     proc InitBindingsOfFreezableText {} {
         foreach ev [bind Text] {
-            InitOneBindingOfFreezableText $ev
+            WrapBindingFromTextToFreezableText $ev
         }
         return
     }
 
+    proc SubstituteSingleValueInListVarKeyEq {listVariable old new} {
+        upvar 1 $listVariable var
+        set idx [lsearch -exact $var $old]
+        if {$idx >= 0} {
+            set var [lreplace $var $idx $idx [list $new]]
+        }
+    }
+
     # InitOneBindingOfFreezableText <Key-Return>
     InitBindingsOfFreezableText
-    
 }
 
-######################## Example ################################
-
+######################## Example of readonly text ###############
 #  # Initialization (readonly set to 1)
 # ::clcon_text::clcon_text .text -readonly 1
 #  # Changing readonly after creation
@@ -149,3 +175,29 @@ namespace eval ::clcon_text {
 
 # pack .text   -side top
 # pack .text2 -side bottom
+
+
+################### Example of freezing ########################
+# catch { destroy .freezingExample }
+# toplevel .freezingExample
+
+# set txt .freezingExample.text
+# ::clcon_text::clcon_text $txt
+    
+# for {set x 0} {$x<10} {incr x} { 
+#     $txt insert end "line $x\n"
+# }
+
+# pack $txt -side top -fill both
+# focus $txt
+
+# # Do .freezingExample.text Freeze
+# # to start buffering input
+# # Do .freezingExample.text Unfreeze
+# # to finish
+
+############ Test case in clcon ###########
+#..set ed [::edt::edit /s2/clcon/clcon_text.tcl]
+#..$ed Freeze
+# Now type something and try to do something
+#..$ed Unfreeze

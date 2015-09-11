@@ -480,6 +480,7 @@ namespace eval ::edt {
             $w.text mark set insert [dict get $opts -offset]
             $w.text see insert
         }
+        return $w.text
     }
 
 }
