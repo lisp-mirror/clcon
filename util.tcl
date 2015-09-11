@@ -25,6 +25,8 @@ proc ProcExistsP p {
 }
 
 
+proc showVar {name} { puts "sV:$name=[uplevel 1 [string cat {expr $} $name]]" }
+
 # tests
 # puts [CountOccurancesOfSubstring "a" "babab"]
 # 2
