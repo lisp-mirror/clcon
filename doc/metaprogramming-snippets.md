@@ -68,3 +68,9 @@ search-tablelist.srchtblst.tcl [../search-tablelist.srchtblst.tcl](../search-tab
 Можно было сразу сгенерировать лямбду, но по (неудачно придуманному) соглашению мы
 передаём только её тело.
 
+tkcon
+---
+
+        $m add command -label "Paste" -under 0 \
+            -command [list tk_textPaste $text]
+

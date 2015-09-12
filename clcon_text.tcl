@@ -86,7 +86,6 @@ namespace eval ::clcon_text {
         method Freeze {} {
             ::mprs::AssertEq $options(-private_freezed) 0 "Freeze: must be unfreezed"
             $self configure -private_freezed 1
-            puts "FIXME: text can be pasted via menu bar"
         }
        
         method Unfreeze {} {
@@ -117,18 +116,36 @@ namespace eval ::clcon_text {
         }
     }
 
-    proc WrapEventScriptForFreezedText {script} {
+    # In freezable text, all event handler scripts must be processed
+    # with this function to support freezing protocol.
+    # Optional destination is required when event is bound not to
+    # text itself, but, say, to menu bar. In this case destination
+    # must expand to pathName of text.
+    # Note: macro is not hygienic, $W can be captured, this is why
+    # it is protected with namespace prefix.
+    proc WrapEventScriptForFreezedText {script {destination "%W"}} {
         set Template {
-            if {[%W cget -private_freezed]} {
-                %W RememberEvent {<<<<OldEventBody>>>>}
+            if {[<<<<destination>>>> cget -private_freezed]} {
+                <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>>}
                 break 
             } else {
                 <<<<OldEventBody>>>>
             }
         }
-        regsub -all <<<<OldEventBody>>>> $Template $script
+        set t1 [regsub -all <<<<OldEventBody>>>> $Template $script]
+        set t2 [regsub -all <<<<destination>>>> $t1 $destination]
+        return $t2
     }
 
+
+    # By calling this function we ensure freezing of the
+    # buffer before processing the event.
+    # Unfreezing must be arranged by event itself
+    proc WrapFreezingEventScriptForFreezedText {script} {
+        error "write me like WrapEventScriptForFreezedText"
+    }
+
+    
     proc WrapBindingFromTextToFreezableText {ev} {
         set script [bind Text $ev]
         set script2 [WrapEventScriptForFreezedText $script]

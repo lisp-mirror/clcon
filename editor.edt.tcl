@@ -221,7 +221,11 @@ namespace eval ::edt {
         wm withdraw $tw
         after idle "::edt::MaybeDestroyEditorWindow $tw"
     }
-    
+
+
+    proc wesppt {script} {
+        ::clcon_text::WrapEventScriptForFreezedText $script
+    }
 
     # Initializes editor GUI, loads text
     # args are for error only
@@ -268,16 +272,14 @@ namespace eval ::edt {
         ##
         set m [menu [::tkcon::MenuButton $menu File file]]
         $m add command -label "Save As..."  -underline 0 \
-            -command [list ::tkcon::Save {} widget $w.text]
-        $m add command -label "Append To..."  -underline 0 \
-            -command [list ::tkcon::Save {} widget $w.text a+]
+            -command [wesppt [list ::tkcon::Save {} widget $w.text]]
         $m add separator
 
-        set CloseFile [list ::edt::EditCloseFile $tw $w]
+        set CloseFile [wesppt [list ::edt::EditCloseFile $tw $w]]
         $m add command -label "Close" -accel "Control-w" -command $CloseFile
         bind $w <Control-Key-w> $CloseFile
         
-        set dismiss [list wm withdraw $tw]
+        set dismiss [wesppt [list wm withdraw $tw]]
         $m add command -label "Hide editor window" -underline 0 -command $dismiss
         
         ## Edit Menu
@@ -285,23 +287,25 @@ namespace eval ::edt {
         set text $w.text
         set m [menu [::tkcon::MenuButton $menu Edit edit]]
         $m add command -label "Cut"   -under 2 \
-            -command [list tk_textCut $text]
+            -command [wesppt [list tk_textCut $text]]
         $m add command -label "Copy"  -under 0 \
-            -command [list tk_textCopy $text]
+            -command [wesppt [list tk_textCopy $text]]
         $m add command -label "Paste" -under 0 \
-            -command [list tk_textPaste $text]
+            -command [wesppt [list tk_textPaste $text]]
         $m add separator
         $m add command -label "Find" -under 0 \
-            -command [list ::fndrpl::OpenFindBox $text "text" "find" {}]
+            -command [wesppt [list ::fndrpl::OpenFindBox $text "text" "find" {}]]
         
         ## Send To Menu
         ## 
         # Try to keep Send menu by allowing to send to main interpreter only
         set m [menu [::tkcon::MenuButton $menu "Send to..." send]]
         set other [tkcon attach]
+
+        set SendToOther [wesppt "::tkcon::EvalOther $other \
+		    eval \[$w.text get 1.0 end-1c\]"]
         $m add command -label "Send To [lindex $other 0]" \
-            -command "::tkcon::EvalOther $other \
-		    eval \[$w.text get 1.0 end-1c\]"
+            -command $SendToOther
 
         ## Window Menu
         ##
