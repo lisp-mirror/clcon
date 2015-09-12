@@ -91,9 +91,11 @@ cl-user package is assumed for all interaction. If you change package, consequen
 
 ## Documentation
 
+[Demo tour](doc/demo-tour.md) - narrow footpath through best views of all currently working features of clcon
+
 [User manual](https://bitbucket.org/budden/clcon/src/default/doc/user-manual.md)
 
-[Wiki](https://bitbucket.org/budden/clcon/wiki/) - contains screenshots, but otherwise is not very useful. 
+[Wiki](https://bitbucket.org/budden/clcon/wiki/) - contains screenshots, but otherwise is not very useful.  
 
 [FAQ](https://bitbucket.org/budden/clcon/src/default/doc/FAQ.md)
 
