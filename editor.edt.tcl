@@ -224,7 +224,7 @@ namespace eval ::edt {
 
 
     proc wesppt {script} {
-        ::clcon_text::WrapEventScriptForFreezedText $script
+        ::clcon_text::WrapFreezableHandlerScript $script
     }
 
     # Initializes editor GUI, loads text

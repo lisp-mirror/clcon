@@ -44,7 +44,8 @@ namespace eval ::clcon_text {
         option -private_freezed -default 0
         # It is private. Don't write to it
         option -private_freezed_events_queue [list]
-
+        # PRIVATE. Number of modifications sent which were not processed by oduvanchik yet
+        option -private_pending_sent_modifications 0
         constructor {args} {
             installhull using text
             # Apply any options passed at creation time.
@@ -111,8 +112,10 @@ namespace eval ::clcon_text {
     }
 
     proc MaybeSendToLisp {clcon_text type arglist} {
-        if {[$clcon_text cget -send_to_lisp]} {
-            puts "::clcon_text::MaybeSendToLisp: $clcon_text $type $args"
+        variable ::tkcon::OPT
+        if {[$clcon_text cget -send_to_lisp]
+            && $::tkcon::OPT(oduvan-backend) } {
+            puts "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
         }
     }
 
@@ -141,12 +144,12 @@ namespace eval ::clcon_text {
     # By calling this function we ensure freezing of the
     # buffer before processing the event.
     # Unfreezing must be arranged by event itself
-    proc WrapFreezingEventScriptForClconText {script} {
+    proc WrapFreezingAndFreezableHandlerScript {script} {
         error "write me like WrapEventScriptForFreezedText"
     }
 
     
-    proc WrapBindingFromTextToFreezableText {ev} {
+    proc WrapFreezableHandlerScript {ev} {
         set script [bind Text $ev]
         set script2 [WrapEventScriptForFreezedText $script]
         bind FreezableText $ev $script2
@@ -156,7 +159,7 @@ namespace eval ::clcon_text {
 # Fills FreezableText bindtag with wrapped bindings of Text
     proc InitBindingsOfFreezableText {} {
         foreach ev [bind Text] {
-            WrapBindingFromTextToFreezableText $ev
+            WrapFreezableHandlerScript $ev
         }
         return
     }
