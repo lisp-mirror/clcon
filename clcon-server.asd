@@ -17,4 +17,5 @@
                (:file "eval-in-tcl")
                (:file "swank-inspector" :description "inspector backend pieces")
                (:file "swank-compilation-errors")
-               ))
+               (:file "text2odu" :description "inteface between clcon_text widget and oduvanchik"
+               )))
