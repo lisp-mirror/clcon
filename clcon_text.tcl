@@ -18,7 +18,7 @@
 #
 #
 # If -send_to_lisp options is set, all text modifications are
-# sent to lisp (to be implemented)
+# sent to lisp. Do not change this option after editing startup.
 #
 # Freeze/unfreeze - utility for synchronous buffer modifications.
 #
@@ -55,6 +55,9 @@ namespace eval ::clcon_text {
             set NewBindTags [SubstituteSingleValueInListVarKeyEq CurrentBindTags Text FreezableText]
             bindtags $win $NewBindTags
             bind $win <<UnfreezeNext>> "$self Unfreeze"
+        }
+        destructor {
+            DeleteBackendBufferForText $win
         }
 
         # Maybe disable the text widget's insert and delete methods, to
@@ -106,17 +109,80 @@ namespace eval ::clcon_text {
             }
         }
 
+        # Note that we have sent notification, or if notification was processed on lisp side
+        method IncrPrivatePendingSentModifications {delta} {
+            set j $options(-private_pending_sent_modifications)
+            incr j $delta
+            puts "-private_pending_sent_modifications = $j"
+            $self configure -private_pending_sent_modifications
+        }
+        
         # Enqueue into associated event list
         delegate method * to hull
         delegate option * to hull
     }
 
+    # Creates editor buffer in backend
+    proc MakeBackendBufferForText {clcon_text} {
+        variable ::tkcon::OPT
+        if $::tkcon::OPT(oduvan-backend) {
+            $clcon_text configure -send_to_lisp 1
+            ::tkcon::EvalInSwankAsync "(clco:make-oduvan-backend-buffer $clcon_text)" {} 0
+        }
+    }
+
+    proc DeleteBackendBufferForText {clcon_text} {
+        puts "DeleteBackendBufferForText not written!"
+    }
+
+    proc lq {x} {
+        ::tkcon::QuoteLispObjToString $x
+    }
+
     proc MaybeSendToLisp {clcon_text type arglist} {
         variable ::tkcon::OPT
-        if {[$clcon_text cget -send_to_lisp]
-            && $::tkcon::OPT(oduvan-backend) } {
-            puts "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
+        if {![$clcon_text cget -send_to_lisp]
+            ||
+            !$::tkcon::OPT(oduvan-backend) } {
+            return
         }
+        set qId [lq $clcon_text]
+        switch -exact $type {
+            i {
+                # FIXME we
+                set index [lindex $arglist 0]
+                set qIndex [::text2odu::CoerceIndex $clcon_text $index]
+                set qText [lq [lindex $arglist 1]]
+                set lispCmd "(clco:notify-oduvan-on-tcl-text-insert $qId $qIndex $qText)"
+            }
+            d {
+                set b [lindex $arglist 0]
+                set qB [::text2odu::CoerceIndex $clcon_text $b]
+                set e [lindex $arglist 1]
+                set qE [::text2odu::CoerceIndex $clcon_text $e]
+                set lispCmd "(clco:notify-oduvan-on-tcl-text-delete $qId $qB $qE)"
+            }
+            default {
+                error "Hurray! We found replace command with args $clcon_text $type $arglist!"
+            }
+        }
+        $clcon_text IncrPrivatePendingSentModifications 1
+        ::tkcon::EvalInSwankAsync $lispCmd [subst -nocommands {
+            putd \$EventAsList
+            $clcon_text IncrPrivatePendingSentModifications -1
+        }] 0 t
+            # {:find-existing}
+            # showVar arglist
+            # set lispArglist [lmap a $arglist {
+            #     ::tkcon::QuoteLispObjToString $a
+            # }]
+            # $clcon_text IncrPrivatePendingSentModifications 1
+            # ::tkcon::EvalInSwankAsync \
+            #     "(clco:notify-oduvan-on-tcl-text-change $type $lispArglist)" \
+            #     [subst -nocommands {
+            #         $clcon_text IncrPrivatePendingSentModifications -1
+            #     }] 0
+        puts "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
     }
 
     # In freezable text, all event handler scripts must be processed

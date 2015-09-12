@@ -351,6 +351,12 @@ namespace eval ::edt {
                                             return \$__tkcon(data)
                                         }
                                         ]]
+                
+                # It is too late. We will miss original portion of the text.
+                # This is done intentionally for the debugging. Place this code
+                # above insertion of text (or to clcon_text constructor?)
+                ::clcon_text::MakeBackendBufferForText $w.text
+               
                 after idle [::tkcon::Highlight $w.text \
                                 [string trimleft [file extension $word] .]]
             }
@@ -484,6 +490,7 @@ namespace eval ::edt {
             $w.text mark set insert [dict get $opts -offset]
             $w.text see insert
         }
+
         return $w.text
     }
 

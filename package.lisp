@@ -11,7 +11,8 @@
            #:*clcon-source-directory*
                                         ; oduvan-backend
            #:make-oduvan-backend-buffer
-           #:notify-oduvan-on-tcl-text-change
+           #:notify-oduvan-on-tcl-text-insert
+           #:notify-oduvan-on-tcl-text-delete
            )
   )
 

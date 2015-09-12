@@ -339,7 +339,7 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
         putd "About to RunContinuation for $ContinuationId"
         RunContinuation $ContinuationId $EventAsList
     } else {
-        putd "ProcessAsyncEvent - skipping Id=$ContinuationId Data=[Unleash [lindex $EventAsList 1]]"
+        puts stderr "ProcessAsyncEvent: skipping async event from lisp: $EventAsList" 
         ::tkcon::SheduleCheckSWANKEventQueue
     }
     return {}
@@ -655,8 +655,12 @@ proc ::tkcon::OuterNewSwank {} {
 
 # Pass something to lisp, quoted. Lame!
 proc ::tkcon::QuoteLispObjToString {str} {
-    putd "We must quote string $str better!"
-    return [string cat "\"" $str "\""]    
+    # putd "We must quote string $str better!"
+    # return [string cat "\"" $str "\""]
+
+    regsub -all {[\ \\\"]} $str {\\&} s2
+    set result [string cat \" $s2 \"]
+    return $result
 }
 
 ## ::tkcon::LispFindDefinitionInner
