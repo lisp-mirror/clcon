@@ -224,10 +224,10 @@ namespace eval ::edt {
 
 
     proc wesppt {script} {
-        ::clcon_text::WrapFreezableHandlerScript $script
+        ::clcon_text::WrapEventScriptForFreezedText $script
     }
 
-    # Initializes editor GUI, loads text
+    # Initializes editor GUI, loads text.
     # args are for error only
     proc SetupEditorWindow {tw w word opts tail} {
         variable ::tkcon::PRIV
