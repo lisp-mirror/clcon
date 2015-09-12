@@ -7,6 +7,8 @@
 ; there are ways to reduce risk:
 ; 1. Use safe interpreters on tcl side
 ; 2. Check code on tcl side
+; In general, avoid using this functionality. It is for quick-and-dirty hacks, 
+
 
 (in-package :clco)
 
