@@ -162,9 +162,9 @@ proc ::mprs::DeleteSyncEventsFromTheQueue {} {
 proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDesignator {}} {ContinuationCounter {}}} {
     variable PRIV
 
-    set ConnectionName $PRIV(SwankConnection)
+    set ConnectionName $::swcnn::CurrentSwankConnection
 
-    if {$PRIV(SwankConnection) eq {}} {
+    if {$::swcnn::CurrentSwankConnection eq {}} {
         error "Attempt to EvalInSwankAsync with disconnected SWANK: $form"
     }
     
@@ -488,11 +488,11 @@ proc ::tkcon::SwankReadMessageFromStream {stream} {
 proc ::tkcon::SwankReadMessageString {} {
     variable PRIV
 
-    if {$PRIV(SwankConnection) eq {}} {
+    if {$::swcnn::CurrentSwankConnection eq {}} {
         error "Attempt to read from closed connection"
     }
 
-    upvar \#0 $PRIV(SwankConnection) con
+    upvar \#0 $::swcnn::CurrentSwankConnection con
 
     
     set channel $con(sock)
@@ -567,11 +567,11 @@ proc ::tkcon::SetupSwankConnection {channel console} {
 
 proc ::tkcon::DisconnectFromSwank {} {
     variable PRIV
-    set name $PRIV(SwankConnection)
+    set name $::swcnn::CurrentSwankConnection
     if {$name eq {}} {
         error "::tkcon::DisconnectFromSwank: disconnected already"
     }
-    set PRIV(SwankConnection) {}
+    set ::swcnn::CurrentSwankConnection {}
     ::swcnn::TerminateConnection $name
     Prompt
 }             
@@ -605,7 +605,7 @@ proc ::tkcon::AttachSwank {name} {
 
 
     set PRIV(SwankThread) t
-    set PRIV(SwankConnection) $name
+    set ::swcnn::CurrentSwankConnection $name
 
     # interp alias {} ::tkcon::EvalAttached {} ::tkcon::EvalInSwankAsync {} \#0
 

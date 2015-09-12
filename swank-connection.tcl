@@ -64,7 +64,7 @@ proc ::swcnn::MakeSwankConnection {host port} {
     variable CurrentSwankConnection
     variable ::tkcon::PRIV
 
-    if {$PRIV(SwankConnection) ne {}} {
+    if {$::swcnn::CurrentSwankConnection ne {}} {
         error "::swcnn::MakeSwankConnection: connected already (1)"
     }            
 

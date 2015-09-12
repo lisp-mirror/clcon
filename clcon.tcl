@@ -284,7 +284,6 @@ proc ::tkcon::Init {args} {
 	uid		0
 	tabs		{}
 
-        SwankConnection {}
         SwankThread      {}
     } {
 	if {![info exists PRIV($key)]} { set PRIV($key) $default }
@@ -1096,7 +1095,7 @@ proc ::tkcon::GarbageCollect {} {
 proc ::tkcon::Eval {w} {
     variable PRIV
     set gotcmd [CmdGet $w]
-    if {$PRIV(SwankConnection) ne {}} {
+    if {$::swcnn::CurrentSwankConnection ne {}} {
         # FIXME: this is an async command, can we return from it? 
         EvalInSwankFromConsole $w
         return
@@ -1339,7 +1338,7 @@ proc ::tkcon::EvalSocketClosed {sock} {
 
     putd "Entered EvalSocketClosed"
 
-    upvar \#0 $PRIV(SwankConnection) con
+    upvar \#0 $::swcnn::CurrentSwankConnection con
     set OurChannel $con(sock)
     
     if {$sock eq $OurChannel} {
@@ -1498,7 +1497,7 @@ proc ::tkcon::Prompt {{pre {}} {post {}} {prompt {}}} {
     } else {
         set debugging 0
     }
-    if {$PRIV(SwankConnection) ne {} && !$debugging } {
+    if {$::swcnn::CurrentSwankConnection ne {} && !$debugging } {
         $w insert end [EvalSlave history nextid] prompt
         $w insert end " CL-UsER>" prompt
     } else {
