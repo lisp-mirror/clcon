@@ -62,7 +62,17 @@ proc ::swcnn::TerminateCurrentConnection {} {
 # We assume that console is attached to slave interpreter already
 proc ::swcnn::MakeSwankConnection {host port} {
     variable CurrentSwankConnection
+    variable ::tkcon::PRIV
 
+    if {$PRIV(SwankConnection) ne {}} {
+        error "::swcnn::MakeSwankConnection: connected already (1)"
+    }            
+
+    if {$CurrentSwankConnection ne {}} {
+        error "::swcnn::MakeSwankConnection: connected already (2)"
+    }            
+
+    
     TerminateCurrentConnection
 
     set id [GenSwankConnectionCounter]

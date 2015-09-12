@@ -163,15 +163,14 @@ proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDe
     variable PRIV
 
     set ConnectionName $PRIV(SwankConnection)
+
+    if {$ConnectionName eq {}} {
+        error "Attempt to EvalInSwankAsync with disconnected SWANK: $form"
+    }
+    
     upvar \#0 $ConnectionName con
     set sock $con(sock)
     putd "I think socket stream is $sock"
-
-    putd "Here we must check if socket is dead, but this is skipped"
-    if {$PRIV(deadapp)} {
-        puts stderr "Socket is dead - cannot execute $form"
-        return
-    }
 
     # We don't need that for lisp. Some other translation should occur, hopefully we done it ok
     # Commend from old code:
@@ -563,6 +562,9 @@ proc ::tkcon::SetupSwankConnection {channel console} {
 proc ::tkcon::DisconnectFromSwank {} {
     variable PRIV
     set name $PRIV(SwankConnection)
+    if {$name eq {}} {
+        error "::tkcon::DisconnectFromSwank: disconnected already"
+    }
     set PRIV(SwankConnection) {}
     ::swcnn::TerminateConnection $name
     Prompt

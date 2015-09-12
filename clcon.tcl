@@ -1381,27 +1381,24 @@ proc ::tkcon::EvalSocketClosed {sock} {
     variable OPT
     variable PRIV
 
-    catch {close $sock}
-    if {$sock ne $PRIV(app)} {
-	# If we are not still attached to that socket, just return.
-	# Might be nice to tell the user the socket closed ...
+    puts "Entered EvalSocketClosed"
+
+    upvar \#0 $PRIV(SwankConnection) con
+    set OurChannel $con(sock)
+    
+    if {$sock eq $OurChannel} {
+        # This is our connection
+        puts stderr "Our SWANK connection is dead. Returning to tcl interpreter"
+        DisconnectFromSwank
+        # ::swcnn::TerminateCurrentConnection
+    } else {
+        puts stderr "Strange that some alien connection is closed"
+        showVar sock
+        showVar OurChannel
+        catch {close $sock}
 	return
     }
-    if {$OPT(dead) ne "leave" &&
-	($OPT(dead) eq "ignore" ||
-	 [tk_messageBox -title "Dead Attachment" -type yesno \
-	      -icon question \
-	      -message "\"$PRIV(app)\" appears to have died.\
-	    \nReturn to primary slave interpreter?"] eq "no")} {
-	set PRIV(appname) "DEAD:$PRIV(appname)"
-	set PRIV(deadapp) 1
-    } else {
-	set err "Attached Tk interpreter \"$PRIV(app)\" died."
-	Attach {}
-	set PRIV(deadapp) 0
-	EvalSlave set errorInfo $err
-    }
-    Prompt \n [CmdGet $PRIV(console)]
+           
 }
 
 ## ::tkcon::EvalNamespace - evaluates the args in a particular namespace
