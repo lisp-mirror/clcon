@@ -164,7 +164,7 @@ proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDe
 
     set ConnectionName $PRIV(SwankConnection)
 
-    if {$ConnectionName eq {}} {
+    if {$PRIV(SwankConnection) eq {}} {
         error "Attempt to EvalInSwankAsync with disconnected SWANK: $form"
     }
     
@@ -435,7 +435,6 @@ proc ::tkcon::TempSwankChannelReadable {sock} {
     variable SWANKEventQueue
     variable SWANKIsInSyncMode
 
-    puts stderr "First of all we must have checked disconnect event, but let's skip it for now"
     set Event [SwankReadMessageString]
 
     # just for debugging 
@@ -488,7 +487,14 @@ proc ::tkcon::SwankReadMessageFromStream {stream} {
 ## from swank-protocol::read-message-string
 proc ::tkcon::SwankReadMessageString {} {
     variable PRIV
+
+    if {$PRIV(SwankConnection) eq {}} {
+        error "Attempt to read from closed connection"
+    }
+
     upvar \#0 $PRIV(SwankConnection) con
+
+    
     set channel $con(sock)
     fconfigure $channel -blocking 1
     set result [SwankReadMessageFromStream $channel]

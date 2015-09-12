@@ -1337,7 +1337,7 @@ proc ::tkcon::EvalSocketClosed {sock} {
     variable OPT
     variable PRIV
 
-    puts "Entered EvalSocketClosed"
+    putd "Entered EvalSocketClosed"
 
     upvar \#0 $PRIV(SwankConnection) con
     set OurChannel $con(sock)
