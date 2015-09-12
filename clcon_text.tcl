@@ -69,14 +69,20 @@ namespace eval ::clcon_text {
         # Enable synonyms, so the program can operate on text
         # Pass all other methods and options to the real text widget, so
         # that the remaining behavior is as expected.
-        method RoInsert {args} { set result [$hull insert {*}$args]
-            MaybeSendToLisp $self i $args; return $result
+        method RoInsert {args} {
+            MaybeSendToLisp $self i $args
+            set result [$hull insert {*}$args]
+            return $result
         }
-        method RoDelete {args} { set result [$hull delete {*}$args]
-            MaybeSendToLisp $self d $args; return $result
+        method RoDelete {args} {
+            MaybeSendToLisp $self d $args
+            set result [$hull delete {*}$args]
+            return $result
         }
-        method RoReplace {args} { set result [$hull replace {*}$args]
-            MaybeSendToLisp $self r $args; return $result
+        method RoReplace {args} {
+            MaybeSendToLisp $self r $args
+            set result [$hull replace {*}$args]
+            return $result
         }
 
         method RememberEvent {script} {
