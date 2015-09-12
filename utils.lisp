@@ -4,6 +4,9 @@
 (defun standard-readtable ()
   (with-standard-io-syntax *readtable*))
 
+(defparameter *clcon-source-directory*
+  (asdf:component-pathname (asdf:find-system :clcon-server)))
+
 (defun tcl-escape-filename (filename)
   (cl-tk:tcl-escape (SWANK/BACKEND:PATHNAME-TO-FILENAME filename)))
 

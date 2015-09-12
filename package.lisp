@@ -8,6 +8,7 @@
            #:ldbg-edit-frame-source-location
            #:server-lookup-definition
            #:eval-in-tcl
+           #:*clcon-source-directory*
            )
   )
 
