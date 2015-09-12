@@ -114,7 +114,7 @@ namespace eval ::clcon_text {
             set j $options(-private_pending_sent_modifications)
             incr j $delta
             puts "-private_pending_sent_modifications = $j"
-            $self configure -private_pending_sent_modifications
+            $self configure -private_pending_sent_modifications $j
         }
         
         # Enqueue into associated event list
@@ -122,21 +122,22 @@ namespace eval ::clcon_text {
         delegate option * to hull
     }
 
+    proc lq {x} {
+        ::tkcon::QuoteLispObjToString $x
+    }
+   
     # Creates editor buffer in backend
     proc MakeBackendBufferForText {clcon_text} {
         variable ::tkcon::OPT
+        set qClcon_text [lq $clcon_text]
         if $::tkcon::OPT(oduvan-backend) {
             $clcon_text configure -send_to_lisp 1
-            ::tkcon::EvalInSwankAsync "(clco:make-oduvan-backend-buffer $clcon_text)" {} 0
+            ::tkcon::EvalInSwankAsync "(clco:make-oduvan-backend-buffer $qClcon_text)" {} 0
         }
     }
 
     proc DeleteBackendBufferForText {clcon_text} {
         puts "DeleteBackendBufferForText not written!"
-    }
-
-    proc lq {x} {
-        ::tkcon::QuoteLispObjToString $x
     }
 
     proc MaybeSendToLisp {clcon_text type arglist} {
