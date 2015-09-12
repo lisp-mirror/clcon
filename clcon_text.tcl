@@ -171,6 +171,7 @@ namespace eval ::clcon_text {
             putd \$EventAsList
             $clcon_text IncrPrivatePendingSentModifications -1
         }] 0 t
+            # FIXME maybe we need :find-existing? 
             # {:find-existing}
             # showVar arglist
             # set lispArglist [lmap a $arglist {
