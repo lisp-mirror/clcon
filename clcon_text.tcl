@@ -149,7 +149,6 @@ namespace eval ::clcon_text {
         set qId [lq $clcon_text]
         switch -exact $type {
             i {
-                # FIXME we
                 set index [lindex $arglist 0]
                 set qIndex [::text2odu::CoerceIndex $clcon_text $index]
                 set qText [lq [lindex $arglist 1]]
