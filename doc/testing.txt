@@ -58,7 +58,8 @@ Hide Window и потом опять defun - не должно ломаться.
 
 Список ошибок компиляции
 ========================
-(clco::compile-file-for-tcl "/s2/clcon/err.lisp" nil) 
+
+    (clco::compile-file-for-tcl (merge-pathnames "test/error-browser-sample-file.lisp" clcon-server:*clcon-source-directory*) nil)
 
 Соглашение об именах
 ====================
