@@ -239,6 +239,7 @@ proc ::tkcon::Init {args} {
 	overrideexit	1
 	usehistory	1
         putd-enabled    0
+        oduvan-backend  0
         swank-ip        127.0.0.1
         swank-port      4009
 
@@ -429,6 +430,7 @@ proc ::tkcon::Init {args} {
 		-root		{ set PRIV(root) $val }
 		-font		{ set OPT(font) $val }
                 -putd-enabled   { set OPT(putd-enabled) $val }
+                -oduvan-backend { set OPT(oduvan-backend) $val }
                 -swank-ip       { set OPT(swank-ip) $val }
                 -swank-port     { set OPT(swank-port) $val }
 		-rcfile	{}
@@ -1785,18 +1787,20 @@ proc ::tkcon::InitMenus {w title} {
     foreach m [list [menu $w.prefs] [menu $w.pop.prefs]] {
 	$m add check -label "1.Putd-enabled" \
 		-underline 0 -variable ::tkcon::OPT(putd-enabled)
-	$m add check -label "2.Non-Tcl Attachments (defunct)" \
+	$m add check -label "2.Oduvan-backend" \
+		-underline 0 -variable ::tkcon::OPT(oduvan-backend)
+	$m add check -label "3.Non-Tcl Attachments (defunct)" \
 		-underline 0 -variable ::tkcon::OPT(nontcl)
-	$m add check -label "3.Show Multiple Matches" \
+	$m add check -label "4.Show Multiple Matches" \
 		-underline 0 -variable ::tkcon::OPT(showmultiple)
-	$m add check -label "Show Statusbar" \
+	$m add check -label "5.Show Statusbar" \
 	    -underline 5 -variable ::tkcon::OPT(showstatusbar) \
 	    -command {
 		if {$::tkcon::OPT(showstatusbar)} {
 		    grid $::tkcon::PRIV(statusbar)
 		} else { grid remove $::tkcon::PRIV(statusbar) }
 	    }
-	$m add cascade -label "Scrollbar" -underline 2 -menu $m.scroll
+	$m add cascade -label "6.Scrollbar" -underline 2 -menu $m.scroll
 
 	## Scrollbar Menu
 	##

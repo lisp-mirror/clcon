@@ -12,7 +12,9 @@ You can also change this option in runtime from 'Prefs' menu. Changed value is n
 
 ```-swank-ip ADDR``` - assign an alternate IP address for swank server (default is 127.0.0.1).
 
-```-swank-port NNNN``` - assign alternate port for swank connection (default is 4009). Do not connect to the port use use for SLIME/EMACS interaction. 
+```-swank-port NNNN``` - assign alternate port for swank connection (default is 4009). Do not connect to the port use use for SLIME/EMACS interaction.
+
+```-oduvan-backend 1``` - supposes that oduvanchik runs on SWANK side and enables some lisp-specific editor features (implementation is under construction). You can also change it via Pres menu bar submenu.
 
 Completion
 ----------
