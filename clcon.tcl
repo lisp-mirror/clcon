@@ -1174,11 +1174,6 @@ proc ::tkcon::EvalCmd {w cmd} {
 		if {$code == 1} {
 		    set PRIV(errorInfo) "Non-Tcl errorInfo not available"
 		}
-	    } elseif {$PRIV(apptype) eq "socket"} {
-		set code [catch {EvalSocket $cmd} res]
-		if {$code == 1} {
-		    set PRIV(errorInfo) "Socket-based errorInfo not available"
-		}
 	    } else {
 		set code [catch {EvalAttached $cmd} res]
 		if {$code == 1} {
@@ -1283,6 +1278,7 @@ proc ::tkcon::EvalSend cmd {
     variable OPT
     variable PRIV
 
+    puts stderr "::tkcon::EvalSend invoked :("
     if {$PRIV(deadapp)} {
 	if {[lsearch -exact [::send::interps] $PRIV(app)]<0} {
 	    return
@@ -1310,46 +1306,6 @@ proc ::tkcon::EvalSend cmd {
 	    EvalSlave set errorInfo $err
 	}
 	Prompt \n [CmdGet $PRIV(console)]
-    }
-    return -code $code $result
-}
-
-
-
-## ::tkcon::EvalSocket - sends the string to an interpreter attached via
-## a tcp/ip socket
-##
-## In the EvalSocket case, ::tkcon::PRIV(app) is the socket id
-##
-## Must determine whether socket is dead when an error is received
-# ARGS:	cmd	- the data string to send across
-# Returns:	the result of the command
-##
-proc ::tkcon::EvalSocket cmd {
-    variable OPT
-    variable PRIV
-    global tcl_version
-    tr "Normally this code must not be used"
-
-    if {$PRIV(deadapp)} {
-	if {![info exists PRIV(app)] || \
-		[catch {eof $PRIV(app)} eof] || $eof} {
-	    return
-	} else {
-	    set PRIV(appname) [string range $PRIV(appname) 5 end]
-	    set PRIV(deadapp) 0
-	    Prompt "\n\"$PRIV(app)\" alive\n" [CmdGet $PRIV(console)]
-	}
-    }
-    # Sockets get \'s interpreted, so that users can
-    # send things like \n\r or explicit hex values
-    set cmd [subst -novariables -nocommands $cmd]
-    #puts [list $PRIV(app) $cmd]
-    set code [catch {puts $PRIV(app) $cmd ; flush $PRIV(app)} result]
-    if {$code && [eof $PRIV(app)]} {
-	## Interpreter died or disappeared
-	puts "$code eof [eof $PRIV(app)]"
-	EvalSocketClosed $PRIV(app)
     }
     return -code $code $result
 }
