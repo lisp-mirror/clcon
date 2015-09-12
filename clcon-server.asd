@@ -5,7 +5,7 @@
   :author "Denis Budyak"
   :licence "MIT"
   :description "clcon - Common Lisp IDE"
-  :long-description "Tk - based set of development tools comprising CL IDE for MacOS X, Linux and Windows"
+  :long-description "Tk - based set of development tools comprising CL IDE for Linux and Windows"
   :depends-on (:cl-tk :swank)
   :serial t
   :components ((:file "package")
