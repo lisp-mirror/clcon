@@ -157,7 +157,6 @@ proc ::mprs::DeleteSyncEventsFromTheQueue {} {
     }
 }
 
-
 ## ItIsListenerEval must be 1 to wrap form into (swank-repl:listener-eval ...) or 0 otherwise
 # If ContinuationCounter is not passed, it is calculated when needed
 proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDesignator {}} {ContinuationCounter {}}} {
@@ -169,16 +168,10 @@ proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDe
     putd "I think socket stream is $sock"
 
     putd "Here we must check if socket is dead, but this is skipped"
-#   if {$PRIV(deadapp)} {
-#	if {![info exists PRIV(app)] || \
-#		[catch {eof $PRIV(app)} eof] || $eof} {
-#	    return
-#	} else {
-#	    set PRIV(appname) [string range $PRIV(appname) 5 end]
-#	    set PRIV(deadapp) 0
-#	    Prompt "\n\"$PRIV(app)\" alive\n" [CmdGet $PRIV(console)]
-#	}
-#   }
+    if {$PRIV(deadapp)} {
+        puts stderr "Socket is dead - cannot execute $form"
+        return
+    }
 
     # We don't need that for lisp. Some other translation should occur, hopefully we done it ok
     # Commend from old code:
@@ -208,11 +201,14 @@ proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDe
 
     
     set code [catch {puts -nonewline $sock $cmd ; flush $sock} result]
-        if {$code && [eof $sock]} {
-            ## SWANK server stream died or disappeared
-            putd "$code eof [eof $sock]"
-            EvalSocketClosed $sock $ConnectionName
-        }
+    if {$code} {
+        puts stderr "writing to socket returned code $code"
+    }
+    if {$code && [eof $sock]} {
+        ## SWANK server stream died or disappeared
+        puts stderr "writing to socket returned $code eof [eof $sock]"
+        EvalSocketClosed $sock $ConnectionName
+    }
     return -code $code $result
 }
 
@@ -332,6 +328,8 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
         ::ldbg::DebugActivate $EventAsList
     } elseif { $Head eq ":debug-return" } {
         ::ldbg::DebugReturn $EventAsList $ContinuationId
+    } elseif { $Head eq ":indentation-update" } {
+        putd "Impolitely ignore :indentation-update"
     } elseif { [ContinuationExistsP $ContinuationId ] == 1 } {
         # we should have generated event which would evaluate continuation later.
         # but what we will do with sync events then?
@@ -438,7 +436,7 @@ proc ::tkcon::TempSwankChannelReadable {sock} {
     variable SWANKEventQueue
     variable SWANKIsInSyncMode
 
-    # First of all we must have checked disconnect event, but let's skip it for now
+    puts stderr "First of all we must have checked disconnect event, but let's skip it for now"
     set Event [SwankReadMessageString]
 
     # just for debugging 
