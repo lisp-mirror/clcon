@@ -9,6 +9,9 @@
            #:server-lookup-definition
            #:eval-in-tcl
            #:*clcon-source-directory*
+                                        ; oduvan-backend
+           #:make-oduvan-backend-buffer
+           #:notify-oduvan-on-tcl-text-change
            )
   )
 
