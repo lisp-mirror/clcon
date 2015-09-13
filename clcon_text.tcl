@@ -182,8 +182,7 @@ namespace eval ::clcon_text {
             putd \$EventAsList
             catch {$clcon_text IncrPrivatePendingSentModifications -1}
         }] 0 {:find-existing}
-        
-        puts "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
+        #puts "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
     }
 
     # In freezable text, all event handler scripts must be processed

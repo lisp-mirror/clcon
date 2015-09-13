@@ -191,7 +191,6 @@ proc ::tkcon::EvalInSwankAsync {form continuation {MsgFmtKind 1} {ThreadDesignat
     
     upvar \#0 $ConnectionName con
     set sock $con(sock)
-    putd "I think socket stream is $sock"
 
     # We don't need that for lisp. Some other translation should occur, hopefully we done it ok
     # Commend from old code:
@@ -206,13 +205,7 @@ proc ::tkcon::EvalInSwankAsync {form continuation {MsgFmtKind 1} {ThreadDesignat
     }
    
     set cmd $form
-    
-    putd "regsub result: $cmd"
-
     set cmd [SwankMaybeWrapFormIntoListenerEval $cmd $MsgFmtKind]
-
-    putd "wrapped to listener eval: $cmd"
-    
     set cmd [FormatSwankRexEvalMessage $cmd $MsgFmtKind $ThreadDesignator $ContinuationCounter]
 
     ::mprs::EnqueueContinuation $ContinuationCounter $continuation 
@@ -372,8 +365,11 @@ proc ::mprs::EnqueueContinuation {ContinuationId code} {
         return
     }
     variable ContinuationsDict
+    set PrintContinuationsDict [expr [llength $ContinuationsDict]>0]
     dict set ContinuationsDict $ContinuationId [list {EventAsList} $code]
-    putd "ContinuationsDict = $ContinuationsDict"
+    if {$PrintContinuationsDict} {
+        showVar ContinuationsDict
+    }
 }
 
 proc ::mprs::ContinuationExistsP {ContinuationId} {
@@ -465,9 +461,11 @@ proc ::tkcon::TempSwankChannelReadable {sock} {
     putd "message from socket: $Event"
 
     if { [string index $Event 0] eq "(" } {
-        putd "Skipping lisp-formed event $Event"
+        puts stderr "Skipping lisp-formed event $Event"
     } else {
-        putd "queue is $SWANKEventQueue . Lets post to it"
+        if {[llength $SWANKEventQueue]} {
+            putd "queue is $SWANKEventQueue . Lets post to it"
+        }
         lappend SWANKEventQueue $Event
         if { $SWANKIsInSyncMode == 0 } {
             SheduleCheckSWANKEventQueue
