@@ -6,7 +6,7 @@
   :licence "MIT"
   :description "clcon - Common Lisp IDE"
   :long-description "Tk - based set of development tools comprising CL IDE for Linux and Windows"
-  :depends-on (:cl-tk :swank)
+  :depends-on (:cl-tk :swank #+clcon-oduvan :oduvanchik.clx)
   :serial t
   :components ((:file "package")
                (:file "utils")
@@ -17,5 +17,7 @@
                (:file "eval-in-tcl")
                (:file "swank-inspector" :description "inspector backend pieces")
                (:file "swank-compilation-errors")
-               (:file "text2odu" :description "inteface between clcon_text widget and oduvanchik"
-               )))
+               (:file "text2odu" :description "outer inteface between clcon_text widget and oduvanchik"
+                      )
+               #+clcon-oduvan (:file "oduvan1" :description "implementation of interface declared in text2odu")
+               ))

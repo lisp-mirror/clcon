@@ -5,17 +5,22 @@
 
 (defun make-oduvan-backend-buffer (clcon_text-pathname)
   "Called from tcl when text is created"
-  (print `(make-oduvan-backend-buffer ,clcon_text-pathname) *terminal-io*)
+  #-clcon-oduvan (print `(make-oduvan-backend-buffer ,clcon_text-pathname) *terminal-io*)
+  #+clcon-oduvan (do-make-oduvan-backend-buffer clcon_text-pathname)
   nil
   )
 
 (defun notify-oduvan-on-tcl-text-insert (clcon_text-pathname index string)
   "Called from RoInsert"
-  (print `(notify-oduvan-on-tcl-text-insert ,index ,string))
+  (declare (ignorable clcon_text-pathname))
+  #-clcon-oduvan (print `(notify-oduvan-on-tcl-text-insert ,index ,string))
+  #+clcon-oduvan (do-notify-oduvan-on-tcl-text-insert clcon_text-pathname index string)
   nil)
 
 
 (defun notify-oduvan-on-tcl-text-delete (clcon_text-pathname beg end)
   "Called from RoInsert"
-  (print `(notify-oduvan-on-tcl-text-delete ,beg ,end))
+  (declare (ignorable clcon_text-pathname))
+  #-clcon-oduvan (print `(notify-oduvan-on-tcl-text-delete ,beg ,end))
+  #+clcon-oduvan (do-notify-oduvan-on-tcl-text-delete clcon_text-pathname beg end)
   nil)
