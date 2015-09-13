@@ -1,26 +1,35 @@
 ; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
 ; see also text2odu.tcl
+; this code runs in arbitrary SWANK worker thread 
 
 (in-package :clco)
 
-(defun make-oduvan-backend-buffer (clcon_text-pathname)
-  "Called from tcl when text is created"
-  #-clcon-oduvan (print `(make-oduvan-backend-buffer ,clcon_text-pathname) *terminal-io*)
-  #+clcon-oduvan (do-make-oduvan-backend-buffer clcon_text-pathname)
+(defun post-oduvan-event (clcon_text-pathname &rest args)
+  #-clcon-oduvan (print `(post-oduvan-event ,clcon_text-pathname ,@args))
+  #+clcon-oduvan (print `(post-oduvan-event ,clcon_text-pathname ,@args))
   nil
   )
+  
 
-(defun notify-oduvan-on-tcl-text-insert (clcon_text-pathname index string)
+(defun notify-oduvan-construct-backend-buffer (clcon_text-pathname)
+  "Called from tcl when text is created"
+  (post-oduvan-event 'constuct-backend-buffer clcon_text-pathname)
+  )
+
+(defun nti  (clcon_text-pathname index string)
+  "notify-oduvan-tcl-text-insert . Called from RoInsert"
+  (post-oduvan-event 'tcl-text-insert clcon_text-pathname index string)
+  )
+
+
+(defun notify-oduvan-tcl-text-delete (clcon_text-pathname beg end)
   "Called from RoInsert"
-  (declare (ignorable clcon_text-pathname))
-  #-clcon-oduvan (print `(notify-oduvan-on-tcl-text-insert ,index ,string))
-  #+clcon-oduvan (do-notify-oduvan-on-tcl-text-insert clcon_text-pathname index string)
-  nil)
+  (post-oduvan-event 'tcl-text-delete clcon_text-pathname beg end)
+  )
 
 
-(defun notify-oduvan-on-tcl-text-delete (clcon_text-pathname beg end)
+(defun notify-oduvan-destroy-backend-buffer (clcon_text-pathname)
   "Called from RoInsert"
-  (declare (ignorable clcon_text-pathname))
-  #-clcon-oduvan (print `(notify-oduvan-on-tcl-text-delete ,beg ,end))
-  #+clcon-oduvan (do-notify-oduvan-on-tcl-text-delete clcon_text-pathname beg end)
-  nil)
+  (post-oduvan-event 'destroy-backend-buffer clcon_text-pathname)
+  )
+

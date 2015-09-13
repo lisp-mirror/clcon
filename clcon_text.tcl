@@ -57,7 +57,7 @@ namespace eval ::clcon_text {
             bind $win <<UnfreezeNext>> "$self Unfreeze"
         }
         destructor {
-            DeleteBackendBufferForText $win
+            DestroyBackendBuffer $win
         }
 
         # Maybe disable the text widget's insert and delete methods, to
@@ -132,18 +132,16 @@ namespace eval ::clcon_text {
         ::tkcon::QuoteLispObjToString $x
     }
    
-    # Creates editor buffer in backend
-    proc MakeBackendBufferForText {clcon_text} {
+    proc ConstructBackendBuffer {clcon_text} {
         variable ::tkcon::OPT
-        set qClcon_text [lq $clcon_text]
         if $::tkcon::OPT(oduvan-backend) {
             $clcon_text configure -send_to_lisp 1
-            ::tkcon::EvalInSwankAsync "(clco:make-oduvan-backend-buffer $qClcon_text)" {} 0 {:find-existing}
+            MaybeSendToLisp $clcon_text ConstructBackendBuffer {}
         }
     }
 
-    proc DeleteBackendBufferForText {clcon_text} {
-        puts "DeleteBackendBufferForText not written!"
+    proc DestroyBackendBuffer {clcon_text} {
+        MaybeSendToLisp $clcon_text DestroyBackendBuffer {}
     }
 
     proc MaybeSendToLisp {clcon_text type arglist} {
@@ -159,36 +157,32 @@ namespace eval ::clcon_text {
                 set index [lindex $arglist 0]
                 set qIndex [::text2odu::CoerceIndex $clcon_text $index]
                 set qText [lq [lindex $arglist 1]]
-                set lispCmd "(clco:notify-oduvan-on-tcl-text-insert $qId $qIndex $qText)"
+                set lispCmd "(clco:nti $qId $qIndex $qText)"
             }
             d {
                 set b [lindex $arglist 0]
                 set qB [::text2odu::CoerceIndex $clcon_text $b]
                 set e [lindex $arglist 1]
                 set qE [::text2odu::CoerceIndex $clcon_text $e]
-                set lispCmd "(clco:notify-oduvan-on-tcl-text-delete $qId $qB $qE)"
+                set lispCmd "(clco:notify-oduvan-tcl-text-delete $qId $qB $qE)"
+            }
+            ConstructBackendBuffer {
+                set lispCmd "(clco:notify-oduvan-construct-backend-buffer $qId)"
+            }
+            DestroyBackendBuffer {
+                set lispCmd "(clco:notify-oduvan-destroy-backend-buffer $qId)"
             }
             default {
-                error "Hurray! We found replace command with args $clcon_text $type $arglist!"
+                error "Hurray! We found replace command $type with args $clcon_text $type $arglist!"
             }
         }
+
         $clcon_text IncrPrivatePendingSentModifications 1
         ::tkcon::EvalInSwankAsync $lispCmd [subst -nocommands {
             putd \$EventAsList
-            $clcon_text IncrPrivatePendingSentModifications -1
+            catch {$clcon_text IncrPrivatePendingSentModifications -1}
         }] 0 {:find-existing}
-            # FIXME maybe we need :find-existing? 
-            # {:find-existing}
-            # showVar arglist
-            # set lispArglist [lmap a $arglist {
-            #     ::tkcon::QuoteLispObjToString $a
-            # }]
-            # $clcon_text IncrPrivatePendingSentModifications 1
-            # ::tkcon::EvalInSwankAsync \
-            #     "(clco:notify-oduvan-on-tcl-text-change $type $lispArglist)" \
-            #     [subst -nocommands {
-            #         $clcon_text IncrPrivatePendingSentModifications -1
-            #     }] 0
+        
         puts "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
     }
 

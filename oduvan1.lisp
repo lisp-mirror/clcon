@@ -16,15 +16,3 @@
 
 |#
 
-(defun do-make-oduvan-backend-buffer (clcon_text-pathname)
-  nil
-  )
-
-(defun do-notify-oduvan-on-tcl-text-insert (clcon_text-pathname index string)
-  "Called from RoInsert"
-  nil)
-
-
-(defun do-notify-oduvan-on-tcl-text-delete (clcon_text-pathname beg end)
-  "Called from RoInsert"
-  nil)
