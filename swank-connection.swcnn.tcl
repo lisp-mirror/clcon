@@ -101,5 +101,16 @@ namespace eval ::swcnn {
         }
     }
 
-
+    # (defun ping-pong ()
+    #   (let* ((tag (make-tag))
+    #          (pattern `(:emacs-pong ,tag)))
+    #     (send-to-emacs `(:ping ,(current-thread-id) ,tag))
+    #     (wait-for-event pattern)))
+    proc Pong {EventAsList} {
+        set threadId [::mprs::Unleash [lindex $EventAsList 1]]
+        set tag [::mprs::Unleash [lindex $EventAsList 2]]
+        # tag is a number, no need to quote it
+        set lispCmd "(:emacs-pong $threadId $tag)"
+        ::tkcon::EvalInSwankAsync $lispCmd {} 2 $threadId
+    }
 }

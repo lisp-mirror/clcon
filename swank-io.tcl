@@ -43,10 +43,14 @@ proc ::tkcon::GenContinuationCounter {} {
 ## from swank-protocol::emacs-rex
 proc ::tkcon::CalculateThreadDesignatorForSwank {ItIsListenerEval} {
     variable PRIV
-    if {$ItIsListenerEval == 1} {
-        return ":repl-thread"
-    } else {
+    if {$ItIsListenerEval == 0} {
         return $PRIV(SwankThread)
+    } elseif {$ItIsListenerEval == 1} {
+        return ":repl-thread"
+    } elseif {$ItIsListenerEval == 2} {
+        error "Thread designator must be supplied"
+    } else { 
+        error "Unknown ItIsListenerEval"
     }
 }
 
@@ -54,12 +58,19 @@ proc ::tkcon::FormatSwankRexEvalMessageInner {cmd ThreadDesignator ContinuationC
     # commented out line is for my patched version which passes readtable
     # set msgNoLen "(:emacs-rex-rt $cmd \"COMMON-LISP-USER\" nil $ThreadDesignator $ContinuationCounter)"
     set msgNoLen "(:emacs-rex $cmd \"COMMON-LISP-USER\" $ThreadDesignator $ContinuationCounter)"
+    EncodeAnySwankMessage $msgNoLen
+}
+
+proc ::tkcon::EncodeAnySwankMessage {msgNoLen} {
     set strLenHex [format "%06X" [string length $msgNoLen]]
     set msgAndLen [string cat $strLenHex $msgNoLen]
     return $msgAndLen
 }
 
 proc ::tkcon::FormatSwankRexEvalMessage {cmd ItIsListenerEval {ThreadDesignator {}} {ContinuationCounter {}}} {
+    if {$ItIsListenerEval == 2} {
+        return [EncodeAnySwankMessage $cmd]
+    }
     if { $ThreadDesignator eq {} } {
         set ThreadDesignator [CalculateThreadDesignatorForSwank $ItIsListenerEval]
     }
@@ -157,8 +168,18 @@ proc ::mprs::DeleteSyncEventsFromTheQueue {} {
     }
 }
 
-## ItIsListenerEval must be 1 to wrap form into (swank-repl:listener-eval ...) or 0 otherwise
-# If ContinuationCounter is not passed, it is calculated when needed
+## Args:
+# Form - text of form to execute quoted as needed
+# Continuation - body of proc to accept argument EventAsList
+# ItIsListenerEval
+#   0 - normal eval (IDE orders EMACS to do evaluation)
+#   1 - listener eval (form will be wrapped into (swank-repl:listener-eval ...)
+#   2 - emacs-pong event (passed verbatim, ThreadDesignator and ContinuationCounter unneded)
+#
+#   ThreadDesignator - see swank::thread-for-evaluation
+#   ContinuationCounter - required to identify addressee of swank's reply.
+#        If not passed, it is calculated when needed
+# 
 proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDesignator {}} {ContinuationCounter {}}} {
     variable PRIV
 
@@ -180,7 +201,7 @@ proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDe
 
     ::CurIntPath "EvalInSwankAsync 2"
     
-    if { $ContinuationCounter eq {} } {
+    if { $ContinuationCounter eq {} && $ItIsListenerEval != 2 } {
         set ContinuationCounter [GenContinuationCounter]
     }
    
@@ -218,7 +239,7 @@ proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDe
 ##
 ##  Send an S-expression command to Swank to evaluate. The resulting response must
 ##  be read with read-response.
-## ItIsListenerEval must be 1 if form is (swank-repl:listener-eval ...) or 0 otherwise
+##  ItIsListenerEval must be 1 if form is (swank-repl:listener-eval ...) or 0 otherwise
 proc ::tkcon::SwankEmacsRex {form {ItIsListenerEval 0}} {
     EvalInSwankAsync $form {} $ItIsListenerEval
 }
@@ -329,6 +350,8 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
         ::ldbg::DebugReturn $EventAsList $ContinuationId
     } elseif { $Head eq ":indentation-update" } {
         putd "Impolitely ignore :indentation-update"
+    } elseif { $Head eq ":ping" } {
+        ::swcnn::Pong $EventAsList
     } elseif { [ContinuationExistsP $ContinuationId ] == 1 } {
         # we should have generated event which would evaluate continuation later.
         # but what we will do with sync events then?
@@ -342,7 +365,6 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
     return {}
 } 
 
-
 ## Continuations work for sync or async event
 # Code accepts event in $EventAsList variable which contains event unleashed one time
 proc ::mprs::EnqueueContinuation {ContinuationId code} {
@@ -350,7 +372,6 @@ proc ::mprs::EnqueueContinuation {ContinuationId code} {
     dict set ContinuationsDict $ContinuationId [list {EventAsList} $code]
     putd "ContinuationsDict = $ContinuationsDict"
 }
-
 
 proc ::mprs::ContinuationExistsP {ContinuationId} {
     variable ContinuationsDict
