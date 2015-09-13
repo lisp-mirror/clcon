@@ -138,7 +138,7 @@ namespace eval ::clcon_text {
         set qClcon_text [lq $clcon_text]
         if $::tkcon::OPT(oduvan-backend) {
             $clcon_text configure -send_to_lisp 1
-            ::tkcon::EvalInSwankAsync "(clco:make-oduvan-backend-buffer $qClcon_text)" {} 0
+            ::tkcon::EvalInSwankAsync "(clco:make-oduvan-backend-buffer $qClcon_text)" {} 0 {:find-existing}
         }
     }
 
@@ -176,7 +176,7 @@ namespace eval ::clcon_text {
         ::tkcon::EvalInSwankAsync $lispCmd [subst -nocommands {
             putd \$EventAsList
             $clcon_text IncrPrivatePendingSentModifications -1
-        }] 0 t
+        }] 0 {:find-existing}
             # FIXME maybe we need :find-existing? 
             # {:find-existing}
             # showVar arglist
