@@ -119,8 +119,11 @@ namespace eval ::clcon_text {
         method IncrPrivatePendingSentModifications {delta} {
             set j $options(-private_pending_sent_modifications)
             incr j $delta
-            puts "-private_pending_sent_modifications = $j"
             $self configure -private_pending_sent_modifications $j
+            if {$j>1} {
+                puts "-private_pending_sent_modifications = $j"
+            }
+            return $j
         }
         
         # Enqueue into associated event list
