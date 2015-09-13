@@ -41,16 +41,16 @@ proc ::tkcon::GenContinuationCounter {} {
 }
 
 ## from swank-protocol::emacs-rex
-proc ::tkcon::CalculateThreadDesignatorForSwank {ItIsListenerEval} {
+proc ::tkcon::CalculateThreadDesignatorForSwank {MsgFmtKind} {
     variable PRIV
-    if {$ItIsListenerEval == 0} {
+    if {$MsgFmtKind == 0} {
         return $PRIV(SwankThread)
-    } elseif {$ItIsListenerEval == 1} {
+    } elseif {$MsgFmtKind == 1} {
         return ":repl-thread"
-    } elseif {$ItIsListenerEval == 2} {
+    } elseif {$MsgFmtKind == 2} {
         error "Thread designator must be supplied"
     } else { 
-        error "Unknown ItIsListenerEval"
+        error "Unknown MsgFmtKind"
     }
 }
 
@@ -67,12 +67,12 @@ proc ::tkcon::EncodeAnySwankMessage {msgNoLen} {
     return $msgAndLen
 }
 
-proc ::tkcon::FormatSwankRexEvalMessage {cmd ItIsListenerEval {ThreadDesignator {}} {ContinuationCounter {}}} {
-    if {$ItIsListenerEval == 2} {
+proc ::tkcon::FormatSwankRexEvalMessage {cmd MsgFmtKind {ThreadDesignator {}} {ContinuationCounter {}}} {
+    if {$MsgFmtKind == 2} {
         return [EncodeAnySwankMessage $cmd]
     }
     if { $ThreadDesignator eq {} } {
-        set ThreadDesignator [CalculateThreadDesignatorForSwank $ItIsListenerEval]
+        set ThreadDesignator [CalculateThreadDesignatorForSwank $MsgFmtKind]
     }
     if { $ContinuationCounter eq {} } {
         set ContinuationCounter [GenContinuationCounter]
@@ -81,8 +81,8 @@ proc ::tkcon::FormatSwankRexEvalMessage {cmd ItIsListenerEval {ThreadDesignator 
     return [FormatSwankRexEvalMessageInner $cmd $ThreadDesignator $ContinuationCounter]
 }
 
-proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form ItIsListenerEval} {
-    if {$ItIsListenerEval == 1} {
+proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form MsgFmtKind} {
+    if {$MsgFmtKind == 1} {
         set cmd [regsub -all {([\"\\])} $form {\\\0}]
         return "(swank-repl:listener-eval \"$cmd\")"
     } else {
@@ -171,7 +171,7 @@ proc ::mprs::DeleteSyncEventsFromTheQueue {} {
 ## Args:
 # Form - text of form to execute quoted as needed
 # Continuation - body of proc to accept argument EventAsList
-# ItIsListenerEval
+# MsgFmtKind
 #   0 - normal eval (IDE orders EMACS to do evaluation)
 #   1 - listener eval (form will be wrapped into (swank-repl:listener-eval ...)
 #   2 - emacs-pong event (passed verbatim, ThreadDesignator and ContinuationCounter unneded)
@@ -180,7 +180,7 @@ proc ::mprs::DeleteSyncEventsFromTheQueue {} {
 #   ContinuationCounter - required to identify addressee of swank's reply.
 #        If not passed, it is calculated when needed
 # 
-proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDesignator {}} {ContinuationCounter {}}} {
+proc ::tkcon::EvalInSwankAsync {form continuation {MsgFmtKind 1} {ThreadDesignator {}} {ContinuationCounter {}}} {
     variable PRIV
 
     set ConnectionName $::swcnn::CurrentSwankConnection
@@ -201,7 +201,7 @@ proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDe
 
     ::CurIntPath "EvalInSwankAsync 2"
     
-    if { $ContinuationCounter eq {} && $ItIsListenerEval != 2 } {
+    if { $ContinuationCounter eq {} && $MsgFmtKind != 2 } {
         set ContinuationCounter [GenContinuationCounter]
     }
    
@@ -209,11 +209,11 @@ proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDe
     
     putd "regsub result: $cmd"
 
-    set cmd [SwankMaybeWrapFormIntoListenerEval $cmd $ItIsListenerEval]
+    set cmd [SwankMaybeWrapFormIntoListenerEval $cmd $MsgFmtKind]
 
     putd "wrapped to listener eval: $cmd"
     
-    set cmd [FormatSwankRexEvalMessage $cmd $ItIsListenerEval $ThreadDesignator $ContinuationCounter]
+    set cmd [FormatSwankRexEvalMessage $cmd $MsgFmtKind $ThreadDesignator $ContinuationCounter]
 
     ::mprs::EnqueueContinuation $ContinuationCounter $continuation 
 
@@ -239,9 +239,9 @@ proc ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDe
 ##
 ##  Send an S-expression command to Swank to evaluate. The resulting response must
 ##  be read with read-response.
-##  ItIsListenerEval must be 1 if form is (swank-repl:listener-eval ...) or 0 otherwise
-proc ::tkcon::SwankEmacsRex {form {ItIsListenerEval 0}} {
-    EvalInSwankAsync $form {} $ItIsListenerEval
+##  MsgFmtKind must be 1 if form is (swank-repl:listener-eval ...) or 0 otherwise
+proc ::tkcon::SwankEmacsRex {form {MsgFmtKind 0}} {
+    EvalInSwankAsync $form {} $MsgFmtKind
 }
 
 ## swank-protocol::request-swank-require

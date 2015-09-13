@@ -4,7 +4,7 @@
 
 # Command evaluation with tcl escape handling and history substitution
 # Main checkpoints are:
-# ::tkcon::EvalInSwankAsync {form continuation {ItIsListenerEval 1} {ThreadDesignator {}} {ContinuationCounter {}}  - normal evaluation
+# ::tkcon::EvalInSwankAsync {form continuation {MsgFmtKind 1} {ThreadDesignator {}} {ContinuationCounter {}}  - normal evaluation
 # where w and cmd are local variables, $EventAsList is a parameter of Continuation.
 # continuation maybe of form
 #"::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $cmd]"
