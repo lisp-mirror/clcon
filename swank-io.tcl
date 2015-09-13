@@ -368,6 +368,9 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
 ## Continuations work for sync or async event
 # Code accepts event in $EventAsList variable which contains event unleashed one time
 proc ::mprs::EnqueueContinuation {ContinuationId code} {
+    if {$code eq {}} {
+        return
+    }
     variable ContinuationsDict
     dict set ContinuationsDict $ContinuationId [list {EventAsList} $code]
     putd "ContinuationsDict = $ContinuationsDict"
