@@ -1,6 +1,8 @@
 ; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*- 
 (in-package :clco)
 
+(defvar *general-mutex* (bt:make-lock "clcon-server::*general-mutex*")) 
+
 (defun standard-readtable ()
   (with-standard-io-syntax *readtable*))
 
@@ -31,3 +33,7 @@ defined by swank::defslimefun this way"
     ; FIXME - save docstring somehow. 
     `(defun ,swank-fun ,args ,@real-body)))
                              
+(defmacro --> (object slot)
+  "bubububu"
+  `(slot-value ,object ',slot))
+

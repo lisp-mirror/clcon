@@ -207,3 +207,5 @@ cat out.log | grep ctext
 
 
 
+-----------
+grep *fast*

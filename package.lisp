@@ -14,6 +14,8 @@
            #:nti ; notify-oduvan-tcl-text-insert
            #:notify-oduvan-tcl-text-delete
            #:notify-oduvan-destroy-backend-buffer
+
+           #:start-oduvanchik ; start oduvanchik in another thread
            )
   )
 

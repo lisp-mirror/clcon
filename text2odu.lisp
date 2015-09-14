@@ -1,21 +1,45 @@
 ; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
 ; see also text2odu.tcl
 ; this code runs in arbitrary SWANK worker thread 
+; it must not depend on oduvanchik source
 
 (in-package :clco)
 
-
-(defvar *text2odu-event-queue-lock*
-  (bt:make-lock "*text2odu-event-queue-lock*")
-  "Lock to operate with *text2odu-event-queue*")
+(defvar *text2odu-disptatcher-start-shutdown-lock*
+  (bt:make-lock "clcon-server::*text2odu-disptatcher-start-shutdown-lock*"))
 
 (defvar *text2odu-event-queue*
   (list)
   "Event queue for messages from clcon to oduvan")
 
+(defvar *text2odu-condition-variable*
+  (bt:make-condition-variable :name "clcon-server::*text2odu-condition-variable*"
+                              ))
+
+(defvar *text2odu-event-queue-lock*
+  (bt:make-lock "*text2odu-event-queue-lock*")
+  "Lock to operate with *text2odu-event-queue*")
+
+
+(defvar *text2odu-dispatcher-thread* nil)
+
+
+(defun reset-text2odu-event-queue ()
+  (bt:with-lock-held (*text2odu-event-queue-lock*)
+    (setf *text2odu-event-queue* (list))
+    (bt:condition-notify *text2odu-condition-variable*)
+    )
+  nil
+  )
 
 (deftype text2odu-event-kind ()
-  '(member construct-backend-buffer before-tcl-text-insert before-tcl-text-delete destroy-backend-buffer))
+  '(member
+    construct-backend-buffer
+    before-tcl-text-insert
+    before-tcl-text-delete
+    destroy-backend-buffer
+    shutdown-text2odu-dispatcher ; called at the exit
+    ))
 
 (defstruct row-col
   (row 0 :type integer)
@@ -24,17 +48,12 @@
 
 (defstruct text2odu-event
   (kind (budden-tools:mandatory-slot 'kind) :type text2odu-event-kind)
-  (clcon_text-pathname (budden-tools:mandatory-slot 'clcon_text-pathname) :type string)
+  (clcon_text-pathname nil :type (or null string)) 
   (string nil :type (or null string)) ; string to insert
   (beg nil :type (or null row-col)) ; begin index
   (end nil :type (or null row-col))   ; end index
   )
         
-(defmacro --> (object slot)
-  "bubububu"
-  `(slot-value ,object ',slot))
-
-
 (defun parse-row-col (tcl-index)
   "Returns row-col structure by tcl-index of kind NN.NN"
   (let ((parsed (split-sequence:split-sequence #\. tcl-index)))
@@ -54,6 +73,7 @@
     (setf *text2odu-event-queue*
           (append *text2odu-event-queue*
                   (list (budden-tools:the* text2odu-event event))))
+    (bt:condition-notify *text2odu-condition-variable*)
     )
   nil
   )
@@ -97,12 +117,20 @@
     )))
 
 
-(defun test1 ()
-  (notify-oduvan-construct-backend-buffer "a")
-  (sleep 0.1)
-  (nti "a" "0.0" "(defun ugu () 'ugu)")
-  (sleep 0.1)
-  (notify-oduvan-destroy-backend-buffer "a")
-  )
+(defun shutdown-text2odu-dispatcher ()
+  "Shuts down dispatcher and waits for its termination. 
+   See also start-text2odu-dispatcher"
+  (print "Shutting down text2odu-dispatcher-thread...")
+  (bt:with-lock-held (*text2odu-disptatcher-start-shutdown-lock*)
+    (unwind-protect
+         (when (and (bt:threadp *text2odu-dispatcher-thread*)
+                    (bt:thread-alive-p *text2odu-dispatcher-thread*))
+           (post-oduvan-event
+            (make-text2odu-event
+             :kind 'shutdown-text2odu-dispatcher
+             ))
+           (bt:join-thread *text2odu-dispatcher-thread*))
+      (setf *text2odu-dispatcher-thread* nil)
+      nil
+      )))
 
-(test1)
