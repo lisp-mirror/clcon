@@ -38,24 +38,48 @@ Features demonstrated are:
 ## Installation and startup 
 You need:
 
-- fresh versions of [SBCL](http://www.sbcl.org/platform-table.html) 
-- fresh version of tcl/tk. On Windows, you can download tcl/tk from [Activestate](http://www.activestate.com/activetcl/downloads). On Debian, use your package manager to download tk8.6 . 
-- [quicklisp](https://www.quicklisp.org/beta/) set up at your SBCL
+### Dependencies, part 1
 
-Next, start your SBCL and install dependencies. 
+- fresh versions of [SBCL](http://www.sbcl.org/platform-table.html) 
+- fresh version of tcl/tk. On Windows, you can download tcl/tk from [Activestate](http://www.activestate.com/activetcl/downloads). On Debian, use your package manager to download tk8.6 .
+- [quicklisp](https://www.quicklisp.org/beta/) set up at your SBCL
+- fresh version of [budden-tools](https://bitbucket.org/budden/budden-tools). Put it under local-projects directory of quicklisp, e.g. (for Linux)
+```
+cd ~/quicklisp/local-projects
+hg clone https://bitbucket.org/budden/budden-tools
+```  
+- good version of clcon itself, put it where convenient. No "installation" procedure exists yet. 
+
+### Choose if you want to try oduvanchik's backend
+Oduvanchik's backend is
+i) not written yet
+ii) linux-only
+But if you want to give it a try, you should do Dependencies, part 2. 
+
+### Dependencies, part 2
+(Only if you choose to try oduvanchik's backend)
+- put fresh version of [oduvanchik](https://bitbucket.org/budden/oduvanchik) under local-projects directory of quicklisp. E.g. (Linux)
+  ```
+  cd ~/quicklisp/local-projects
+  hg clone https://bitbucket.org/budden/oduvanchik
+  ```
+
+### Start your SBCL and install dependencies. 
 
 ```
 #!lisp
 (ql:quickload :swank) ; don't need it if you have SLIME already
-(ql:quickload :cl-tk) 
+(ql:quickload :cl-tk)
 ```
 
 To load server-side code to lisp, use
 ```
 #!lisp
-(push "path/to/clcon-server-source/" asdf:*central-registry*)
+; uncomment next line if you chose to use oduvanchik backend
+; (pushnew :clcon-oduvan *features*)
+(pushnew #P"path/to/clcon-server-source/" asdf:*central-registry* :test 'equalp)
 ;in windows you can write like this:
-;(push "C:/xxx/xxx/clcon/" asdf:*central-registry*)
+;(pushnew #P"C:/xxx/xxx/clcon/" asdf:*central-registry* :test 'equalp)
 (asdf:load-system :clcon-server)
 (swank:create-server :port 4009 :dont-close t)
 ```
