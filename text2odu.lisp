@@ -100,7 +100,7 @@
 (defun test1 ()
   (notify-oduvan-construct-backend-buffer "a")
   (sleep 0.1)
-  (nti "a" "0.0" "b")
+  (nti "a" "0.0" "(defun ugu () 'ugu)")
   (sleep 0.1)
   (notify-oduvan-destroy-backend-buffer "a")
   )
