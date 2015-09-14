@@ -6,7 +6,7 @@
   :licence "MIT"
   :description "clcon - Common Lisp IDE"
   :long-description "Tk - based set of development tools comprising CL IDE for Linux and Windows"
-  :depends-on (:cl-tk :swank #+clcon-oduvan :oduvanchik.clx)
+  :depends-on (:cl-tk :swank #+clcon-oduvan :oduvanchik.clx :bordeaux-threads :budden-tools)
   :serial t
   :components ((:file "package")
                (:file "utils")
