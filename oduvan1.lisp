@@ -16,3 +16,7 @@
 
 |#
 
+(defun start-oduvanchik ()
+  (bt:make-thread #'oduvanchik:oduvanchik :name "Oduvanchik")
+  (warn "We must wait for startup before returning")
+  )
