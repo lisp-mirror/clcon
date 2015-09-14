@@ -68,6 +68,8 @@ But if you want to give it a try, you should do Dependencies, part 2.
 
 ```
 #!lisp
+(ql:quickload :alexandria)
+(ql:quickload :split-sequence)
 (ql:quickload :swank) ; don't need it if you have SLIME already
 (ql:quickload :cl-tk)
 ```
