@@ -35,6 +35,11 @@ package require Tk
 package require snit
 
 namespace eval ::clcon_text {
+    variable GlobalPendingText2OduEventCounter
+    if {![info exists GlobalPendingText2OduEventCounter]} {
+        set GlobalPendingText2OduEventCounter 0
+    }
+    
     ::snit::widgetadaptor clcon_text {
         option -readonly -default 0
         # Send all editions to lisp
@@ -115,17 +120,7 @@ namespace eval ::clcon_text {
             }
         }
 
-        # Note that we have sent notification, or if notification was processed on lisp side
-        method IncrPrivatePendingSentModifications {delta} {
-            set j $options(-private_pending_sent_modifications)
-            incr j $delta
-            $self configure -private_pending_sent_modifications $j
-            if {$j>1} {
-                puts "-private_pending_sent_modifications = $j"
-            }
-            return $j
-        }
-        
+       
         # Enqueue into associated event list
         delegate method * to hull
         delegate option * to hull
@@ -144,10 +139,43 @@ namespace eval ::clcon_text {
     }
 
     proc DestroyBackendBuffer {clcon_text} {
-        MaybeSendToLisp $clcon_text DestroyBackendBuffer {}
+        MaybeSendToLisp $clcon_text DestroyBackendBuffer {} 1
     }
 
-    proc MaybeSendToLisp {clcon_text type arglist} {
+        # Note that we have sent notification, or if notification
+        # was processed on lisp side. Control number of pending events.
+        # Args
+        # increment - change of value
+        # clcon_text - pathName of clcon_text widget
+        # UseGlobalCounter - if 1, use global. If 0 - local. 
+        proc IncrPendingSentNotifications {increment clcon_text UseGlobalCounter} {
+            if {$UseGlobalCounter} {
+                variable GlobalPendingText2OduEventCounter 
+                incr GlobalPendingText2OduEventCounter $increment
+                if {$GlobalPendingText2OduEventCounter>1} {
+                    # If we show this, something seem to be wrong
+                    shovVar GlobalPendingText2OduEventCounter
+                    puts stderr "GlobalPendingText2OduEventCounter should be 0 or 1"
+                }
+                return $GlobalPendingText2OduEventCounter
+            } else {
+                set j [$clcon_text cget -private_pending_sent_modifications]
+                incr j $increment
+                $clcon_text configure -private_pending_sent_modifications $j
+                if {$j>1} {
+                    puts "-private_pending_sent_modifications = $j"
+                }
+                return $j
+            }
+        }
+    
+    # Args
+    # clcon_text - pathname of clcon_text widget
+    # type - type of event, "i", "d", "ConstructBackendBuffer", "DestroyBackendBuffer"
+    # arglist - list of arguments of event (see code)
+    # UseGlobalPendingText2OduEventCounter - if 1, this is not buffer-specific event
+    # (destroy event in fact)
+    proc MaybeSendToLisp {clcon_text type arglist {UseGlobalPendingText2OduEventCounter 0}} {
         variable ::tkcon::OPT
         if {![$clcon_text cget -send_to_lisp]
             ||
@@ -180,10 +208,11 @@ namespace eval ::clcon_text {
             }
         }
 
-        $clcon_text IncrPrivatePendingSentModifications 1
+        IncrPendingSentNotifications 1 $clcon_text $UseGlobalPendingText2OduEventCounter
         ::tkcon::EvalInSwankAsync $lispCmd [subst -nocommands {
             putd \$EventAsList
-            catch {$clcon_text IncrPrivatePendingSentModifications -1}
+            ::clcon_text::IncrPendingSentNotifications \
+                -1 $clcon_text $UseGlobalPendingText2OduEventCounter
         }] 0 {:find-existing}
         #puts "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
     }
