@@ -14,3 +14,10 @@
           (*read-default-float-format* 'double-float))
       (prin1-to-string (switch-to-double-floats object)))))
 
+
+(defun swank/rpc-original-read-form (string package)
+  (with-standard-io-syntax
+    (let ((*package* package))
+      (if *validate-input*
+          (validating-read string)
+          (read-from-string string)))))
