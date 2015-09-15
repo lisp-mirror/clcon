@@ -23,6 +23,6 @@
 (defpackage :clco-oduvanchik-key-bindings
   (:use :cl :oduvanchik :oduvanchik-internals)
   (:export #:set-clco-oduvanchik-key-bindings
-           #:*f8-key-event*
+           #:*text2odu-key-event-f8*
            #:*f17-key-event
            #:*f18-key-event*))

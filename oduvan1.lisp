@@ -31,24 +31,24 @@
     (pop *text2odu-event-queue*)))
 
 
-(defun podsunutq-event (text2odu-event)
+(defun podsunutq-event (key-event text2odu-event)
   "Puts fake event onto oduvan event queue as if it came from keyboard. Clone of oduvanchik-internals::q-event . Note we do not set hunk"
   (bt:with-lock-held (oduvanchik-internals::*q-event-lock*) ; budden
     (oduvanchik-ext:without-interrupts
       (let* (
              ; stolen from oduvanchik-internals::window-input-handler
              (stream oduvanchik-internals::*editor-input*)
-             (new (make-fake-keyboard-event text2odu-event))
+             (new (make-fake-keyboard-event key-event text2odu-event))
              (tail (oduvanchik-internals::editor-input-tail stream)))
         (setf (oduvanchik-internals::input-event-next tail) new)
         (setf (oduvanchik-internals::editor-input-tail stream) new)))))
 
 ; (defun new-event (key-event x y hunk next &optional unread-p)
-(defun make-fake-keyboard-event (text2odu-event)
+(defun make-fake-keyboard-event (key-event text2odu-event)
   "Just trying to put some event as if it was from the keyboard"
   (oduvanchik-internals::new-event
    ; (oduvanchik-ext:char-key-event #\!)  ; stolen from hi::translate-tty-event
-   clco-oduvanchik-key-bindings:*f8-key-event*
+   key-event 
    11
    3
    nil ; hunk was smth like #<oduvanchik.x11::x11-hunk nil+374, "Main" {DDC03F1}>
@@ -66,7 +66,9 @@
             (return-from text2odu-dispatcher-thread-function nil))
            (t
             (format t "Sending real event ~S to oduvanchik keyboard buffer!" e)
-            (podsunutq-event e)))))))
+            (podsunutq-event
+             clco-oduvanchik-key-bindings:*text2odu-key-event-f8*
+             e)))))))
 
 
 (defun start-text2odu-dispatcher ()
@@ -80,12 +82,22 @@
                           )))
   )
 
+(defun shutdown-text2odu-dispatcher-on-oduvanchik-exit-hook ()
+  (shutdown-text2odu-dispatcher))
+
 (defun start-oduvanchik ()
+  (declare (special oduvanchik::exit-hook))
   (reset-text2odu-event-queue)
   (start-text2odu-dispatcher)
+  (oduvanchik-internals::remove-all-hooks oduvanchik::exit-hook)
+  (oduvanchik::add-hook oduvanchik::exit-hook
+                        'shutdown-text2odu-dispatcher-on-oduvanchik-exit-hook)
   (bt:make-thread #'oduvanchik:oduvanchik :name "Oduvanchik")
   (warn "We must wait for startup before returning")
   )
+
+(defun shutdown-oduvanchik-via-keyboard-buffer ()
+  (podsunutq-event clco-oduvanchik-key-bindings::*f17-key-event* nil))
 
 ; need separate file for this
 (defun test1 ()
@@ -97,9 +109,11 @@
     (nti "a" "0.0" "(defun ugu () 'ugu)")
     (sleep 0.1)
     (notify-oduvan-destroy-backend-buffer "a")
-    (shutdown-text2odu-dispatcher)
-    )
+    (shutdown-oduvanchik-via-keyboard-buffer)
     nil
+    )
+  (warn "you need to move mouse over oduvanchik's window to close editor.")
+  nil
   )
 
 ;(test1)
