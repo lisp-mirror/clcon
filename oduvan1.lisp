@@ -66,7 +66,7 @@
             (setf *text2odu-dispatcher-thread* nil)
             (return-from text2odu-dispatcher-thread-function nil))
            (t
-            (format t "~%Sending real event ~S to oduvanchik keyboard buffer!" e)
+            ;(format t "~%Sending real event ~S to oduvanchik keyboard buffer!" e)
             (clco-oduvanchik-key-bindings::text2odu-dispatcher-to-editor-queue-put e)
             (podsunutq-event
              clco-oduvanchik-key-bindings:*text2odu-key-event-f8*
@@ -103,7 +103,7 @@
 
 ; need separate file for this
 (defun test1 ()
-  (with-output-to-string (*standard-output*)
+  (with-output-to-string (ddd #|*standard-output*|#)
     (start-oduvanchik)
     (sleep 0.5)
     (notify-oduvan-construct-backend-buffer "a")

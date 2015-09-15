@@ -69,7 +69,7 @@
   #-clcon-oduvan (print `(post-oduvan-event ,event))
   #+clcon-oduvan
   (bt:with-lock-held (*text2odu-event-queue-lock*)
-    (print `(post-oduvan-event ,event))
+    ;(print `(post-oduvan-event ,event))
     (setf *text2odu-event-queue*
           (append *text2odu-event-queue*
                   (list (budden-tools:the* text2odu-event event))))
