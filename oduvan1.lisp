@@ -31,27 +31,30 @@
     (pop *text2odu-event-queue*)))
 
 
-(defun podsunutq-event ()
+(defun podsunutq-event (text2odu-event)
   "Puts fake event onto oduvan event queue as if it came from keyboard. Clone of oduvanchik-internals::q-event . Note we do not set hunk"
   (bt:with-lock-held (oduvanchik-internals::*q-event-lock*) ; budden
     (oduvanchik-ext:without-interrupts
       (let* (
              ; stolen from oduvanchik-internals::window-input-handler
              (stream oduvanchik-internals::*editor-input*)
-             (new (make-fake-keyboard-event))
+             (new (make-fake-keyboard-event text2odu-event))
              (tail (oduvanchik-internals::editor-input-tail stream)))
         (setf (oduvanchik-internals::input-event-next tail) new)
         (setf (oduvanchik-internals::editor-input-tail stream) new)))))
 
 ; (defun new-event (key-event x y hunk next &optional unread-p)
-(defun make-fake-keyboard-event ()
+(defun make-fake-keyboard-event (text2odu-event)
   "Just trying to put some event as if it was from the keyboard"
   (oduvanchik-internals::new-event
-   (oduvanchik-ext:char-key-event clco-oduvanchik-key-bindings:*f8-key-event*) ; stolen from hi::translate-tty-event
+   ; (oduvanchik-ext:char-key-event #\!)  ; stolen from hi::translate-tty-event
+   clco-oduvanchik-key-bindings:*f8-key-event*
    11
    3
    nil ; hunk was smth like #<oduvanchik.x11::x11-hunk nil+374, "Main" {DDC03F1}>
    nil
+   nil
+   text2odu-event
    ))
 
 (defun text2odu-dispatcher-thread-function ()
@@ -62,8 +65,8 @@
            ((eq (--> e kind) 'shutdown-text2odu-dispatcher)
             (return-from text2odu-dispatcher-thread-function nil))
            (t
-            (warn "We lose information on real event ~S here!" e)
-            (podsunutq-event)))))))
+            (format t "Sending real event ~S to oduvanchik keyboard buffer!" e)
+            (podsunutq-event e)))))))
 
 
 (defun start-text2odu-dispatcher ()
