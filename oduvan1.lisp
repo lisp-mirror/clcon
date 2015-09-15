@@ -47,7 +47,7 @@
 (defun make-fake-keyboard-event ()
   "Just trying to put some event as if it was from the keyboard"
   (oduvanchik-internals::new-event
-   (oduvanchik-ext:char-key-event #\!) ; stolen from hi::translate-tty-event
+   (oduvanchik-ext:char-key-event clco-oduvanchik-key-bindings:*f8-key-event*) ; stolen from hi::translate-tty-event
    11
    3
    nil ; hunk was smth like #<oduvanchik.x11::x11-hunk nil+374, "Main" {DDC03F1}>
@@ -84,8 +84,7 @@
   (warn "We must wait for startup before returning")
   )
 
-
-
+; need separate file for this
 (defun test1 ()
   (with-output-to-string (*standard-output*)
     (start-oduvanchik)

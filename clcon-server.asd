@@ -20,4 +20,6 @@
                (:file "text2odu" :description "outer inteface between clcon_text widget and oduvanchik"
                       )
                #+clcon-oduvan (:file "oduvan1" :description "implementation of interface declared in text2odu")
-               ))
+               #+clcon-oduvan (:file "oduvanchik-key-bindings" :description "fake key bindings to enable event sending from clcon"
+                                     ))
+  )
