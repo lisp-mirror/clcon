@@ -154,7 +154,7 @@ namespace eval ::clcon_text {
                 incr GlobalPendingText2OduEventCounter $increment
                 if {$GlobalPendingText2OduEventCounter>1} {
                     # If we show this, something seem to be wrong
-                    shovVar GlobalPendingText2OduEventCounter
+                    showVar GlobalPendingText2OduEventCounter
                     puts stderr "GlobalPendingText2OduEventCounter should be 0 or 1"
                 }
                 return $GlobalPendingText2OduEventCounter
