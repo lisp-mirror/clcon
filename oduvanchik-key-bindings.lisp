@@ -27,7 +27,7 @@
 (defun set-clco-oduvanchik-key-bindings ()
   ; (oduvanchik::bind-key "Beginning of line" #k"F8")
   (oduvanchik::bind-key "Exit Oduvanchik" *f17-key-event*)
-  (oduvanchik::bind-key "evaltext2oduevent" *f8-key-event*)
+  (oduvanchik::bind-key "evaltext2oduevent" #k"F8")
   )
 
 (set-clco-oduvanchik-key-bindings)
