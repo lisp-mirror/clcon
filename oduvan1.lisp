@@ -94,7 +94,9 @@
   (oduvanchik::add-hook oduvanchik::exit-hook
                         'shutdown-text2odu-dispatcher-on-oduvanchik-exit-hook)
   (bt:make-thread #'oduvanchik:oduvanchik :name "Oduvanchik")
+  (clco-oduvanchik-key-bindings::set-clco-oduvanchik-key-bindings)
   (start-text2odu-dispatcher)
+  
   (warn "We must wait for startup before returning")
   )
 

@@ -14,8 +14,10 @@
 (defmethod delete-characters-between-marks (beg end)
   "Code stolen from delete-characters"
   (cond
-    ((mark>= beg end)
+    ((mark> beg end)
      (error "mark>= beg end")
+     )
+    ((mark= beg end)
      t)
     (t
      (setf (region-start oduvanchik-internals::*internal-temp-region*) beg
@@ -59,16 +61,20 @@
         )))))
      
 
-
-(oduvanchik::defcommand "evaltext2oduevent" (p)
-    "Get and eval single clcon event"
-    "Get and eval single clcon event"
+(defun eval-pending-text2odu-events ()
   (loop 
      (let ((e (clco-oduvanchik-key-bindings::text2odu-dispatcher-to-editor-queue-pop)))
        (cond
          (e (eval-text2odu-event e))
          (t (return))
          ))))
+
+
+(oduvanchik::defcommand "evaltext2oduevent" (p)
+    "Get and eval single clcon event"
+    "Get and eval single clcon event"
+  (eval-pending-text2odu-events)
+  )
 
 
 
