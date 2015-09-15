@@ -63,9 +63,11 @@
        (when e
          (cond
            ((eq (--> e kind) 'shutdown-text2odu-dispatcher)
+            (setf *text2odu-dispatcher-thread* nil)
             (return-from text2odu-dispatcher-thread-function nil))
            (t
-            (format t "Sending real event ~S to oduvanchik keyboard buffer!" e)
+            (format t "~%Sending real event ~S to oduvanchik keyboard buffer!" e)
+            (clco-oduvanchik-key-bindings::text2odu-dispatcher-to-editor-queue-put e)
             (podsunutq-event
              clco-oduvanchik-key-bindings:*text2odu-key-event-f8*
              e)))))))
@@ -88,11 +90,11 @@
 (defun start-oduvanchik ()
   (declare (special oduvanchik::exit-hook))
   (reset-text2odu-event-queue)
-  (start-text2odu-dispatcher)
   (oduvanchik-internals::remove-all-hooks oduvanchik::exit-hook)
   (oduvanchik::add-hook oduvanchik::exit-hook
                         'shutdown-text2odu-dispatcher-on-oduvanchik-exit-hook)
   (bt:make-thread #'oduvanchik:oduvanchik :name "Oduvanchik")
+  (start-text2odu-dispatcher)
   (warn "We must wait for startup before returning")
   )
 
@@ -110,9 +112,12 @@
     (sleep 0.1)
     (notify-oduvan-destroy-backend-buffer "a")
     (shutdown-oduvanchik-via-keyboard-buffer)
-    nil
     )
-  (warn "you need to move mouse over oduvanchik's window to close editor.")
+  (print "You need to move mouse over oduvanchik's window to close editor. Waiting...")
+  (loop
+     (unless *text2odu-dispatcher-thread* (return))
+     (sleep 0.5)
+     (format t "."))
   nil
   )
 

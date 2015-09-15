@@ -26,3 +26,7 @@
            #:*text2odu-key-event-f8*
            #:*f17-key-event
            #:*f18-key-event*))
+
+
+;(defpackage :eval-text2odu-event
+;  (:use :cl :clcon-server :oduvanchik :oduvanchik-internals))
