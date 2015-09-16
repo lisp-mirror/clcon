@@ -88,7 +88,7 @@
 (defun shutdown-text2odu-dispatcher-on-oduvanchik-exit-hook ()
   (shutdown-text2odu-dispatcher))
 
-(defun start-oduvanchik (&key (direct-tcl t))
+(defun start-oduvanchik (&key (direct-tcl nil))
   (declare (special oduvanchik::exit-hook))
   (reset-text2odu-event-queue)
   (oduvanchik-internals::remove-all-hooks oduvanchik::exit-hook)
