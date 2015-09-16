@@ -52,8 +52,11 @@ hg clone https://bitbucket.org/budden/budden-tools
 
 ### Choose if you want to try oduvanchik's backend
 Oduvanchik's backend is
+
 i) not written yet
+
 ii) linux-only
+
 But if you want to give it a try, you should do Dependencies, part 2. 
 
 ### Dependencies, part 2
@@ -131,4 +134,4 @@ cl-user package is assumed for all interaction. If you change package, consequen
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-Is in tracker. Current activity is to adapt [oduvanchik](https://bitbucket.org/budden/oduvanchik) (Russian for dandelion, formerly known as  hemlock, but transformated spiritually) to be an editor's backend. We hope to keep oduvanchik's editor buffer in sync with clcon's editor text widget so that we could run lisp mode commands on it and do syntax highlighting on text widget without implementing this functionality. Ability to run on Windows can be temporarily lost in course of this activity as oduvanchik is Xlib-dependent (now). 
+Is in tracker. Current activity is to adapt [oduvanchik](https://bitbucket.org/budden/oduvanchik) (Russian for dandelion, formerly known as  hemlock, but transformated spiritually) to be an editor's backend. We hope to keep oduvanchik's editor buffer in sync with clcon's editor text widget so that we could run lisp mode commands on it and do syntax highlighting on text widget without implementing this functionality. Ability to run on Windows can be temporarily lost in course of this activity as oduvanchik is Xlib-dependent (now).
