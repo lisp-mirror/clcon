@@ -78,7 +78,7 @@
   )
         
 (defun parse-row-col (tcl-index)
-  "Returns row-col structure by tcl-index of kind NN.NN"
+  "Returns row-col structure by tcl-index of kind NN.NN."
   (let ((parsed (split-sequence:split-sequence #\. tcl-index)))
     (assert (eq (length parsed) 2))
     (make-row-col :row (parse-integer (first parsed))
@@ -127,7 +127,7 @@
     :kind 'before-tcl-text-delete
     :clcon_text-pathname clcon_text-pathname
     :beg (parse-row-col beg)
-    :end (parse-row-col end)
+    :end (if (equal end "") nil (parse-row-col end))
     )))
 
 

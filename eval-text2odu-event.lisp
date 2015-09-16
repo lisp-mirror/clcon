@@ -8,7 +8,7 @@
                                         ;(line-next
   (alexandria:once-only (row-col)
     `(with-mark ((,name (buffer-start-mark (current-buffer)) :right-inserting))
-       (line-offset ,name (clco::row-col-row ,row-col) (clco::row-col-col ,row-col))
+       (line-offset ,name (- (clco::row-col-row ,row-col) 1) (clco::row-col-col ,row-col))
        ,@body)))
 
 (defmethod delete-characters-between-marks (beg end)
@@ -31,6 +31,21 @@
      (with-mark-in-row-col (beg (clcon-server::text2odu-event-beg e))
        (insert-string beg (clcon-server::text2odu-event-string e))))))
 
+(defun eval-before-tcl-text-delete (e)
+  (etypecase e
+    (clcon-server::text2odu-event
+     (let ((ebeg (clcon-server::text2odu-event-beg e))
+           (eend (clcon-server::text2odu-event-end e)))
+       (with-mark-in-row-col (beg ebeg)
+         (cond
+           (eend
+            (with-mark-in-row-col (end eend)
+              (delete-characters-between-marks beg end)))
+           (t
+            (delete-characters beg 1)
+            ))))))
+  t)
+
 (defun eval-construct-backend-buffer (e)
   (declare (ignore e))
   (delete-characters-between-marks
@@ -51,7 +66,8 @@
        (clco::before-tcl-text-insert
         (eval-before-tcl-text-insert e))
        (clco::before-tcl-text-delete
-        (warn "ignoring before-tcl-text-delete event")
+        (eval-before-tcl-text-delete e)
+        ; (warn "ignoring before-tcl-text-delete event")
         )
        (clco::destroy-backend-buffer
         (warn "ignoring destroy-backend-buffer event")
