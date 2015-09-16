@@ -89,11 +89,13 @@ To load server-side code to lisp, use
 (swank:create-server :port 4009 :dont-close t)
 ```
 
-After that, start IDE
+After that, start IDE:
+
 Unix:
 ```
 wish clcon.tcl
 ```
+
 Windows: double click clcon.tcl
 
 It should start up the IDE and connect automatically to swank. 
