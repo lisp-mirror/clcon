@@ -146,8 +146,11 @@
      (swank/rpc::swank/rpc-original-prin1-to-string-for-emacs object package))))
 
 
-this code should not build.
+(def-patched-swank-fun swank::wait-for-event/event-loop (connection pattern timeout)
+  (let ((swank::*emacs-connection* connection))
+    (swank::swank-original-wait-for-event/event-loop connection pattern timeout)))
 
-insert here: (let ((*swank-connection* connection)) ... ) 
-(defun wait-for-event/event-loop (connection pattern timeout)
-(defun read-loop (connection)
+; insert here: (let ((*swank-connection* connection)) ... ) 
+(def-patched-swank-fun swank::read-loop (connection)
+  (let ((swank::*emacs-connection* connection))
+    (swank::swank-original-read-loop connection)))
