@@ -40,7 +40,7 @@ Click on `[Go to source]` label at error details window and relevant source will
 
 Switching between editor buffers
 ------------
-We plan to make tabbed notebook for switching between windows. But for pro users, keyboard-based buffer switcher is desirable. We have one already. Press `Ctrl-F12` to view buffer list. At any of the buffer items, press `Return` or `Spacebar` to watch chosen buffer. Normally, buffer switcher must have incremental search or incremental filter facility, but it is still missing in our prototype. Surely, it will be there soon.
+We plan to make tabbed notebook for switching between windows. But for pro users, keyboard-based buffer switcher is desirable. We have one already. When in editor, press `Ctrl-F12` to view buffer list. At any of the buffer items, press `Return` or `Spacebar` to watch chosen buffer. Normally, buffer switcher must have incremental search or incremental filter facility, but it is still missing in our prototype. Surely, it will be there soon.
 
 Debugger
 ------
