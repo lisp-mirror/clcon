@@ -1,5 +1,5 @@
-; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
-
+;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+;; evaluation of text2odu events. Takes place in editor thread.
 (in-package :oduvanchik)
 
 (defmacro with-mark-in-row-col ((name row-col) &body body)
