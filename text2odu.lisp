@@ -1,7 +1,30 @@
-; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
-; see also text2odu.tcl
-; this code runs in arbitrary SWANK worker thread 
-; it must not depend on oduvanchik source
+;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+;; see also text2odu.tcl
+;; Acception of text2odu events from tcl and putting them onto *text2odu-event-queue*
+;; this code runs in arbitrary SWANK worker thread 
+;; it must not depend on oduvanchik source
+
+;; Overall text2odu events processing scheme is as follows:
+;; (Arbitrary worker thread)
+;;   Parse event
+;;   post-oduvan-event
+;;    put into *text2odu-event-queue*
+;;
+;; clco::text2odu-dispatcher-thread-function,
+;; clco::*text2odu-dispatcher-thread*,  (oduvan1.lisp)
+;;   takes event from the queue and arranges it to seem a keyboard event
+;;   put keyboard event (podsunutq-event)
+;; and also put event on *text2odu-dispatcher-to-editor-queue*
+;;
+;; editor event loop ( oduvanchik-internals::*direct-tcl* is nil , oduvanchik/src/interp.lisp)
+;;   invokes command bound to key
+;;   oduvanchik::evaltext2oduevent-command (eval-text2odu-event.lisp)
+;;   which pops *text2odu-dispatcher-to-editor-queue* and evals code accordingly to event
+;;   (oduvanchik::eval-text2odu-event, eval-text2odu-event.lisp)
+;; there is also direct-tcl mode, which does not work (window is never redrawn).
+;; there is also unused slot text2odu-dasta in oduvanchik-internals::input-event
+;; 
+
 
 (in-package :clco)
 
