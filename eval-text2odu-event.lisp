@@ -61,9 +61,9 @@
         )))))
      
 
-(defun eval-pending-text2odu-events ()
-  (loop 
-     (let ((e (clco-oduvanchik-key-bindings::text2odu-dispatcher-to-editor-queue-pop)))
+(defun eval-pending-text2odu-events (&key (hang t))
+  (loop
+     (let ((e (clco-oduvanchik-key-bindings::text2odu-dispatcher-to-editor-queue-pop :hang hang)))
        (cond
          (e (eval-text2odu-event e))
          (t (return))

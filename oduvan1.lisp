@@ -68,9 +68,10 @@
            (t
             ;(format t "~%Sending real event ~S to oduvanchik keyboard buffer!" e)
             (clco-oduvanchik-key-bindings::text2odu-dispatcher-to-editor-queue-put e)
-            (podsunutq-event
-             clco-oduvanchik-key-bindings:*text2odu-key-event-f8*
-             e)))))))
+            (unless oduvanchik-internals::*direct-tcl*
+              (podsunutq-event
+               clco-oduvanchik-key-bindings:*text2odu-key-event-f8*
+               e))))))))
 
 
 (defun start-text2odu-dispatcher ()
@@ -87,12 +88,14 @@
 (defun shutdown-text2odu-dispatcher-on-oduvanchik-exit-hook ()
   (shutdown-text2odu-dispatcher))
 
-(defun start-oduvanchik ()
+(defun start-oduvanchik (&key (direct-tcl t))
   (declare (special oduvanchik::exit-hook))
   (reset-text2odu-event-queue)
   (oduvanchik-internals::remove-all-hooks oduvanchik::exit-hook)
   (oduvanchik::add-hook oduvanchik::exit-hook
                         'shutdown-text2odu-dispatcher-on-oduvanchik-exit-hook)
+  (setf oduvanchik-internals::*direct-tcl* direct-tcl)
+  (setf oduvanchik-internals::*eval-command-from-tcl-hook* 'oduvanchik::eval-pending-text2odu-events)
   (bt:make-thread #'oduvanchik:oduvanchik :name "Oduvanchik")
   (clco-oduvanchik-key-bindings::set-clco-oduvanchik-key-bindings)
   (start-text2odu-dispatcher)
@@ -101,7 +104,11 @@
   )
 
 (defun shutdown-oduvanchik-via-keyboard-buffer ()
-  (podsunutq-event clco-oduvanchik-key-bindings::*f17-key-event* nil))
+  (cond
+    (oduvanchik-internals::*direct-tcl*
+     (warn "shutdown-oduvanchik-via-keyboard-buffer: in direct tcl mode, you must not use keyboard buffer. Command ignored"))
+    (t
+     (podsunutq-event clco-oduvanchik-key-bindings::*f17-key-event* nil))))
 
 ; need separate file for this
 (defun test1 ()
