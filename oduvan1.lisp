@@ -89,21 +89,35 @@
   (shutdown-text2odu-dispatcher))
 
 (defun start-oduvanchik (&key (direct-tcl nil))
-  (declare (special oduvanchik::exit-hook))
-  (reset-text2odu-event-queue)
-  (oduvanchik-internals::remove-all-hooks oduvanchik::exit-hook)
-  ; if previous run crashed, this can be useful
-  (ignore-errors (shutdown-text2odu-dispatcher))
-  (oduvanchik::add-hook oduvanchik::exit-hook
-                        'shutdown-text2odu-dispatcher-on-oduvanchik-exit-hook)
-  (setf oduvanchik-internals::*direct-tcl* direct-tcl)
-  (setf oduvanchik-internals::*eval-command-from-tcl-hook* 'oduvanchik::eval-pending-text2odu-events)
-  (bt:make-thread #'oduvanchik:oduvanchik :name "Oduvanchik")
-  (clco-oduvanchik-key-bindings::set-clco-oduvanchik-key-bindings)
-  (start-text2odu-dispatcher)
-  
-  (warn "We must wait for startup before returning")
-  )
+  (declare (special oduvanchik::exit-hook oduvanchik::entry-hook))
+  (let ((entered nil)
+        (entered-lock (bt:make-lock "Oduvanchik entry signal lock"))
+        )
+    (reset-text2odu-event-queue)
+    (oduvanchik-internals::remove-all-hooks oduvanchik::exit-hook)
+                                        ; if previous run crashed, this can be useful
+    (ignore-errors (shutdown-text2odu-dispatcher))
+    (oduvanchik::add-hook oduvanchik::exit-hook
+                          'shutdown-text2odu-dispatcher-on-oduvanchik-exit-hook)
+    (oduvanchik::add-hook
+     oduvanchik::entry-hook
+     (lambda () (bt:with-lock-held (entered-lock) (setf entered t))))
+    
+    (setf oduvanchik-internals::*direct-tcl* direct-tcl)
+    (setf oduvanchik-internals::*eval-command-from-tcl-hook* 'oduvanchik::eval-pending-text2odu-events)
+    
+    (bt:make-thread #'oduvanchik:oduvanchik :name "Oduvanchik")
+    (format t "~%Waiting for oduvanchik to start")
+                                        ; wait for oduvanchik startup 
+    (loop
+       (when (bt:with-lock-held (entered-lock) entered)
+         (return)
+         )
+       (sleep 0.3)
+       (format t "."))
+    (clco-oduvanchik-key-bindings::set-clco-oduvanchik-key-bindings)
+    (start-text2odu-dispatcher)
+    ))
 
 (defun shutdown-oduvanchik-via-keyboard-buffer ()
   (cond

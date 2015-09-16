@@ -11,7 +11,7 @@
        (line-offset ,name (- (clco::row-col-row ,row-col) 1) (clco::row-col-col ,row-col))
        ,@body)))
 
-(defmethod delete-characters-between-marks (beg end)
+(defun delete-characters-between-marks (beg end)
   "Code stolen from delete-characters"
   (cond
     ((mark> beg end)
@@ -24,6 +24,7 @@
            (region-end oduvanchik-internals::*internal-temp-region*) end)
      (delete-region oduvanchik-internals::*internal-temp-region*)
      t)))
+
 
 (defun eval-before-tcl-text-insert (e)
   (etypecase e
