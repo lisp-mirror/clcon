@@ -73,7 +73,8 @@
 (oduvanchik::defcommand "evaltext2oduevent" (p)
     "Get and eval single clcon event"
     "Get and eval single clcon event"
-  (eval-pending-text2odu-events)
+  (eval-pending-text2odu-events :hang p)
+  ;(oduvanchik.x11::kick-oduvanchik)
   )
 
 
