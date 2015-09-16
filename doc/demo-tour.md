@@ -29,7 +29,7 @@ Some tools contain `Window` menu. Watch the menu to see how to switch to other t
 Compilation conditions
 ------------
 At the console, type in:
-     (clco::compile-file-for-tcl (merge-pathnames "test/error-browser-sample-file.lisp" clcon-server:*clcon-source-directory*) nil)
+     ```(clco::compile-file-for-tcl (merge-pathnames "test/error-browser-sample-file.lisp" clcon-server:*clcon-source-directory*) nil)```
 
 This function is a wireframe for a future "compile file" editor command. Compilation notes will be printed at the console. Additionally, compilation condition browser will pop up. As you scroll through notes in the list, error details occur at another window. Click on `[Go to source]` label at error details window and relevant source will open at the editor.
 
