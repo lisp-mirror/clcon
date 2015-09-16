@@ -92,6 +92,8 @@
   (declare (special oduvanchik::exit-hook))
   (reset-text2odu-event-queue)
   (oduvanchik-internals::remove-all-hooks oduvanchik::exit-hook)
+  ; if previous run crashed, this can be useful
+  (ignore-errors (shutdown-text2odu-dispatcher))
   (oduvanchik::add-hook oduvanchik::exit-hook
                         'shutdown-text2odu-dispatcher-on-oduvanchik-exit-hook)
   (setf oduvanchik-internals::*direct-tcl* direct-tcl)
