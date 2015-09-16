@@ -62,6 +62,10 @@
     before-tcl-text-delete
     destroy-backend-buffer
     shutdown-text2odu-dispatcher ; called at the exit
+    ;; eval-oduvanchik-command ; hypotetic. We send command from tcl in freezed mode,
+    ;; sync insertion points, bind *oduvanchik-backend* to t so that all
+    ;; editions are sent synchronously to tcl instead of local processing in oduvanchik
+    indent-next-line ; particular case of eval-oduvanchik-command just for one command
     ))
 
 (defstruct row-col
