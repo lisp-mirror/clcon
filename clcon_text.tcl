@@ -175,7 +175,7 @@ namespace eval ::clcon_text {
     # arglist - list of arguments of event (see code)
     # UseGlobalPendingText2OduEventCounter - if 1, this is not buffer-specific event
     # (destroy event in fact)
-    proc MaybeSendToLisp {clcon_text type arglist {ContinuationBody {}} {UseGlobalPendingText2OduEventCounter 0}} {
+    proc MaybeSendToLisp {clcon_text type arglist {AfterEvalContinuationBody {}} {UseGlobalPendingText2OduEventCounter 0}} {
         variable ::tkcon::OPT
         if {![$clcon_text cget -send_to_lisp]
             ||
@@ -212,17 +212,12 @@ namespace eval ::clcon_text {
             }
         }
 
-        set CombinedContinuation [subst -nocommands {
+        IncrPendingSentNotifications 1 $clcon_text $UseGlobalPendingText2OduEventCounter
+        ::tkcon::EvalInSwankAsync $lispCmd [subst -nocommands {
             putd \$EventAsList
             ::clcon_text::IncrPendingSentNotifications \
                 -1 $clcon_text $UseGlobalPendingText2OduEventCounter
-            $ContinuationBody
-        }]
-
-        showVar CombinedContinuation
-        
-        IncrPendingSentNotifications 1 $clcon_text $UseGlobalPendingText2OduEventCounter
-        ::tkcon::EvalInSwankAsync $lispCmd $CombinedContinuation 0 {:find-existing}
+        }] 0 {:find-existing}
         #puts "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
     }
 
