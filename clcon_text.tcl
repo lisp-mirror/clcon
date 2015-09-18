@@ -302,6 +302,13 @@ namespace eval ::clcon_text {
         MaybeSendToLisp $clcon_text IndentNextLine {} [subst -nocommand {$clcon_text Unfreeze}]
     }
 
+    # To be called from oi::delete-region
+    proc clcon_text_delete_bb_ee {clcon_text} {
+        $clcon_text delete bb ee
+        $clcon_text mark delete bb
+        $clcon_text mark delete ee
+    }
+
     # InitOneBindingOfFreezableText <Key-Return>
     InitBindingsOfFreezableText
 }
