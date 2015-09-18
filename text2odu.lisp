@@ -22,7 +22,7 @@
 ;;   which pops *text2odu-dispatcher-to-editor-queue* and evals code accordingly to event
 ;;   (oduvanchik::eval-text2odu-event, eval-text2odu-event.lisp)
 ;; there is also direct-tcl mode, which does not work (window is never redrawn).
-;; there is also unused slot text2odu-dasta in oduvanchik-internals::input-event
+;; there is also unused slot text2odu-data in oduvanchik-internals::input-event
 ;; 
 
 
