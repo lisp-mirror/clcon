@@ -102,7 +102,7 @@ namespace eval ::clcon_text {
             ::mprs::AssertEq $options(-private_freezed) 0 "Freeze: must be unfreezed"
             $self configure -private_freezed 1
         }
-       
+        
         method Unfreeze {} {
             set q $options(-private_freezed_events_queue)
             set script [lindex $q 0]
@@ -120,7 +120,7 @@ namespace eval ::clcon_text {
             }
         }
 
-       
+        
         # Enqueue into associated event list
         delegate method * to hull
         delegate option * to hull
@@ -129,7 +129,7 @@ namespace eval ::clcon_text {
     proc lq {x} {
         ::tkcon::QuoteLispObjToString $x
     }
-   
+    
     proc ConstructBackendBuffer {clcon_text} {
         variable ::tkcon::OPT
         if $::tkcon::OPT(oduvan-backend) {
@@ -142,32 +142,32 @@ namespace eval ::clcon_text {
         MaybeSendToLisp $clcon_text DestroyBackendBuffer {} {} 1
     }
 
-        # Note that we have sent notification, or if notification
-        # was processed on lisp side. Control number of pending events.
-        # Args
-        # increment - change of value
-        # clcon_text - pathName of clcon_text widget
-        # UseGlobalCounter - if 1, use global. If 0 - local. 
-        proc IncrPendingSentNotifications {increment clcon_text UseGlobalCounter} {
-            if {$UseGlobalCounter} {
-                variable GlobalPendingText2OduEventCounter 
-                incr GlobalPendingText2OduEventCounter $increment
-                if {$GlobalPendingText2OduEventCounter>1} {
-                    # If we show this, something seem to be wrong
-                    showVar GlobalPendingText2OduEventCounter
-                    puts stderr "GlobalPendingText2OduEventCounter should be 0 or 1"
-                }
-                return $GlobalPendingText2OduEventCounter
-            } else {
-                set j [$clcon_text cget -private_pending_sent_modifications]
-                incr j $increment
-                $clcon_text configure -private_pending_sent_modifications $j
-                if {$j>1} {
-                    puts "-private_pending_sent_modifications = $j"
-                }
-                return $j
+    # Note that we have sent notification, or if notification
+    # was processed on lisp side. Control number of pending events.
+    # Args
+    # increment - change of value
+    # clcon_text - pathName of clcon_text widget
+    # UseGlobalCounter - if 1, use global. If 0 - local. 
+    proc IncrPendingSentNotifications {increment clcon_text UseGlobalCounter} {
+        if {$UseGlobalCounter} {
+            variable GlobalPendingText2OduEventCounter 
+            incr GlobalPendingText2OduEventCounter $increment
+            if {$GlobalPendingText2OduEventCounter>1} {
+                # If we show this, something seem to be wrong
+                showVar GlobalPendingText2OduEventCounter
+                puts stderr "GlobalPendingText2OduEventCounter should be 0 or 1"
             }
+            return $GlobalPendingText2OduEventCounter
+        } else {
+            set j [$clcon_text cget -private_pending_sent_modifications]
+            incr j $increment
+            $clcon_text configure -private_pending_sent_modifications $j
+            if {$j>1} {
+                puts "-private_pending_sent_modifications = $j"
+            }
+            return $j
         }
+    }
     
     # Args
     # clcon_text - pathname of clcon_text widget
@@ -257,9 +257,9 @@ namespace eval ::clcon_text {
         set script2 [WrapEventScriptForFreezedText $script]
         bind FreezableText $ev $script2
     }
-        
+    
 
-# Fills FreezableText bindtag with wrapped bindings of Text
+    # Fills FreezableText bindtag with wrapped bindings of Text
     proc InitBindingsOfFreezableText {} {
         foreach ev [bind Text] {
             WrapFreezableHandlerScript $ev
@@ -291,7 +291,7 @@ namespace eval ::clcon_text {
 #  # Changing readonly after creation
 # .text configure -readonly 0
 # .text configure -readonly 1
-    
+
 # .text insert 0.0 "this line will be ignored"
 
 # for {set x 0} {$x<10} {incr x} { 
@@ -312,7 +312,7 @@ namespace eval ::clcon_text {
 
 # set txt .freezingExample.text
 # ::clcon_text::clcon_text $txt
-    
+
 # for {set x 0} {$x<10} {incr x} { 
 #     $txt insert end "line $x\n"
 # }
