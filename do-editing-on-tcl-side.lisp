@@ -4,7 +4,7 @@
 
 
 (defun offset-of-line (line)
-  "Line is an editor's line object, e.g. received as mark-line function. Return line at which it is located, starting from 1"
+  "Line is an editor's line object, e.g. received as mark-line function. Return line number, at which it is located, starting from 1"
   (let* ((buffer (line-buffer line))
          (start-mark (buffer-start-mark buffer))
          (start-line (mark-line start-mark))
@@ -33,7 +33,7 @@
 #| tests: 
  (oduvanchik::send-mark-to-clcon_text (oduvanchik::buffer-start-mark (oduvanchik::current-buffer)) "bb")
  (oduvanchik::send-mark-to-clcon_text (oduvanchik::buffer-end-mark (oduvanchik::current-buffer)) "bb")
-
+|#
 
 #|(defmacro with-mark-in-row-col ((name row-col) &body body)
   "Evaluates body in the scope where name is bound to right-inserting temporary mark placed at clco::row-col struct"

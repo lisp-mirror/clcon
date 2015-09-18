@@ -52,6 +52,7 @@
   (delete-characters-between-marks
    (buffer-start-mark (current-buffer))
    (buffer-end-mark (current-buffer)))
+  (lisp-mode-command nil)
   )
   
 
