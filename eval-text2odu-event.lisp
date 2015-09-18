@@ -62,8 +62,10 @@
     (let ((oduvanchik-internals::*do-editing-on-tcl-side* t))
       (indent-new-line-command nil)
       )
-    (send-mark-to-clcon_text (current-point) "insert")
     )
+  (send-mark-to-clcon_text (current-point) "insert")
+  (clco::invoke-text2odu-event-tcl-continuation e)
+  nil
   )
 
 ; for single chars, use (oduvanchik-ext:char-key-event #\x)

@@ -205,7 +205,8 @@ namespace eval ::clcon_text {
             }
             IndentNextLine {
                 set qB [::text2odu::CoerceIndex $clcon_text insert]
-                set lispCmd "(clco:oduvan-indent-next-line $qId $qB)"
+                set qC [lq $AfterEvalContinuationBody]
+                set lispCmd "(clco:oduvan-indent-next-line $qId $qB $qC)"
             }
             default {
                 error "Hurray! We found replace command $type with args $clcon_text $type $arglist!"
