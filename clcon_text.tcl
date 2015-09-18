@@ -175,7 +175,7 @@ namespace eval ::clcon_text {
     # arglist - list of arguments of event (see code)
     # UseGlobalPendingText2OduEventCounter - if 1, this is not buffer-specific event
     # (destroy event in fact)
-    proc MaybeSendToLisp {clcon_text type arglist {AfterEvalContinuationBody {}} {UseGlobalPendingText2OduEventCounter 0}} {
+    proc MaybeSendToLisp {clcon_text type arglist {far_tcl_continuation_body {}} {UseGlobalPendingText2OduEventCounter 0}} {
         variable ::tkcon::OPT
         if {![$clcon_text cget -send_to_lisp]
             ||
@@ -205,7 +205,7 @@ namespace eval ::clcon_text {
             }
             IndentNextLine {
                 set qB [::text2odu::CoerceIndex $clcon_text insert]
-                set qC [lq $AfterEvalContinuationBody]
+                set qC [lq $far_tcl_continuation_body]
                 set lispCmd "(clco:oduvan-indent-next-line $qId $qB $qC)"
             }
             default {

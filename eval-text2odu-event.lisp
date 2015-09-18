@@ -64,7 +64,7 @@
       )
     )
   (send-mark-to-clcon_text (current-point) "insert")
-  (clco::invoke-text2odu-event-tcl-continuation e)
+  (clco::invoke-text2odu-event-far_tcl_continuation e)
   nil
   )
 

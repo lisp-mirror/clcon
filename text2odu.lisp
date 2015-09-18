@@ -79,13 +79,13 @@
   (string nil :type (or null string)) ; string to insert
   (beg nil :type (or null row-col)) ; begin index
   (end nil :type (or null row-col))   ; end index
-  (tcl-continuation nil :type (or null string)) ; code to eval after return
-  (swank-connection nil :type (or null swank::multithreaded-connection)) ; required if we want to run tcl-continuation
+  (far_tcl_continuation nil :type (or null string)) ; tcl code to eval after event's action is processed (even handler in the editor must send far_tcl_continuation explicitly)
+  (swank-connection nil :type (or null swank::multithreaded-connection)) ; required if we want to run far_tcl_continuation
   )
 
-(defun invoke-text2odu-event-tcl-continuation (e)
+(defun invoke-text2odu-event-far_tcl_continuation (e)
   "Can be called from any thread. Sends a command to invoke continuation to control thread"
-  (let ((c (text2odu-event-tcl-continuation e)))
+  (let ((c (text2odu-event-far_tcl_continuation e)))
     (when c
       (swank::with-connection ((text2odu-event-swank-connection e))
         (eval-in-tcl c))
@@ -134,14 +134,14 @@
     :string string
     )))
 
-(defun oduvan-indent-next-line (clcon_text-pathname insert-index tcl-continuation)
+(defun oduvan-indent-next-line (clcon_text-pathname insert-index far_tcl_continuation)
   "Send indent-next-line event to oduvanchik. See oduvanchik::eval-indent-next-line"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'indent-next-line
     :clcon_text-pathname clcon_text-pathname
     :beg (parse-row-col insert-index)
-    :tcl-continuation tcl-continuation
+    :far_tcl_continuation far_tcl_continuation
     :swank-connection swank::*emacs-connection*
     )))
 
