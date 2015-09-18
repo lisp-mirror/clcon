@@ -59,16 +59,20 @@
   
 
 (defun eval-indent-next-line (e)
-  (with-mark-in-row-col (clcon_text-insert (clcon-server::text2odu-event-beg e))
-    (move-mark (current-point) clcon_text-insert)
-    (let ((oduvanchik-internals::*do-editing-on-tcl-side* t))
-      (indent-new-line-command nil)
-      )
-    )
-  (send-mark-to-clcon_text (current-point) "insert")
-  (clco::invoke-text2odu-event-far_tcl_continuation e)
-  nil
-  )
+  (let ((clcon_text (clco::text2odu-event-clcon_text-pathname e))
+        (cur-row-col (clco::text2odu-event-beg e))
+        (connection (clco::text2odu-event-swank-connection e)))
+    (swank::with-connection (connection)
+      (with-mark-in-row-col (clcon_text-insert cur-row-col)
+        (move-mark (current-point) clcon_text-insert)
+        (let ((oduvanchik-internals::*do-editing-on-tcl-side* t))
+          (indent-new-line-command nil)
+          )
+        )
+      (oi::send-mark-to-clcon_text clcon_text (current-point) :remote-name "insert")
+      (clco::invoke-text2odu-event-far_tcl_continuation e)
+      nil
+      )))
 
 ; for single chars, use (oduvanchik-ext:char-key-event #\x)
 (defun eval-text2odu-event (e)
