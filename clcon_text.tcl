@@ -51,6 +51,7 @@ namespace eval ::clcon_text {
         option -private_freezed_events_queue [list]
         # PRIVATE. Number of modifications sent which were not processed by oduvanchik yet
         option -private_pending_sent_modifications 0
+        option -private_pending_far_tcl_continuations 0
         constructor {args} {
             installhull using text
             # Apply any options passed at creation time.
@@ -168,6 +169,17 @@ namespace eval ::clcon_text {
             return $j
         }
     }
+
+    proc IncrPendingFarTclContinuations {increment clcon_text} {
+        set j [$clcon_text cget -private_pending_far_tcl_continuations]
+        incr j $increment
+        $clcon_text configure -private_pending_far_tcl_continuations $j
+        if {$j>1} {
+            puts "-private_pending_far_tcl_continuations = $j"
+        }
+        return $j
+    }
+    
     
     # Args
     # clcon_text - pathname of clcon_text widget
@@ -205,6 +217,15 @@ namespace eval ::clcon_text {
             }
             IndentNextLine {
                 set qB [::text2odu::CoerceIndex $clcon_text insert]
+
+                if {$far_tcl_continuation_body ne {}} {
+                    ::clcon_text::IncrPendingFarTclContinuations 1 $clcon_text
+                    set far_tcl_continuation_body [subst -nocommands {
+                        $far_tcl_continuation_body
+                        ::clcon_text::IncrPendingFarTclContinuations -1 $clcon_text
+                    }]
+                }
+
                 set qC [lq $far_tcl_continuation_body]
                 set lispCmd "(clco:oduvan-indent-next-line $qId $qB $qC)"
             }
