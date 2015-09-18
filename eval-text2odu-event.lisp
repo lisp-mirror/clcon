@@ -48,12 +48,14 @@
   t)
 
 (defun eval-construct-backend-buffer (e)
-  (declare (ignore e))
-  (delete-characters-between-marks
-   (buffer-start-mark (current-buffer))
-   (buffer-end-mark (current-buffer)))
-  (lisp-mode-command nil)
-  )
+  (let ((b (current-buffer)))
+    (delete-characters-between-marks
+     (buffer-start-mark b)
+     (buffer-end-mark b))
+    ; b must be current here
+    (lisp-mode-command nil)
+    (setf (buffer-name b) (clco::text2odu-event-clcon_text-pathname e))
+    ))
   
 
 (defun eval-indent-next-line (e)
