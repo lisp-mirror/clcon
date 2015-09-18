@@ -56,6 +56,16 @@
   )
   
 
+(defun eval-indent-next-line (e)
+  (with-mark-in-row-col (clcon_text-insert (clcon-server::text2odu-event-beg e))
+    (move-mark (current-point) clcon_text-insert)
+    (let ((oduvanchik-internals::*do-editing-on-tcl-side* t))
+      (indent-new-line-command nil)
+      )
+    (send-mark-to-clcon_text (current-point) "insert")
+    )
+  )
+
 ; for single chars, use (oduvanchik-ext:char-key-event #\x)
 (defun eval-text2odu-event (e)
   "This code is executed inside a command. Transrom text2odu events to oduvanchik function calls"
@@ -76,7 +86,10 @@
         )
        (clco::shutdown-text2odu-dispatcher
         (error "clco::shutdown-text2odu-dispatcher event must not arrive here")
-        )))))
+        )
+       (clco::indent-next-line
+        (eval-indent-next-line e))
+       ))))
      
 
 (defun eval-pending-text2odu-events (&key (hang t))

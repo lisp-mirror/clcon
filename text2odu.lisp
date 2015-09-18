@@ -123,6 +123,14 @@
     :string string
     )))
 
+(defun oduvan-indent-next-line (clcon_text-pathname insert-index)
+  "Send indent-next-line event to oduvanchik. See oduvanchik::eval-indent-next-line"
+  (post-oduvan-event
+   (make-text2odu-event
+    :kind 'indent-next-line
+    :clcon_text-pathname clcon_text-pathname
+    :beg (parse-row-col insert-index)
+    )))
 
 (defun notify-oduvan-tcl-text-delete (clcon_text-pathname beg end)
   "Called from RoDelete before really deleting text"

@@ -203,6 +203,10 @@ namespace eval ::clcon_text {
             DestroyBackendBuffer {
                 set lispCmd "(clco:notify-oduvan-destroy-backend-buffer $qId)"
             }
+            IndentNextLine {
+                set qB [::text2odu::CoerceIndex $clcon_text insert]
+                set lispCmd "(clco:oduvan-indent-next-line $qId $qB)"
+            }
             default {
                 error "Hurray! We found replace command $type with args $clcon_text $type $arglist!"
             }
@@ -268,6 +272,12 @@ namespace eval ::clcon_text {
         if {$idx >= 0} {
             set var [lreplace $var $idx $idx [list $new]]
         }
+    }
+
+    # Just test/example
+    proc IndentNextLine {clcon_text} {
+        puts "$clcon_text Freeze"
+        MaybeSendToLisp $clcon_text IndentNextLine {} "puts \"$clcon_text Unfreeze\""
     }
 
     # InitOneBindingOfFreezableText <Key-Return>
