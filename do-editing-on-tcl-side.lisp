@@ -1,6 +1,6 @@
 ;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
 ;; File related to sending editing primitives to tcl. 
-(in-package :oduvanchik)
+(in-package :oduvanchik-internals)
 
 
 (defun offset-of-line (line)
@@ -19,20 +19,29 @@
          (setf current-line next)
          ))))
 
-(defun send-mark-to-clcon_text (mark remote-name)
-  "For mark, creates corresponding mark in text with name = remote-name, or moves an existing mark"
+(defmethod call-tcl-editing (code)
+  "See gf documentation"
+  (assert *do-editing-on-tcl-side*)
+  (let ((*do-editing-on-tcl-side* nil))
+    (clco:eval-in-tcl command)))
+
+
+(defmethod send-mark-to-clcon_text (clcon_text mark &key remote-name)
+  "See generic-function docstring"
   (check-type remote-name (or symbol string))
   (check-type mark mark)
   (let ((line (mark-line mark)))
     (assert line)
-    (let ((offset-of-line (offset-of-line line)))
-      (format *terminal-io* "send-mark-to-clcon_text: ~A.~A ~A" offset-of-line (mark-charpos mark) remote-name)
-      )
+    (let* ((row (offset-of-line line))
+           (col (mark-charpos mark))
+           (command (format nil "~A mark set ~A ~A.~A"
+                            clcon_text (string remote-name) row col)))
+      (clco:eval-in-tcl command))
     ))
 
 #| tests: 
- (oduvanchik::send-mark-to-clcon_text (oduvanchik::buffer-start-mark (oduvanchik::current-buffer)) "bb")
- (oduvanchik::send-mark-to-clcon_text (oduvanchik::buffer-end-mark (oduvanchik::current-buffer)) "bb")
+ (oduvanchik::send-mark-to-clcon_text ### (oduvanchik::buffer-start-mark (oduvanchik::current-buffer)) :remote-name "bb")
+ (oduvanchik::send-mark-to-clcon_text ### (oduvanchik::buffer-end-mark (oduvanchik::current-buffer)) :remote-name "bb")
 |#
 
 #|(defmacro with-mark-in-row-col ((name row-col) &body body)
