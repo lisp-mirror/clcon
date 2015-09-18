@@ -139,7 +139,7 @@ namespace eval ::clcon_text {
     }
 
     proc DestroyBackendBuffer {clcon_text} {
-        MaybeSendToLisp $clcon_text DestroyBackendBuffer {} 1
+        MaybeSendToLisp $clcon_text DestroyBackendBuffer {} {} 1
     }
 
         # Note that we have sent notification, or if notification
@@ -175,7 +175,7 @@ namespace eval ::clcon_text {
     # arglist - list of arguments of event (see code)
     # UseGlobalPendingText2OduEventCounter - if 1, this is not buffer-specific event
     # (destroy event in fact)
-    proc MaybeSendToLisp {clcon_text type arglist {UseGlobalPendingText2OduEventCounter 0}} {
+    proc MaybeSendToLisp {clcon_text type arglist {ContinuationBody {}} {UseGlobalPendingText2OduEventCounter 0}} {
         variable ::tkcon::OPT
         if {![$clcon_text cget -send_to_lisp]
             ||
