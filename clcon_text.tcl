@@ -212,12 +212,17 @@ namespace eval ::clcon_text {
             }
         }
 
-        IncrPendingSentNotifications 1 $clcon_text $UseGlobalPendingText2OduEventCounter
-        ::tkcon::EvalInSwankAsync $lispCmd [subst -nocommands {
+        set CombinedContinuation [subst -nocommands {
             putd \$EventAsList
             ::clcon_text::IncrPendingSentNotifications \
                 -1 $clcon_text $UseGlobalPendingText2OduEventCounter
-        }] 0 {:find-existing}
+            $ContinuationBody
+        }]
+
+        showVar CombinedContinuation
+        
+        IncrPendingSentNotifications 1 $clcon_text $UseGlobalPendingText2OduEventCounter
+        ::tkcon::EvalInSwankAsync $lispCmd $CombinedContinuation 0 {:find-existing}
         #puts "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
     }
 
@@ -276,8 +281,8 @@ namespace eval ::clcon_text {
 
     # Just test/example
     proc IndentNextLine {clcon_text} {
-        puts "$clcon_text Freeze"
-        MaybeSendToLisp $clcon_text IndentNextLine {} "puts \"$clcon_text Unfreeze\""
+        $clcon_text Freeze
+        MaybeSendToLisp $clcon_text IndentNextLine {} [subst -nocommand {$clcon_text Unfreeze}]
     }
 
     # InitOneBindingOfFreezableText <Key-Return>
