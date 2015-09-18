@@ -79,7 +79,18 @@
   (string nil :type (or null string)) ; string to insert
   (beg nil :type (or null row-col)) ; begin index
   (end nil :type (or null row-col))   ; end index
+  (tcl-continuation nil :type (or null string)) ; code to eval after return
+  (swank-connection nil :type (or null swank::multithreaded-connection)) ; required if we want to run tcl-continuation
   )
+
+(defun invoke-text2odu-event-tcl-continuation (e)
+  "Can be called from any thread. Sends a command to invoke continuation to control thread"
+  (let ((c (text2odu-event-tcl-continuation e)))
+    (when c
+      (swank::with-connection ((text2odu-event-swank-connection e))
+        (eval-in-tcl c))
+      )))
+      
         
 (defun parse-row-col (tcl-index)
   "Returns row-col structure by tcl-index of kind NN.NN."
