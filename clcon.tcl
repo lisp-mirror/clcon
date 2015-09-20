@@ -154,6 +154,7 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
     TkconSourceHere clcon_text.tcl
     TkconSourceHere swank-connection.swcnn.tcl
     TkconSourceHere swank-io.tcl
+    TkconSourceHere swank-applications.tkcon.tcl
     TkconSourceHere console-cmd.tcl
     TkconSourceHere slimv-clcon.tcl
     TkconSourceHere findreplace.tcl
