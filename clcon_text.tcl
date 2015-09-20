@@ -304,9 +304,12 @@ namespace eval ::clcon_text {
 
     # To be called from oi::delete-region
     proc clcon_text_delete_bb_ee {clcon_text} {
+        puts stderr "Entered clcon_text_delete_bb_ee"
         $clcon_text delete bb ee
-        $clcon_text mark delete bb
-        $clcon_text mark delete ee
+        $clcon_text mark unset bb
+        $clcon_text mark unset ee
+        puts stderr "About to exit clcon_text_delete_bb_ee"
+        return {}
     }
 
     # InitOneBindingOfFreezableText <Key-Return>
