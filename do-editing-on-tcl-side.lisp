@@ -23,7 +23,7 @@
   "See gf documentation"
   (assert *do-editing-on-tcl-side*)
   (let ((*do-editing-on-tcl-side* nil))
-    (clco:eval-in-tcl command)))
+    (clco:eval-in-tcl code :nowait nil)))
 
 
 (defmethod send-mark-to-clcon_text (clcon_text mark &key remote-name)
