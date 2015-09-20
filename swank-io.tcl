@@ -28,78 +28,7 @@ namespace eval ::mprs {
 
 # Load conses 
 TkconSourceHere cons.tcl
-
-proc ::tkcon::GenContinuationCounter {} {
-    # See also swank-protocol::connection-request-counter
- variable ContinuationCounter
- if {![info exists ContinuationCounter]} {
-    set ContinuationCounter 1
- } else {
-    set ContinuationCounter [expr {$ContinuationCounter + 1}]
- }
- return $ContinuationCounter
-}
-
-## from swank-protocol::emacs-rex
-proc ::tkcon::CalculateThreadDesignatorForSwank {MsgFmtKind} {
-    variable PRIV
-    if {$MsgFmtKind == 0} {
-        return $PRIV(SwankThread)
-    } elseif {$MsgFmtKind == 1} {
-        return ":repl-thread"
-    } elseif {$MsgFmtKind == 2} {
-        error "Thread designator must be supplied"
-    } else { 
-        error "Unknown MsgFmtKind"
-    }
-}
-
-proc ::tkcon::FormatEmacsReturnMessageInner {value ThreadDesignator ContinuationCounter} {
-    # (:emacs-return thread tag value)
-    set msgNoLen "(:emacs-return $ThreadDesignator $ContinuationCounter $value)"
-    EncodeAnySwankMessage $msgNoLen
-}
-
-proc ::tkcon::FormatSwankRexEvalMessageInner {cmd ThreadDesignator ContinuationCounter} {
-    # commented out line is for my patched version which passes readtable
-    # set msgNoLen "(:emacs-rex-rt $cmd \"COMMON-LISP-USER\" nil $ThreadDesignator $ContinuationCounter)"
-    set msgNoLen "(:emacs-rex $cmd \"COMMON-LISP-USER\" $ThreadDesignator $ContinuationCounter)"
-    EncodeAnySwankMessage $msgNoLen
-}
-
-proc ::tkcon::EncodeAnySwankMessage {msgNoLen} {
-    set strLenHex [format "%06X" [string length $msgNoLen]]
-    set msgAndLen [string cat $strLenHex $msgNoLen]
-    return $msgAndLen
-}
-
-proc ::tkcon::FormatSwankRexEvalMessage {cmd MsgFmtKind {ThreadDesignator {}} {ContinuationCounter {}}} {
-    if {$MsgFmtKind == 2} {
-        return [EncodeAnySwankMessage $cmd]
-    } elseif {$MsgFmtKind == 3} {
-        return [FormatEmacsReturnMessageInner $cmd $ThreadDesignator $ContinuationCounter]
-    }
-    
-    if { $ThreadDesignator eq {} } {
-        set ThreadDesignator [CalculateThreadDesignatorForSwank $MsgFmtKind]
-    }
-    if { $ContinuationCounter eq {} } {
-        set ContinuationCounter [GenContinuationCounter]
-    }      
-
-    return [FormatSwankRexEvalMessageInner $cmd $ThreadDesignator $ContinuationCounter]
-}
-
-proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form MsgFmtKind} {
-    if {$MsgFmtKind == 1} {
-        # QuoteLispObjToString ?
-        set cmd [regsub -all {([\"\\])} $form {\\\0}]
-        return "(swank-repl:listener-eval \"$cmd\")"
-    } else {
-        return $form
-    }
-}
-
+TkconSourceHere send-to-swank.tcl
 
 proc ::tkcon::myerror {text} {
     idebug on
@@ -178,85 +107,6 @@ proc ::mprs::DeleteSyncEventsFromTheQueue {} {
     }
 }
 
-## EvalInSwankAsync - this is a misname. This function is responsible for all
-# sending of events to SWANK.
-# Args:
-# Form - text of form to execute quoted as needed
-# Continuation - body of proc to accept argument EventAsList
-# MsgFmtKind
-#   0 - normal eval (IDE orders EMACS to do evaluation)
-#   1 - listener eval (form will be wrapped into (swank-repl:listener-eval ...)
-#   2 - emacs-pong event (passed verbatim, ThreadDesignator and ContinuationCounter unneeded)
-#   3 - emacs-return event (:emacs-return ContinuationCounter result) - form is a result, which is (:ok lisp-value), (:error lisp-kind . lisp-data), or (:abort). All lisp values must be quoted for passing by the caller of EvalInSwankAsync
-#
-#   ThreadDesignator - see swank::thread-for-evaluation
-#   ContinuationCounter - required to identify addressee of swank's reply.
-#        If not passed, it is calculated when needed
-# 
-proc ::tkcon::EvalInSwankAsync {form continuation {MsgFmtKind 1} {ThreadDesignator {}} {ContinuationCounter {}}} {
-    variable PRIV
-
-    set ConnectionName $::swcnn::CurrentSwankConnection
-
-    if {$::swcnn::CurrentSwankConnection eq {}} {
-        error "Attempt to EvalInSwankAsync with disconnected SWANK: $form"
-    }
-    
-    upvar \#0 $ConnectionName con
-    set sock $con(sock)
-
-    # We don't need that for lisp. Some other translation should occur, hopefully we done it ok
-    # Commend from old code:
-    ## Sockets get \'s interpreted, so that users can
-    ## send things like \n\r or explicit hex values
-    #set cmd [subst -novariables -nocommands $form]
-
-    ::CurIntPath "EvalInSwankAsync 2"
-
-    if { $MsgFmtKind == 3 } {
-        if {$ContinuationCounter eq {} || $ThreadDesignator eq {}} {
-            error "ContinuationCounter (tag) and ThreadDesignator must be supplied for :emacs-return event"
-        }
-        if {$continuation ne {}} {
-            error "Continuation must not be passed for :emacs-return event"
-        }
-    }
-    if { $ContinuationCounter eq {} && $MsgFmtKind != 2 } {
-        set ContinuationCounter [GenContinuationCounter]
-    }
-   
-    set cmd $form
-    set cmd [SwankMaybeWrapFormIntoListenerEval $cmd $MsgFmtKind]
-    set cmd [FormatSwankRexEvalMessage $cmd $MsgFmtKind $ThreadDesignator $ContinuationCounter]
-
-    ::mprs::EnqueueContinuation $ContinuationCounter $continuation
-
-    putd "About to send to SWANK: $cmd"
-
-    
-    set code [catch {puts -nonewline $sock $cmd ; flush $sock} result]
-    if {$code} {
-        puts stderr "writing to socket returned code $code"
-    }
-    if {$code && [eof $sock]} {
-        ## SWANK server stream died or disappeared
-        puts stderr "writing to socket returned $code eof [eof $sock]"
-        EvalSocketClosed $sock $ConnectionName
-    }
-    return -code $code $result
-}
-
-
-## ::tkcon::EmacsRex - from swank-protocol::emacs-rex
-##  Docstring from emacs-rex:
-##  (R)emote (E)xecute S-e(X)p.
-##
-##  Send an S-expression command to Swank to evaluate. The resulting response must
-##  be read with read-response.
-##  MsgFmtKind must be 1 if form is (swank-repl:listener-eval ...) or 0 otherwise
-proc ::tkcon::SwankEmacsRex {form {MsgFmtKind 0}} {
-    EvalInSwankAsync $form {} $MsgFmtKind
-}
 
 ## swank-protocol::request-swank-require
 proc ::tkcon::SwankRequestSwankRequire1 {requirement} {
@@ -354,7 +204,7 @@ proc ::mprs::EvalInTclSync {EventAsList} {
     puts stderr $EventAsList
     set errorCode [catch {eval $Code} Result]
     if {$errorCode} {
-        tk_messageBox "Error in EvalInTclSync - don't know what to do. See clco:eval-in-tcl"
+        tk_messageBox -message "6367: Error in EvalInTclSync - don't know what to do. See clco:eval-in-tcl"
         return
     }
     set qResult [::tkcon::QuoteLispObjToString $Result]
@@ -364,7 +214,7 @@ proc ::mprs::EvalInTclSync {EventAsList} {
     return     
 }
 
-# this is an async event. Process it. E.g. call a continuation
+# this is an async event received from swank. Process it. E.g. call a continuation
 proc ::mprs::ProcessAsyncEvent {EventAsList} {
     set ContinuationId [ExtractContinuationId $EventAsList]
     # we don't need to Unleash keywords
@@ -399,29 +249,6 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
     }
     return {}
 } 
-
-## Continuations work for sync or async event
-# Code accepts event in $EventAsList variable which contains event unleashed one time
-proc ::mprs::EnqueueContinuation {ContinuationId code} {
-    if {$code eq {}} {
-        return
-    }
-    variable ContinuationsDict
-    set PrintContinuationsDict [expr [llength $ContinuationsDict]>0]
-    dict set ContinuationsDict $ContinuationId [list {EventAsList} $code]
-    if {$PrintContinuationsDict} {
-        showVar ContinuationsDict
-    }
-}
-
-proc ::mprs::ContinuationExistsP {ContinuationId} {
-    variable ContinuationsDict
-    if { [dict exists $ContinuationsDict $ContinuationId] } {
-        return 1
-    } else {
-        return 0
-    }
-}
 
 ## We know continuiation exists. Runs its continuation synchronously. 
 proc ::mprs::RunContinuation {ContinuationId EventAsList} {
