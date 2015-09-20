@@ -3,40 +3,21 @@
 ## Formatting and sending messages to SWANK
 
 
-## Continuations work for sync or async event
-# Code accepts event in $EventAsList variable which contains event unleashed one time
-proc ::mprs::EnqueueContinuation {ContinuationId code} {
-    if {$code eq {}} {
-        return
-    }
-    variable ContinuationsDict
-    set PrintContinuationsDict [expr [llength $ContinuationsDict]>0]
-    dict set ContinuationsDict $ContinuationId [list {EventAsList} $code]
-    if {$PrintContinuationsDict} {
-        showVar ContinuationsDict
-    }
+namespace eval ::sts {
 }
 
 
-proc ::mprs::ContinuationExistsP {ContinuationId} {
-    variable ContinuationsDict
-    if { [dict exists $ContinuationsDict $ContinuationId] } {
-        return 1
-    } else {
-        return 0
-    }
+# Pass something to lisp, quoted. Lame!
+proc ::tkcon::QuoteLispObjToString {str} {
+    # putd "We must quote string $str better!"
+    # return [string cat "\"" $str "\""]
+
+    regsub -all {[\ \\\"]} $str {\\&} s2
+    regsub -all {\n} $s2 {\n} s3
+    set result [string cat \" $s3 \"]
+    return $result
 }
 
-proc ::tkcon::GenContinuationCounter {} {
-    # See also swank-protocol::connection-request-counter
- variable ContinuationCounter
- if {![info exists ContinuationCounter]} {
-    set ContinuationCounter 1
- } else {
-    set ContinuationCounter [expr {$ContinuationCounter + 1}]
- }
- return $ContinuationCounter
-}
 
 ## from swank-protocol::emacs-rex
 proc ::tkcon::CalculateThreadDesignatorForSwank {MsgFmtKind} {

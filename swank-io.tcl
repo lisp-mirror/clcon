@@ -19,15 +19,13 @@
 # 4. What I forgot? 
 # Check all situations and behave appropriately. 
 
-
-# Initialize the ::mprs namespace (message parser)
-# This is for SWANK communication-related stuff, though some parts are in ::tkcon namespace
 namespace eval ::mprs {
     variable ContinuationsDict {}
 }
 
-# Load conses 
+# Load conses
 TkconSourceHere cons.tcl
+TkconSourceHere continuations.mprs.tcl
 TkconSourceHere send-to-swank.tcl
 
 proc ::tkcon::myerror {text} {
@@ -127,14 +125,6 @@ proc ::tkcon::SwankRequestCreateRepl {} {
     variable PRIV
     ::tkcon::SwankEmacsRex {(swank-repl:create-repl nil :coding-system "utf-8-unix")}
     set PRIV(SwankThread) 1
-}
-
-
-proc ::mprs::ExtractContinuationId {EventAsList} {
-    set EventHead [lindex $EventAsList 0]
-    if {[lsearch {:return :abort} $EventHead] >= 0} {
-        return [Unleash [lindex $EventAsList 2]]               
-    }
 }
 
 # must be called when SWANKIsInSyncMode and when SWANKSyncContinuation is set
@@ -249,17 +239,6 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
     }
     return {}
 } 
-
-## We know continuiation exists. Runs its continuation synchronously. 
-proc ::mprs::RunContinuation {ContinuationId EventAsList} {
-    variable ContinuationsDict
-    # If we get error here, we trying to call continuation which was not sheduled or
-    # which was lost
-    set Continuation [dict get $ContinuationsDict $ContinuationId]
-    dict unset ContinuationsDict $ContinuationId
-    apply $Continuation $EventAsList
-}
-    
 
 # If there is an event on the queue, process it.
 proc ::mprs::ProcessFirstEventFromQueueAsyncrhonously {} {
@@ -549,17 +528,6 @@ proc ::tkcon::OuterNewSwank {} {
 #    }
 #}
 
-
-# Pass something to lisp, quoted. Lame!
-proc ::tkcon::QuoteLispObjToString {str} {
-    # putd "We must quote string $str better!"
-    # return [string cat "\"" $str "\""]
-
-    regsub -all {[\ \\\"]} $str {\\&} s2
-    regsub -all {\n} $s2 {\n} s3
-    set result [string cat \" $s3 \"]
-    return $result
-}
 
 ## ::tkcon::LispFindDefinitionInner
 # Similar to ::tkcon::ExpandLispSymbol
