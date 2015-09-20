@@ -80,8 +80,12 @@ proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form MsgFmtKind} {
 }
 
 
+## IDE orders EMACS to do some evaluation
+proc ::tkcon::EvalInSwankAsync {form continuation {ThreadDesignator {}} {ContinuationCounter {}}} {
+    ::tkcon::SendEventToSwank $form $continuation 0 $ThreadDesignator $ContinuationCounter
+}
 
-## EvalInSwankAsync - this is a misname. This function is responsible for all
+## SendEventToSwank . This function is responsible for all
 # sending of events to SWANK.
 # Args:
 # Form - text of form to execute quoted as needed
@@ -90,19 +94,19 @@ proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form MsgFmtKind} {
 #   0 - normal eval (IDE orders EMACS to do evaluation)
 #   1 - listener eval (form will be wrapped into (swank-repl:listener-eval ...)
 #   2 - emacs-pong event (passed verbatim, ThreadDesignator and ContinuationCounter unneeded)
-#   3 - emacs-return event (:emacs-return ContinuationCounter result) - form is a result, which is (:ok lisp-value), (:error lisp-kind . lisp-data), or (:abort). All lisp values must be quoted for passing by the caller of EvalInSwankAsync
+#   3 - emacs-return event (:emacs-return ContinuationCounter result) - form is a result, which is (:ok lisp-value), (:error lisp-kind . lisp-data), or (:abort). All lisp values must be quoted for passing by the caller of SendEventToSwank
 #
 #   ThreadDesignator - see swank::thread-for-evaluation
 #   ContinuationCounter - required to identify addressee of swank's reply.
 #        If not passed, it is calculated when needed
 # 
-proc ::tkcon::EvalInSwankAsync {form continuation {MsgFmtKind 1} {ThreadDesignator {}} {ContinuationCounter {}}} {
+proc ::tkcon::SendEventToSwank {form continuation {MsgFmtKind 1} {ThreadDesignator {}} {ContinuationCounter {}}} {
     variable PRIV
 
     set ConnectionName $::swcnn::CurrentSwankConnection
 
     if {$::swcnn::CurrentSwankConnection eq {}} {
-        error "Attempt to EvalInSwankAsync with disconnected SWANK: $form"
+        error "Attempt to SendEventToSwank with disconnected SWANK: $form"
     }
     
     upvar \#0 $ConnectionName con
@@ -114,7 +118,7 @@ proc ::tkcon::EvalInSwankAsync {form continuation {MsgFmtKind 1} {ThreadDesignat
     ## send things like \n\r or explicit hex values
     #set cmd [subst -novariables -nocommands $form]
 
-    ::CurIntPath "EvalInSwankAsync 2"
+    ::CurIntPath "SendEventToSwank 2"
 
     if { $MsgFmtKind == 3 } {
         if {$ContinuationCounter eq {} || $ThreadDesignator eq {}} {
@@ -158,6 +162,6 @@ proc ::tkcon::EvalInSwankAsync {form continuation {MsgFmtKind 1} {ThreadDesignat
 ##  be read with read-response.
 ##  MsgFmtKind must be 1 if form is (swank-repl:listener-eval ...) or 0 otherwise
 proc ::tkcon::SwankEmacsRex {form {MsgFmtKind 0}} {
-    EvalInSwankAsync $form {} $MsgFmtKind
+    SendEventToSwank $form {} $MsgFmtKind
 }
 

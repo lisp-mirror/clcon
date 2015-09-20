@@ -239,7 +239,7 @@ namespace eval ::clcon_text {
             putd \$EventAsList
             ::clcon_text::IncrPendingSentNotifications \
                 -1 $clcon_text $UseGlobalPendingText2OduEventCounter
-        }] 0 {:find-existing}
+        }] {:find-existing}
         #puts "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
     }
 

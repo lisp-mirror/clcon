@@ -70,7 +70,7 @@ proc ::mprs::EvalInSwankSyncInner {lispcode} {
     set ::tkcon::SWANKSyncContinuation $ContinuationCounter
 
     # send command
-    ::tkcon::EvalInSwankAsync $lispcode {} 0 t $ContinuationCounter
+    ::tkcon::EvalInSwankAsync $lispcode {} t $ContinuationCounter
 
     # Delay all async events from lisp. Process sync events. 
     while {1 == 1} {
@@ -200,7 +200,7 @@ proc ::mprs::EvalInTclSync {EventAsList} {
     set qResult [::tkcon::QuoteLispObjToString $Result]
     set EvalInTclValueForm "(:ok $qResult)"
     showVar EvalInTclValueForm
-    ::tkcon::EvalInSwankAsync $EvalInTclValueForm {} 3 $ThreadId $Tag
+    ::tkcon::SendEventToSwank $EvalInTclValueForm {} 3 $ThreadId $Tag
     return     
 }
 
@@ -476,8 +476,6 @@ proc ::tkcon::AttachSwank {name} {
 
     set PRIV(SwankThread) t
     set ::swcnn::CurrentSwankConnection $name
-
-    # interp alias {} ::tkcon::EvalAttached {} ::tkcon::EvalInSwankAsync {} \#0
 
     if { $con(state) eq "socket_only" } {
         fconfigure $sock -buffering full -blocking 0

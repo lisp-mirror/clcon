@@ -280,7 +280,7 @@ namespace eval ::ldbg {
         set lispCmd "(swank:frame-locals-and-catch-tags $FrameNo)"
         ::tkcon::EvalInSwankAsync $lispCmd [subst -nocommands {
             ::ldbg::InsertLocsNTagsForFrameIntoTree $RowName \$EventAsList
-        }] 0 [GetDebuggerThreadId]
+        }] [GetDebuggerThreadId]
     }
 
 
@@ -289,7 +289,7 @@ namespace eval ::ldbg {
         set TblForLisp [::tkcon::QuoteLispObjToString $tbl]
         ::tkcon::EvalInSwankAsync                                                   \
             "(clcon-server:ldbg-edit-frame-source-location $FrameNo $TblForLisp)"   \
-            {} 0 [GetDebuggerThreadId]
+            {} [GetDebuggerThreadId]
     }
     
     proc RowDblClick {tbl RowName} {
@@ -544,7 +544,7 @@ namespace eval ::ldbg {
         ::tkcon::EvalInSwankAsync                           \
             "(swank:inspect-frame-var $FrameNo $LocalNo)"   \
             "::insp::SwankInspect1 \$EventAsList"           \
-            0 $thread
+            $thread
     }
 
     proc InspectCurrentCondition {} {
@@ -552,7 +552,7 @@ namespace eval ::ldbg {
         ::tkcon::EvalInSwankAsync                           \
             " (swank:inspect-current-condition)"            \
             "::insp::SwankInspect1 \$EventAsList"           \
-            0 $thread
+            $thread
     }      
     
     # (:emacs-rex
@@ -567,7 +567,7 @@ namespace eval ::ldbg {
         set level [GetDebuggerLevel]
         ::tkcon::EvalInSwankAsync \
             "(swank:invoke-nth-restart-for-emacs $level $i)" \
-            {} 0 $thread
+            {} $thread
         after idle destroy $MainWindow
     }
 
@@ -579,7 +579,7 @@ namespace eval ::ldbg {
         set level [GetDebuggerLevel]
         ::tkcon::EvalInSwankAsync \
             "(swank:sldb-abort)" \
-            {} 0 $thread
+            {} $thread
         after idle destroy $MainWindow
     }
     

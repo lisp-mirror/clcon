@@ -4,7 +4,7 @@
 
 # Command evaluation with tcl escape handling and history substitution
 # Main checkpoints are:
-# ::tkcon::EvalInSwankAsync {form continuation {MsgFmtKind 1} {ThreadDesignator {}} {ContinuationCounter {}}  - normal evaluation
+# ::tkcon::EvalInSwankAsync {form continuation {ThreadDesignator {}} {ContinuationCounter {}}  - normal evaluation
 # where w and cmd are local variables, $EventAsList is a parameter of Continuation.
 # continuation maybe of form
 #"::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $cmd]"
@@ -196,8 +196,8 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
         } else {
             # FIXME. I suppose this is slow. How to use apply here?
             # tip: grep apply in the whole project
-            set res [EvalInSwankAsync $RealForm \
-                         "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $RealForm]"]
+            set res [SendEventToSwank $RealForm \
+                         "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $RealForm]" 1]
             return $res
         }
     } result]

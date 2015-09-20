@@ -111,6 +111,6 @@ namespace eval ::swcnn {
         set tag [::mprs::Unleash [lindex $EventAsList 2]]
         # tag is a number, no need to quote it
         set lispCmd "(:emacs-pong $threadId $tag)"
-        ::tkcon::EvalInSwankAsync $lispCmd {} 2 $threadId
+        ::tkcon::SendEventToSwank $lispCmd {} 2 $threadId
     }
 }

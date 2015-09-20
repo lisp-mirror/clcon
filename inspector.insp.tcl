@@ -49,7 +49,7 @@ proc ::insp::InitInspector { LispExpr } {
     putd "Entered InitInspector with $LispExpr"
     set Quoted [::tkcon::QuoteLispObjToString $LispExpr]
     set RealExpr "(swank:init-inspector $Quoted)"
-    ::tkcon::EvalInSwankAsync $RealExpr "::insp::SwankInspect1 \$EventAsList" 0 :repl-thread 
+    ::tkcon::EvalInSwankAsync $RealExpr "::insp::SwankInspect1 \$EventAsList" :repl-thread 
 
 
 # (clco::convert-object-to-tcl '(:title "#<cons {BD735A3}>" :id 0 :content (("A proper list:" "\n" "0" ": "
@@ -177,26 +177,26 @@ proc ::insp::SwankInspect1 { EventAsList } {
 proc ::insp::InspectNthPart {w id} {
     set ContId [::tkcon::GenContinuationCounter]
     set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
-    ::tkcon::EvalInSwankAsync "(swank:inspect-nth-part $id)" $OnReply 0 t $ContId
+    ::tkcon::EvalInSwankAsync "(swank:inspect-nth-part $id)" $OnReply t $ContId
 }
 
 proc ::insp::InspectorPop { w } {
     set ContId [::tkcon::GenContinuationCounter]
     set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
-    ::tkcon::EvalInSwankAsync "(swank:inspector-pop)" $OnReply 0 t $ContId
+    ::tkcon::EvalInSwankAsync "(swank:inspector-pop)" $OnReply t $ContId
 }
 
 proc ::insp::InspectorNext { w } {
     set ContId [::tkcon::GenContinuationCounter]
     set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
-    ::tkcon::EvalInSwankAsync "(swank:inspector-next)" $OnReply 0 t $ContId
+    ::tkcon::EvalInSwankAsync "(swank:inspector-next)" $OnReply t $ContId
 }
 
 
 proc ::insp::InspectorReinspect { w } {
     set ContId [::tkcon::GenContinuationCounter]
     set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
-    ::tkcon::EvalInSwankAsync "(swank:inspector-reinspect)" $OnReply 0 t $ContId
+    ::tkcon::EvalInSwankAsync "(swank:inspector-reinspect)" $OnReply t $ContId
 }
 
 
