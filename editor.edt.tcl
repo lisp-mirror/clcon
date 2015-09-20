@@ -272,7 +272,7 @@ namespace eval ::edt {
         ##
         set m [menu [::tkcon::MenuButton $menu File file]]
         $m add command -label "Save As..."  -underline 0 \
-            -command [wesppt [list ::tkcon::Save {} widget $w.text]]
+            -command [list ::tkcon::Save {} widget $w.text]
         $m add separator
 
         set CloseFile [wesppt [list ::edt::EditCloseFile $tw $w]]
