@@ -36,7 +36,7 @@
            (col (mark-charpos mark))
            (command (format nil "~A mark set ~A ~A.~A"
                             clcon_text (string remote-name) row col)))
-      (clco:eval-in-tcl command))
+      (clco:eval-in-tcl command :nowait nil))
     ))
 
 #| tests: 
