@@ -54,6 +54,12 @@ proc ::tkcon::CalculateThreadDesignatorForSwank {MsgFmtKind} {
     }
 }
 
+proc ::tkcon::FormatEmacsReturnMessageInner {value ThreadDesignator ContinuationCounter} {
+    # (:emacs-return thread tag value)
+    set msgNoLen "(:emacs-return $ThreadDesignator $ContinuationCounter $value)"
+    EncodeAnySwankMessage $msgNoLen
+}
+
 proc ::tkcon::FormatSwankRexEvalMessageInner {cmd ThreadDesignator ContinuationCounter} {
     # commented out line is for my patched version which passes readtable
     # set msgNoLen "(:emacs-rex-rt $cmd \"COMMON-LISP-USER\" nil $ThreadDesignator $ContinuationCounter)"
@@ -70,7 +76,10 @@ proc ::tkcon::EncodeAnySwankMessage {msgNoLen} {
 proc ::tkcon::FormatSwankRexEvalMessage {cmd MsgFmtKind {ThreadDesignator {}} {ContinuationCounter {}}} {
     if {$MsgFmtKind == 2} {
         return [EncodeAnySwankMessage $cmd]
+    } elseif {$MsgFmtKind == 3} {
+        return [FormatEmacsReturnMessageInner $cmd $ThreadDesignator $ContinuationCounter]
     }
+    
     if { $ThreadDesignator eq {} } {
         set ThreadDesignator [CalculateThreadDesignatorForSwank $MsgFmtKind]
     }
@@ -83,6 +92,7 @@ proc ::tkcon::FormatSwankRexEvalMessage {cmd MsgFmtKind {ThreadDesignator {}} {C
 
 proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form MsgFmtKind} {
     if {$MsgFmtKind == 1} {
+        # QuoteLispObjToString ?
         set cmd [regsub -all {([\"\\])} $form {\\\0}]
         return "(swank-repl:listener-eval \"$cmd\")"
     } else {
@@ -168,13 +178,16 @@ proc ::mprs::DeleteSyncEventsFromTheQueue {} {
     }
 }
 
-## Args:
+## EvalInSwankAsync - this is a misname. This function is responsible for all
+# sending of events to SWANK.
+# Args:
 # Form - text of form to execute quoted as needed
 # Continuation - body of proc to accept argument EventAsList
 # MsgFmtKind
 #   0 - normal eval (IDE orders EMACS to do evaluation)
 #   1 - listener eval (form will be wrapped into (swank-repl:listener-eval ...)
-#   2 - emacs-pong event (passed verbatim, ThreadDesignator and ContinuationCounter unneded)
+#   2 - emacs-pong event (passed verbatim, ThreadDesignator and ContinuationCounter unneeded)
+#   3 - emacs-return event (:emacs-return ContinuationCounter result) - form is a result, which is (:ok lisp-value), (:error lisp-kind . lisp-data), or (:abort). All lisp values must be quoted for passing by the caller of EvalInSwankAsync
 #
 #   ThreadDesignator - see swank::thread-for-evaluation
 #   ContinuationCounter - required to identify addressee of swank's reply.
@@ -199,7 +212,15 @@ proc ::tkcon::EvalInSwankAsync {form continuation {MsgFmtKind 1} {ThreadDesignat
     #set cmd [subst -novariables -nocommands $form]
 
     ::CurIntPath "EvalInSwankAsync 2"
-    
+
+    if { $MsgFmtKind == 3 } {
+        if {$ContinuationCounter eq {} || $ThreadDesignator eq {}} {
+            error "ContinuationCounter (tag) and ThreadDesignator must be supplied for :emacs-return event"
+        }
+        if {$continuation ne {}} {
+            error "Continuation must not be passed for :emacs-return event"
+        }
+    }
     if { $ContinuationCounter eq {} && $MsgFmtKind != 2 } {
         set ContinuationCounter [GenContinuationCounter]
     }
@@ -208,7 +229,7 @@ proc ::tkcon::EvalInSwankAsync {form continuation {MsgFmtKind 1} {ThreadDesignat
     set cmd [SwankMaybeWrapFormIntoListenerEval $cmd $MsgFmtKind]
     set cmd [FormatSwankRexEvalMessage $cmd $MsgFmtKind $ThreadDesignator $ContinuationCounter]
 
-    ::mprs::EnqueueContinuation $ContinuationCounter $continuation 
+    ::mprs::EnqueueContinuation $ContinuationCounter $continuation
 
     putd "About to send to SWANK: $cmd"
 
@@ -325,6 +346,24 @@ proc ::mprs::MaybeProcessSyncEventFromQueue {} {
     return [list 1 $Event]
 }
 
+
+proc ::mprs::EvalInTclSync {EventAsList} {
+    set ThreadId [Unleash [lindex $EventAsList 1]]
+    set Tag [Unleash [lindex $EventAsList 2]]
+    set Code [Unleash [lindex $EventAsList 3]]
+    puts stderr $EventAsList
+    set errorCode [catch {eval $Code} Result]
+    if {$errorCode} {
+        tk_messageBox "Error in EvalInTclSync - don't know what to do. See clco:eval-in-tcl"
+        return
+    }
+    set qResult [::tkcon::QuoteLispObjToString $Result]
+    set EvalInTclValueForm "(:ok $qResult)"
+    showVar EvalInTclValueForm
+    ::tkcon::EvalInSwankAsync $EvalInTclValueForm {} 3 $ThreadId $Tag
+    return     
+}
+
 # this is an async event. Process it. E.g. call a continuation
 proc ::mprs::ProcessAsyncEvent {EventAsList} {
     set ContinuationId [ExtractContinuationId $EventAsList]
@@ -334,7 +373,10 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
         puts -nonewline [Unleash [lindex $EventAsList 1]]
         ::tkcon::SheduleCheckSWANKEventQueue
     } elseif { $Head eq ":eval-no-wait" } {
+        # is it a synchronous evaluation indeed?
         eval [Unleash [lindex $EventAsList 1]]
+    } elseif { $Head eq  ":eval"} {
+        EvalInTclSync $EventAsList
     } elseif { $Head eq ":debug" } {
         ::ldbg::ldbg $EventAsList
     } elseif { $Head eq ":debug-activate" } {

@@ -75,3 +75,13 @@ Hide Window и потом опять defun - не должно ломаться.
 ..::tkcon::EvalInSwankAsync "ewrw)" {} 0
 
 Должна быть адекватная реакция клиента (какая - пока неведомо)
+
+
+Тестирование eval-in-tcl
+===============
+Есть два режима - nowait и wait.
+Что делать с nowait - не знаю.
+Что делать с wait: выполнить с консоли:
+
+(assert (equalp (clco::eval-in-tcl "expr 1" :nowait nil) "1"))
+

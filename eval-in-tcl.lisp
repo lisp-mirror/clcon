@@ -17,5 +17,12 @@
   (cond (nowait 
          (swank::send-to-emacs `(:eval-no-wait ,code)))
         (t
-         (error "eval-in-tcl :wait not implemented. See swank::eval-in-emacs for code"
-                ))))
+         (force-output)
+         (let ((tag (swank::make-tag)))
+	   (swank::send-to-emacs `(:eval ,(swank::current-thread-id) ,tag 
+                                        ,code))
+	   (let ((value (caddr (swank::wait-for-event `(:emacs-return ,tag result)))))
+	     (swank::dcase value
+	       ((:ok value) value)
+               ((:error kind . data) (error "~a: ~{~a~}" kind data))
+	       ((:abort) (abort))))))))
