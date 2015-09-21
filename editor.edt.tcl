@@ -298,7 +298,7 @@ namespace eval ::edt {
         set cmd [wesppt [list clcon_text::IndentNextLine $text "indent-new-line-command"]]
         $m add command -label "Indent Next Line" -accel "F7" -command $cmd
         bind $w <F7> $cmd
-        set cmd [wesppt [list $text Unfreeze]]
+        set cmd [list $text Unfreeze]
         $m add command -label "1.Unfreeze (if oduvanchik hang)" -command $cmd
         ##
         $m add separator
