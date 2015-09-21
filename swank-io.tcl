@@ -191,7 +191,7 @@ proc ::mprs::EvalInTclSync {EventAsList} {
     set ThreadId [Unleash [lindex $EventAsList 1]]
     set Tag [Unleash [lindex $EventAsList 2]]
     set Code [Unleash [lindex $EventAsList 3]]
-    puts stderr "Entered EvalInTclSync with $EventAsList"
+    #puts stderr "Entered EvalInTclSync with $EventAsList"
     set Result [eval $Code]
     # set errorCode [catch {eval $Code} Result]
     # if {$errorCode} {
@@ -200,8 +200,8 @@ proc ::mprs::EvalInTclSync {EventAsList} {
     # }
     set qResult [::tkcon::QuoteLispObjToString $Result]
     set EvalInTclValueForm "(:ok $qResult)"
-    showVar EvalInTclValueForm
-    puts stderr "Returning from EvalInTclSync"
+    #showVar EvalInTclValueForm
+    #puts stderr "Returning from EvalInTclSync"
     ::tkcon::SendEventToSwank $EvalInTclValueForm {} 3 $ThreadId $Tag
     return     
 }
