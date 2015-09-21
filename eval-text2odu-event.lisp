@@ -83,7 +83,6 @@
         (let ((oduvanchik-internals::*do-editing-on-tcl-side* t))
           (indent-new-line-command nil)
           )
-        ;(send-buffer-point-to-clcon_text buffer)
         )
       (clco::invoke-text2odu-event-far_tcl_continuation e)
       nil
@@ -92,7 +91,6 @@
 ; for single chars, use (oduvanchik-ext:char-key-event #\x)
 (defun eval-text2odu-event (e)
   "This code is executed inside a command. Transrom text2odu events to oduvanchik function calls"
-  (format t "~%eval-text2odu-event: received ~S" e)
   (etypecase e
     (clcon-server::text2odu-event
      (ecase (clco::text2odu-event-kind e)

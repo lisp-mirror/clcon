@@ -10,6 +10,7 @@
     (if (eq mark point) "insert" default)))    
 
 (defmethod sync-mark-from-clcon_text (clcon_text mark remote-name)
+  "See also send-mark-to-clcon_text"
   (check-type remote-name (or symbol string))
   (check-type mark mark)
   (let* ((code (format nil "expr [~A index ~A]" clcon_text remote-name))
