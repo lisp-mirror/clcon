@@ -79,13 +79,12 @@
          (buffer (oi::clcon_text-to-buffer clcon_text)))
     (swank::with-connection (connection)
       (use-buffer buffer
-        (with-mark-in-row-col (clcon_text-insert cur-row-col)
-          (move-mark (current-point) clcon_text-insert)
-          (let ((oduvanchik-internals::*do-editing-on-tcl-side* t))
-            (indent-new-line-command nil)
-            )
+        (oi::sync-mark-from-clcon_text clcon_text (current-point) "insert")
+        (let ((oduvanchik-internals::*do-editing-on-tcl-side* t))
+          (indent-new-line-command nil)
           )
-        (send-buffer-point-to-clcon_text buffer))
+        ;(send-buffer-point-to-clcon_text buffer)
+        )
       (clco::invoke-text2odu-event-far_tcl_continuation e)
       nil
       )))
