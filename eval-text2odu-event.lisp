@@ -72,6 +72,8 @@
     (oi::send-mark-to-clcon_text clcon_text p :remote-name "insert")
     ))
 
+(defun nop (&rest args) (declare (ignore args)))
+
 (defun eval-indent-next-line (e)
   (let* ((clcon_text (clco::text2odu-event-clcon_text-pathname e))
          (cur-row-col (clco::text2odu-event-beg e))
