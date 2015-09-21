@@ -16,10 +16,13 @@
   (let* ((code (format nil "expr [~A index ~A]" clcon_text remote-name))
          (index (call-tcl-simple code)))
     (multiple-value-bind (row col) (parse-tcl-text-index index)
-      (budden-tools:show-expr `(,row ,col))
       (odu::set-mark-to-row-and-col mark row col)
-      (budden-tools:show-expr (multiple-value-list (mark-row-and-col mark)))
-      )))
+      (multiple-value-bind (new-row new-col)
+          (mark-row-and-col mark)
+        (unless (and (= row new-row) (= col new-col))
+          (cerror "continue" "sync-mark-from-clcon_text failed: row:~A?~A,col:~A?~A"
+                  row new-row col new-col))
+        ))))
 
 (defun offset-of-line (line)
   "Line is an editor's line object, e.g. received as mark-line function. Return line number, at which it is located, starting from 1"
