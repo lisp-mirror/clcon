@@ -23,7 +23,7 @@
   "See gf documentation"
   (assert *do-editing-on-tcl-side*)
   (let ((*do-editing-on-tcl-side* nil))
-    (clco:eval-in-tcl code)))
+    (clco:eval-in-tcl code :nowait nil)))
 
 (defmethod call-tcl-simple (code)
   "See generic-function documentation"
@@ -35,6 +35,14 @@
   (let ((tcl-character (cl-tk:tcl-escape (make-string 1 :initial-element character))))
     (format nil "~A insert ~A ~A" clcon_text remote-mark-name tcl-character)))
 
+(defmethod tcl-code-for-insert-string (clcon_text remote-mark-name string)
+  "See generic-function docstring"
+  (format nil "~A insert ~A ~A" clcon_text remote-mark-name (cl-tk:tcl-escape string)))
+
+(defmethod tcl-code-for-delete-region (clcon_text remote-beg-mark-name remote-end-mark-name)
+  "See generic-function docstring"
+  (format nil "~A delete ~A ~A" clcon_text remote-beg-mark-name remote-end-mark-name)
+  )
 
 #| tests: 
  (oduvanchik::send-mark-to-clcon_text ### (oduvanchik::buffer-start-mark (oduvanchik::current-buffer)) :remote-name "bb")
