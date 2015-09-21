@@ -49,12 +49,18 @@
 
 (defmethod tcl-code-for-insert-character (clcon_text remote-mark-name character)
   "See generic-function docstring"
-  (let ((tcl-character (cl-tk:tcl-escape (make-string 1 :initial-element character))))
-    (format nil "~A insert ~A ~A" clcon_text remote-mark-name tcl-character)))
+  (with-standard-io-syntax
+    (let ((tcl-character (cl-tk:tcl-escape (make-string 1 :initial-element character))))
+      (format nil "~A insert ~A ~A"
+              clcon_text remote-mark-name tcl-character
+              ))))
 
 (defmethod tcl-code-for-insert-string (clcon_text remote-mark-name string)
   "See generic-function docstring"
-  (format nil "~A insert ~A ~A" clcon_text remote-mark-name (cl-tk:tcl-escape string)))
+  (with-standard-io-syntax
+    (format nil "~A insert ~A ~A"
+            clcon_text remote-mark-name (cl-tk:tcl-escape string)
+            )))
 
 (defmethod tcl-code-for-delete-region (clcon_text remote-beg-mark-name remote-end-mark-name)
   "See generic-function docstring"
