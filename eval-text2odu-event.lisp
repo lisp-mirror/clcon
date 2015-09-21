@@ -74,7 +74,7 @@
 
 (defun nop (&rest args) (declare (ignore args)))
 
-(defun eval-indent-next-line (e)
+(defun call-oduvanchik-function-with-clcon_text (e)
   (let* ((clcon_text (clco::text2odu-event-clcon_text-pathname e))
          (cur-row-col (clco::text2odu-event-beg e))
          (connection (clco::text2odu-event-swank-connection e))
@@ -119,8 +119,8 @@
        (clco::shutdown-text2odu-dispatcher
         (error "clco::shutdown-text2odu-dispatcher event must not arrive here")
         )
-       (clco::indent-next-line
-        (eval-indent-next-line e))
+       (clco::call-oduvanchik-function-with-clcon_text
+        (call-oduvanchik-function-with-clcon_text e))
        ))))
      
 

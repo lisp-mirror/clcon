@@ -65,7 +65,7 @@
     ;; eval-oduvanchik-command ; hypotetic. We send command from tcl in freezed mode,
     ;; sync insertion points, bind *oduvanchik-backend* to t so that all
     ;; editions are sent synchronously to tcl instead of local processing in oduvanchik
-    indent-next-line ; particular case of eval-oduvanchik-command just for one command
+    call-oduvanchik-function-with-clcon_text ; particular case of eval-oduvanchik-command just for one command
     ))
 
 (defstruct row-col
@@ -134,11 +134,11 @@
     :string string
     )))
 
-(defun oduvan-indent-next-line (clcon_text-pathname insert-index far_tcl_continuation oduvanchik-function-name)
-  "Send indent-next-line event to oduvanchik. See oduvanchik::eval-indent-next-line"
+(defun call-oduvanchik-function-with-clcon_text (clcon_text-pathname insert-index far_tcl_continuation oduvanchik-function-name)
+  "Send call-oduvanchik-function-with-clcon_text event to oduvanchik. See oduvanchik::call-oduvanchik-function-with-clcon_text"
   (post-oduvan-event
    (make-text2odu-event
-    :kind 'indent-next-line
+    :kind 'call-oduvanchik-function-with-clcon_text
     :clcon_text-pathname clcon_text-pathname
     :string oduvanchik-function-name
     :beg (parse-row-col insert-index) ; likely to be unused

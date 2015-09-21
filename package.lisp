@@ -14,8 +14,7 @@
            #:nti ; notify-oduvan-tcl-text-insert
            #:notify-oduvan-tcl-text-delete
            #:notify-oduvan-destroy-backend-buffer
-           #:oduvan-indent-next-line ; just an example, remove it later (maybe?)
-
+           #:call-oduvanchik-function-with-clcon_text 
            #:start-oduvanchik ; start oduvanchik in another thread
            )
   )

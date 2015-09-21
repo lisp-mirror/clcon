@@ -215,7 +215,7 @@ namespace eval ::clcon_text {
             DestroyBackendBuffer {
                 set lispCmd "(clco:notify-oduvan-destroy-backend-buffer $qId)"
             }
-            IndentNextLine {
+            CallOduvanchikFunction {
                 set qB [::text2odu::CoerceIndex $clcon_text insert]
                 set qText [lq [lindex $arglist 0]]
 
@@ -228,7 +228,7 @@ namespace eval ::clcon_text {
                 }
 
                 set qC [lq $far_tcl_continuation_body]
-                set lispCmd "(clco:oduvan-indent-next-line $qId $qB $qC $qText)"
+                set lispCmd "(clco:call-oduvanchik-function-with-clcon_text $qId $qB $qC $qText)"
             }
             default {
                 error "Hurray! We found replace command $type with args $clcon_text $type $arglist!"
@@ -297,10 +297,9 @@ namespace eval ::clcon_text {
         }
     }
 
-    # Just test/example
-    proc IndentNextLine {clcon_text OduvanchikFunctionName} {
+    proc CallOduvanchikFunction {clcon_text OduvanchikFunctionName} {
         $clcon_text Freeze
-        MaybeSendToLisp $clcon_text IndentNextLine [list $OduvanchikFunctionName] [subst -nocommand {$clcon_text Unfreeze}]
+        MaybeSendToLisp $clcon_text CallOduvanchikFunction [list $OduvanchikFunctionName] [subst -nocommand {$clcon_text Unfreeze}]
     }
 
     # # To be called from oi::delete-region
