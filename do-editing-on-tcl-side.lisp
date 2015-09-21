@@ -2,6 +2,12 @@
 ;; File related to sending editing primitives to tcl. 
 (in-package :oduvanchik-internals)
 
+(defun remote-mark-name (mark default)
+  "If mark is buffer-point, return just 'insert'. Otherwise, return default"
+  (let* ((line (mark-line mark))
+         (buffer (line-buffer line))
+         (point (buffer-point buffer)))
+    (if (eq mark point) "insert" default)))    
 
 (defun offset-of-line (line)
   "Line is an editor's line object, e.g. received as mark-line function. Return line number, at which it is located, starting from 1"
