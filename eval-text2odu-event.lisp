@@ -2,13 +2,20 @@
 ;; evaluation of text2odu events. Takes place in editor thread.
 (in-package :oduvanchik)
 
+(defun set-mark-to-row-and-col (mark row col)
+  "Row and col a given in clcon_text 's coordinate system"
+  (let* ((line (mark-line mark))
+         (buffer (line-buffer line)))
+    (move-mark mark (buffer-start-mark buffer))
+    (line-offset mark (- row 1) col)))
+
 (defmacro with-mark-in-row-col ((name row-col) &body body)
   "Evaluates body in the scope where name is bound to right-inserting temporary mark placed at clco::row-col struct"
   ;(beginning-of-buffer-command)
                                         ;(line-next
   (alexandria:once-only (row-col)
     `(with-mark ((,name (buffer-start-mark (current-buffer)) :right-inserting))
-       (line-offset ,name (- (clco::row-col-row ,row-col) 1) (clco::row-col-col ,row-col))
+       (set-mark-to-row-and-col ,name (clco::row-col-row ,row-col) (clco::row-col-col ,row-col))
        ,@body)))
 
 (defun delete-characters-between-marks (beg end)
@@ -67,7 +74,7 @@
 
 (defun eval-indent-next-line (e)
   (let* ((clcon_text (clco::text2odu-event-clcon_text-pathname e))
-         (cur-row-col (clco::text2odu-event-beg e))
+         ;(cur-row-col (clco::text2odu-event-beg e))
          (connection (clco::text2odu-event-swank-connection e))
          (buffer (oi::clcon_text-to-buffer clcon_text)))
     (swank::with-connection (connection)

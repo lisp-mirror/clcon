@@ -9,6 +9,17 @@
          (point (buffer-point buffer)))
     (if (eq mark point) "insert" default)))    
 
+(defmethod sync-mark-from-clcon_text (clcon_text mark remote-name)
+  (check-type remote-name (or symbol string))
+  (check-type mark mark)
+  (let* ((code (format nil "expr [~A index ~A]" clcon_text remote-name))
+         (index (call-tcl-simple code)))
+    (multiple-value-bind (row col) (parse-tcl-text-index index)
+      (budden-tools:show-expr `(,row ,col))
+      (odu::set-mark-to-row-and-col mark row col)
+      (budden-tools:show-expr (multiple-value-list (mark-row-and-col mark)))
+      )))
+
 (defun offset-of-line (line)
   "Line is an editor's line object, e.g. received as mark-line function. Return line number, at which it is located, starting from 1"
   (let* ((buffer (line-buffer line))
