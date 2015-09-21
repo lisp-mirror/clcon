@@ -223,8 +223,9 @@ namespace eval ::edt {
     }
 
 
+    # Wrapped for freezed text, for menu only
     proc wesppt {script} {
-        ::clcon_text::WrapEventScriptForFreezedText $script
+        ::clcon_text::WrapEventScriptForFreezedText $script [uplevel 1 {string cat "$w.text"}]
     }
 
     # Initializes editor GUI, loads text.
@@ -272,7 +273,7 @@ namespace eval ::edt {
         ##
         set m [menu [::tkcon::MenuButton $menu File file]]
         $m add command -label "Save As..."  -underline 0 \
-            -command [list ::tkcon::Save {} widget $w.text]
+            -command [wesppt [list ::tkcon::Save {} widget $w.text]]
         $m add separator
 
         set CloseFile [wesppt [list ::edt::EditCloseFile $tw $w]]
