@@ -74,14 +74,23 @@
 
 (defun eval-indent-next-line (e)
   (let* ((clcon_text (clco::text2odu-event-clcon_text-pathname e))
-         ;(cur-row-col (clco::text2odu-event-beg e))
+         (cur-row-col (clco::text2odu-event-beg e))
          (connection (clco::text2odu-event-swank-connection e))
-         (buffer (oi::clcon_text-to-buffer clcon_text)))
+         (buffer (oi::clcon_text-to-buffer clcon_text))
+         (fn-name (clco::text2odu-event-string e))
+         (fn (find-symbol (string-upcase fn-name) :oduvanchik))
+         )
+    (assert (and
+             (eq (symbol-package fn) (find-package :oduvanchik)) ; security limitation
+             (fboundp fn)) () "Symbol ~S (~S) not found, funbound or have home-package different from :oduvanchik" fn-name fn)
     (swank::with-connection (connection)
       (use-buffer buffer
-        (oi::sync-mark-from-clcon_text clcon_text (current-point) "insert")
+        (odu::set-mark-to-row-and-col (current-point)
+                                      (clco::row-col-row cur-row-col)
+                                      (clco::row-col-col cur-row-col))
+        ; (oi::sync-mark-from-clcon_text clcon_text (current-point) "insert")
         (let ((oduvanchik-internals::*do-editing-on-tcl-side* t))
-          (indent-new-line-command nil)
+          (funcall fn nil)
           )
         )
       (clco::invoke-text2odu-event-far_tcl_continuation e)

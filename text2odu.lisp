@@ -134,13 +134,14 @@
     :string string
     )))
 
-(defun oduvan-indent-next-line (clcon_text-pathname insert-index far_tcl_continuation)
+(defun oduvan-indent-next-line (clcon_text-pathname insert-index far_tcl_continuation oduvanchik-function-name)
   "Send indent-next-line event to oduvanchik. See oduvanchik::eval-indent-next-line"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'indent-next-line
     :clcon_text-pathname clcon_text-pathname
-    :beg (parse-row-col insert-index)
+    :string oduvanchik-function-name
+    :beg (parse-row-col insert-index) ; likely to be unused
     :far_tcl_continuation far_tcl_continuation
     :swank-connection swank::*emacs-connection*
     )))

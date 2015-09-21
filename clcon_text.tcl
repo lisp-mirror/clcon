@@ -217,6 +217,7 @@ namespace eval ::clcon_text {
             }
             IndentNextLine {
                 set qB [::text2odu::CoerceIndex $clcon_text insert]
+                set qText [lq [lindex $arglist 0]]
 
                 if {$far_tcl_continuation_body ne {}} {
                     ::clcon_text::IncrPendingFarTclContinuations 1 $clcon_text
@@ -227,7 +228,7 @@ namespace eval ::clcon_text {
                 }
 
                 set qC [lq $far_tcl_continuation_body]
-                set lispCmd "(clco:oduvan-indent-next-line $qId $qB $qC)"
+                set lispCmd "(clco:oduvan-indent-next-line $qId $qB $qC $qText)"
             }
             default {
                 error "Hurray! We found replace command $type with args $clcon_text $type $arglist!"
@@ -297,9 +298,9 @@ namespace eval ::clcon_text {
     }
 
     # Just test/example
-    proc IndentNextLine {clcon_text} {
+    proc IndentNextLine {clcon_text OduvanchikFunctionName} {
         $clcon_text Freeze
-        MaybeSendToLisp $clcon_text IndentNextLine {} [subst -nocommand {$clcon_text Unfreeze}]
+        MaybeSendToLisp $clcon_text IndentNextLine [list $OduvanchikFunctionName] [subst -nocommand {$clcon_text Unfreeze}]
     }
 
     # # To be called from oi::delete-region
