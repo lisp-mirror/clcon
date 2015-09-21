@@ -293,6 +293,14 @@ namespace eval ::edt {
             -command [wesppt [list tk_textCopy $text]]
         $m add command -label "Paste" -under 0 \
             -command [wesppt [list tk_textPaste $text]]
+        ##
+        $m add separator
+        set cmd [wesppt [list clcon_text::IndentNextLine $text]]
+        $m add command -label "Indent Next Line" -accel "F7" -command $cmd
+        bind $w <F7> $cmd
+        set cmd [wesppt [list $text Unfreeze]]
+        $m add command -label "1.Unfreeze (if oduvanchik hang)" -command $cmd
+        ##
         $m add separator
         $m add command -label "Find" -under 0 \
             -command [wesppt [list ::fndrpl::OpenFindBox $text "text" "find" {}]]
