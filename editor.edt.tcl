@@ -322,11 +322,21 @@ namespace eval ::edt {
         $m add separator
         #        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text "indent-new-line-command"]]
         set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text "new-line-command"]]
-
         $m add command -label "Indent Next Line" -accel "F7" -command $cmd
         bind $w <F7> $cmd
+        
         set cmd [list $text Unfreeze]
         $m add command -label "1.Unfreeze (if oduvanchik hang)" -command $cmd
+
+        set cmd [list ::tkcon::EvalInSwankAsync "(clco::compare-clcon_text-and-oduvanchik-buffer-contents \"$text\")" {}]
+        $m add command -label "Check Oduvanchik Sync" -accel "F8" -command $cmd
+        bind $w <F8> $cmd
+
+        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text "nop"]]
+        $m add command -label "Sync cursor" -accel "F9" -command $cmd
+        bind $w <F9> $cmd
+
+        
         ##
         $m add separator
         $m add command -label "Find" -under 0 \

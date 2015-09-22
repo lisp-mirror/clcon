@@ -306,6 +306,10 @@ namespace eval ::clcon_text {
     }
 
     proc CallOduvanchikFunction {clcon_text OduvanchikFunctionName} {
+        variable ::tkcon::OPT
+        if {!$::tkcon::OPT(oduvan-backend)} {
+            error "Unable to call oduvanchik functions with oduvan-backend disabled"
+        }
         $clcon_text Freeze
         MaybeSendToLisp $clcon_text CallOduvanchikFunction [list $OduvanchikFunctionName] [subst -nocommand {$clcon_text Unfreeze}]
     }
