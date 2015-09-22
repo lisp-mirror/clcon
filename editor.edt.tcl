@@ -390,7 +390,7 @@ namespace eval ::edt {
             file	{
                 ::clcon_text::ConstructBackendBuffer $w.text
 
-                $w.text insert 1.0 [::edt::ReadFileIntoString $word 1]
+                $w.text insert 1.0 [::edt::ReadFileIntoString $word 0]
 
                 after idle [::tkcon::Highlight $w.text \
                                 [string trimleft [file extension $word] .]]
