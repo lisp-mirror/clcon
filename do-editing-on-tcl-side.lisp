@@ -11,6 +11,7 @@
 
 (defmethod sync-mark-from-clcon_text (clcon_text mark remote-name)
   "See also send-mark-to-clcon_text"
+  (cerror "This gf should not be used" "")
   (check-type remote-name (or symbol string))
   (check-type mark mark)
   (let* ((code (format nil "expr [~A index ~A]" clcon_text remote-name))
@@ -96,7 +97,7 @@
            (tcl-code-for-insert-string
             clcon_text rmn string))
           (budden-tools:show-expr `(insert-string-before-sync-mark ,(multiple-value-list (mark-row-and-col mark))))
-          (sync-mark-from-clcon_text clcon_text mark rmn)
+          ;(sync-mark-from-clcon_text clcon_text mark rmn)
           (budden-tools:show-expr `(insert-string-after-sync-mark ,(multiple-value-list (mark-row-and-col mark))))
           (call-tcl-editing 
            (tcl-code-for-unset-clcon_text-mark clcon_text rmn))
@@ -114,7 +115,7 @@
           clcon_text mark :remote-name rmn)
          (tcl-code-for-insert-character
           clcon_text rmn character))
-        (sync-mark-from-clcon_text clcon_text mark rmn)
+        ;(sync-mark-from-clcon_text clcon_text mark rmn)
         (call-tcl-editing
          (tcl-code-for-unset-clcon_text-mark clcon_text rmn))
         t
