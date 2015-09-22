@@ -84,6 +84,7 @@
 
 (defmethod insert-string-with-clcon_text (mark string start end)
   "When oi::*do-editing-on-tcl-side*, does all processing by itself. If processes request, returns t. Otherwise returns nil"
+  (assert *do-editing-on-tcl-side*)
   (assert (= start 0))
   (assert (= end (length string)))
   (let* ((b (buffer-of-mark mark)))
@@ -104,6 +105,7 @@
       t)))
 
 (defmethod insert-character-with-clcon_text (mark character)
+  (assert *do-editing-on-tcl-side*)
   (let* ((b (buffer-of-mark mark))
          (clcon_text (oi::buffer-to-clcon_text b))
          (rmn (remote-mark-name mark "ic")))
@@ -126,6 +128,7 @@
   )
 
 (defmethod ninsert-region-with-clcon_text (mark region)
+  (assert *do-editing-on-tcl-side*)
   (let* ((b (buffer-of-mark mark)))
     (when (bufferp b) ; see %buffer slot description in oi::line definition
       ;; this means text is in some buffer and thus we must reflect it on clcon side
@@ -135,6 +138,7 @@
 (defmethod delete-characters-with-clcon_text (mark n)
   "We have to reproduce some logic from primary (defmethod delete-characters t) method"
   ;; code from primary method
+  (assert *do-editing-on-tcl-side*)
   (let* ((line (mark-line mark))
          (charpos (mark-charpos mark))
          (length (line-length* line))
@@ -161,6 +165,7 @@
       )))
 
 (defmethod delete-region-with-clcon_text (region)
+  (assert *do-editing-on-tcl-side*)
   (let* ((start (region-start region))
          (end (region-end region))
          (first-line (mark-line start))
@@ -183,6 +188,7 @@
     ))
 
 (defmethod delete-and-save-region-with-clcon_text (region)
+  (assert *do-editing-on-tcl-side*)
   (delete-region-with-clcon_text region)
   )
 
