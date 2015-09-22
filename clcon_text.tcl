@@ -194,15 +194,23 @@ namespace eval ::clcon_text {
             !$::tkcon::OPT(oduvan-backend) } {
             return
         }
+        # This is a temporary solution. This is a separate option indeed
+        set SendInsertionAndDeletions [expr {![$clcon_text cget -private_freezed]}]
         set qId [lq $clcon_text]
         switch -exact $type {
             i {
+                if {!$SendInsertionAndDeletions} {
+                    return
+                }
                 set index [lindex $arglist 0]
                 set qIndex [::text2odu::CoerceIndex $clcon_text $index]
                 set qText [lq [lindex $arglist 1]]
                 set lispCmd "(clco:nti $qId $qIndex $qText)"
             }
             d {
+                if {!$SendInsertionAndDeletions} {
+                    return
+                }
                 set b [lindex $arglist 0]
                 set qB [::text2odu::CoerceIndex $clcon_text $b]
                 set e [lindex $arglist 1]

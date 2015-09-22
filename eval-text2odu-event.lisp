@@ -94,6 +94,7 @@
         (let ((oduvanchik-internals::*do-editing-on-tcl-side* t))
           (funcall fn nil)
           )
+        (odu::send-buffer-point-to-clcon_text buffer)
         )
       (clco::invoke-text2odu-event-far_tcl_continuation e)
       nil
