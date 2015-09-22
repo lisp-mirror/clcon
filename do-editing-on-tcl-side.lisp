@@ -187,9 +187,22 @@
   )
 
 
+;; Region selection
+(defun tcl-code-to-select-region (clcon_text rmn-rb rmn-re)
+  (format nil "::edt::TextSetSelectionTo ~A ~A ~A"
+          clcon_text (tcl-index-of-mark rmn-rb) (tcl-index-of-mark rmn-re)))
 
-
-
+(defmethod transfer-selection-to-clcon_text (buffer)
+  (when *do-editing-on-tcl-side*
+    (use-buffer buffer
+      (let* ((clcon_text (buffer-to-clcon_text buffer))
+             (r (current-region t nil))
+             (rb (region-start r))
+             (re (region-end r)))
+        (call-combined-tcl-editing
+         (tcl-code-to-select-region clcon_text rb re)
+         )))))
+       
 
 #| tests: 
  (oduvanchik::send-mark-to-clcon_text ### (oduvanchik::buffer-start-mark (oduvanchik::current-buffer)) :remote-name "bb")
