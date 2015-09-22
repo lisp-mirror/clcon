@@ -252,7 +252,46 @@ namespace eval ::edt {
     proc wesppt {script} {
         ::clcon_text::WrapEventScriptForFreezedText $script [uplevel 1 {string cat "$w.text"}]
     }
+    
+    proc OduFnMenuItem {w m text oduCmd {accel {}}} {
+        set oduFn [string cat $oduCmd "-command"]
+        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text $oduFn]]
+        $m add command -label $oduCmd -accel $accel -command $cmd
+        if {$accel ne {}} {
+            bind $w $accel $cmd
+        }
+    }
 
+    proc MakeLispModeMenu {menu w text} {
+        set m [menu [::tkcon::MenuButton $menu 3.Lisp lisp]]
+
+        # It is too late hour to start show-mark
+        # We have archietectural problems there (rompsite.lisp is too early on the build)
+        # set oduCmd "lisp-insert-\)"
+        # set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text $oduCmd]]
+        # $m add command -label $oduCmd -accel "F11" -command $cmd
+        # bind $w <F11> $cmd
+
+        $m add separator
+        OduFnMenuItem $w $m $text indent-new-line
+        OduFnMenuItem $w $m $text transpose-forms
+        $m add separator
+        OduFnMenuItem $w $m $text beginning-of-defun
+        OduFnMenuItem $w $m $text end-of-defun
+        OduFnMenuItem $w $m $text mark-defun 
+        $m add separator
+        OduFnMenuItem $w $m $text forward-form
+        OduFnMenuItem $w $m $text backward-form
+        OduFnMenuItem $w $m $text forward-list
+        OduFnMenuItem $w $m $text backward-list
+        OduFnMenuItem $w $m $text forward-up-list
+        OduFnMenuItem $w $m $text backward-up-list
+        OduFnMenuItem $w $m $text down-list
+    }
+
+
+
+    
     # Initializes editor GUI, loads text.
     # args are for error only
     proc SetupEditorWindow {tw w word opts tail} {
@@ -293,10 +332,11 @@ namespace eval ::edt {
         
         set menu [menu $w.mbar]
         $w configure -menu $menu
+        set text $w.text
         
         ## File Menu
         ##
-        set m [menu [::tkcon::MenuButton $menu File file]]
+        set m [menu [::tkcon::MenuButton $menu 1.File file]]
         $m add command -label "Save As..."  -underline 0 \
             -command [wesppt [list ::tkcon::Save {} widget $w.text]]
         $m add separator
@@ -310,8 +350,7 @@ namespace eval ::edt {
         
         ## Edit Menu
         ##
-        set text $w.text
-        set m [menu [::tkcon::MenuButton $menu Edit edit]]
+        set m [menu [::tkcon::MenuButton $menu 2.Edit edit]]
         $m add command -label "Cut"   -under 2 \
             -command [wesppt [list tk_textCut $text]]
         $m add command -label "Copy"  -under 0 \
@@ -320,27 +359,12 @@ namespace eval ::edt {
             -command [wesppt [list tk_textPaste $text]]
         ##
         $m add separator
-        set oduCmd "indent-new-line-command"
-        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text $oduCmd]]
-        $m add command -label $oduCmd -accel "F7" -command $cmd
-        bind $w <F7> $cmd
-        
-        set cmd [list $text Unfreeze]
-        $m add command -label "1.Unfreeze (if oduvanchik hang)" -command $cmd
-
-        set cmd [list ::tkcon::EvalInSwankAsync "(clco::compare-clcon_text-and-oduvanchik-buffer-contents \"$text\")" {}]
-        $m add command -label "Check Oduvanchik Sync" -accel "F8" -command $cmd
-        bind $w <F8> $cmd
-
-        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text "nop"]]
-        $m add command -label "Sync cursor" -accel "F9" -command $cmd
-        bind $w <F9> $cmd
-
-        
-        ##
-        $m add separator
         $m add command -label "Find" -under 0 \
             -command [wesppt [list ::fndrpl::OpenFindBox $text "text" "find" {}]]
+
+        ## Lisp mode Menu
+        ##
+        MakeLispModeMenu $menu $w $text
         
         ## Send To Menu
         ## 
@@ -366,6 +390,27 @@ namespace eval ::edt {
             -command $cmd
         bind $w <Control-Key-period> $cmd
         
+        ## Secret Menu
+        ##
+        set text $w.text
+        set m [menu [::tkcon::MenuButton $menu Secret secret]]
+
+        set oduFn "indent-new-line-command"
+        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text $oduFn]]
+        $m add command -label $oduFn -accel "F7" -command $cmd
+        bind $w <F7> $cmd
+        
+        set cmd [list $text Unfreeze]
+        $m add command -label "1.Unfreeze (if oduvanchik hang)" -command $cmd
+
+        set cmd [list ::tkcon::EvalInSwankAsync "(clco::compare-clcon_text-and-oduvanchik-buffer-contents \"$text\")" {}]
+        $m add command -label "Check Oduvanchik Sync" -accel "F8" -command $cmd
+        bind $w <F8> $cmd
+
+        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text "nop"]]
+        $m add command -label "Sync cursor" -accel "F9" -command $cmd
+        bind $w <F9> $cmd
+
         
         # Layout
         grid $w.text - $w.sy -sticky news
