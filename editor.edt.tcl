@@ -223,17 +223,29 @@ namespace eval ::edt {
     }
 
 
-    proc ReadFileIntoString {word} {
+    proc ReadFileIntoString {word {RemoveLastNewline 0}} {
         set obj [string cat "__tkcon" [GenNamedCounter "ReadFileObj"]]
+        if {$RemoveLastNewline} {
+            set NoNewLineOption "-nonewline"
+        } else {
+            set NoNewLineOption ""
+        }
         set cmd [subst -nocommands {
             set ${obj}(fid) [open {$word} r]
-            set ${obj}(data) [read \$${obj}(fid)]
+            set ${obj}(data) [read $NoNewLineOption \$${obj}(fid)]
             close \$${obj}(fid)
             after 1000 unset ${obj}
             return \$${obj}(data)
         }
                 ]
-        ::tkcon::EvalOther {} slave eval $cmd
+        set line [::tkcon::EvalOther {} slave eval $cmd]
+        return $line
+        # if {$RemoveLastNewline && [string range $line end end] eq "\n"} {
+        #     puts "oKi"
+        #     return [string range $line 0 end-1]
+        # } else {
+        #     return $line
+        # }
     }
     
     # Wrapped for freezed text, for menu only
@@ -368,7 +380,7 @@ namespace eval ::edt {
             file	{
                 ::clcon_text::ConstructBackendBuffer $w.text
 
-                $w.text insert 1.0 [::edt::ReadFileIntoString $word]
+                $w.text insert 1.0 [::edt::ReadFileIntoString $word 1]
 
                 after idle [::tkcon::Highlight $w.text \
                                 [string trimleft [file extension $word] .]]
