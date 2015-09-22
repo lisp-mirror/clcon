@@ -1,11 +1,6 @@
 ## Debugger
 # TkconSourceHere search-tablelist.tcl
 
-proc ::clconcmd::l {} {
-    TkconSourceHere swank-io.tcl
-    TkconSourceHere ldbg.tcl
-}
-                   
 namespace eval ::ldbg {
 
     # Initial event which caused entering into a debugger as lisdt

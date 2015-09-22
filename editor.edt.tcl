@@ -529,4 +529,19 @@ namespace eval ::edt {
         return $w.text
     }
 
+    proc oImplementation {commandNameWoPrefix} {
+        set fn [string cat $commandNameWoPrefix "-command"]
+        set w [CurrentlyVisibleBuffer]
+        set txt $w.text
+        set cmd [list clcon_text::CallOduvanchikFunction $txt $fn]
+        set wcmd [clcon_text::WrapEventScriptForFreezedText $cmd $txt]
+        eval $wcmd
+    }   
+    
+
+}
+
+# Run oduvanchik command (with 
+proc ::clconcmd::o {commandNameWoPrefix} {
+    ::edt::oImplementation $commandNameWoPrefix
 }
