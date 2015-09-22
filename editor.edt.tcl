@@ -98,7 +98,7 @@ namespace eval ::edt {
 
     proc ShowSomeEditor {} {
         set tw [CurrentlyVisibleBuffer]
-        ::tkcon::FocusWindowByName $tw
+        ::tkcon::FocusWindowByName $tw $tw.text
         return 
     }
 
@@ -235,10 +235,10 @@ namespace eval ::edt {
         variable ::tkcon::COLOR
         variable ::tkcon::OPT
 
-        if {[string length $word] > 20} {
-            wm title $tw "[string range $word 0 16]... - Edit $w.text"
+        if {[string length $word] > 50} {
+            wm title $tw "Editor $w.text - ...[string range $word end-48 end]"
         } else {
-            wm title $tw "$word - Edit $w.text"
+            wm title $tw "Editor $w.text - $word"
         }
 
         wm protocol $tw WM_DELETE_WINDOW "::edt::HideEditorWindow $tw"
