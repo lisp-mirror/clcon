@@ -71,6 +71,131 @@
   (format nil "~A delete ~A ~A" clcon_text remote-beg-mark-name remote-end-mark-name)
   )
 
+(defmethod tcl-code-for-delete-characters (clcon_text remote-beg-mark-name n)
+  "See generic-function docstring"
+  (format nil "~A delete ~A {~A + ~D c}"
+          clcon_text remote-beg-mark-name remote-beg-mark-name n))
+
+
+(defun buffer-of-mark (mark)
+  "Returns buffer of the mark"
+  (line-buffer (mark-line mark)))
+
+(defmethod insert-string-with-clcon_text (mark string start end)
+  "When oi::*do-editing-on-tcl-side*, does all processing by itself. If processes request, returns t. Otherwise returns nil"
+  (when oi::*do-editing-on-tcl-side*
+    (assert (= start 0))
+    (assert (= end (length string)))
+    (let* ((b (buffer-of-mark mark)))
+      (when (bufferp b)
+        (let* ((clcon_text (oi::buffer-to-clcon_text b))
+               (rmn (remote-mark-name mark "is")))
+          (call-combined-tcl-editing
+           (tcl-code-for-send-mark-to-clcon_text
+            clcon_text mark :remote-name rmn)
+           (tcl-code-for-insert-string
+            clcon_text rmn string))
+          (budden-tools:show-expr `(insert-string-before-sync-mark ,(multiple-value-list (mark-row-and-col mark))))
+          (sync-mark-from-clcon_text clcon_text mark rmn)
+          (budden-tools:show-expr `(insert-string-after-sync-mark ,(multiple-value-list (mark-row-and-col mark))))
+          (call-tcl-editing 
+           (tcl-code-for-unset-clcon_text-mark clcon_text rmn))
+          )
+        t))))
+
+(defmethod insert-character-with-clcon_text (mark character)
+  (when *do-editing-on-tcl-side*
+    (let* ((b (buffer-of-mark mark))
+           (clcon_text (oi::buffer-to-clcon_text b))
+           (rmn (remote-mark-name mark "ic")))
+      (when (bufferp b)
+        (call-combined-tcl-editing
+         (tcl-code-for-send-mark-to-clcon_text
+          clcon_text mark :remote-name rmn)
+         (tcl-code-for-insert-character
+          clcon_text rmn character))
+        (sync-mark-from-clcon_text clcon_text mark rmn)
+        (call-tcl-editing
+         (tcl-code-for-unset-clcon_text-mark clcon_text rmn))
+        t
+        ))))
+
+(defmethod insert-region-with-clcon_text (mark region)
+  (when *do-editing-on-tcl-side*
+    (let ((rs (region-to-string region)))
+      (insert-string-with-clcon_text mark rs 0 (length rs))))
+  )
+
+(defmethod ninsert-region-with-clcon_text (mark region)
+  (when *do-editing-on-tcl-side*
+    (let* ((b (buffer-of-mark mark)))
+      (when (bufferp b) ; see %buffer slot description in oi::line definition
+        ;; this means text is in some buffer and thus we must reflect it on clcon side
+        (insert-region-with-clcon_text mark region)
+        t))))
+
+(defmethod delete-characters-with-clcon_text (mark n)
+  "We have to reproduce some logic from primary (defmethod delete-characters t) method"
+  ;; code from primary method
+  (let* ((line (mark-line mark))
+         (charpos (mark-charpos mark))
+         (length (line-length* line))
+         (b (buffer-of-mark mark)))
+    (cond
+      ((not (bufferp b))
+       nil)
+      ((zerop n) t)
+      ;; Deleting chars on one line, just bump the pointers.
+      ((<= 0 (+ charpos n) length)
+       ;; end of code from primary method
+       (let* ((rmn-dcb (remote-mark-name mark "dcb"))
+              (clcon_text (buffer-to-clcon_text b)))
+         (call-combined-tcl-editing
+          (tcl-code-for-send-mark-to-clcon_text 
+           clcon_text mark :remote-name rmn-dcb)
+          (tcl-code-for-delete-characters clcon_text rmn-dcb n)
+          (tcl-code-for-unset-clcon_text-mark clcon_text rmn-dcb)
+          ))
+       t
+       )
+      (t
+       nil) ; primary method would call delete region and there we will send command to tcl
+      )))
+
+(defmethod delete-region-with-clcon_text (region)
+  (when *do-editing-on-tcl-side*
+    (let* ((start (region-start region))
+           (end (region-end region))
+           (first-line (mark-line start))
+           (buffer (line-%buffer first-line)))
+      (when (bufferp buffer)
+        (let* (
+               (clcon_text (buffer-to-clcon_text buffer))
+               (rmn-bb (remote-mark-name start "bb"))
+               (rmn-ee (remote-mark-name end "ee")))
+          (call-combined-tcl-editing
+           (tcl-code-for-send-mark-to-clcon_text
+            clcon_text start :remote-name rmn-bb)
+           (tcl-code-for-send-mark-to-clcon_text
+            clcon_text end :remote-name rmn-ee)
+           (tcl-code-for-delete-region clcon_text rmn-bb rmn-ee)
+           (tcl-code-for-unset-clcon_text-mark clcon_text rmn-bb)
+           (tcl-code-for-unset-clcon_text-mark clcon_text rmn-ee)))
+        t
+        )
+      )))
+
+(defmethod delete-and-save-region-with-clcon_text (region)
+  "Save functionality will not work when *do-editing-on-tcl-side*"
+  (delete-region-with-clcon_text region)
+  )
+
+
+
+
+
+
+
 #| tests: 
  (oduvanchik::send-mark-to-clcon_text ### (oduvanchik::buffer-start-mark (oduvanchik::current-buffer)) :remote-name "bb")
  (oduvanchik::send-mark-to-clcon_text ### (oduvanchik::buffer-end-mark (oduvanchik::current-buffer)) :remote-name "bb")
