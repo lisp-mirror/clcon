@@ -212,3 +212,6 @@ grep *fast*
 Отладка взаимодействия клиент-сервер в одуванчике-clcon_text
 ---------
 (trace clco::eval-in-tcl odu::eval-text2odu-event)
+
+Отладка соответствия между редактированием
+(trace clco::eval-in-tcl oi::insert-character oi::insert-string oi::insert-region oi::ninsert-region oi::delete-characters oi::delete-region oi::delete-and-save-region)

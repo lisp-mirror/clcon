@@ -96,9 +96,9 @@
             clcon_text mark :remote-name rmn)
            (tcl-code-for-insert-string
             clcon_text rmn string))
-          (budden-tools:show-expr `(insert-string-before-sync-mark ,(multiple-value-list (mark-row-and-col mark))))
+          ;(budden-tools:show-expr `(insert-string-before-sync-mark ,(multiple-value-list (mark-row-and-col mark))))
           ;(sync-mark-from-clcon_text clcon_text mark rmn)
-          (budden-tools:show-expr `(insert-string-after-sync-mark ,(multiple-value-list (mark-row-and-col mark))))
+          ;(budden-tools:show-expr `(insert-string-after-sync-mark ,(multiple-value-list (mark-row-and-col mark))))
           (call-tcl-editing 
            (tcl-code-for-unset-clcon_text-mark clcon_text rmn))
           )
