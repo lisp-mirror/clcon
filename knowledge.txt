@@ -205,7 +205,10 @@ cat out.log | grep ctext
 /usr/share/tcltk/tklib0.6/ctext/ctext.tcl
 
 
-
-
 -----------
 grep *fast*
+
+
+Отладка взаимодействия клиент-сервер в одуванчике-clcon_text
+---------
+(trace clco::eval-in-tcl odu::eval-text2odu-event)

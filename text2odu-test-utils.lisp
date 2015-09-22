@@ -20,8 +20,9 @@
    (oduvanchik::buffer-end-mark buffer)))
 
 (defun entire-clcon_text-string (clcon_text)
+  "We skip last newline as it is imposed by text widget"
   (let ((cmd
-         (format nil "~A get 1.0 end" clcon_text)))
+         (format nil "~A get 1.0 {end - 1 c}" clcon_text)))
     (eval-in-tcl cmd :nowait nil)))
 
 (defun winmerge-strings-fn ()
