@@ -223,6 +223,19 @@ namespace eval ::edt {
     }
 
 
+    proc ReadFileIntoString {word} {
+        set obj [string cat "__tkcon" [GenNamedCounter "ReadFileObj"]]
+        set cmd [subst -nocommands {
+            set ${obj}(fid) [open {$word} r]
+            set ${obj}(data) [read \$${obj}(fid)]
+            close \$${obj}(fid)
+            after 1000 unset ${obj}
+            return \$${obj}(data)
+        }
+                ]
+        ::tkcon::EvalOther {} slave eval $cmd
+    }
+    
     # Wrapped for freezed text, for menu only
     proc wesppt {script} {
         ::clcon_text::WrapEventScriptForFreezedText $script [uplevel 1 {string cat "$w.text"}]
@@ -355,16 +368,8 @@ namespace eval ::edt {
             file	{
                 ::clcon_text::ConstructBackendBuffer $w.text
 
-                $w.text insert 1.0 [::tkcon::EvalOther {} slave eval \
-                                        [subst -nocommands {
-                                            set __tkcon(fid) [open {$word} r]
-                                            set __tkcon(data) [read \$__tkcon(fid)]
-                                            close \$__tkcon(fid)
-                                            after 1000 unset __tkcon
-                                            return \$__tkcon(data)
-                                        }
-                                        ]]
-               
+                $w.text insert 1.0 [::edt::ReadFileIntoString $word]
+
                 after idle [::tkcon::Highlight $w.text \
                                 [string trimleft [file extension $word] .]]
             }
