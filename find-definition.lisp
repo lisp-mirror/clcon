@@ -16,7 +16,7 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
   "Generates tcl code which prints out one hyperlink"
   (let ((escaped-text (cl-tk:tcl-escape text))
         (escaped-file (tcl-escape-filename file))
-        (offset-2 (format nil "{0.0+ ~A chars}" offset))
+        (offset-2 (format nil "{1.0+ ~A chars}" offset))
         )
     (format stream "::tkcon::WriteActiveText $w ~A ~A {::tkcon::EditFileAtOffset ~A ~A}; $w insert ~A \\\n; "
             escaped-text
@@ -58,7 +58,7 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
     (cond
       ((and file offset)
        (let ((escaped-file (tcl-escape-filename file))
-             (offset-2 (format nil "{0.0+ ~A chars}" offset)))
+             (offset-2 (format nil "{1.0+ ~A chars}" offset)))
          (format stream "tkcon::EditFileAtOffset ~A ~A" escaped-file offset-2)))
       (t
        (ecase mode
@@ -124,7 +124,7 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
 (defmethod budden-goto-position ((text ltk:text) position)
   "clone of goto"
   (check-type position integer)
-  (let ((cursor-pos (format nil "{0.0+ ~A chars}" position)))
+  (let ((cursor-pos (format nil "{1.0+ ~A chars}" position)))
     (ltk::scroll-to text cursor-pos)
     (ltk::set-cursor-pos text cursor-pos)
     (ltk::force-focus text)))

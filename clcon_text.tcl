@@ -331,7 +331,7 @@ namespace eval ::clcon_text {
 # .text configure -readonly 0
 # .text configure -readonly 1
 
-# .text insert 0.0 "this line will be ignored"
+# .text insert 1.0 "this line will be ignored"
 
 # for {set x 0} {$x<10} {incr x} { 
 #     .text RoInsert end "line $x\n"

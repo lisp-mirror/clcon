@@ -151,7 +151,7 @@ proc ::tkcon::EditFileAtOffset {filename offset} {
     variable OPT
     $OPT(edit) -type file -offset $offset -- $filename
     #see offset - incoroporate it into edit.
-    # $w mark set insert "0.0+ $offset chars"
+    # $w mark set insert "1.0+ $offset chars"
     # focus -force $editor
 }
 

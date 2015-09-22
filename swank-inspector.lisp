@@ -6,7 +6,7 @@
   "Generates tcl code which prints out one hyperlink"
   (let ((escaped-text (cl-tk:tcl-escape text))
         (escaped-file (tcl-escape-filename file))
-        (offset-2 (format nil "{0.0+ ~A chars}" offset))
+        (offset-2 (format nil "{1.0+ ~A chars}" offset))
         )
     (format stream "::tkcon::WriteActiveText $w ~A output {::tkcon::EditFileAtOffset ~A ~A}; $w insert output \\\n; "
             escaped-text

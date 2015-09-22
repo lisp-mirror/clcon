@@ -133,7 +133,7 @@
     (sleep 0.5)
     (notify-oduvan-construct-backend-buffer "a")
     (sleep 0.1)
-    (nti "a" "0.0" "(defun ugu () 'ugu)")
+    (nti "a" "1.0" "(defun ugu () 'ugu)")
     (sleep 0.1)
     (notify-oduvan-destroy-backend-buffer "a")
     (shutdown-oduvanchik-via-keyboard-buffer)

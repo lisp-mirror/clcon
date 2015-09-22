@@ -368,7 +368,7 @@ namespace eval ::ldbg {
 
         set tbl $w.tf.tbl
 
-        $w.title.text RoDelete 0.0 end
+        $w.title.text RoDelete 1.0 end
         WriteDebuggerTitle $w.title.text
 
         set frames [ExtractStackFrames $EventAsList]

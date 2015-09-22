@@ -57,7 +57,7 @@ namespace eval ::fndrpl {
     # variable c
     variable window
     variable SearchString            ""
-    variable SearchPos               "0.0"
+    variable SearchPos               "1.0"
     variable SearchDir               "forwards"
     variable findcase                0 
     variable current_window          # 1
@@ -254,7 +254,7 @@ namespace eval ::fndrpl {
             if {$SearchPos != ""} {
                 $text see $SearchPos
 
-                $text tag remove sel 0.0 end
+                $text tag remove sel 1.0 end
 
                 if {$SearchDir == "forwards"} {
                     tkTextSetCursor $text "$SearchPos+$leng char"        
@@ -382,7 +382,7 @@ namespace eval ::fndrpl {
             } else { tkTextSetCursor $text $SearchPos }
 
         } else {
-            set SearchPos "0.0"
+            set SearchPos "1.0"
         }
     }
 
@@ -400,7 +400,7 @@ namespace eval ::fndrpl {
 
         c
         ReplaceIt $text norec
-        while {$SearchPos!="0.0"} {
+        while {$SearchPos!="1.0"} {
             ReplaceIt $text norec
         }
     }

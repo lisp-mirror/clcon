@@ -54,13 +54,13 @@ namespace eval ::erbr {
 
         # clear old data if it existed
 
-        [TitleOfErrorBrowser $w] delete 0.0 end
-        $b delete 0.0 end
+        [TitleOfErrorBrowser $w] delete 1.0 end
+        $b delete 1.0 end
         
         # and now insert what we have parsed
         
-        [TitleOfErrorBrowser $w] insert 0.0 "WOW1"
-        $b insert 0.0 "I don't know what is that"
+        [TitleOfErrorBrowser $w] insert 1.0 "WOW1"
+        $b insert 1.0 "I don't know what is that"
     }
 
 
@@ -85,7 +85,7 @@ namespace eval ::erbr {
 
         set text $tv.body.text
         EnsureTextView
-        $text RoDelete 0.0 end
+        $text RoDelete 1.0 end
         #    $tv.body.text RoInsert end $MyCode
         set lambda [list {w} $MyCode]
         apply $lambda [list $text]
@@ -149,12 +149,12 @@ namespace eval ::erbr {
         focus $tbl
 
         # after 100 {::erbr::AppendData "error 1" {
-        #     $w RoInsert 0.0 "wow";
+        #     $w RoInsert 1.0 "wow";
         #     $w RoInsert end "ura"
         # }}
 
         # after 200 {::erbr::AppendData "error 2" {
-        #     $w RoInsert 0.0 "2222"
+        #     $w RoInsert 1.0 "2222"
         # }}
 
         return

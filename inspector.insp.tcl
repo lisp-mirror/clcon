@@ -125,12 +125,12 @@ proc ::insp::InsertDataToShowOrBeep { w EventAsList } {
     set b [BodyTextOfInspector $w]
     
     # clear old data if it existed
-    [TitleOfInspector $w] RoDelete 0.0 end
-    $b RoDelete 0.0 end
+    [TitleOfInspector $w] RoDelete 1.0 end
+    $b RoDelete 1.0 end
     
     # and now insert what we have parsed
     
-    [TitleOfInspector $w] RoInsert 0.0 "$InspectedTitle\nMagic numbers: $InspectedMagicNumbers"
+    [TitleOfInspector $w] RoInsert 1.0 "$InspectedTitle\nMagic numbers: $InspectedMagicNumbers"
 
     if { $ObjectTooLarge } {
         set tag [::tkcon::UniqueTag $b]

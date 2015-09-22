@@ -383,7 +383,7 @@ namespace eval ::edt {
         }
         $w.text edit reset
         $w.text edit modified 0
-        $w.text mark set insert 0.0
+        $w.text mark set insert 1.0
     }
 
 
