@@ -192,16 +192,14 @@
   (format nil "::edt::TextSetSelectionTo ~A ~A ~A"
           clcon_text (tcl-index-of-mark rmn-rb) (tcl-index-of-mark rmn-re)))
 
-(defmethod transfer-selection-to-clcon_text (buffer)
-  (when *do-editing-on-tcl-side*
-    (use-buffer buffer
-      (let* ((clcon_text (buffer-to-clcon_text buffer))
-             (r (current-region t nil))
-             (rb (region-start r))
-             (re (region-end r)))
-        (call-combined-tcl-editing
-         (tcl-code-to-select-region clcon_text rb re)
-         )))))
+(defmethod transfer-selection-to-clcon_text (region)
+  (let* ((rb (region-start region))
+         (re (region-end region))
+         (buffer (buffer-of-mark rb))
+         (clcon_text (buffer-to-clcon_text buffer)))
+    (call-tcl-simple
+     (tcl-code-to-select-region clcon_text rb re)
+     )))
        
 
 #| tests: 
