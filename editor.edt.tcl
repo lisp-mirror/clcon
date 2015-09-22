@@ -529,6 +529,12 @@ namespace eval ::edt {
         return $w.text
     }
 
+    # This should go to special file?
+    proc TextSetSelectionTo {text from to} {
+        $text tag remove sel 1.0 end
+        $text tag add sel $from $to
+    }
+
     proc oImplementation {commandNameWoPrefix} {
         set fn [string cat $commandNameWoPrefix "-command"]
         set w [CurrentlyVisibleBuffer]

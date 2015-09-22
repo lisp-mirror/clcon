@@ -213,5 +213,18 @@ grep *fast*
 ---------
 (trace clco::eval-in-tcl odu::eval-text2odu-event)
 
-Отладка соответствия между редактированием
+Отладка соответствия между редактированием там и сям
+---------
 (trace clco::eval-in-tcl oi::insert-character oi::insert-string oi::insert-region oi::ninsert-region oi::delete-characters oi::delete-region oi::delete-and-save-region)
+
+trasnpose-forms
+beginning-of-defun
+end-of-defun
+forward-list
+backward-list
+forward-form
+backward-form
+mark-defun 
+forward-up-list
+backward-up-list
+down-list
