@@ -228,3 +228,5 @@ mark-defun
 forward-up-list
 backward-up-list
 down-list
+mark-containing-form odu - see oi::clcon_text-selection-coordinates docstring
+
