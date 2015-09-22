@@ -38,6 +38,20 @@ proc SubstituteSingleValueInListVarKeyEq {listVariable old new} {
     }
 }
 
+# Allows for named counters.
+proc GenNamedCounter {name} {
+    set VarName ContinuationCounter$name
+    upvar \#0 $VarName Counter
+    global $VarName
+    if {![info exists $VarName]} {
+        set Counter 1
+    } else {
+        set Counter [expr {$Counter + 1}]
+    }
+    return $Counter
+}
+
+
 
 # tests
 # puts [CountOccurancesOfSubstring "a" "babab"]
