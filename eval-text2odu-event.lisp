@@ -90,9 +90,11 @@
         (odu::set-mark-to-row-and-col (current-point)
                                       (clco::row-col-row cur-row-col)
                                       (clco::row-col-col cur-row-col))
-        ; (oi::sync-mark-from-clcon_text clcon_text (current-point) "insert")
+        ;; (oi::sync-mark-from-clcon_text clcon_text (current-point) "insert")
+        ;; known functions are indent-new-line-command and new-line-command
         (let ((oduvanchik-internals::*do-editing-on-tcl-side* t))
           (funcall fn nil)
+          (clco::compare-clcon_text-and-oduvanchik-buffer-contents clcon_text)
           )
         (odu::send-buffer-point-to-clcon_text buffer)
         )
