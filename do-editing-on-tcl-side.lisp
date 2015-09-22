@@ -187,9 +187,8 @@
 
 (defmethod delete-and-save-region-with-clcon_text (region)
   "Save functionality will not work when *do-editing-on-tcl-side*"
-  (delete-region-with-clcon_text region)
+  (error "Not Implemented")
   )
-
 
 
 
