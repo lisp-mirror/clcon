@@ -63,6 +63,8 @@ Place dot (.) in the first position of the command to invoke named IDE command. 
 
 ```.NNN``` where NNN is a decimal number re-runs command from history with that number
 
+```.o``` run oduvanchik command in visible editor buffer. Command must be written with dashes and without '-command' suffix, e.g. ```.o indent-new-line```
+
 ```.help``` lists available IDE commands (no real help, sorry :) )
 
 Tcl escapes
