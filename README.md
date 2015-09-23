@@ -51,12 +51,7 @@ hg clone https://bitbucket.org/budden/budden-tools
 - good version of clcon itself, put it where convenient. No "installation" procedure exists yet. 
 
 ### Choose if you want to try oduvanchik's backend
-Oduvanchik's backend is
-
-i) not written yet
-
-ii) linux-only
-
+Oduvanchik's backend is linux-only and is not well tested for now. 
 But if you want to give it a try, you should do Dependencies, part 2. 
 
 ### Dependencies, part 2
@@ -103,16 +98,7 @@ Then type in expression like
 
 ```
 #!lisp
-"asdf"
-```
-or
-```
-#!lisp
-(defun my-func (x) (map 'string 'identity (list #\\ #\" #\$)))
-```
-or
-```
-(dotimes (i 10) (print i) (sleep 0.5))
+(print "Hello, world")
 ```
 
 at the IDE's console and press Return. Expression should be evaluated on lisp side correctly
@@ -126,7 +112,7 @@ cl-user package is assumed for all interaction. If you change package, consequen
 
 [User manual](https://bitbucket.org/budden/clcon/src/default/doc/user-manual.md)
 
-[Wiki](https://bitbucket.org/budden/clcon/wiki/) - contains screenshots, but otherwise is not very useful.  
+[Wiki](https://bitbucket.org/budden/clcon/wiki/) - contains [screenshots](https://bitbucket.org/budden/clcon/wiki/Screenshots), but otherwise is not very useful.  
 
 [FAQ](https://bitbucket.org/budden/clcon/src/default/doc/FAQ.md)
 
@@ -136,4 +122,6 @@ cl-user package is assumed for all interaction. If you change package, consequen
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-Is in tracker. Current activity is to adapt [oduvanchik](https://bitbucket.org/budden/oduvanchik) (Russian for dandelion, formerly known as  hemlock, but transformated spiritually) to be an editor's backend. We hope to keep oduvanchik's editor buffer in sync with clcon's editor text widget so that we could run lisp mode commands on it and do syntax highlighting on text widget without implementing this functionality. Ability to run on Windows can be temporarily lost in course of this activity as oduvanchik is Xlib-dependent (now).
+1. Be able to build with lisp mode, but without dependency on X. Currently we have no lisp mode on Windows.
+2. One-click installable distribution.
+3. Hacking of missing features. 
