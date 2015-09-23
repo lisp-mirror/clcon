@@ -403,7 +403,7 @@ namespace eval ::edt {
         set cmd [list $text Unfreeze]
         $m add command -label "1.Unfreeze (if oduvanchik hang)" -command $cmd
 
-        set cmd [list ::tkcon::EvalInSwankAsync "(clco::compare-clcon_text-and-oduvanchik-buffer-contents \"$text\")" {}]
+        set cmd [list ::tkcon::EvalInSwankAsync "(clco::compare-clcon_text-and-oduvanchik-buffer-contents \"$text\")" {} {:find-existing}]
         $m add command -label "Check Oduvanchik Sync" -accel "F8" -command $cmd
         bind $w <F8> $cmd
 

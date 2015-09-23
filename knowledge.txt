@@ -230,3 +230,16 @@ backward-up-list
 down-list
 mark-containing-form odu - see oi::clcon_text-selection-coordinates docstring
 
+
+Информация для переделки
+-------
+tty-input.lisp - ввод с клавиатуры - вроде несложно.
+/s2/oduvanchik2/src/struct.lisp - родовые функции для работы с экраном
+/s2/oduvanchik2/src/tty-screen.lisp - их методы
+
+oi::init-tty-screen-manager - точка входа в него. 
+
+
+Начинаем отлаживать невидимый одуванчик
+-------
+(trace clco::podsunutq-event clco::pop-text2odu-event-queue odu::eval-text2odu-event)
