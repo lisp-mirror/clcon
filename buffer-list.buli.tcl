@@ -3,11 +3,6 @@
 ## bound to only one window. Sometimes we might try to use peering text widgets
 ## to clone some buffers to several windows, which is useful sometimes.
 
-proc ::clconcmd::bufferlist {} {
-    tkcon main ::buli::BufferListBox 
-}
-
-
 namespace eval ::buli {
 
     # contents of widget separated from widget

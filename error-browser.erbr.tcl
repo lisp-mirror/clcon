@@ -15,10 +15,6 @@
 #    nil 0.009999999776482582 t "/s2/clcon/err.fasl"))
 #  15)
 
-proc ::clconcmd::erbr {} {
-    tkcon main ::erbr::SwankBrowseErrors1 {'defun}
-}
-
 
 namespace eval ::erbr {
     variable data

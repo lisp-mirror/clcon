@@ -592,7 +592,3 @@ namespace eval ::edt {
 
 }
 
-# Run oduvanchik command (with 
-proc ::clconcmd::o {commandNameWoPrefix} {
-    ::edt::oImplementation $commandNameWoPrefix
-}

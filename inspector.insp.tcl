@@ -64,11 +64,6 @@ proc ::insp::InitInspector { LispExpr } {
 }
 
 
-proc ::clconcmd::insp* {} {
-    tkcon main ::insp::SwankInspect "*"
-}
-
-
 proc ::insp::ConfigureTextFonts {text} {
     variable ::tkcon::COLOR
     $text configure \

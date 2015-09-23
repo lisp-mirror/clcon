@@ -20,10 +20,6 @@
 # 
 
 
-proc ::clconcmd::history {} {
-    tkcon main history
-}
-
 proc ::tkcon::TclEscapeP { cmd } {
     if {[string index $cmd 0] eq "."} {
         return 1

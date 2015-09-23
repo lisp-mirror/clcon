@@ -63,16 +63,6 @@ namespace eval ::clconcmd {
     # we need to run them in context of one console
 }
 
-proc ::clconcmd::help {} {
-    set result1 [info procs ::clconcmd::*]
-    regsub -all "::clconcmd::" $result1 "" result2
-    puts $result2
-}
-
-proc ::clconcmd::history {} {
-    history
-}
-
 # Initialize the ::tkcon namespace
 #
 namespace eval ::tkcon {
@@ -142,10 +132,6 @@ proc putd arg1 {
 proc TkconSourceHere { filename } {
     variable ::tkcon::ScriptDirectory
     source [file join $::tkcon::ScriptDirectory $filename]
-}
-
-proc ::clconcmd::tcsoh {filename} {
-    tkcon main TkconSourceHere $filename
 }
 
 proc ::tkcon::ReloadSomeIDESources1 {} {
@@ -5718,6 +5704,7 @@ proc ::tkcon::ReloadSomeIDESources4 {} {
     TkconSourceHere buffer-list.buli.tcl
     TkconSourceHere lisp-debugger.ldbg.tcl
     TkconSourceHere tcltextedit-unsorted.tcl
+    TkconSourceHere clconcmd.tcl
 }
 
 ::tkcon::ReloadSomeIDESources4
