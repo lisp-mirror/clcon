@@ -1,0 +1,65 @@
+﻿-*- coding : utf-8 -*-
+сокращения:
+
+o-i = :oduvan-invisible
++- - развязка по o-i.
+meth - метод
+>> - то же
+
+2 - версия 2 (ветка default), собрана без o-i, загружена система :oduvanchik.clx показывает видимый одуванчик, 
+3 - версия 3 (наши изменения для invisible), o-i и если загружена система :oduvanchik.tty, показывает невидимый.
+Если не o-i и загружена система :oduvanchik.clx - показывает оба.
+
+
+*.asd - нет проблем, 3 ok
+connections.lisp - некоторые ф-ии под -o-i
+dired.lisp - множество +-, функционал не работает под o-i
+filecoms - нужно проверить правильность odu-get-file-kind
+linedit - множество +-, функционал не работает под o-i
+main.lisp - 
+
+ call-with-editor: 
+   2: mini даёт тип бекэнда iolib
+   3: mini даёт тип бекэнда ugugu
+
+
+oduvanchik-ext.lisp
+   3: default-directory под угрозой
+   3: complete-file-directory вряд ли уцелела   
+
+rompsite.lisp
+   choose-backend-type
+   2: развязка
+   3: безусловно :mini (надо переименовать)
+
+   3: meth backend-init-raw-io (:invisible) - ничего не делать
+
+
+screen.lisp
+   3: meth init-screen-manager (:invisible) - ничего не делать
+
+termcap.lisp
+   3: termcap - clear-display всегда возвращает "" (но может быть, это и не нужно)
+
+tty-disp-rt.lisp
+   get-terminal-attributes
+    2: tiocgwinsz не работает и я не смог заставить
+    3: проставлена насильно 40 строк, 80 колонок
+
+   tty-write-char 3: ничего не делать (на практике вызывается)
+   tty-write-cmd  >>
+   device-force-output >>
+   device-finish-output >>
+   device-init >> , только вызываем redisplay-all - не должно повредить
+   device-exit >>
+   setup-init >>
+   reset-input >>
+
+tty-input.lisp
+   register-tty-translations 
+     3: ничего не делать
+
+tty-screen.lisp
+     3: заполняем объект ерундой, поток будет непригоден для чтения и записи
+
+   
