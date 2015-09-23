@@ -6,7 +6,11 @@
   :licence "MIT"
   :description "clcon - Common Lisp IDE"
   :long-description "Tk - based set of development tools comprising CL IDE for Linux and Windows"
-  :depends-on (:cl-tk :swank #+clcon-oduvan :oduvanchik.clx :bordeaux-threads :budden-tools :split-sequence)
+  :depends-on (:cl-tk :swank
+                      ;;#+(and :clcon-oduvan (not :oduvan-invisible)) :oduvanchik.clx
+                      ;;#+(and :clcon-oduvan :oduvan-invisible) :oduvanchik.tty
+                      :oduvanchik.tty ; FIXME FIXME FIXME                      
+                      :bordeaux-threads :budden-tools :split-sequence)
   :serial t
   :components ((:file "package")
                (:file "utils")
