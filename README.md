@@ -23,6 +23,10 @@ Simple, one-click installable CL environment for beginners
 
 ## Current state
 Overall state and quality is "working prototype".
+It is likely that you fall into trouble at any place. 
+So do not try to just "play around" with the IDE. Take
+a [demo tour](doc/demo-tour.md) instead.
+
 Features demonstrated are: 
 
 - REPL with command history and history substitution
