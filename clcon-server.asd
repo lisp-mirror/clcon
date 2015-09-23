@@ -7,9 +7,8 @@
   :description "clcon - Common Lisp IDE"
   :long-description "Tk - based set of development tools comprising CL IDE for Linux and Windows"
   :depends-on (:cl-tk :swank
-                      ;;#+(and :clcon-oduvan (not :oduvan-invisible)) :oduvanchik.clx
-                      ;;#+(and :clcon-oduvan :oduvan-invisible) :oduvanchik.tty
-                      :oduvanchik.tty ; FIXME FIXME FIXME                      
+                      #+(and :clcon-oduvan (not :oduvan-invisible)) :oduvanchik.clx
+                      #+(and :clcon-oduvan :oduvan-invisible) :oduvanchik.tty
                       :bordeaux-threads :budden-tools :split-sequence)
   :serial t
   :components ((:file "package")
