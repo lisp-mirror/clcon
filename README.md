@@ -33,7 +33,7 @@ Features demonstrated are:
 - Debugger (view stack, locals, goto source, invoke restarts, search)
 - completion for lisp symbols and filenames in REPL
 - find source in REPL
-- lisp mode (auto-indent, moving through lists, mark defun etc.)
+- lisp mode (not covered by demo tour)
 - inspector 
 - compilation notes browser
 - editor buffer list
