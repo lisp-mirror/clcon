@@ -41,9 +41,8 @@ Features demonstrated are:
 - running of tcl code with special "escapes"
 
 ## Installation and startup 
-You need:
 
-### Dependencies, part 1
+### Load and install dependencies, part 1
 
 - fresh versions of [SBCL](http://www.sbcl.org/platform-table.html) 
 - fresh version of tcl/tk. On Windows, you can download tcl/tk from [Activestate](http://www.activestate.com/activetcl/downloads). On Debian, use your package manager to download tk8.6 .
@@ -58,10 +57,10 @@ hg clone https://bitbucket.org/budden/budden-tools
 ### Choose if you want to try oduvanchik's backend
 Oduvanchik's backend enables a lisp mode. It is not documented yet
 so it is unlikey you'll be able to run it. But if you want to give 
-it a try, you should do Dependencies, part 2. 
+it a try, you should load and install dependencies, part 2. 
 
-### Dependencies, part 2
-(Only if you choose to try oduvanchik's backend)
+### Load and install dependencies, part 2
+(Only if you choose to try lisp mode)
 - put fresh version of [oduvanchik](https://bitbucket.org/budden/oduvanchik) under local-projects directory of quicklisp. E.g. (Linux)
   ```
   cd ~/quicklisp/local-projects
