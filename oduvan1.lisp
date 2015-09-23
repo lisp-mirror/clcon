@@ -31,20 +31,20 @@
     (pop *text2odu-event-queue*)))
 
 
-(defun podsunutq-event (key-event text2odu-event)
+(defun podsunutq-event (key-event)
   "Puts fake event onto oduvan event queue as if it came from keyboard. Clone of oduvanchik-internals::q-event . Note we do not set hunk"
   (bt:with-lock-held (oduvanchik-internals::*q-event-lock*) ; budden
     (oduvanchik-ext:without-interrupts
       (let* (
              ; stolen from oduvanchik-internals::window-input-handler
              (stream oduvanchik-internals::*editor-input*)
-             (new (make-fake-keyboard-event key-event text2odu-event))
+             (new (make-fake-keyboard-event key-event))
              (tail (oduvanchik-internals::editor-input-tail stream)))
         (setf (oduvanchik-internals::input-event-next tail) new)
         (setf (oduvanchik-internals::editor-input-tail stream) new)))))
 
 ; (defun new-event (key-event x y hunk next &optional unread-p)
-(defun make-fake-keyboard-event (key-event text2odu-event)
+(defun make-fake-keyboard-event (key-event)
   "Just trying to put some event as if it was from the keyboard"
   (oduvanchik-internals::new-event
    ; (oduvanchik-ext:char-key-event #\!)  ; stolen from hi::translate-tty-event
@@ -54,7 +54,6 @@
    nil ; hunk was smth like #<oduvanchik.x11::x11-hunk nil+374, "Main" {DDC03F1}>
    nil
    nil
-   text2odu-event
    ))
 
 (defun text2odu-dispatcher-thread-function ()
@@ -71,7 +70,7 @@
             (unless oduvanchik-internals::*direct-tcl*
               (podsunutq-event
                clco-oduvanchik-key-bindings:*text2odu-key-event-f8*
-               e))))))))
+               ))))))))
 
 
 (defun start-text2odu-dispatcher ()
@@ -124,7 +123,7 @@
     (oduvanchik-internals::*direct-tcl*
      (warn "shutdown-oduvanchik-via-keyboard-buffer: in direct tcl mode, you must not use keyboard buffer. Command ignored"))
     (t
-     (podsunutq-event clco-oduvanchik-key-bindings::*f17-key-event* nil))))
+     (podsunutq-event clco-oduvanchik-key-bindings::*f17-key-event*))))
 
 ; need separate file for this
 (defun test1 ()
