@@ -26,14 +26,15 @@ Overall state and quality is "working prototype".
 Features demonstrated are: 
 
 - REPL with command history and history substitution
-- Debugger (inspect stack and locals, goto source, invoke restarts, search)
+- Debugger (view stack, locals, goto source, invoke restarts, search)
 - completion for lisp symbols and filenames in REPL
 - find source in REPL
-- swank-based inspector 
-- compilation error browser
+- lisp mode (auto-indent, moving through lists, mark defun etc.)
+- inspector 
+- compilation notes browser
 - editor buffer list
-- prototypes of "Find" and "Find next" commands for text and treeview
-- you can still run tcl code with special "escapes"
+- "Find" and "Find next" commands for text and treeview
+- running of tcl code with special "escapes"
 
 ## Installation and startup 
 You need:
@@ -122,6 +123,6 @@ cl-user package is assumed for all interaction. If you change package, consequen
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-1. Be able to build with lisp mode, but without dependency on X. Currently we have no lisp mode on Windows.
-2. One-click installable distribution.
-3. Hacking of missing features. 
+1. One-click installable distribution.
+2. Hacking of missing features.
+3. Code cleanup.
