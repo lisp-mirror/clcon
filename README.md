@@ -56,8 +56,9 @@ hg clone https://bitbucket.org/budden/budden-tools
 - good version of clcon itself, put it where convenient. No "installation" procedure exists yet. 
 
 ### Choose if you want to try oduvanchik's backend
-Oduvanchik's backend is linux-only and is not well tested for now. 
-But if you want to give it a try, you should do Dependencies, part 2. 
+Oduvanchik's backend enables a lisp mode. It is not documented yet
+so it is unlikey you'll be able to run it. But if you want to give 
+it a try, you should do Dependencies, part 2. 
 
 ### Dependencies, part 2
 (Only if you choose to try oduvanchik's backend)
