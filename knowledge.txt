@@ -243,3 +243,11 @@ oi::init-tty-screen-manager - точка входа в него.
 Начинаем отлаживать невидимый одуванчик
 -------
 (trace clco::podsunutq-event clco::pop-text2odu-event-queue odu::eval-text2odu-event)
+
+
+ГРЕП
+---
+Поиск в одуванчике:
+
+grep -nH -e :mini `cat /s2/oduvanchik/odu-files.grep` 2> /dev/null
+/s2/oduvanchik2/odugrep.sh :invisible
