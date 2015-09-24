@@ -35,7 +35,27 @@
               ;; Lock not held, must unwind without touching *data*.
               (return-from text2odu-dispatcher-to-editor-queue-pop nil)))
     (pop *text2odu-dispatcher-to-editor-queue*)))
- 
+
+
+(defun text2odu-dispatcher-to-editor-queue-peek (&key hang)
+  "Does not pop event, but checks or waits for it. Returns event or nil"
+  (bt:with-lock-held (*text2odu-dispatcher-to-editor-queue-lock*)
+    (loop until (or *text2odu-dispatcher-to-editor-queue*
+                    (not hang))
+       do (or (bt:condition-wait
+               *text2odu-dispatcher-to-editor-condition-variable*
+               *text2odu-dispatcher-to-editor-queue-lock*
+               )
+              ;; Lock not held, must unwind without touching *data*.
+              (return-from text2odu-dispatcher-to-editor-queue-peek nil)))
+    (first *text2odu-dispatcher-to-editor-queue*)))
+
+(defmethod oi::oduvan-invisible-peek-input-event (dummy &key hang)
+  (declare (ignore dummy))
+  (text2odu-dispatcher-to-editor-queue-peek :hang hang))
+
+
+
 (defun set-clco-oduvanchik-key-bindings ()
   ; (oduvanchik::bind-key "Beginning of line" #k"F8")
   (oduvanchik::bind-key "Exit Oduvanchik" *f17-key-event*)
