@@ -59,8 +59,7 @@ clcon_text.tcl -> swank-io.tcl -> text2odu.lisp(*text2odu-event-queue*)->
 
 oduvan1(тред диспетчера в функции clco::text2odu-dispatcher-thread-function
              перекладывает события в очередь *text2odu-dispatcher-to-editor-queue*
-             и подсовывает событие нажатия клавиши F8 в очередь входных событий
-             одуванчика - clco::podsunutq-event
+             и подсовывает событие нажатия клавиши F8 или другой кнопки в очередь входных событий одуванчика - clco::podsunutq-event
              )
 
 одуванчик изменён, чтобы очередь входных событий опрашивалась через интервал времени,
@@ -87,14 +86,11 @@ oi::call-tcl-simple, oi::call-tcl-editing .
 Невидимый одуванчик
 ===============
 
-
-```
-clcon_text.tcl -> swank-io.tcl -> text2odu.lisp(*text2odu-event-queue*)->
-
-oduvan1(тред диспетчера в функции clco::text2odu-dispatcher-thread-function
-             перекладывает события в очередь *text2odu-dispatcher-to-editor-queue*
-             и больше ничего не делает. 
-             )
+Всё то же самое, но в метод
+```(defmethod dispatch-events-with-backend ((backend (eql :invisible-connection-backend)))``
+       встроен вызов oduvan-invisible-peek-input-event
+         -> text2odu-dispatcher-to-editor-queue-peek )```
+       
 
 одуванчик изменён, чтобы опрашивать очередь входных событий с помощью 
   odu::eval-pending-text2odu-events :hang t 

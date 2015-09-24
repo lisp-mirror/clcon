@@ -13,7 +13,7 @@
 (in-package :clco)
 
 (defun eval-in-tcl (code &key (nowait t))
-  "Eval FORM in tcl. Code is a string. Must be called from worker thread or in the scope of with-connection. Note that ping-pong protection from piling up of events on one side is disabled (TODO report this issue to slime-devel)"
+  "Synchronously eval FORM in tcl. Code is a string. Must be called from worker thread or in the scope of with-connection. Note that ping-pong protection from piling up of events on one side is disabled (TODO report this issue to slime-devel). Synchronous operation is established with wait-for-event call, so other events can pass w/o problems"
   (cond (nowait 
          (swank::send-to-emacs `(:eval-no-wait ,code)))
         (t
