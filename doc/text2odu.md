@@ -9,11 +9,6 @@ Lisp-mode для clcon
 
 Поэтому обязанности разделены. clcon_text (порождённый snit потомок text или ctext) отвечает почти за всё. одуванчик отвечает только за команды, специфичные для лиспового режима. Работает механизм синхронизации между clcon_text и одуванчиком.
 
-;; Acception of text2odu events from tcl and putting them onto *text2odu-event-queue*
-;; this code runs in arbitrary SWANK worker thread 
-;; it must not depend on oduvanchik source
-
-
 Режимы работы
 ==========
 
@@ -87,6 +82,24 @@ oduvan1(тред диспетчера в функции clco::text2odu-dispatche
 Половину, связанную с режимом ведущего одуванчика, не расписываем.
 См. oduvanchik::call-oduvanchik-function-with-clcon_text,
 oi::call-tcl-simple, oi::call-tcl-editing . 
+```
+
+Невидимый одуванчик
+===============
+
+
+```
+clcon_text.tcl -> swank-io.tcl -> text2odu.lisp(*text2odu-event-queue*)->
+
+oduvan1(тред диспетчера в функции clco::text2odu-dispatcher-thread-function
+             перекладывает события в очередь *text2odu-dispatcher-to-editor-queue*
+             и больше ничего не делает. 
+             )
+
+одуванчик изменён, чтобы опрашивать очередь входных событий с помощью 
+  odu::eval-pending-text2odu-events :hang t 
+    -> clco-oduvanchik-key-bindings::text2odu-dispatcher-to-editor-queue-pop
+    - извлекает события из очереди *text2odu-dispatcher-to-editor-queue* и выполняет его
 
 
 Элементы инфраструктуры для связи пары субъектов
