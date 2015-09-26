@@ -15,24 +15,32 @@ proc ::tkcon::LispFindDefinitionInner str {
     set Quoted [QuoteLispObjToString $str]
     set LispCmd "(cl:progn (clcon-server:server-lookup-definition $Quoted))"
    
-    set SwankReply [::tkcon::EvalInSwankSync $LispCmd]
+    ::tkcon::EvalInSwankAsync $LispCmd {::tkcon::LispFindDefinitionInnerContinuation $EventAsList} {:find-existing}
     
-    putd "EvalInSwankSync returned $SwankReply"
-    putd "car swankreply = [::mprs::Car $SwankReply]"
-  
-    if {[::mprs::Car $SwankReply] eq ":ok"} {
-        # what about code injection? FIXME safety
-        set TclCode "set w $PRIV(console); [::mprs::Unleash [::mprs::Cadr $SwankReply]]"
-        putd "I will now eval code $TclCode"
-        eval $TclCode
-        $PRIV(console) see end
-    } else {
-        putd "ListDefinitions: I don't know what is [::mprs::Car $SwankReply]"
-        return
-    }
-    return $str
 }
 
+
+proc ::tkcon::LispFindDefinitionInnerContinuation {SwankReplyAsList} {
+    variable PRIV
+    set head [::mprs::Unleash [lindex $SwankReplyAsList 0]]
+
+    if {$head eq ":return"} {
+        set l [::mprs::Unleash [lindex $SwankReplyAsList 1]]
+        set h2 [lindex $l 0]
+        if {$h2 eq ":ok"} {
+            # what about code injection? FIXME safety
+            set TclCode "set w $PRIV(console); [::mprs::Unleash [lindex $l 1]]"
+            putd "I will now eval code $TclCode"
+            eval $TclCode
+            $PRIV(console) see end
+        } else {
+            error "ListDefinitions: I don't know what is $h2"
+        }
+    } else {
+        error "ListDefinitions: unknown her $h"
+    }
+    return
+}
 
 
 # Similar to ::tkcon::ExpandLispSymbol
