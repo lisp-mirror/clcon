@@ -75,6 +75,7 @@
 (defun nop (&rest args) (declare (ignore args)))
 
 (defun call-oduvanchik-function-with-clcon_text (e)
+  "see swank:eval-for-emacs as an example of error handling"
   (let* ((clcon_text (clco::text2odu-event-clcon_text-pathname e))
          (cur-row-col (clco::text2odu-event-beg e))
          (connection (clco::text2odu-event-swank-connection e))
