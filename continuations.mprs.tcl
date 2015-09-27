@@ -55,6 +55,8 @@ proc ::mprs::ExtractContinuationId {EventAsList} {
     set EventHead [lindex $EventAsList 0]
     if {[lsearch {:return :abort} $EventHead] >= 0} {
         return [Unleash [lindex $EventAsList 2]]               
+    } else {
+        return {}
     }
 }
 
