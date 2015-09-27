@@ -235,8 +235,10 @@ namespace eval ::clcon_text {
                     }]
                 }
 
-                set qC [lq $far_tcl_continuation_body]
-                set lispCmd "(clco:call-oduvanchik-function-with-clcon_text $qId $qB $qC $qText)"
+                # set qC [lq $far_tcl_continuation_body]
+                set far_tcl_cont_id [::tkcon::GenContinuationCounter]
+                ::mprs::EnqueueContinuation $far_tcl_cont_id $far_tcl_continuation_body
+                set lispCmd "(clco:call-oduvanchik-function-with-clcon_text $qId $qB $far_tcl_cont_id $qText)"
             }
             default {
                 error "Hurray! We found replace command $type with args $clcon_text $type $arglist!"

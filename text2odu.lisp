@@ -59,19 +59,10 @@
   (string nil :type (or null string)) ; string to insert
   (beg nil :type (or null row-col)) ; begin index
   (end nil :type (or null row-col))   ; end index
-  (far_tcl_continuation nil :type (or null string)) ; tcl code to eval after event's action is processed (even handler in the editor must send far_tcl_continuation explicitly)
-  (swank-connection nil :type (or null swank::multithreaded-connection)) ; required if we want to run far_tcl_continuation
+  (far_tcl_cont_id nil :type (or null integer)) ; tcl continuation id to eval after event's action is processed
+  (swank-connection nil :type (or null swank::multithreaded-connection)) 
   )
 
-(defun invoke-text2odu-event-far_tcl_continuation (e)
-  "Can be called from any thread. Sends a command to invoke continuation to control thread"
-  (let ((c (text2odu-event-far_tcl_continuation e)))
-    (when c
-      (swank::with-connection ((text2odu-event-swank-connection e))
-        (eval-in-tcl c))
-      )))
-      
-        
 (defun parse-row-col (tcl-index)
   "Returns row-col structure by tcl-index of kind NN.NN."
   (let ((parsed (split-sequence:split-sequence #\. tcl-index)))
@@ -114,7 +105,7 @@
     :string string
     )))
 
-(defun call-oduvanchik-function-with-clcon_text (clcon_text-pathname insert-index far_tcl_continuation oduvanchik-function-name)
+(defun call-oduvanchik-function-with-clcon_text (clcon_text-pathname insert-index far_tcl_cont_id oduvanchik-function-name)
   "Send call-oduvanchik-function-with-clcon_text event to oduvanchik. See oduvanchik::call-oduvanchik-function-with-clcon_text"
   (post-oduvan-event
    (make-text2odu-event
@@ -122,7 +113,7 @@
     :clcon_text-pathname clcon_text-pathname
     :string oduvanchik-function-name
     :beg (parse-row-col insert-index) ; likely to be unused
-    :far_tcl_continuation far_tcl_continuation
+    :far_tcl_cont_id far_tcl_cont_id
     :swank-connection swank::*emacs-connection*
     )))
 

@@ -82,6 +82,7 @@
          (buffer (oi::clcon_text-to-buffer clcon_text))
          (fn-name (clco::text2odu-event-string e))
          (fn (find-symbol (string-upcase fn-name) :oduvanchik))
+         (cont (clco::text2odu-event-far_tcl_cont_id e))
          )
     (assert (and
              (eq (symbol-package fn) (find-package :oduvanchik)) ; security limitation
@@ -99,7 +100,8 @@
           )
         (odu::send-buffer-point-to-clcon_text buffer)
         )
-      (clco::invoke-text2odu-event-far_tcl_continuation e)
+      ; stolen from swank::eval-for-emacs
+      (swank::send-to-emacs `(:return ,(swank::current-thread) (:ok "ugugu") ,cont))
       nil
       )))
 
