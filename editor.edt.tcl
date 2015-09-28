@@ -247,6 +247,29 @@ namespace eval ::edt {
         #     return $line
         # }
     }
+
+    proc FindSourceContinuation {clcon_text EventAsList} {
+        set Head [::mprs::Unleash [lindex $EventAsList 0]]
+        ::mprs::AssertEq $Head ":return"
+        set l2 [::mprs::Unleash [lindex $EventAsList 1]]
+        set h2 [::mprs::Unleash [lindex $l2 0]]
+        if {$h2 eq ":ok"} {
+            set code [::mprs::Unleash [lindex $l2 1]]
+            set proc [subst -nocommand {{w} {$code}}]
+            # tk_messageBox -message $proc
+            apply $proc [::tkcon::CurrentConsole] 
+        } else {
+            tk_messageBox -parent $clcon_text -message "FindSource command aborted"
+        }
+          
+    }
+    
+    proc FindSourceCommand {text} {
+        set console [::tkcon::CurrentConsole]
+        ::clcon_text::CallOduvanchikFunction $text "find-source-command" {{
+            ::edt::FindSourceContinuation $clcon_text $EventAsList
+        }}
+    }    
     
     # Wrapped for freezed text, for menu only
     proc wesppt {script} {
@@ -287,6 +310,14 @@ namespace eval ::edt {
         OduFnMenuItem $w $m $text forward-up-list
         OduFnMenuItem $w $m $text backward-up-list
         OduFnMenuItem $w $m $text down-list
+
+        $m add separator
+
+        set cmd [wesppt [list ::edt::FindSourceCommand $text]]
+        $m add command -label "Find Source" -accel "Alt-." -command $cmd
+        bind $w <Alt-period> $cmd
+        bind $w <Alt-Key-Cyrillic_yu> $cmd
+
     }
 
 

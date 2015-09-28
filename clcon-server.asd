@@ -1,7 +1,7 @@
 
 (defsystem :clcon-server
   :name "clcon-server"
-  :version "0.0"
+  :version "0.2"
   :author "Denis Budyak"
   :licence "MIT"
   :description "clcon - Common Lisp IDE"
@@ -28,5 +28,7 @@
                #+clcon-oduvan (:file "oduvan1" :description "implementation of interface declared in text2odu")
                #+clcon-oduvan (:file "eval-text2odu-event" :description "processing events on editor side")
                #+clcon-oduvan (:file "do-editing-on-tcl-side" :description "Functions to send editing primitives to tcl. Functions are hanged on oduvanchik's hooks")
+               (:file "clcon-oduvanchik-commands" :description "Our lisp mode and other application-level oduvanchik commands for clcon"
+                      )
                )
   )
