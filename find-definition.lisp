@@ -66,7 +66,10 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
           (print-just-line stream "Unable to locate to definition"))
          (:eval
           (format stream "tk_messageBox -parent $w -message {Unable to locate to definition}")
-       ))))))
+          ))))))
+
+(defun write-code-to-show-console (stream)
+  (format stream "::tkcon::FocusConsole; "))
   
 
 (defun server-lookup-definition (text)
@@ -78,6 +81,8 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
       (case l
         (0 (print-just-line ou "No definitions found"))
         (t
+         (when (> l 1)
+           (write-code-to-show-console ou))
          (dolist (dal dspecs-and-locations)
            (destructuring-bind (dspec loc) dal
              (cond
