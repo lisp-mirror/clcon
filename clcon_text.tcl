@@ -307,13 +307,20 @@ namespace eval ::clcon_text {
         }
     }
 
-    proc CallOduvanchikFunction {clcon_text OduvanchikFunctionName} {
+    # UserContBody is a body of procedure to be called with two parameters: clcon_text and EventAsList. 
+    proc CallOduvanchikFunction {clcon_text OduvanchikFunctionName {UserContBody {}}} {
         variable ::tkcon::OPT
         if {!$::tkcon::OPT(oduvan-backend)} {
             error "Unable to call oduvanchik functions with oduvan-backend disabled"
         }
         $clcon_text Freeze
-        MaybeSendToLisp $clcon_text CallOduvanchikFunction [list $OduvanchikFunctionName] [subst -nocommand {$clcon_text Unfreeze}]
+        if {$UserContBody ne {}} {
+            set ContBody [subst -nocommand {$clcon_text Unfreeze; apply {{clcon_text EventAsList} $UserContBody} $clcon_text \$EventAsList}]
+        } else {
+            set ContBody [subst -nocommand {$clcon_text Unfreeze}]
+        }
+        showVar ContBody
+        MaybeSendToLisp $clcon_text CallOduvanchikFunction [list $OduvanchikFunctionName] $ContBody
     }
 
     # # To be called from oi::delete-region
