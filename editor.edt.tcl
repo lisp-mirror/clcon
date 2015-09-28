@@ -467,6 +467,8 @@ namespace eval ::edt {
                 after idle [::tkcon::Highlight $w.text tcl]
             }
             file	{
+                $w.text configure -filename $word
+                
                 ::clcon_text::ConstructBackendBuffer $w.text
 
                 $w.text insert 1.0 [::edt::ReadFileIntoString $word 0]
