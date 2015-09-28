@@ -81,12 +81,14 @@
 
 
 (defun call-oduvanchik-fn-internal (fn clcon_text buffer)
-  (let ((oduvanchik-internals::*do-editing-on-tcl-side* t))
-    (funcall fn nil)
-    (clco::compare-clcon_text-and-oduvanchik-buffer-contents clcon_text)
-    )
-  (odu::send-buffer-point-to-clcon_text buffer)
-  )
+  (let (result)      
+    (let* ((oduvanchik-internals::*do-editing-on-tcl-side* t))
+      (setf result (funcall fn nil))
+      (clco::compare-clcon_text-and-oduvanchik-buffer-contents clcon_text)
+      )
+    (odu::send-buffer-point-to-clcon_text buffer)
+    result
+    ))
 
 (defun call-oduvanchik-function-with-clcon_text (e)
   "see swank:eval-for-emacs as an example of error handling"
