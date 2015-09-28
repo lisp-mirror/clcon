@@ -227,7 +227,7 @@ proc ::tkcon::Init {args} {
 	overrideexit	1
 	usehistory	1
         putd-enabled    0
-        oduvan-backend  0
+        oduvan-backend  1
         swank-ip        127.0.0.1
         swank-port      4009
 
