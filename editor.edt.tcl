@@ -378,6 +378,9 @@ namespace eval ::edt {
         
         set dismiss [wesppt [list wm withdraw $tw]]
         $m add command -label "Hide editor window" -underline 0 -command $dismiss
+        $m add command -label "4.Reload some of IDE sources" -underline 0 \
+	    -command ::tkcon::ReloadSomeIDESources
+
         
         ## Edit Menu
         ##
