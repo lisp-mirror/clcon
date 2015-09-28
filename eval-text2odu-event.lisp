@@ -74,6 +74,20 @@
 
 (defun nop (&rest args) (declare (ignore args)))
 
+(defun eval-for-emacs-clone-for-oduvanchik (fn id)
+  "Copy-paste from swank::eval-for-emacs with some additions"
+  (let (ok result condition)
+    ))
+
+
+(defun call-oduvanchik-fn-internal (fn clcon_text buffer)
+  (let ((oduvanchik-internals::*do-editing-on-tcl-side* t))
+    (funcall fn nil)
+    (clco::compare-clcon_text-and-oduvanchik-buffer-contents clcon_text)
+    )
+  (odu::send-buffer-point-to-clcon_text buffer)
+  )
+
 (defun call-oduvanchik-function-with-clcon_text (e)
   "see swank:eval-for-emacs as an example of error handling"
   (let* ((clcon_text (clco::text2odu-event-clcon_text-pathname e))
@@ -87,23 +101,17 @@
     (assert (and
              (eq (symbol-package fn) (find-package :oduvanchik)) ; security limitation
              (fboundp fn)) () "Symbol ~S (~S) not found, funbound or have home-package different from :oduvanchik" fn-name fn)
-    (swank::with-connection (connection)
+    (swank::with-connection (connection) 
       (use-buffer buffer
         (odu::set-mark-to-row-and-col (current-point)
                                       (clco::row-col-row cur-row-col)
                                       (clco::row-col-col cur-row-col))
         ;; (oi::sync-mark-from-clcon_text clcon_text (current-point) "insert")
         ;; known functions are indent-new-line-command and new-line-command
-        (let ((oduvanchik-internals::*do-editing-on-tcl-side* t))
-          (funcall fn nil)
-          (clco::compare-clcon_text-and-oduvanchik-buffer-contents clcon_text)
-          )
-        (odu::send-buffer-point-to-clcon_text buffer)
-        )
-      ; stolen from swank::eval-for-emacs
-      (swank::send-to-emacs `(:return ,(swank::current-thread) (:ok "clcon-call-cont") ,cont))
-      nil
-      )))
+        (swank::eval-for-emacs `(call-oduvanchik-fn-internal ',fn ',clcon_text ',buffer) :common-lisp-user cont)
+        
+        nil
+        ))))
 
 ; for single chars, use (oduvanchik-ext:char-key-event #\x)
 (defun eval-text2odu-event (e)
