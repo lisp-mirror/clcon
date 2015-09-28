@@ -981,6 +981,14 @@ proc ::tkcon::FocusWindowByName {window {widget {}}} {
     return 
 }
     
+# Returns text widget of current console. It is suitable e.g.
+# for calling write-code-to-pass-to-loc with the pattern
+# apply {$w ...} [::tkcon::CurrentConsole]
+proc ::tkcon::CurrentConsole {} {
+    variable PRIV
+    return $PRIV(console)
+}
+
 
 proc ::tkcon::FocusConsole {} {
     variable PRIV
