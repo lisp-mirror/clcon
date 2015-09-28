@@ -52,6 +52,7 @@ namespace eval ::clcon_text {
         # PRIVATE. Number of modifications sent which were not processed by oduvanchik yet
         option -private_pending_sent_modifications 0
         option -private_pending_far_tcl_continuations 0
+        option -filename {}
         constructor {args} {
             installhull using text
             # Apply any options passed at creation time.
@@ -160,6 +161,9 @@ namespace eval ::clcon_text {
             }
             return $GlobalPendingText2OduEventCounter
         } else {
+            if {![winfo exists $clcon_text]} {
+                return 0
+            }
             set j [$clcon_text cget -private_pending_sent_modifications]
             incr j $increment
             $clcon_text configure -private_pending_sent_modifications $j
