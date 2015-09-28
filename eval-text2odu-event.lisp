@@ -101,7 +101,7 @@
         (odu::send-buffer-point-to-clcon_text buffer)
         )
       ; stolen from swank::eval-for-emacs
-      (swank::send-to-emacs `(:return ,(swank::current-thread) (:ok "ugugu") ,cont))
+      (swank::send-to-emacs `(:clcon-call-cont ,(swank::current-thread) (:ok "ugugu") ,cont))
       nil
       )))
 

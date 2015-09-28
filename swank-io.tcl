@@ -229,7 +229,7 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
         putd "Impolitely ignore :indentation-update"
     } elseif { $Head eq ":ping" } {
         ::swcnn::Pong $EventAsList
-    } elseif { [ContinuationExistsP $ContinuationId ] == 1 } {
+    } elseif { [ContinuationExistsP $ContinuationId ] == 1 && [lsearch -exact [list ":return" ":clcon-call-cont"] $Head] >= 0 } {
         # we should have generated event which would evaluate continuation later.
         # but what we will do with sync events then?
         # we must either run all continations asynchronously, either run all continuations synchronously.
