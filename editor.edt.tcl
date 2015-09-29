@@ -322,6 +322,48 @@ namespace eval ::edt {
 
 
 
+    proc LoadContents {w word opts tail} {
+        switch -glob -- [dict get $opts -type] {
+            proc*	{
+                $w.text insert 1.0 \
+                    [::tkcon::EvalOther {} slave dump proc [list $word]]
+                after idle [::tkcon::Highlight $w.text tcl]
+            }
+            var*	{
+                $w.text insert 1.0 \
+                    [::tkcon::EvalOther {} slave dump var [list $word]]
+                after idle [::tkcon::Highlight $w.text tcl]
+            }
+            file	{
+
+                if {$word ne {}} {
+                    set filemtime [file mtime $word]
+                } else {
+                    set filemtime {}
+                }
+                
+                $w.text configure -filename $word -filemtime $filemtime
+                
+                ::clcon_text::ConstructBackendBuffer $w.text
+                
+                $w.text insert 1.0 [::edt::ReadFileIntoString $word 0]
+                
+                after idle [::tkcon::Highlight $w.text \
+                                [string trimleft [file extension $word] .]]
+            }
+            error*	{
+                $w.text insert 1.0 [join $tail \n]
+                after idle [::tkcon::Highlight $w.text error]
+            }
+            default	{
+                $w.text insert 1.0 [join $tail \n]
+            }
+        }
+        $w.text edit reset
+        $w.text edit modified 0
+        $w.text mark set insert 1.0
+    }
+
     
     # Initializes editor GUI, loads text.
     # args are for error only
@@ -368,6 +410,12 @@ namespace eval ::edt {
         ## File Menu
         ##
         set m [menu [::tkcon::MenuButton $menu 1.File file]]
+
+        set cmd [wesppt [list ::edt::Save $w.text]]
+        $m add command -label "Save" -command $cmd -accel "Control-S"
+        bind $w <Control-Key-s> $cmd
+        bind $w <Control-Key-Cyrillic_yeru> $cmd
+        
         $m add command -label "Save As..."  -underline 0 \
             -command [wesppt [list ::tkcon::Save {} widget $w.text]]
         $m add separator
@@ -454,39 +502,7 @@ namespace eval ::edt {
         grid rowconfigure $w 0 -weight 1
 
         
-        
-        switch -glob -- [dict get $opts -type] {
-            proc*	{
-                $w.text insert 1.0 \
-                    [::tkcon::EvalOther {} slave dump proc [list $word]]
-                after idle [::tkcon::Highlight $w.text tcl]
-            }
-            var*	{
-                $w.text insert 1.0 \
-                    [::tkcon::EvalOther {} slave dump var [list $word]]
-                after idle [::tkcon::Highlight $w.text tcl]
-            }
-            file	{
-                $w.text configure -filename $word
-                
-                ::clcon_text::ConstructBackendBuffer $w.text
-
-                $w.text insert 1.0 [::edt::ReadFileIntoString $word 0]
-
-                after idle [::tkcon::Highlight $w.text \
-                                [string trimleft [file extension $word] .]]
-            }
-            error*	{
-                $w.text insert 1.0 [join $tail \n]
-                after idle [::tkcon::Highlight $w.text error]
-            }
-            default	{
-                $w.text insert 1.0 [join $tail \n]
-            }
-        }
-        $w.text edit reset
-        $w.text edit modified 0
-        $w.text mark set insert 1.0
+        LoadContents $w $word $opts $tail
     }
 
 
