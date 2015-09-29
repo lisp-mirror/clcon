@@ -30,11 +30,6 @@ proc ::tkcon::Eval {w} {
 }
 
 
-proc tr {x} {
-    catch { throw {ARITH DIVZERO {divide by zero}}} 
-    tk_messageBox -message "$x [info errorstack]"
-}
-
 ## ::tkcon::EvalCmd - evaluates a single command, adding it to history
 # ARGS:	w	- console text widget
 # 	cmd	- the command to evaluate

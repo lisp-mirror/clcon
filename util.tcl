@@ -60,3 +60,10 @@ proc GenNamedCounter {name} {
 # 1
 # puts [CountOccurancesOfSubstring "a*" "ba*ba*b"]
 # 2
+
+
+
+proc tr {x} {
+    catch { throw {ARITH DIVZERO {divide by zero}}} 
+    tk_messageBox -message "$x [info errorstack]"
+}
