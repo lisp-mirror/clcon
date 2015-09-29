@@ -34,6 +34,8 @@
 package require Tk
 package require snit
 
+
+# FIXME some options might be buffer-related, not text-related.
 namespace eval ::clcon_text {
     variable GlobalPendingText2OduEventCounter
     if {![info exists GlobalPendingText2OduEventCounter]} {
@@ -53,6 +55,7 @@ namespace eval ::clcon_text {
         option -private_pending_sent_modifications 0
         option -private_pending_far_tcl_continuations 0
         option -filename {}
+        option -filemtime {}
         constructor {args} {
             installhull using text
             # Apply any options passed at creation time.
