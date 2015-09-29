@@ -54,15 +54,38 @@
             ))))))
   t)
 
-(defun eval-construct-backend-buffer (e)
-  (let ((b (current-buffer)))
-    (delete-characters-between-marks
-     (buffer-start-mark b)
-     (buffer-end-mark b))
-    ; b must be current here
-    (lisp-mode-command nil)
-    (setf (buffer-name b) (clco::text2odu-event-clcon_text-pathname e))
+(defun find-buffer-by-name (buffer-name)
+  (getstring buffer-name *buffer-names*))
+
+(defun delete-old-buffer (buffer-name)
+  "Find buffer with that name and delete it. We rely on the fact we have one window only so we can switch to safe haven in the only window"
+  (let ((b (find-buffer-by-name buffer-name)))
+    (when b
+      (switch-to-safe-haven-buffer)
+      (delete-buffer b))
     ))
+
+(defun switch-to-safe-haven-buffer ()
+  "Switches to 'safe haven' buffer creating it if needed"
+  (let ((name "*safe haven*"))
+    (change-to-buffer
+     (or (find-buffer-by-name name)
+         (make-buffer name)))))
+
+(defun eval-construct-backend-buffer (e)
+  (let* ((buffer-name (clco::text2odu-event-clcon_text-pathname e)))         
+    (delete-old-buffer buffer-name)
+    (let* ((b (make-buffer buffer-name)))
+      (change-to-buffer b)
+      (lisp-mode-command nil)
+      )))
+
+(defun eval-destroy-backend-buffer (e)
+  (let* ((buffer-name (clco::text2odu-event-clcon_text-pathname e))
+         (old-buffer (find-buffer-by-name buffer-name)))
+    (when old-buffer
+      (switch-to-safe-haven-buffer)
+      (delete-buffer old-buffer))))
 
 
 (defun send-buffer-point-to-clcon_text (buffer)
@@ -117,7 +140,7 @@
 
 ; for single chars, use (oduvanchik-ext:char-key-event #\x)
 (defun eval-text2odu-event (e)
-  "This code is executed inside a command. Transrom text2odu events to oduvanchik function calls"
+  "This code is executed inside a command. Transform text2odu events to oduvanchik function calls"
   (etypecase e
     (clcon-server::text2odu-event
      (ecase (clco::text2odu-event-kind e)
@@ -130,7 +153,7 @@
         ; (warn "ignoring before-tcl-text-delete event")
         )
        (clco::destroy-backend-buffer
-        (warn "ignoring destroy-backend-buffer event")
+        (eval-destroy-backend-buffer e)
         )
        (clco::shutdown-text2odu-dispatcher
         (error "clco::shutdown-text2odu-dispatcher event must not arrive here")

@@ -41,6 +41,7 @@ namespace eval ::edt {
             set UntitledBuffer 0
         }
         DoSaveFile $clcon_text $FileName
+        puts "see addrecent in tcltextedit/cmds.tcl"
     }
        
 }

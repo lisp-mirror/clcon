@@ -283,6 +283,7 @@ namespace eval ::edt {
         if {$accel ne {}} {
             bind $w $accel $cmd
         }
+        return $cmd
     }
 
     proc MakeLispModeMenu {menu w text} {
@@ -296,7 +297,8 @@ namespace eval ::edt {
         # bind $w <F11> $cmd
 
         $m add separator
-        OduFnMenuItem $w $m $text indent-new-line
+        set cmd [OduFnMenuItem $w $m $text indent-new-line "<Shift-Return>"]
+        bind $text <Shift-Return> "$cmd; break"
         OduFnMenuItem $w $m $text transpose-forms
         $m add separator
         OduFnMenuItem $w $m $text beginning-of-defun
