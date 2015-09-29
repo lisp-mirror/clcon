@@ -67,16 +67,20 @@
 
 (defun switch-to-safe-haven-buffer ()
   "Switches to 'safe haven' buffer creating it if needed"
-  (let ((name "*safe haven*"))
-    (change-to-buffer
-     (or (find-buffer-by-name name)
-         (make-buffer name)))))
+  (let* ((name "*safe haven*")
+         (existing (find-buffer-by-name name))
+         (result (or existing (make-buffer name))))
+    (change-to-buffer result)
+    (unless existing
+      (auto-save-mode-command 0))
+    ))
 
 (defun eval-construct-backend-buffer (e)
   (let* ((buffer-name (clco::text2odu-event-clcon_text-pathname e)))         
     (delete-old-buffer buffer-name)
     (let* ((b (make-buffer buffer-name)))
       (change-to-buffer b)
+      (auto-save-mode-command 0)
       (lisp-mode-command nil)
       )))
 
