@@ -7,7 +7,7 @@ proc MaybeCreateLogger {} {
         wm title .logger "Logg"
         text .logger.text 
         pack .logger.text
-        wm protocol  .logger WM_DELETE_WINDOW { destroy . }
+        # wm protocol  .logger WM_DELETE_WINDOW { destroy . }
     }
 }
 
