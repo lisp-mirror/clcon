@@ -60,7 +60,7 @@
   (beg nil :type (or null row-col)) ; begin index
   (end nil :type (or null row-col))   ; end index
   (far_tcl_cont_id nil :type (or null integer)) ; tcl continuation id to eval after event's action is processed
-  (swank-connection nil :type (or null swank::multithreaded-connection)) 
+  (swank-connection nil :type (or null swank::multithreaded-connection)) ; can be omitted for several event types
   )
 
 (defun parse-row-col (tcl-index)
@@ -93,6 +93,7 @@
    (make-text2odu-event
     :kind 'construct-backend-buffer
     :clcon_text-pathname clcon_text-pathname
+    :swank-connection swank::*emacs-connection*
     )))
 
 (defun nti  (clcon_text-pathname index string)
