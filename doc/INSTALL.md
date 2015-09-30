@@ -38,8 +38,24 @@ it a try, you should load and install dependencies, part 2.
 To load server-side code to lisp, use
 ```
 #!lisp
-; uncomment next line if you chose to use oduvanchik backend
-; (pushnew :clcon-oduvan *features*)
+;; Set some features.
+;; Don't forget to clear your asdf fasl cache and rebuile
+;; if you change any feature
+
+; enable oduvanchik backend. This feature will be removed soon
+; as oduvanchik backends goes well
+(pushnew :clcon-oduvan *features*)
+
+; If :oduvan-invisible set, we can build and start on Windows
+; If :oduvan-invisible is not set, we can run only on Linux, but
+; we also see normal Oduvanchik's GUI
+; I usually develop with :oduvan-invisible disabled
+(pushnew :oduvan-invisible *features*)
+
+; uncomment next line to see highlight (oduvanchik would hangs up soon)
+; (pushnew :oduvan-enable-highlight *features*) 
+
+;; Setting paths and loading
 (pushnew #P"path/to/clcon-server-source/" asdf:*central-registry* :test 'equalp)
 ;in windows you can write like this:
 ;(pushnew #P"C:/xxx/xxx/clcon/" asdf:*central-registry* :test 'equalp)
