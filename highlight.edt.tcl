@@ -3,13 +3,12 @@
 namespace eval ::edt {
     variable ColorTable
 
-    set ColorTable {black blue red yellow orange
-        blue blue blue blue
-        blue blue blue blue
-        blue blue blue blue
-        blue blue blue blue
-        blue blue blue blue
-        blue blue blue blue
+    set ColorTable {
+        black blue red orange cyan
+        blue gray brown "dark grey"
+        "dark blue" "gold" "light coral"
+        "cyan" "medium orchid" "medium purple"
+        "moccasin"
     }
 
     proc HighlightTagName {i} {
