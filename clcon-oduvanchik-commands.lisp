@@ -75,6 +75,8 @@
   (let* ((result (call-next-method))
          (marks (oi::sy-font-marks result))
          (buffer (line-buffer line)))
+    (declare (ignorable marks buffer))
+    #+oduvan-enable-highlight
     (when (bufferp buffer)
       (let* ((clcon_text (oi::buffer-to-clcon_text buffer))
              (connection (oduvanchik-interface:variable-value
@@ -83,13 +85,13 @@
              )
         (when (and clcon_text connection marks)
           (let* ((cmd (with-output-to-string (ou)
-                         (format ou "::edt::ApplyHighlightToLine ~A " clcon_text)
-                         (encode-marks-for-line line ou)
-                         )))
-             (format *trace-output* "~S" cmd)
-             (swank::with-connection (connection)
+                        (format ou "::edt::ApplyHighlightToLine ~A " clcon_text)
+                        (encode-marks-for-line line ou)
+                        )))
+            ;(format *trace-output* "~S" cmd)
+            (swank::with-connection (connection)
               ;; we should carefully synchronize them indeed
-               (clco:eval-in-tcl cmd :nowait nil))))))
+              (clco:eval-in-tcl cmd :nowait nil))))))
     result))
 
 
