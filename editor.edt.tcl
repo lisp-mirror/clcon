@@ -150,6 +150,13 @@ namespace eval ::edt {
         dict set EditorReusableWindowDict $key $w
     }
 
+    # This function can be useful for some other tools, e.g. recent files menu
+    proc IsFileBeingEdited {filename} {
+        variable EditorReusableWindowDict
+        set key [list $filename -type file]
+        dict exists $EditorReusableWindowDict $key
+    }
+    
     # RuseOrCreateEditorWindow . Returns a window 
     proc FindOrMakeEditorWindow {word opts tail} {
         variable EditorReusableWindowDict
@@ -205,6 +212,7 @@ namespace eval ::edt {
         RemoveWindowFromLists $tw $w
         destroy $w
         UpdateMRUAndBufferList {}
+        ::recent::RedrawRecentMenuForConsole
     }
 
     proc MaybeDestroyEditorWindow {tw} {
@@ -505,6 +513,10 @@ namespace eval ::edt {
 
         
         LoadContents $w $word $opts $tail
+
+        if {[dict get $opts -type] == "file"} {
+            ::recent::AddRecent $word
+        }
     }
 
 
@@ -577,7 +589,7 @@ namespace eval ::edt {
     # Reorganizes windows according to their usage order
     # Refreshes buffer list. LastUsedTw can be {} when deleting window!
     proc UpdateMRUAndBufferList {LastUsedTw} {
-        putd "We should have reordered windows here"
+        putd "We should have reordered windows here. See recent.tcl"
         after idle ::buli::RefreshData
     }
     

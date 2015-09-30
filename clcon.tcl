@@ -145,6 +145,7 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
     TkconSourceHere slimv-clcon.tcl
     TkconSourceHere findreplace.tcl
     TkconSourceHere findbox.fndrpl.tcl
+    TkconSourceHere recent.tcl
 }
 
 ::tkcon::ReloadSomeIDESources1
@@ -481,7 +482,7 @@ proc ::tkcon::Init {args} {
 	# consoles will adopt from the main's history, but still
 	# keep separate histories
 	if {!$PRIV(WWW) && $OPT(usehistory) && [file exists $PRIV(histfile)]} {
-	    puts -nonewline "loading history file ... "
+	    puts -nonewline "loading history and recent menu file ... "
 	    # The history file is built to be loaded in and
 	    # understood by tkcon
 	    if {[catch {uplevel \#0 [list source $PRIV(histfile)]} herr]} {
@@ -490,6 +491,9 @@ proc ::tkcon::Init {args} {
 	    }
 	    set PRIV(event) [EvalSlave history nextid]
 	    puts "[expr {$PRIV(event)-1}] events added"
+
+            # We rely upon the fact that Menu exists already.
+            ::recent::RedrawRecentMenuForConsole
 	}
     }
 
@@ -1169,11 +1173,17 @@ proc ::tkcon::InitMenus {w title} {
 	    [menu $w.pop.file -disabledforeground $COLOR(disabled)]] {
 	$m add command -label "1.Load File" -underline 0 -command ::tkcon::Load
 	$m add cascade -label "2.Save ..."  -underline 0 -menu $m.save
+
 	$m add separator
 	$m add command -label "3.Quit" -command exit
 	$m add separator
+
+        set cmd ::tkcon::ReloadSomeIDESources
 	$m add command -label "4.Reload some of IDE sources" -underline 0 \
-	    -command ::tkcon::ReloadSomeIDESources
+	    -command $cmd
+
+        $m add cascade -label "5.Open recent ..." -underline 0 -menu $m.recent
+        
         
 
 	## Save Menu
@@ -1189,7 +1199,13 @@ proc ::tkcon::InitMenus {w title} {
 	$s add command -label "Stdout"	-underline 3 \
 		-command {::tkcon::Save {} stdout}
 	$s add command -label "Stderr"	-underline 3 \
-		-command {::tkcon::Save {} stderr}
+            -command {::tkcon::Save {} stderr}
+
+
+        ## Recent menu
+        set s $m.recent
+        menu $s -disabledforeground $COLOR(disabled)
+        
     }
 
     ## Console Menu
@@ -2193,6 +2209,7 @@ proc ::tkcon::MainInit {} {
 			}
 			incr id
 		    }
+                    ::recent::SaveRecentFilesList $fid
 		    close $fid
 		}
 	    }
@@ -3028,6 +3045,7 @@ proc tkcon_gets args {
 proc ::tkcon::ReloadSomeIDESources2 {} {
     TkconSourceHere eval.tkcon.tcl
     TkconSourceHere editor.edt.tcl
+    TkconSourceHere menu.recent.tcl
     TkconSourceHere highlight.edt.tcl
     TkconSourceHere inspector.insp.tcl
     TkconSourceHere save.edt.tcl
