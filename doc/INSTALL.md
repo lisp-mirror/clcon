@@ -1,6 +1,6 @@
 ## Clcon installation and startup 
 
-### Load and install dependencies, part 1
+### Load and install dependencies
 
 - fresh versions of [SBCL](http://www.sbcl.org/platform-table.html) 
 - fresh version of tcl/tk. On Windows, you can download tcl/tk from [Activestate](http://www.activestate.com/activetcl/downloads). On Debian, use your package manager to download tk8.6 .
@@ -12,13 +12,6 @@ hg clone https://bitbucket.org/budden/budden-tools
 ```  
 - good version of clcon itself, put it where convenient. No "installation" procedure exists yet. 
 
-### Choose if you want to try oduvanchik's backend
-Oduvanchik's backend enables a lisp mode. It is not documented yet
-so it is unlikey you'll be able to run it. But if you want to give 
-it a try, you should load and install dependencies, part 2. 
-
-### Load and install dependencies, part 2
-(Only if you choose to try lisp mode)
 - put fresh version of [oduvanchik](https://bitbucket.org/budden/oduvanchik) under local-projects directory of quicklisp. E.g. (Linux)
   ```
   cd ~/quicklisp/local-projects
@@ -46,7 +39,7 @@ To load server-side code to lisp, use
 ; as oduvanchik backends goes well
 (pushnew :clcon-oduvan *features*)
 
-; If :oduvan-invisible set, we can build and start on Windows
+; If :oduvan-invisible set, we can build and start on MS Windows
 ; If :oduvan-invisible is not set, we can run only on Linux, but
 ; we also see normal Oduvanchik's GUI
 ; I usually develop with :oduvan-invisible disabled
@@ -84,3 +77,5 @@ at the IDE's console and press Return. Expression should be evaluated on lisp si
 and result should be printed at clcon. 
 
 cl-user package is assumed for all interaction. If you change package, consequences are undefined.
+
+To see what clcon can do, take a [Demo Tour](demo-tour.md)
