@@ -32,8 +32,7 @@ Features demonstrated are:
 - REPL with command history and history substitution
 - Debugger (view stack, locals, goto source, invoke restarts, search)
 - completion for lisp symbols and filenames in REPL
-- find source in REPL
-- lisp mode (not covered by demo tour)
+- lisp mode with syntax-highlight, find-source, auto indent (not covered by demo tour)
 - inspector 
 - compilation notes browser
 - editor buffer list
