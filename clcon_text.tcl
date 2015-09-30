@@ -65,6 +65,7 @@ namespace eval ::clcon_text {
             set NewBindTags [SubstituteSingleValueInListVarKeyEq CurrentBindTags Text FreezableText]
             bindtags $win $NewBindTags
             bind $win <<UnfreezeNext>> "$self Unfreeze"
+            ::edt::CreateHighlightTags $self
         }
         destructor {
             DestroyBackendBuffer $win

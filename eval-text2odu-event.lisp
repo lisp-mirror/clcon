@@ -75,13 +75,21 @@
       (auto-save-mode-command 0))
     ))
 
+(defhvar "Swank connection" "Always nil (hopefully)")
+
 (defun eval-construct-backend-buffer (e)
   (let* ((buffer-name (clco::text2odu-event-clcon_text-pathname e)))         
     (delete-old-buffer buffer-name)
     (let* ((b (make-buffer buffer-name)))
       (change-to-buffer b)
+      (oduvanchik-interface:defhvar "Swank Connection" "Ugugu" :buffer b)
       (auto-save-mode-command 0)
       (lisp-mode-command nil)
+      (budden-tools::show-expr (clco::text2odu-event-swank-connection e))
+      (setf (oi::variable-value 'odu::swank-connection :current b)
+            (clco::text2odu-event-swank-connection e))
+      (budden-tools::show-expr (oi::variable-value 'odu::swank-connection :current b))
+      (budden-tools::show-expr (oi::variable-value 'odu::swank-connection :buffer b))
       )))
 
 (defun eval-destroy-backend-buffer (e)
