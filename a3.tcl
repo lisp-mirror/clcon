@@ -1,3 +1,8 @@
+#!/bin/sh
+# -*- tcl -*-
+# \
+exec wish "$0" ${1+"$@"}
+
 namespace eval SNotebook {
 
     # create scroll buttons  
