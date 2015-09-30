@@ -19,7 +19,8 @@ Code is completely platform-independent and should run on other platforms too. A
 [See here](https://bitbucket.org/budden/clcon/wiki/Screenshots)
 
 ## Project goals
-Simple, one-click installable CL environment for beginners
+- GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine)
+- Simple, one-click installable CL environment for beginners
 
 ## Current state
 Overall state and quality is "working prototype".
@@ -38,6 +39,7 @@ Features demonstrated are:
 - editor buffer list
 - "Find" and "Find next" commands for text and treeview
 - running of tcl code with special "escapes"
+- recent file list
 
 ## Installation and startup
 See [doc/INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/INSTALL.md)

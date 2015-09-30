@@ -39,7 +39,7 @@ To load server-side code to lisp, use
 ```
 #!lisp
 ;; Set some features.
-;; Don't forget to clear your asdf fasl cache and rebuile
+;; Don't forget to clear your asdf fasl cache and rebuild
 ;; if you change any feature
 
 ; enable oduvanchik backend. This feature will be removed soon
