@@ -13,10 +13,10 @@ hg clone https://bitbucket.org/budden/budden-tools
 - good version of clcon itself, put it where convenient. No "installation" procedure exists yet. 
 
 - put fresh version of [oduvanchik](https://bitbucket.org/budden/oduvanchik) under local-projects directory of quicklisp. E.g. (Linux)
-  ```
-  cd ~/quicklisp/local-projects
-  hg clone https://bitbucket.org/budden/oduvanchik
-  ```
+```
+cd ~/quicklisp/local-projects
+hg clone https://bitbucket.org/budden/oduvanchik
+```
 
 ### Start your SBCL and install dependencies. 
 
