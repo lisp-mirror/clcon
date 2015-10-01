@@ -865,7 +865,7 @@ proc ::tkcon::InitTab {w} {
 	$con configure -font tkconfixed
     }
     set OPT(font) [$con cget -font]
-    bindtags $con [list $con TkConsole TkConsolePost $PRIV(root) all]
+    bindtags $con [list TkConsoleTextOverrides $con TkConsole TkConsolePost $PRIV(root) all]
 
     # scrollbar
     if {!$PRIV(WWW)} {
@@ -3933,7 +3933,7 @@ proc ::tkcon::ReloadSomeIDESources3 {} {
         TkconSourceHere tkcon-unknown.tcl
     } elseif { $::tkcon::ENABLE_UNKNOWN == -1 } {
         TkconSourceHere tkcon-unknown-mini.tcl
-    }
+    }   
 }
 
 ::tkcon::ReloadSomeIDESources3
@@ -3991,10 +3991,8 @@ proc ::tkcon::Bindings {} {
 	<<TkCon_Eval>>		<Return>
 	<<TkCon_Eval>>		<KP_Enter>
 	<<TkCon_Clear>>		<Control-l>
-	<<TkCon_Previous>>	<Up>
 	<<TkCon_PreviousImmediate>>	<Control-p>
 	<<TkCon_PreviousSearch>>	<Control-r>
-	<<TkCon_Next>>		<Down>
 	<<TkCon_NextImmediate>>	<Control-n>
 	<<TkCon_NextSearch>>	<Control-s>
 	<<TkCon_Transpose>>	<Control-t>
@@ -4013,6 +4011,17 @@ proc ::tkcon::Bindings {} {
 	bind TkConsole $key {}
     }
 
+    # The same for TkConsoleTextOverrides
+    set bindings {
+        <<TkCon_Previous>> <Control-Key-Up>
+        <<TkCon_Next>> <Control-Key-Down>
+    }
+    foreach {ev key} [subst -nocommand -noback $bindings] {
+	event add $ev $key
+	## Make sure the specific key won't be defined
+	bind TkConsoleTextOverrides $key {}
+    }
+    
     ## Make the ROOT bindings
     bind $PRIV(root) <<TkCon_Exit>>	exit
     bind $PRIV(root) <<TkCon_New>>	{ ::tkcon::New }
@@ -4151,7 +4160,7 @@ proc ::tkcon::Bindings {} {
 	break ; # could check "%K" == "Tab"
     }
     bind TkConsole <<TkCon_LispFindDefinition>> {
-	if {[%W compare insert > limit]} {::tkcon::LispFindDefinition %W}
+	::tkcon::LispFindDefinition %W
 	break ; # could check "%K" == "Tab"
     }
     bind TkConsole <<TkCon_ExpandVar>> {
@@ -4225,19 +4234,21 @@ proc ::tkcon::Bindings {} {
 	clear
 	::tkcon::Prompt {} $::tkcon::PRIV(tmp)
     }
-    bind TkConsole <<TkCon_Previous>> {
+    bind TkConsoleTextOverrides <<TkCon_Previous>> {
 	if {[%W compare {insert linestart} != {limit linestart}]} {
 	    tk::TextSetCursor %W [tk::TextUpDownLine %W -1]
 	} else {
 	    ::tkcon::Event -1
 	}
+        break
     }
-    bind TkConsole <<TkCon_Next>> {
+    bind TkConsoleTextOverrides <<TkCon_Next>> {
 	if {[%W compare {insert linestart} != {end-1c linestart}]} {
 	    tk::TextSetCursor %W [tk::TextUpDownLine %W 1]
 	} else {
 	    ::tkcon::Event 1
 	}
+        break
     }
     bind TkConsole <<TkCon_NextImmediate>>  { ::tkcon::Event 1 }
     bind TkConsole <<TkCon_PreviousImmediate>> { ::tkcon::Event -1 }
