@@ -421,6 +421,11 @@ namespace eval ::edt {
         ##
         set m [menu [::tkcon::MenuButton $menu 1.File file]]
 
+        set cmd ::tkcon::OpenForEdit 
+	$m add command -label "Open" -command $cmd -accel "Control-O"
+        bind $text <Control-Key-o> "$cmd; break"
+        bind $text <Control-Key-Cyrillic_shcha> "$cmd; break"
+
         set cmd [wesppt [list ::edt::Save $w.text]]
         $m add command -label "Save" -command $cmd -accel "Control-S"
         bind $w <Control-Key-s> $cmd
@@ -451,8 +456,14 @@ namespace eval ::edt {
             -command [wesppt [list tk_textPaste $text]]
         ##
         $m add separator
-        $m add command -label "Find" -under 0 \
-            -command [wesppt [list ::fndrpl::OpenFindBox $text "text" "find" {}]]
+	set cmd [wesppt [list ::fndrpl::OpenFindBox $text "text" "find" {}]]
+        $m add command -label "Find" -under 0 -command $cmd -accel "Control-F"
+        bind $w <Control-Key-f> $cmd
+        bind $w <Control-Key-Cyrillic_a> $cmd
+
+        set cmd [list ::fndrpl::FindIt $text]
+	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd 
+        bind $w <F3> $cmd
 
         ## Lisp mode Menu
         ##
