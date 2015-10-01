@@ -114,8 +114,6 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
 
 
 
-;сюда нужно перенести код из oduvanchik по выделению символа и применить его для вызова лиспового комплишена из clcon
-
 ;get-token-prefix
 
 
