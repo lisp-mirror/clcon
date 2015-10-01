@@ -18,7 +18,7 @@ Windows: installing file release
 - Start c:\clcon\bin\clcon-server-and-client.cmd - this will load and run the IDE. When running for the first time, building will take a while. Subsequent loads are faster
 - To see what clcon can do, take a [Demo Tour](demo-tour.md)
 - If all is ok, you have clcon with SBCL (use Alt-. to find sources of SBCL objects) and quicklisp (use ql:quickload to load libraries)
-- Repositories of clcon components (clcon, oduvanchik, budden-tools) - feel free to send patches :)
+- Repositories of clcon components (clcon, oduvanchik, budden-tools) are at c:\clcon\quicklisp\local-projects - feel free to send patches :)
 
 Alternative way: loading sources and building (Linux & Windows)
 -----------
