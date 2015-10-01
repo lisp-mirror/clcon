@@ -31,11 +31,12 @@
   "Later we must add load-p logic if compilation failed. Now we just ignore it. Otherwise we would need
 to decide how to organise dialog between parties. So we just compile, and return code to be evaluated to print result with hyperlinks"
   (let* ((compilation-result (apply #'swank:compile-file-for-emacs filename load-p options))
+         (success (swank::compilation-result-successp compilation-result))
          (notes (swank::compilation-result-notes compilation-result))
          )
-    (print notes)
-    (when notes
-      (eval-in-tcl "::erbr::SwankBrowseErrors1 {}")
+    (when notes (print notes))
+    (when (or notes (not success))
+      (eval-in-tcl (format nil "::erbr::SwankBrowseErrors1 ~A" (CLCO::CONVERT-OBJECT-TO-TCL compilation-result)))
       (dolist (note notes)
         (eval-in-tcl (calc-details-code note))
         ))))
