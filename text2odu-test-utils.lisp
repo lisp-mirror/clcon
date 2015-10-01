@@ -44,5 +44,5 @@
                     :lfile "~/.clcon_text-str"
                     :rfile "~/.odu-str"))
           (t
-           (cerror "oduvanchik vs clcon_text buffer contents mismatch" "Continue")))))))
+           (cerror "Continue" "oduvanchik vs clcon_text buffer contents mismatch" )))))))
             
