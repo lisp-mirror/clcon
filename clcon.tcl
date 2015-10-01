@@ -205,7 +205,7 @@ proc ::tkcon::Init {args} {
 	dead		{}
 	edit		::edt::edit
 	expandorder	{Pathname Variable Procname}
-	font		{}
+	font		{{Lucida Console} 14}
 	history		48
 	hoterrors	1
 	library		{}
