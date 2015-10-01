@@ -167,9 +167,22 @@ proc ::tkcon::EditFileAtOffset {filename offset} {
 ## 
 proc ::tkcon::LispFindDefinition {w} {
     set exp [::tkcon::BeginningOfLispSymbolRegexp]
-    set tmp [$w search -backwards -regexp $exp insert-1c limit-1c]
-    if {[string compare {} $tmp]} {append tmp +2c} else {set tmp limit}
-    set str [$w get $tmp insert]
+
+    if {[$w compare insert >= limit]} {
+        set SearchStartPos limit
+    } else {
+        set SearchStartPos {insert linestart}
+    }
+    
+    set tmp [$w search -backwards -regexp $exp insert-1c $SearchStartPos]
+    if {[string compare {} $tmp]} {append tmp +2c} else {set tmp $SearchStartPos}
+    set tmp2 [$w search -regexp $exp $tmp]
+    if {[string compare {} $tmp2]} {append tmp2 +1c} else {set tmp2 {insert lineend}}
+    set str [$w get $tmp $tmp2]
+
+    showVar tmp
+    showVar tmp2
+    showVar str
     LispFindDefinitionInner $str
 }
 
