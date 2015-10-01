@@ -2395,6 +2395,7 @@ proc ::tkcon::Event {int {str {}}} {
 	}
     } else {
 	## String is empty, just get next/prev event
+        putd $PRIV(event)
 	if {$int > 0} {
 	    ## Goto next command in history
 	    if {$PRIV(event) < $nextid} {
@@ -2404,13 +2405,16 @@ proc ::tkcon::Event {int {str {}}} {
 		} else {
 		    $w insert limit [EvalSlave history event $PRIV(event)]
 		}
-	    }
+	    } else {
+                bell
+            }
 	} else {
 	    ## Goto previous command in history
 	    if {$PRIV(event) == $nextid} {
 		set PRIV(cmdbuf) [CmdGet $w]
 	    }
 	    if {[catch {EvalSlave history event [incr PRIV(event) -1]} res]} {
+                bell
 		incr PRIV(event)
 	    } else {
 		$w delete limit end
