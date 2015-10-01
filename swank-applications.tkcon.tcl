@@ -179,10 +179,6 @@ proc ::tkcon::LispFindDefinition {w} {
     set tmp2 [$w search -regexp $exp $tmp]
     if {[string compare {} $tmp2]} {append tmp2 +1c} else {set tmp2 {insert lineend}}
     set str [$w get $tmp $tmp2]
-
-    showVar tmp
-    showVar tmp2
-    showVar str
     LispFindDefinitionInner $str
 }
 
