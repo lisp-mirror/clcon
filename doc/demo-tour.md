@@ -71,7 +71,9 @@ Invoking tcl
 --------
 Commands starting from `..` are interpreted by tcl. E.g. type in ``..puts "Wow!"`` to see string printed at the console. There is also a way to invoke tcl from lisp, but it has security hazard and can be disabled in the future. Type in `(clcon-server:eval-in-tcl "tk_messageBox -message WOW")` at the console and you'll see message box, which was invoked from the lisp side. For now, `eval-in-tcl` is used for quick-and-dirty implementation of some clcon features.
 
-Coming soon
+Auto indent
 --------
-Auto-indent, syntax highlight.
+Switch to buffer list (Control-F12) and select any file. At the end of line, press Shift-Return to see auto-indent in action. 
+
+
 
