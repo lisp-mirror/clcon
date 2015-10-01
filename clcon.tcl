@@ -190,6 +190,12 @@ proc ::tkcon::Init {args} {
 	if {![info exists COLOR($key)]} { set COLOR($key) $default }
     }
 
+    if {![info exists OPT(font)]} {
+        if {$tcl_platform(platform) == "windows"} {
+            set OPT(font) {{Lucida Console} 14}
+        } 
+    }
+    
     # expandorder could also include 'Methodname' for XOTcl/NSF methods
     foreach {key default} {
 	autoload	{}
@@ -205,7 +211,7 @@ proc ::tkcon::Init {args} {
 	dead		{}
 	edit		::edt::edit
 	expandorder	{Pathname Variable Procname}
-	font		{{Lucida Console} 14}
+	font		{}
 	history		48
 	hoterrors	1
 	library		{}
