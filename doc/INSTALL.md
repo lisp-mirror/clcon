@@ -16,7 +16,8 @@ Windows: installing file release
 - Unpack it to c:\clcon
 - Download and install [ActiveTCL](http://www.activestate.com/activetcl). Be sure to create .tcl file association (it is done by default)
 - Start c:\clcon\bin\clcon-server-and-client.cmd - this will load and run the IDE. When running for the first time, building will take a while. Subsequent loads are faster
-- You have clcon with SBCL (use Alt-. to find sources of SBCL objects) and quicklisp (use ql:quickload to load libraries)
+- To see what clcon can do, take a [Demo Tour](demo-tour.md)
+- If all is ok, you have clcon with SBCL (use Alt-. to find sources of SBCL objects) and quicklisp (use ql:quickload to load libraries)
 - Repositories of clcon components (clcon, oduvanchik, budden-tools) - feel free to send patches :)
 
 Alternative way: loading sources and building (Linux & Windows)
