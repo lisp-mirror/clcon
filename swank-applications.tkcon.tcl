@@ -101,10 +101,6 @@ proc ::tkcon::ExpandLispSymbol str {
     ##tr [alias]
     set SwankReply [::tkcon::EvalInSwankSync $LispCmd]
     
-    putd "EvalInSwankSync returned $SwankReply"
-    putd "car swankreply = [::mprs::Car $SwankReply]"
-
-
 #(:return
 # (:ok
 #  (("defcas" "defclass" "defconstant" "defconstant-uneql" "defconstant-uneql-name" "defconstant-uneql-new-value" "defconstant-uneql-old-value" "defgeneric" "defglobal" "defimplementation" "define-alien-routine" "define-alien-type" "define-alien-variable" "define-cas-expander" "define-compiler-macro" "define-condition" "define-hash-table-test" "define-load-time-global" "define-method-combination" "define-modify-macro" ...)
@@ -117,11 +113,13 @@ proc ::tkcon::ExpandLispSymbol str {
         putd "ExpandLispSymbol: I don't know what is [::mprs::Car $SwankReply]"
         return
     }
+
+    if {[::mprs::Null [::mprs::Car $ExpansionsAndBestMatch]]} {
+        return -code break ""
+    }
     
     set match [::mprs::UnleashListOfAtoms [::mprs::Car $ExpansionsAndBestMatch]]
     # set MatchesList 
-
-    putd "ExpandLispSymbol: match = $match"
 
     if {[llength $match] > 1} {
 	regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
