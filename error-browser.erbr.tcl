@@ -176,6 +176,7 @@ namespace eval ::erbr {
         puts "Now will call toplevel $w"
         toplevel $w
         wm title $w "Error details"
+        bind $w <Escape> [list destroy $w]
         frame $w.body
         set text $w.body.text
         ::clcon_text::clcon_text $text -readonly 1
