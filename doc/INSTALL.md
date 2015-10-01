@@ -45,6 +45,9 @@ To load server-side code to lisp, use
 ; I usually develop with :oduvan-invisible disabled
 (pushnew :oduvan-invisible *features*)
 
+; May be needed sometimes for the debugging. 
+; (pushnew :oduvan-use-sleep-in-dispatch *features*)
+
 ; uncomment next line to see highlight (oduvanchik would hangs up soon)
 ; (pushnew :oduvan-enable-highlight *features*) 
 
