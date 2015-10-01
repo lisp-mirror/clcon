@@ -20,8 +20,8 @@ namespace eval tkcon {
 
         ## in 8.6b3, the virtual events <<NextLine>> and <<PrevLine>> 
         #  mess up our history feature
-        bind TkConsole <<NextLine>> {}
-        bind TkConsole <<PrevLine>> {}
+        #bind TkConsole <<NextLine>> {}
+        #bind TkConsole <<PrevLine>> {}
 
         ## Now make all our virtual event bindings
         #	<<TkCon_Expand>>	<Key-Tab>
@@ -74,11 +74,13 @@ namespace eval tkcon {
         }
 
         # The same for TkConsoleTextOverrides
-        set bindings {
+        set bindings2 {
+            <<PrevLine>> <Key-Up>
+            <<NextLine>> <Key-Down>
             <<TkCon_Previous>> <Control-Key-Up>
             <<TkCon_Next>> <Control-Key-Down>
         }
-        foreach {ev key} [subst -nocommand -noback $bindings] {
+        foreach {ev key} [subst -nocommand -noback $bindings2] {
             event add $ev $key
             ## Make sure the specific key won't be defined
             bind TkConsoleTextOverrides $key {}
@@ -297,19 +299,21 @@ namespace eval tkcon {
             ::tkcon::Prompt {} $::tkcon::PRIV(tmp)
         }
         bind TkConsoleTextOverrides <<TkCon_Previous>> {
-            if {[%W compare {insert linestart} != {limit linestart}]} {
-                tk::TextSetCursor %W [tk::TextUpDownLine %W -1]
-            } else {
-                ::tkcon::Event -1
-            }
+            #if {[%W compare {insert linestart} != {limit linestart}]} {
+            #    tk::TextSetCursor %W [tk::TextUpDownLine %W -1]
+            #} else {
+            #    ::tkcon::Event -1
+            #}
+            ::tkcon::Event -1
             break
         }
         bind TkConsoleTextOverrides <<TkCon_Next>> {
-            if {[%W compare {insert linestart} != {end-1c linestart}]} {
-                tk::TextSetCursor %W [tk::TextUpDownLine %W 1]
-            } else {
-                ::tkcon::Event 1
-            }
+            #if {[%W compare {insert linestart} != {end-1c linestart}]} {
+            #    tk::TextSetCursor %W [tk::TextUpDownLine %W 1]
+            #} else {
+            #    ::tkcon::Event 1
+            #}
+            ::tkcon::Event 1
             break
         }
         bind TkConsole <<TkCon_NextImmediate>>  { ::tkcon::Event 1 }
