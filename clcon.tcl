@@ -2027,10 +2027,10 @@ proc ::tkcon::Load { {fn ""} } {
 ## 
 proc ::tkcon::OpenForEdit { {fn ""} } {
     set types {
+	{{All Files}	*}
 	{{Lisp Files}	{.lisp .asd}}
 	{{Tcl Files}	{.tcl .tk}}
 	{{Text Files}	{.txt}}
-	{{All Files}	*}
     }
     # Allow for VFS directories, use Tk dialogs automatically when in
     # VFS-based areas
