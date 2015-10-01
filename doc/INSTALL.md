@@ -1,8 +1,8 @@
 Clcon installation and startup 
----------------------------
+==============
 
 Warning
-========
+-------
 Clcon is at early alpha stage. It is more working prototype than ready to use software. So install it to:
 - Take your impression of it's look and feel (use [Demo Tour](demo-tour.md)) and send me your positive feedback :) 
 - Decide if you want to participate in the development
@@ -11,7 +11,7 @@ Especially dangerous idea is to use it as a file editor. It can crash at any mom
 So it is easy to lose your work. I really use clcon for some activity, but it is still far from being complete IDE. 
 
 Windows: installing file release
-============
+----------
 - Download file release from [Downloads page](https://bitbucket.org/budden/clcon/downloads)
 - Unpack it to c:\clcon
 - Download and install [ActiveTCL](http://www.activestate.com/activetcl). Be sure to create .tcl file association (it is done by default)
@@ -20,7 +20,7 @@ Windows: installing file release
 - Repositories of clcon components (clcon, oduvanchik, budden-tools) - feel free to send patches :)
 
 Alternative way: loading sources and building (Linux & Windows)
-====================
+-----------
 
 ### Load and install dependencies
 
