@@ -42,7 +42,8 @@ Features demonstrated are:
 - recent file list
 
 ## Installation and startup
-See [doc/INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/INSTALL.md)
+For windows, we even have [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.2.2.zip). 
+Anyway, see [doc/INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/INSTALL.md) for installation instructions. 
 
 ## Documentation
 
@@ -60,6 +61,13 @@ See [doc/INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/INSTALL.
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-1. One-click installable distribution.
-2. Hacking of missing features.
-3. Code cleanup.
+- fix bugs in lisp mode 
+- paren highlighting
+- use as a GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine)
+- eval-in-frame
+- cross-reference navigation
+- better editor functionality
+- thread list with thread debugging
+- grep
+- fix other numerous bugs
+- full-featured menu
