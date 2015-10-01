@@ -25,7 +25,7 @@ proc ::mprs::EnqueueContinuation {ContinuationId code} {
     }
     variable ContinuationsDict
     # Having two events in the queue is normal sometimes. 
-    set PrintContinuationsDict [expr [llength $ContinuationsDict]>1]
+    set PrintContinuationsDict [expr [llength $ContinuationsDict]>2]
     dict set ContinuationsDict $ContinuationId [list {EventAsList} $code]
     if {$PrintContinuationsDict} {
         showVar ContinuationsDict
