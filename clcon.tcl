@@ -717,7 +717,7 @@ proc ::tkcon::InitUI {title} {
     set PRIV(base) $w
 
     catch {font create tkconfixed -family Courier -size -20}
-    catch {font create tkconfixedbold -family Courier -size -15 -weight bold}
+    catch {font create tkconfixedbold -family Courier -size -20 -weight bold}
 
     set PRIV(statusbar) [set sbar [frame $w.fstatus]]
     set PRIV(tabframe)  [frame $sbar.tabs]
@@ -1172,7 +1172,10 @@ proc ::tkcon::InitMenus {w title} {
     foreach m [list [menu $w.file -disabledforeground $COLOR(disabled)] \
                    [menu $w.pop.file -disabledforeground $COLOR(disabled)]] {
         
-	$m add command -label "1.Open for edit" -underline 0 -command ::tkcon::OpenForEdit
+        set cmd ::tkcon::OpenForEdit 
+	$m add command -label "1.Open for edit" -underline 0 -command $cmd -accel "Control-O"
+        bind TkConsoleTextOverrides <Control-Key-o> $cmd
+        bind TkConsole <Control-Key-Cyrillic_shcha> $cmd
         
 	$m add command -label "Load Tcl File" -command ::tkcon::Load
 	$m add cascade -label "2.Save console output..."  -underline 0 -menu $m.save
@@ -1295,6 +1298,8 @@ proc ::tkcon::InitMenus {w title} {
         set cmd [list ::fndrpl::OpenFindBox $text "text" "find" {}]
 	$m add command -label "Find"  -underline 0 -accel $PRIV(ACC)F \
             -command $cmd
+        bind TkConsole <Control-Key-f> $cmd
+        bind TkConsole <Control-Key-Cyrillic_a> $cmd
 
         set cmd [list ::fndrpl::FindIt $text]
 	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd 
