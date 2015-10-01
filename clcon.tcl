@@ -1170,9 +1170,12 @@ proc ::tkcon::InitMenus {w title} {
     ## File Menu
     ##
     foreach m [list [menu $w.file -disabledforeground $COLOR(disabled)] \
-	    [menu $w.pop.file -disabledforeground $COLOR(disabled)]] {
-	$m add command -label "1.Load File" -underline 0 -command ::tkcon::Load
-	$m add cascade -label "2.Save ..."  -underline 0 -menu $m.save
+                   [menu $w.pop.file -disabledforeground $COLOR(disabled)]] {
+        
+	$m add command -label "1.Open for edit" -underline 0 -command ::tkcon::OpenForEdit
+        
+	$m add command -label "Load Tcl File" -command ::tkcon::Load
+	$m add cascade -label "2.Save console output..."  -underline 0 -menu $m.save
 
 	$m add separator
 	$m add command -label "3.Quit" -command exit
@@ -2011,6 +2014,35 @@ proc ::tkcon::Load { {fn ""} } {
     } { return }
     EvalAttached [list source $fn]
 }
+
+
+## ::tkcon::OpenForEdit 
+# ARGS:	fn	- (optional) filename to source in
+# Returns:	selected filename ({} if nothing was selected)
+## 
+proc ::tkcon::OpenForEdit { {fn ""} } {
+    set types {
+	{{Lisp Files}	{.lisp .asd}}
+	{{Tcl Files}	{.tcl .tk}}
+	{{Text Files}	{.txt}}
+	{{All Files}	*}
+    }
+    # Allow for VFS directories, use Tk dialogs automatically when in
+    # VFS-based areas
+    set check [expr {$fn == "" ? [pwd] : $fn}]
+    if {$::tcl_version >= 8.4 && [lindex [file system $check] 0] == "tclvfs"} {
+	set opencmd [list ::tk::dialog::file:: open]
+    } else {
+	set opencmd [list tk_getOpenFile]
+    }
+    if {$fn eq "" &&
+	([catch {tk_getOpenFile -filetypes $types \
+		     -title "Source File"} fn] || $fn eq "")
+    } { return }
+    ::edt::edit $fn
+    return $fn
+}
+
 
 ## ::tkcon::Save - saves the console or other widget buffer to a file
 ## This does not eval in a slave because it's not necessary
