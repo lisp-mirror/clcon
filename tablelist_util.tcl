@@ -26,6 +26,38 @@ namespace eval ::tablelist_util {
         $tbl see $index
         #after idle "::srchtblst::TreeSetTo2 $tbl $index"
         TreeSetTo2 $tbl $index
-    }    
+    }
+
+
+    # Sorting by clicking on column title. 
+    proc ReverseSortOrder {oldSortOrder} {
+        if { $oldSortOrder eq {increasing} } {
+            return {-decreasing}
+        } else {
+            return {-increasing}
+        }
+    }       
+
+    proc SortOrReSort {tablelist column} {
+        set t $tablelist
+        set oldSortColumn [$t sortcolumn]
+        set oldSortOrder [$t sortorder]
+        if {$oldSortColumn == $column} {
+            set sortOrder [ReverseSortOrder $oldSortOrder]
+        } else {
+            set sortOrder {-increasing}
+        }
+        $t sortbycolumn $column $sortOrder
+    }
+
+    
+    proc BindReSortingToClickingOnColumnLabel {tbl} {
+        for {set i 0} {$i<[$tbl columncount]} {incr i} {
+            set path [$tbl labelpath $i]
+            set cmd "::tablelist_util::SortOrReSort $tbl $i"
+            bind $path <ButtonRelease-1> $cmd
+        }
+    }
+
 }
     
