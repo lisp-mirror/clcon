@@ -1,8 +1,11 @@
-; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*- 
+;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+;; Backend of compilation error browser, see also error-browser.erbr.tcl
 (in-package :clco)
 
-(defun calc-details-code (note)
+(defun calc-details-code (note serial)
+  (budden-tools:show-expr note)
   (let* ((title (getf note :message))
+         (severity (getf note :severity))
          (location (getf note :location))
          (source-context (getf note :source-context))
          (references (getf note :references))
@@ -22,7 +25,9 @@
                  (print-just-line ou
                                   (format nil "~%References: ~S" references))
                                   ))))))
-    (format nil "::erbr::AppendData ~A ~A"
+    (format nil "::erbr::AppendData ~A ~A ~A ~A"
+            serial
+            (cl-tk:tcl-escape (string-downcase (string severity)))
             (cl-tk:tcl-escape title)
             (cl-tk:tcl-escape details-code))))
   
@@ -33,12 +38,13 @@ to decide how to organise dialog between parties. So we just compile, and return
   (let* ((compilation-result (apply #'swank:compile-file-for-emacs filename load-p options))
          (success (swank::compilation-result-successp compilation-result))
          (notes (swank::compilation-result-notes compilation-result))
+         (serial 0)
          )
     ;(when notes (print notes))
     (when (or notes (not success))
       (eval-in-tcl (format nil "::erbr::SwankBrowseErrors1 ~A" (CLCO::CONVERT-OBJECT-TO-TCL compilation-result)))
       (dolist (note notes)
-        (eval-in-tcl (calc-details-code note))
+        (eval-in-tcl (calc-details-code note (incf serial)))
         ))))
 
 

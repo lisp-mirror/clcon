@@ -1,6 +1,13 @@
-# Compilation error browser. To see it in action, execute in console:
-# (clco::compile-file-for-tcl "/s2/clcon/err.lisp" nil) 
-## 
+# Compilation error browser.
+# Backend is in swank-compilation-errors.lisp
+#
+# We have a big design problem here: error browser is designed for single file 
+# compilation only. To serve compiling systems it must be redesigned somehow.
+#
+# To see browser in action, execute in console:
+# (clco::compile-file-for-tcl
+#    (at-lisp-root "clcon/test/error-browser-sample-file.lisp") nil)
+#
 
 # Example of message: 
 # (:return
@@ -17,9 +24,28 @@
 
 
 namespace eval ::erbr {
+
+    # dict serial -> item
     variable data
+
+    # text view (error details)
     variable tv
+
+    # Title list 
     variable TitleListWindow
+
+    # Compilation successful 
+    variable successp
+
+    # Duration, sec
+    variable duration
+
+    # Fasl file 
+    variable faslfile
+
+    # Compilation failed, but fasl can be loaded
+    variable ForceLoadingMakesSence 0
+    
 
     proc WidgetParent { w } {
         set lst [split $w .]
@@ -53,11 +79,11 @@ namespace eval ::erbr {
 
 
     # Insert text from index into detail window, and raise it
-    proc RefershDetails {idx} {
+    proc RefershDetails {rowName} {
         variable data
         variable tv
 
-        set item [lindex $data $idx]
+        set item [dict get $data $rowName]
 
         # are we out of range?
         if { $item eq "" } {
@@ -82,56 +108,159 @@ namespace eval ::erbr {
 
 
     proc DoOnSelect {tbl idx} {
-        after idle [RefershDetails $idx]
+        set rowName [$tbl rowcget $idx -name]
+        after idle [RefershDetails $rowName]
     }
 
 
     proc InitData { EventAsList } {
         variable data
         
-        set data {}
+        set data [dict create]
         
 
     }
 
-    proc AppendData {title DetailsCode} {
+    # FIXME we need full list of severities
+    proc SeverityToSeverityNumber {severity} {
+        switch -exact $severity {
+            "style-warning" {return 0}
+            "warning"       {return 1}
+            "read-error"    -
+            "error"         {return 2}
+            default {
+                tk_messageBox -message "Unfinished function ::erbr::SeverityToNumber - $severityWord"
+                {return 2}
+            }
+        }
+    }
+        
+
+    proc CellBackgroundColorBySeverity {severity} {
+        variable ::tkcon::COLOR
+        set SeverityNumber [SeverityToSeverityNumber $severity]
+        switch -exact $SeverityNumber {
+            0 { return $COLOR(bg) }
+            1 { return $COLOR(error_browser_serious_bg) }
+            2 { return $COLOR(error_browser_fatal_bg) }
+            default { error "unknown severity number" }
+        }
+    }
+    
+
+    proc AppendData {serial severity title DetailsCode} {
         variable TitleListWindow
         variable tv
         variable data
-        set NewItem [dict create title $title DetailsCode $DetailsCode]
-        lappend data $NewItem
+        set RowName [string cat "n" $serial]
+        set NewItem [dict create title $serial serial $title DetailsCode $DetailsCode severity $severity]
+        dict set data $RowName $NewItem
 
         set tbl $TitleListWindow.tf.tbl    
-        $tbl insert end [list $title]
+        set newIndex [$tbl insert end [list $serial $severity $title]]
+        $tbl rowconfigure $newIndex  -name $RowName -background [CellBackgroundColorBySeverity $severity]
 
         # If we inserted first item, highlight it
-        if {[llength $data] == 1} {
+        if {[dict size $data] == 1} {
             after idle "$tbl activate 0; $tbl selection set 0 0"
         }
+
+        DefaultSortHeaders $tbl
         # InsertDataToShowOrBeep $w $EventAsList
+    }
+
+
+    # Parses all but messages. We do not need messages at all - clco::calc-details-code does it for us. 
+    proc ParseCompilationResult { EventAsList } {
+
+        #puts stderr $EventAsList
+        
+        #l:compilation-result {l{l:message sThe\ function\ was\ called\ with\ one\ argument,\ but\ wants\ exactly\ zero. :severity :warning :location {l:location {l:file s/s2/clcon/test/error-browser-sample-file.lisp } {l:position n113 } yCOMMON-LISP:NIL } :references yCOMMON-LISP:NIL } {l:message sundefined\ variable:\ xxx :severity :warning :location {l:location {l:file s/s2/clcon/test/error-browser-sample-file.lisp } {l:position n91 } yCOMMON-LISP:NIL } :references yCOMMON-LISP:NIL :source-context s-->\ PROGN\ SB-IMPL::%DEFUN\ MULTIPLE-VALUE-PROG1\ PROGN\ \n==>\n\ \ (BLOCK\ CLCO::BAR\ CLCO::XXX\ (CLCO::BAR\ 75))\n } } yCOMMON-LISP:NIL n0.004 yCOMMON-LISP:NIL s/s2/clcon/test/error-browser-sample-file.fasl 
+
+        # (defstruct (:compilation-result
+        #              (:type list) :named)
+        # 1  notes
+        # 2  (successp nil :type boolean)
+        # 3  (duration 0.0 :type float)
+        # 4  (loadp nil :type boolean)
+        # 5  (faslfile nil :type (or null string)))
+
+        variable successp
+        variable duration
+        variable faslfile
+        variable ForceLoadingMakesSence 
+
+        set e $EventAsList
+        set successp [expr {![::mprs::Null [lindex $e 2]]}]
+        set duration [::mprs::Unleash [lindex $e 3]]
+        set lFaslfile [lindex $e 5]
+
+        if {[::mprs::Null $lFaslfile]} {
+            set faslfile {}
+        } else {
+            set faslfile [::mprs::Unleash $lFaslfile]
+        }
+
+        set ForceLoadingMakesSence [expr {!$successp && ($faslfile ne {})}]
+    }
+
+    # It is unspecified (yet) whether we destroy it. Let's delete them for debugging purposes
+    proc CloseErrorBrowser {} {
+        variable TitleListWindow
+        variable tv
+        if {[winfo exists $tv]} {
+            wm withdraw $tv
+            after idle destroy $tv
+        }
+        if {[winfo exists $TitleListWindow]} {
+            wm withdraw $TitleListWindow
+            after idle destroy $TitleListWindow
+        }
+    }
+
+    proc ForceLoad {} {
+        variable ForceLoadingMakesSence
+        variable faslfile
+        if {!$ForceLoadingMakesSence} {
+            return
+        }
+        set qFaslfile [::tkcon::QuoteLispObjToString $faslfile]
+        ::tkcon::FocusConsole
+        puts "Force loading $faslfile..."
+        # ::tkcon::EvalInSwankAsync 
+        ::tkcon::SendEventToSwank "(common-lisp:load $qFaslfile)" \
+            {::erbr::CloseErrorBrowser} 1 {:find-existing}
+    }
+    
+    proc FillHeaderText { clcon_text } {
+        variable successp
+        variable duration
+        variable faslfile
+        variable ForceLoadingMakesSence
+        set t $clcon_text
+        $t RoDelete 1.0 end
+        $t tag configure RedText -foreground red
+        if {$ForceLoadingMakesSence} {
+            $t RoInsert end "Compilation failed. Press ! to load fasl anyway\n" {RedText}
+            $t RoInsert end [string cat $faslfile \n]
+        } elseif {!$successp} {
+            $t RoInsert end "Compilation failed\n" {RedText}
+        }
+        $t RoInsert end "Compilation took $duration s\n"
     }
 
     # This is a contiuation assigned on reply on initialization request 
     proc SwankBrowseErrors1 { EventAsList } {
         # EventAsList is ignored
-
-        puts stderr $EventAsList
-
-        #l:compilation-result {l{l:message sThe\ function\ was\ called\ with\ one\ argument,\ but\ wants\ exactly\ zero. :severity :warning :location {l:location {l:file s/s2/clcon/test/error-browser-sample-file.lisp } {l:position n113 } yCOMMON-LISP:NIL } :references yCOMMON-LISP:NIL } {l:message sundefined\ variable:\ xxx :severity :warning :location {l:location {l:file s/s2/clcon/test/error-browser-sample-file.lisp } {l:position n91 } yCOMMON-LISP:NIL } :references yCOMMON-LISP:NIL :source-context s-->\ PROGN\ SB-IMPL::%DEFUN\ MULTIPLE-VALUE-PROG1\ PROGN\ \n==>\n\ \ (BLOCK\ CLCO::BAR\ CLCO::XXX\ (CLCO::BAR\ 75))\n } } yCOMMON-LISP:NIL n0.004 yCOMMON-LISP:NIL s/s2/clcon/test/error-browser-sample-file.fasl 
-
-        # (defstruct (:compilation-result
-        #              (:type list) :named)
-        #   notes
-        #   (successp nil :type boolean)
-        #   (duration 0.0 :type float)
-        #   (loadp nil :type boolean)
-        #   (faslfile nil :type (or null string)))
-
         variable tv
 
         InitData {}
         
         set w [PrepareGui1]
+
+        ParseCompilationResult $EventAsList
+        
+        FillHeaderText $w.header.text 
 
         EnsureTextView
 
@@ -177,7 +306,7 @@ namespace eval ::erbr {
         if {[winfo exists $tv]} {
             return
         }
-        puts "Now will call toplevel $w"
+        putd "Now will call toplevel $w"
         toplevel $w
         wm title $w "Error details"
         bind $w <Escape> [list destroy $w]
@@ -191,26 +320,39 @@ namespace eval ::erbr {
         return
 
     }
+
+    # It is reasonable to sort by severity first, then by number
+    # How do we transform severity to number? -sortmode , -sortcommand for column
+    proc DefaultSortHeaders {tbl} {
+        $tbl sortbycolumnlist {1 0} {decreasing increasing}
+    }
     
     # Fills browser from data 
     proc FillHeaders {tbl} {
         variable data
-        foreach item $data {
+        dict map {rowName item} $data {
             set title [dict get $item {title}]
             $tbl insert end [list $title]
         }
+        DefaultSortHeaders $tbl
     }
 
     proc TitleListFileMenu {w menu} {
-         set m [menu [::tkcon::MenuButton $menu "1.File" file]]
-    #     $m add command -label "Save As..."  -underline 0 \
-        # 	-command [list ::tkcon::Save {} widget $text]
+        set m [menu [::tkcon::MenuButton $menu "1.File" file]]
+        #     $m add command -label "Save As..."  -underline 0 \
+            # 	-command [list ::tkcon::Save {} widget $text]
     #     $m add command -label "Append To..."  -underline 0 \
-        # 	-command [list ::tkcon::Save {} widget $text a+]
-    #     $m add separator
-         $m add command -label "1.Dismiss" -underline 0 -accel "Escape" -command [list destroy $w]
+            # 	-command [list ::tkcon::Save {} widget $text a+]
+        #     $m add separator
+        $m add command -label "1.Dismiss" -underline 0 -accel "Escape" -command [list destroy $w]
         bind $w <Escape>		[list destroy $w]
         #     bind $w <Control-Key-Cyrillic_tse>		[list destroy $w]
+
+        set cmd ::erbr::ForceLoad
+        $m add command -label "!Force load fasl from failed compilation" -underline 0 -command $cmd
+        bind $w.header.text <exclam> $cmd
+        set bodytag [$w.tf.tbl bodytag]
+        bind $bodytag <exclam> $cmd
     }
 
     proc TitleListEditMenu {w menu} {
@@ -223,7 +365,27 @@ namespace eval ::erbr {
         $m add command -label "2.Find" -under 0 -command $cmd -accel "Control-F" 
         bind $w <Control-Key-f> $cmd
         bind $w <Control-Key-Cyrillic_a> $cmd
-    }    
+    }
+
+    # proc SortOrderBooleanToWord {x} {
+    #     if {$x == 0} { decreasing } else { increasing }
+    # }
+
+    # Unused 
+    # proc TitleListSortMenu {w menu} {
+    #     variable InDecreasingOrder
+    #     set tbl [GetTitleListMenuTbl $w]
+    #     set m [menu [::tkcon::MenuButton $menu "3.Sort" sort]]
+    #     $m add check -label "0.In decreasing order" -underline 0 -variable ::erbr::InDecreasingOrder -command {if {$::erbr::InDecreasingOrder} }
+    #     $m add check -label "1.№" -underline 0
+    #     $m add check -label "2.Severity" -underline 0
+
+    #     puts stderr [$tbl labeltag 0]
+    #     bind [$tbl labeltag 0] <ButtonRelease-1> "puts Fuck"
+    # }
+
+
+                
 
     # proc TitleListInspectMenu {w menu text} {
     #     set m [menu [::tkcon::MenuButton $menu "3.Inspect" inspect]]
@@ -247,6 +409,15 @@ namespace eval ::erbr {
     }
 
         
+    proc CompareSeveritiesBySeverityNumber {x y} {
+        set xN [SeverityToSeverityNumber $x]
+        set yN [SeverityToSeverityNumber $y]
+        if {$xN<$yN} {
+            return -1
+        } elseif {$xN==$yN} {
+            return 0
+        } else {return 1}
+    }
 
   
     # Make toplevel widget and its children 
@@ -276,33 +447,29 @@ namespace eval ::erbr {
 
         set TitleListWindow $w
 
-        # ----------------------------------- menu -------------------
-        
-        set menu [menu $w.mbar]
-        $w configure -menu $menu
-        
-        TitleListFileMenu $w $menu
-        TitleListEditMenu $w $menu
-        #TitleListInspectMenu $w $menu $w.body.text
-
-        
         # --------------------------------- frames-----------------              
 
-        frame $w.header
-        text $w.header.text
+        ::gui_util::frame_clcon_text_and_scrollbars $w.header {-readonly 1 -height 6}
         
         frame $w.tf
         set tbl $w.tf.tbl
         
-        tablelist::tablelist $tbl -columns {20 ""} -stretch all -spacing 10
-        $tbl resetsortinfo 
+        tablelist::tablelist $tbl -columns {3 "№" 12 "Severity" 20 "Text"} -stretch 2 -spacing 10
+        # $tbl resetsortinfo
 
         $tbl configure \
             -foreground \#000000 \
             -font tkconfixed -borderwidth 1 -highlightthickness 0
         
 
-        $tbl columnconfigure 0 -wrap true  
+        $tbl columnconfigure 0 -sortmode integer
+        $tbl columnconfigure 1 \
+            -sortmode command \
+            -sortcommand ::erbr::CompareSeveritiesBySeverityNumber
+        $tbl columnconfigure 2 -wrap true
+
+        ::tablelist_util::BindReSortingToClickingOnColumnLabel $tbl
+
         
         set f1 $w.tf
         scrollbar $f1.sy -orient v -command [list $tbl yview]
@@ -312,7 +479,18 @@ namespace eval ::erbr {
         grid columnconfigure $f1 1 -weight 1
         grid rowconfigure $f1 0 -weight 1
 
+        pack $w.header -side top -fill x
         pack $f1 -fill both -expand 1
+
+        # ----------------------------------- menu and bindings ------------
+        # It must be below frames as we bind keys to them
+        
+        set menu [menu $w.mbar]
+        $w configure -menu $menu
+        
+        TitleListFileMenu $w $menu
+        TitleListEditMenu $w $menu
+        #TitleListInspectMenu $w $menu $w.body.text
 
         return $w    
     }
