@@ -9,13 +9,14 @@ namespace eval ::edt {
         puts $f [$clcon_text get 1.0 "end-1 char"] nonewline
         set mtime [file mtime $FileName]
         close $f
-        $clcon_text configure -filename $FileName -filemtime $mtime
+        [$clcon_text cget -opened_file] configure -filename $FileName -filemtime $mtime
         $clcon_text edit modified 0
     }
 
 
     proc UntitledBufferP {clcon_text} {
-        expr {[$clcon_text cget -filename]=={}}
+        set opened_file [$clcon_text cget -opened_file]
+        expr {[$opened_file cget -filename]=={}}
     }
 
     proc DoSave {clcon_text FileName} {
@@ -23,7 +24,8 @@ namespace eval ::edt {
 
     # Returns 1 if file was saved. Can modify clcon_text data.
     proc Save {clcon_text} {
-        set FileName [$clcon_text cget -filename]
+        set opened_file [$clcon_text cget -opened_file]
+        set FileName [$opened_file cget -filename]
         if {[UntitledBufferP $clcon_text]} {
             set UntitledBuffer 1
             set FileName [FILESaveRequest {}]
@@ -33,7 +35,7 @@ namespace eval ::edt {
         } elseif {![$clcon_text edit modified]} {
             tk_messageBox -parent $clcon_text -message "No changes to save"
             return 0
-        } elseif {[$clcon_text cget -filemtime] < [file mtime $FileName]} {
+        } elseif {[$opened_file cget -filemtime] < [file mtime $FileName]} {
             tk_messageBox -parent $clcon_text -message "File have changed by another program. Can't save (yet)"
             return 0
         } else {

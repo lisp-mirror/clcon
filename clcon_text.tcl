@@ -37,6 +37,12 @@ package require snit
 
 # FIXME some options might be buffer-related, not text-related.
 namespace eval ::clcon_text {
+
+    snit::type opened_file {
+        option -filename {}
+        option -filemtime {}
+    }
+    
     variable GlobalPendingText2OduEventCounter
     if {![info exists GlobalPendingText2OduEventCounter]} {
         set GlobalPendingText2OduEventCounter 0
@@ -54,8 +60,7 @@ namespace eval ::clcon_text {
         # PRIVATE. Number of modifications sent which were not processed by oduvanchik yet
         option -private_pending_sent_modifications 0
         option -private_pending_far_tcl_continuations 0
-        option -filename {}
-        option -filemtime {}
+        option -opened_file {}
         constructor {args} {
             installhull using text
             # Apply any options passed at creation time.
@@ -66,6 +71,7 @@ namespace eval ::clcon_text {
             bindtags $win $NewBindTags
             bind $win <<UnfreezeNext>> "$self Unfreeze"
             ::edt::CreateHighlightTags $self
+            $self configure -opened_file [opened_file $self.opened_file]
         }
         destructor {
             DestroyBackendBuffer $win

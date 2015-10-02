@@ -352,7 +352,7 @@ namespace eval ::edt {
                     set filemtime {}
                 }
                 
-                $w.text configure -filename $word -filemtime $filemtime
+                [$w.text cget -opened_file] configure -filename $word -filemtime $filemtime
                 
                 ::clcon_text::ConstructBackendBuffer $w.text
                 
