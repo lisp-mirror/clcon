@@ -294,6 +294,15 @@ namespace eval ::edt {
         return $cmd
     }
 
+    proc CompileAndLoadTheFile {clcon_text} {
+        set opened_file [$clcon_text cget -opened_file]
+        set FileName [$opened_file cget -filename]
+        set qFileName [::tkcon::QuoteLispObjToString $FileName]
+        set form "(clco::compile-file-for-tcl $qFileName t)"
+        ::tkcon::FocusConsole
+        ::tkcon::SendEventToSwank $form {} 1 {:find-existing}
+    }
+
     proc MakeLispModeMenu {menu w text} {
         set m [menu [::tkcon::MenuButton $menu 3.Lisp lisp]]
 
@@ -304,6 +313,9 @@ namespace eval ::edt {
         # $m add command -label $oduCmd -accel "F11" -command $cmd
         # bind $w <F11> $cmd
 
+        set cmd [list ::edt::CompileAndLoadTheFile $text]
+        $m add command -label "0.Compile and load" -underline 0 -command $cmd
+        
         $m add separator
         set cmd [OduFnMenuItem $w $m $text indent-new-line "<Shift-Return>"]
         bind $text <Shift-Return> "$cmd; break"
@@ -327,6 +339,8 @@ namespace eval ::edt {
         $m add command -label "Find Source" -accel "Alt-." -command $cmd
         bind $w <Alt-period> $cmd
         bind $w <Alt-Key-Cyrillic_yu> $cmd
+
+        
 
     }
 
