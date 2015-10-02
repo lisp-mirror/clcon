@@ -63,6 +63,7 @@ namespace eval ::clcon_text {
         option -opened_file {}
         constructor {args} {
             installhull using text
+            $self configure -opened_file [opened_file $self.opened_file]
             # Apply any options passed at creation time.
             $self configurelist $args
             # Set FreezableText tags at first place (maybe should have placed to other place)
@@ -71,9 +72,9 @@ namespace eval ::clcon_text {
             bindtags $win $NewBindTags
             bind $win <<UnfreezeNext>> "$self Unfreeze"
             ::edt::CreateHighlightTags $self
-            $self configure -opened_file [opened_file $self.opened_file]
         }
         destructor {
+            $options(-opened_file) destroy
             DestroyBackendBuffer $win
         }
 
