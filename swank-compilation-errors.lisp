@@ -3,7 +3,6 @@
 (in-package :clco)
 
 (defun calc-details-code (note serial)
-  (budden-tools:show-expr note)
   (let* ((title (getf note :message))
          (severity (getf note :severity))
          (location (getf note :location))
@@ -18,18 +17,28 @@
                (print-just-line ou title :index "end")
                (when location
                  (write-one-dspec-and-location "Go to Source" location ou :index "end")
-                 (print-just-line ou (format nil "~%") :index "end"))
+                 (print-just-line ou (format nil "~%") :index "end")
+                 )
                (when source-context
                  (print-just-line ou source-context :index "end"))
                (when references
                  (print-just-line ou
                                   (format nil "~%References: ~S" references))
-                                  ))))))
-    (format nil "::erbr::AppendData ~A ~A ~A ~A"
+                 )))))
+         (code-to-jump-to-location
+          (cond
+            (location
+             (with-output-to-string (ou2)
+               (write-code-to-pass-to-loc ou2 location :mode :eval)))
+            (t
+             "{}")))
+         )
+    (format nil "::erbr::AppendData ~A ~A ~A ~A ~A"
             serial
             (cl-tk:tcl-escape (string-downcase (string severity)))
             (cl-tk:tcl-escape title)
-            (cl-tk:tcl-escape details-code))))
+            (cl-tk:tcl-escape details-code)
+            (cl-tk:tcl-escape code-to-jump-to-location))))
   
 
 (defun compile-file-for-tcl (filename load-p &rest options)

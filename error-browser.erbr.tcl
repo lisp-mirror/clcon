@@ -45,6 +45,10 @@ namespace eval ::erbr {
 
     # Compilation failed, but fasl can be loaded
     variable ForceLoadingMakesSence 0
+
+
+    # If 1, source is shown as entry is selected in TitleList
+    variable AutoShowSource 0
     
 
     proc WidgetParent { w } {
@@ -82,6 +86,8 @@ namespace eval ::erbr {
     proc RefershDetails {rowName} {
         variable data
         variable tv
+        variable AutoShowSource
+        variable TitleListWindow
 
         set item [dict get $data $rowName]
 
@@ -104,12 +110,18 @@ namespace eval ::erbr {
         apply $lambda [list $text]
         
         event generate $tv <<GoToTop>>
+
+        if {$AutoShowSource} {
+            set ctjl [dict get $item {CodeToJumpToLocation}]
+            set lambda [list {w} $ctjl]
+            apply $lambda [list $TitleListWindow]  
+        }
     }
 
 
     proc DoOnSelect {tbl idx} {
         set rowName [$tbl rowcget $idx -name]
-        after idle [RefershDetails $rowName]
+        after idle ::erbr::RefershDetails $rowName
     }
 
 
@@ -148,12 +160,18 @@ namespace eval ::erbr {
     }
     
 
-    proc AppendData {serial severity title DetailsCode} {
+    proc AppendData {serial severity title DetailsCode CodeToJumpToLocation} {
         variable TitleListWindow
         variable tv
         variable data
         set RowName [string cat "n" $serial]
-        set NewItem [dict create title $serial serial $title DetailsCode $DetailsCode severity $severity]
+        set NewItem [dict create                                    \
+                         serial $serial                             \
+                         severity $severity                         \
+                         title $title                               \
+                         DetailsCode $DetailsCode                   \
+                         CodeToJumpToLocation $CodeToJumpToLocation \
+                    ]
         dict set data $RowName $NewItem
 
         set tbl $TitleListWindow.tf.tbl    
