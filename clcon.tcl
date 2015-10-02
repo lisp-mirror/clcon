@@ -187,6 +187,8 @@ proc ::tkcon::Init {args} {
 	stderr		\#FF0000
         debug_string    \#888888
         ldbg_frame_bg   \#F8F8D0
+        error_browser_serious_bg \#F8F8D0
+        error_browser_fatal_bg   \#F8D0D0
     } {
 	if {![info exists COLOR($key)]} { set COLOR($key) $default }
     }
