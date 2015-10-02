@@ -62,17 +62,6 @@ namespace eval ::insp {
         #    SwankInspect1 $result             
     }
 
-
-    proc ConfigureTextFonts {text} {
-        variable ::tkcon::COLOR
-        $text configure \
-            -foreground $COLOR(stdin) \
-            -background $COLOR(bg) \
-            -insertbackground $COLOR(cursor) \
-            -font $::tkcon::OPT(font) -borderwidth 1 -highlightthickness 0 \
-            -undo 1
-    }
-
     # Initializes inspector with lisp expr. 
     proc SwankInspect { LispExpr } {
         # only passes request to emacs. Initialization is done asyncrhonously
@@ -222,21 +211,15 @@ namespace eval ::insp {
         # --------------------------------- frames-----------------              
         
         # making title frame
-        frame $w.title
         # height 2 - for magic numbers
-        ::clcon_text::clcon_text $w.title.text -height 2 -readonly 1
-        scrollbar $w.title.sx -orient h -command [list $w.title.text xview]
-        scrollbar $w.title.sy -orient v -command [list $w.title.text yview]
-        ConfigureTextFonts $w.title.text
-        $w.title.text configure \
-            -xscrollcommand [list $w.title.sx set] \
-            -yscrollcommand [list $w.title.sy set] 
+
+        ::gui_util::frame_clcon_text_and_scrollbars $w.title {-height 2 -readonly 1}
         
         # make body frame    
         frame $w.body
         ::clcon_text::clcon_text $w.body.text -readonly 1
 
-        ConfigureTextFonts $w.body.text
+        ::gui_util::ConfigureTextFonts $w.body.text
         $w.body.text configure \
             -xscrollcommand [list $w.body.sx set] \
             -yscrollcommand [list $w.body.sy set] 
@@ -270,13 +253,6 @@ namespace eval ::insp {
         grid columnconfigure $w.body 0 -weight 1 
         grid columnconfigure $w.body 1 -weight 1
         grid rowconfigure $w.body 0 -weight 1 
-
-        # now layout title elements in title
-        grid $w.title.text - $w.title.sy -sticky news
-        grid $w.title.sx - -sticky ew
-        grid columnconfigure $w.title 0 -weight 1
-        grid columnconfigure $w.title 1 -weight 1
-        grid rowconfigure $w.title 0 -weight 1
 
         # combine the entire widget
         pack $w.title -side top -fill x 
