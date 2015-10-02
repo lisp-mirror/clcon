@@ -52,7 +52,11 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
          (print-just-line stream printed-dspec :index index))))))
 
 (defun write-code-to-pass-to-loc (stream loc &key (mode :text))
-  "Writes code which would help to pass to location. If mode = :text we will insert the code into text widget. If mode = :eval we will eval the code in the context where $w contains some widget"
+  "Writes code which would help to pass to location. 
+   If mode = :text we will insert the code into text widget. 
+   If mode = :eval we will eval the code in the context where $w contains some widget. 
+This widget is required as a parent of tk_messageBox which we show when we unable to locate.
+"
   (multiple-value-bind (file offset)
       (parse-location-into-file-and-pos loc)
     (cond
