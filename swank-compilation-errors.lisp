@@ -34,7 +34,7 @@ to decide how to organise dialog between parties. So we just compile, and return
          (success (swank::compilation-result-successp compilation-result))
          (notes (swank::compilation-result-notes compilation-result))
          )
-    (when notes (print notes))
+    ;(when notes (print notes))
     (when (or notes (not success))
       (eval-in-tcl (format nil "::erbr::SwankBrowseErrors1 ~A" (CLCO::CONVERT-OBJECT-TO-TCL compilation-result)))
       (dolist (note notes)

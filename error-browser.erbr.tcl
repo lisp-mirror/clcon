@@ -31,15 +31,6 @@ namespace eval ::erbr {
     catch {font create tkconfixed -family Courier -size -20}
     #	    $con configure -font tkconfixed
 
-    # Replace this at integration stage
-    proc ConfigureTextFonts {text} {
-        $text configure \
-            -foreground \#000000 \
-            -insertbackground \#000000 \
-            -font tkconfixed -borderwidth 1 -highlightthickness 0 \
-            -undo 1
-    }
-
     #        -background {} \
 
 
@@ -123,6 +114,19 @@ namespace eval ::erbr {
     # This is a contiuation assigned on reply on initialization request 
     proc SwankBrowseErrors1 { EventAsList } {
         # EventAsList is ignored
+
+        puts stderr $EventAsList
+
+        #l:compilation-result {l{l:message sThe\ function\ was\ called\ with\ one\ argument,\ but\ wants\ exactly\ zero. :severity :warning :location {l:location {l:file s/s2/clcon/test/error-browser-sample-file.lisp } {l:position n113 } yCOMMON-LISP:NIL } :references yCOMMON-LISP:NIL } {l:message sundefined\ variable:\ xxx :severity :warning :location {l:location {l:file s/s2/clcon/test/error-browser-sample-file.lisp } {l:position n91 } yCOMMON-LISP:NIL } :references yCOMMON-LISP:NIL :source-context s-->\ PROGN\ SB-IMPL::%DEFUN\ MULTIPLE-VALUE-PROG1\ PROGN\ \n==>\n\ \ (BLOCK\ CLCO::BAR\ CLCO::XXX\ (CLCO::BAR\ 75))\n } } yCOMMON-LISP:NIL n0.004 yCOMMON-LISP:NIL s/s2/clcon/test/error-browser-sample-file.fasl 
+
+        # (defstruct (:compilation-result
+        #              (:type list) :named)
+        #   notes
+        #   (successp nil :type boolean)
+        #   (duration 0.0 :type float)
+        #   (loadp nil :type boolean)
+        #   (faslfile nil :type (or null string)))
+
         variable tv
 
         InitData {}
@@ -177,27 +181,9 @@ namespace eval ::erbr {
         toplevel $w
         wm title $w "Error details"
         bind $w <Escape> [list destroy $w]
-        frame $w.body
-        set text $w.body.text
-        ::clcon_text::clcon_text $text -readonly 1
 
-        ConfigureTextFonts $text
-        $text configure -yscrollcommand [list $w.body.sy set] 
-        catch {
-            # 8.5+ stuff
-            set tabsp [expr {$OPT(tabspace) * [font measure $OPT(font) 0]}]
-            $text configure -tabs [list $tabsp left] -tabstyle wordprocessor
-        }
-
-        #scrollbar $w.body.sx -orient h -command [list $w.body.text xview]
-        scrollbar $w.body.sy -orient v -command [list $text yview]
+        ::gui_util::frame_clcon_text_and_vertical_scrollbar $w.body {-readonly 1}
         
-        grid $text - $w.body.sy -sticky news
-        #grid $w.body.sx - -sticky ew
-        grid columnconfigure $w.body 0 -weight 1 
-        grid columnconfigure $w.body 1 -weight 1
-        grid rowconfigure $w.body 0 -weight 1 
-
         pack $w.body -fill both -expand 1
 
         bind $w <<GoToTop>> [list ::erbr::DoGoToTop $w]
@@ -302,6 +288,9 @@ namespace eval ::erbr {
         
         # --------------------------------- frames-----------------              
 
+        frame $w.header
+        text $w.header.text
+        
         frame $w.tf
         set tbl $w.tf.tbl
         
