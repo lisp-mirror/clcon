@@ -6,7 +6,9 @@ Command line options
 Most of [tkcon's command line options](http://tkcon.sourceforge.net/docs/start.html), are kept intact.
 New options: 
 
-```-putd-enabled 1``` - enable printing lots of debug messages. ```-putd-enabled 0``` - to disable (default).
+```-putd-output-file <filename>``` - file to print debug messages to. We can not print them to console correctly, as this calls update inside. 
+
+```-putd-enabled 1``` - enable printing lots of debug messages. ```-putd-enabled 0``` - to disable (default). putd-enabled can be set to 1 only when putd-output-file is specified.
 
 You can also change this option in runtime from 'Prefs' menu. Changed value is not saved for future sessions. 
 
