@@ -289,7 +289,7 @@ namespace eval ::edt {
         set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text $oduFn]]
         $m add command -label $oduCmd -accel $accel -command $cmd
         if {$accel ne {}} {
-            bind $w $accel $cmd
+            bind $w $accel "$cmd; break"
         }
         return $cmd
     }
