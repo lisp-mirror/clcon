@@ -23,7 +23,8 @@
                  (print-just-line ou source-context :index "end"))
                (when references
                  (print-just-line ou
-                                  (format nil "~%References: ~S" references))
+                                  (format nil "~%References: ~S" references)
+                                  :index "end")
                  )))))
          (code-to-jump-to-location
           (cond

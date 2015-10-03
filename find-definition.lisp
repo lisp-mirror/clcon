@@ -55,7 +55,8 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
   "Writes code which would help to pass to location. 
    If mode = :text we will insert the code into text widget. 
    If mode = :eval we will eval the code in the context where $w contains some widget. 
-This widget is required as a parent of tk_messageBox which we show when we unable to locate.
+This widget is required as a parent of tk_messageBox which we show when we unable to locate
+and which is activated after showing message box.
 "
   (multiple-value-bind (file offset)
       (parse-location-into-file-and-pos loc)
@@ -65,12 +66,17 @@ This widget is required as a parent of tk_messageBox which we show when we unabl
              (offset-2 (format nil "{1.0+ ~A chars}" offset)))
          (format stream "tkcon::EditFileAtOffset ~A ~A" escaped-file offset-2)))
       (t
-       (ecase mode
-         (:text 
-          (print-just-line stream "Unable to locate to definition"))
-         (:eval
-          (format stream "tk_messageBox -parent $w -message {Unable to locate to definition}")
-          ))))))
+       (let* ((qLocation (cl-tk:tcl-escape (prin1-to-string loc)))
+              (message (format nil "Unable to locate to definition ~A" qLocation)))
+         (ecase mode
+           (:text 
+            (print-just-line stream message))
+           (:eval
+            (format
+             stream
+             "tk_messageBox -parent $w -message {~A} ~% focus $w" message)
+            )))
+       ))))
 
 (defun write-code-to-show-console (stream)
   (format stream "::tkcon::FocusConsole; "))

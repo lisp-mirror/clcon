@@ -7,3 +7,15 @@
 
 (eval-when (:load-toplevel)
   (print "I'm loading"))
+
+(defun bar () xxx
+    (bar 75)
+    )
+
+(defun bar () xxx
+    (bar 75)
+    )
+
+(defun bar () xxx
+    (bar 75)
+    )

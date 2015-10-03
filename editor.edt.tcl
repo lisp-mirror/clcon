@@ -314,8 +314,11 @@ namespace eval ::edt {
         # bind $w <F11> $cmd
 
         set cmd [list ::edt::CompileAndLoadTheFile $text]
-        $m add command -label "0.Compile and load" -underline 0 -command $cmd
-        
+        $m add command -label "0.Compile and load" -underline 0 -command $cmd -accel "F5"
+        bind $text <F5> $cmd
+
+        ::erbr::AddNextAndPreviousCompilerMessagesCommands $m $text
+
         $m add separator
         set cmd [OduFnMenuItem $w $m $text indent-new-line "<Shift-Return>"]
         bind $text <Shift-Return> "$cmd; break"
@@ -512,11 +515,6 @@ namespace eval ::edt {
         set text $w.text
         set m [menu [::tkcon::MenuButton $menu Secret secret]]
 
-        set oduFn "indent-new-line-command"
-        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text $oduFn]]
-        $m add command -label $oduFn -accel "F7" -command $cmd
-        bind $w <F7> $cmd
-        
         set cmd [list $text Unfreeze]
         $m add command -label "1.Unfreeze (if oduvanchik hang)" -command $cmd
 

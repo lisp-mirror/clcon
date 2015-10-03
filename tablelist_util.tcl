@@ -59,5 +59,12 @@ namespace eval ::tablelist_util {
         }
     }
 
+    proc GotoIndex {tbl index} {
+        set ind [$tbl index $index]
+        $tbl selection clear 0 end
+        $tbl selection set $ind $ind
+        $tbl activate $ind
+        $tbl selection anchor $ind
+    }
 }
     

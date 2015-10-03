@@ -64,24 +64,6 @@ namespace eval ::erbr {
     #        -background {} \
 
 
-    proc InsertDataToShowOrBeep { w EventAsList } {
-        # bind var for convenience
-
-        set b [BodyTextOfErrorBrowser $w]
-
-        # clear old data if it existed
-
-        [TitleOfErrorBrowser $w] delete 1.0 end
-        $b delete 1.0 end
-        
-        # and now insert what we have parsed
-        
-        [TitleOfErrorBrowser $w] insert 1.0 "WOW1"
-        $b insert 1.0 "I don't know what is that"
-    }
-
-
-
     # Insert text from index into detail window, and raise it
     proc RefershDetails {rowName} {
         variable data
@@ -114,7 +96,8 @@ namespace eval ::erbr {
         if {$AutoShowSource} {
             set ctjl [dict get $item {CodeToJumpToLocation}]
             set lambda [list {w} $ctjl]
-            apply $lambda [list $TitleListWindow]  
+            set tbl [GetTitleListMenuTbl $TitleListWindow]
+            apply $lambda [list $tbl]  
         }
     }
 
@@ -180,11 +163,27 @@ namespace eval ::erbr {
 
         # If we inserted first item, highlight it
         if {[dict size $data] == 1} {
-            after idle "$tbl activate 0; $tbl selection set 0 0"
+            after idle [::tablelist_util::GotoIndex $tbl 0]
         }
 
         DefaultSortHeaders $tbl
         # InsertDataToShowOrBeep $w $EventAsList
+    }
+
+    proc EditOtherCompilerMessage {increment} {
+        variable TitleListWindow
+        if {[winfo exists $TitleListWindow]} {
+            set tbl $TitleListWindow.tf.tbl
+            set anc [$tbl index anchor]
+            set wantedAnc [expr {$anc + $increment}]
+            if {$wantedAnc < 0} {
+                bell
+            } elseif {$wantedAnc >= [$tbl size]} {
+                bell
+            } else {
+                after idle [list ::tablelist_util::GotoIndex $tbl $wantedAnc]
+            }
+        }
     }
 
 
@@ -355,6 +354,21 @@ namespace eval ::erbr {
         DefaultSortHeaders $tbl
     }
 
+    proc AddNextAndPreviousCompilerMessagesCommands {menu tagListForKeys} {
+        set m $menu
+
+        set cmdBack [list ::erbr::EditOtherCompilerMessage -1]
+        $m add command -label "Goto prev compiler message" -command $cmdBack -accel "Alt-F7"
+
+        set cmdForward [list ::erbr::EditOtherCompilerMessage 1]
+        $m add command -label "Goto next compiler message" -command $cmdForward -accel "Alt-F8"
+        foreach tag $tagListForKeys {
+            puts stderr $tag
+            bind $tag <Alt-Key-F7> $cmdBack
+            bind $tag <Alt-Key-F8> $cmdForward
+        }
+    }
+    
     proc TitleListFileMenu {w menu} {
         set m [menu [::tkcon::MenuButton $menu "1.File" file]]
         #     $m add command -label "Save As..."  -underline 0 \
@@ -375,6 +389,7 @@ namespace eval ::erbr {
 
     proc TitleListEditMenu {w menu} {
         set tbl [GetTitleListMenuTbl $w]
+        set text [HeaderOfErrorBrowser $w]
         set m [menu [::tkcon::MenuButton $menu "2.Edit" edit]]
         $m add command -label "1.Copy" -under 0 -command [list tk_textCopy $tbl] -state disabled
     #     $m add separator
@@ -383,6 +398,10 @@ namespace eval ::erbr {
         $m add command -label "2.Find" -under 0 -command $cmd -accel "Control-F" 
         bind $w <Control-Key-f> $cmd
         bind $w <Control-Key-Cyrillic_a> $cmd
+
+        $m add separator
+
+        AddNextAndPreviousCompilerMessagesCommands $m [list [$tbl bodytag] $text]
     }
 
     # proc SortOrderBooleanToWord {x} {
@@ -518,10 +537,9 @@ namespace eval ::erbr {
         return $w.tf.tbl
     }
 
-    proc TitleOfErrorBrowser {w} {
-        set f1 $w.pane.title
-        set f2 $w.pane.body
-        return $w.pane.title.text
+        
+    proc HeaderOfErrorBrowser {w} {
+        return $w.header.text 
     }
 
     proc BodyTextOfErrorBrowser {w} {
