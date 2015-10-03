@@ -1,4 +1,5 @@
 # ::clcon_text::clcon_text Widget based on example from snit FAQ
+# NEVER USE PUTS or SHOWVAR in this file: it calls update so everything breaks
 # Options:
 #   -readonly
 #   -send_to_lisp
@@ -105,10 +106,10 @@ namespace eval ::clcon_text {
 
         method RememberEvent {script} {
             set q $options(-private_freezed_events_queue)
-            #puts "Remembering script $script"
+            #putd "Remembering script $script"
             lappend q $script
             $self configure -private_freezed_events_queue $q
-            #puts "[llength $q] events remembered]" 
+            #putd "[llength $q] events remembered]" 
         }
 
         method Freeze {} {
@@ -123,7 +124,7 @@ namespace eval ::clcon_text {
             $self configure -private_freezed_events_queue $q
             ::mprs::AssertEq $options(-private_freezed) 1 "Unfreeze: must be freezed"
             if {$script ne {}} {
-                #puts "Unfreeze: about to eval $script"
+                #putd "Unfreeze: about to eval $script"
                 eval $script
             }
             if {[llength $q]} {
@@ -167,8 +168,8 @@ namespace eval ::clcon_text {
             incr GlobalPendingText2OduEventCounter $increment
             if {$GlobalPendingText2OduEventCounter>1} {
                 # If we show this, something seem to be wrong
-                showVar GlobalPendingText2OduEventCounter
-                puts stderr "GlobalPendingText2OduEventCounter should be 0 or 1"
+                showVarPutd GlobalPendingText2OduEventCounter
+                putd "GlobalPendingText2OduEventCounter should be 0 or 1"
             }
             return $GlobalPendingText2OduEventCounter
         } else {
@@ -179,7 +180,7 @@ namespace eval ::clcon_text {
             incr j $increment
             $clcon_text configure -private_pending_sent_modifications $j
             if {$j>1} {
-                puts "-private_pending_sent_modifications = $j"
+                putd "-private_pending_sent_modifications = $j"
             }
             return $j
         }
@@ -190,7 +191,7 @@ namespace eval ::clcon_text {
         incr j $increment
         $clcon_text configure -private_pending_far_tcl_continuations $j
         if {$j>1} {
-            puts "-private_pending_far_tcl_continuations = $j"
+            putd "-private_pending_far_tcl_continuations = $j"
         }
         return $j
     }
@@ -266,7 +267,7 @@ namespace eval ::clcon_text {
             ::clcon_text::IncrPendingSentNotifications \
                 -1 $clcon_text $UseGlobalPendingText2OduEventCounter
         }] {:find-existing}
-        #puts "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
+        #putd "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
     }
 
     # In freezable text, all event handler scripts must be processed
@@ -334,17 +335,17 @@ namespace eval ::clcon_text {
         } else {
             set ContBody [subst -nocommand {$clcon_text Unfreeze}]
         }
-        showVar ContBody
+        showVarPutd ContBody
         MaybeSendToLisp $clcon_text CallOduvanchikFunction [list $OduvanchikFunctionName] $ContBody
     }
 
     # # To be called from oi::delete-region
     # proc clcon_text_delete_bb_ee {clcon_text} {
-    #     puts stderr "Entered clcon_text_delete_bb_ee"
+    #     putd stderr "Entered clcon_text_delete_bb_ee"
     #     $clcon_text delete bb ee
     #     $clcon_text mark unset bb
     #     $clcon_text mark unset ee
-    #     puts stderr "About to exit clcon_text_delete_bb_ee"
+    #     putd stderr "About to exit clcon_text_delete_bb_ee"
     #     return {}
     # }
 
