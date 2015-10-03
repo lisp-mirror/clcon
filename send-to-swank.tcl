@@ -124,9 +124,6 @@ proc ::tkcon::SendEventToSwank {form continuation {MsgFmtKind 1} {ThreadDesignat
         if {$ContinuationCounter eq {} || $ThreadDesignator eq {}} {
             error "ContinuationCounter (tag) and ThreadDesignator must be supplied for :emacs-return event"
         }
-        if {$continuation ne {}} {
-            error "Continuation must not be passed for :emacs-return event"
-        }
     }
     if { $ContinuationCounter eq {} && $MsgFmtKind != 2 } {
         set ContinuationCounter [GenContinuationCounter]
@@ -136,7 +133,13 @@ proc ::tkcon::SendEventToSwank {form continuation {MsgFmtKind 1} {ThreadDesignat
     set cmd [SwankMaybeWrapFormIntoListenerEval $cmd $MsgFmtKind]
     set cmd [FormatSwankRexEvalMessage $cmd $MsgFmtKind $ThreadDesignator $ContinuationCounter]
 
-    ::mprs::EnqueueContinuation $ContinuationCounter $continuation
+    if { [lsearch -integer {0 1} $MsgFmtKind] >= 0  } {
+      ::mprs::EnqueueContinuation $ContinuationCounter $continuation
+    } else {
+      if {$continuation ne {}} {
+          error "Continuation must not be passed for this event kind"
+      }
+    }
 
     putd "About to send to SWANK: $cmd"
 
