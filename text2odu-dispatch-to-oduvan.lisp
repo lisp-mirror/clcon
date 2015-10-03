@@ -3,9 +3,6 @@
 
 ; this file is only built if :clcon-oduvan feature present
 ; threads: we do not assume in which thread notification functions are called. 
-; we have to design threading model for editor. E.g. one thread per buffer, one 
-; dispatcher thread. Or no dedicated dispatcher thread.
-
 
 (in-package :clco)
 
@@ -87,16 +84,24 @@
   (shutdown-text2odu-dispatcher))
 
 (defun start-oduvanchik ()
+  (error "Move start-oduvanchik to another file")
   (declare (special oduvanchik::exit-hook oduvanchik::entry-hook))
   (let ((entered nil)
         (entered-lock (bt:make-lock "Oduvanchik entry signal lock"))
         )
     (reset-text2odu-event-queue)
     (oduvanchik-internals::remove-all-hooks oduvanchik::exit-hook)
-                                        ; if previous run crashed, this can be useful
+
+
+    ;; if previous run crashed, this can be useful
     (ignore-errors (shutdown-text2odu-dispatcher))
+    (ignore-errors (shutdown-highlight-dispatcher))
+
     (oduvanchik::add-hook oduvanchik::exit-hook
                           'shutdown-text2odu-dispatcher-on-oduvanchik-exit-hook)
+    (oduvanchik::add-hook oduvanchik::exit-hook
+                          'shutdown-highlight-dispatcher-on-oduvanchik-exit-hook)
+
     (oduvanchik::add-hook
      oduvanchik::entry-hook
      (lambda () (bt:with-lock-held (entered-lock) (setf entered t))))
@@ -112,6 +117,7 @@
        (format t "."))
     (clco-oduvanchik-key-bindings::set-clco-oduvanchik-key-bindings)
     (start-text2odu-dispatcher)
+    (start-highlight-dispatcher)
     ))
 
 (defun shutdown-oduvanchik-via-keyboard-buffer ()

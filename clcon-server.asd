@@ -28,6 +28,8 @@
                #+clcon-oduvan (:file "text2odu-dispatch-to-oduvan" :description "Dispatcher thread which moves events from *text2odu-event-queue* to oduvanchik editor")
                #+clcon-oduvan (:file "eval-text2odu-event" :description "processing events on editor side")
                #+clcon-oduvan (:file "do-editing-on-tcl-side" :description "Functions to send editing primitives to tcl. Functions are hanged on oduvanchik's hooks")
+               (:file "highlight-from-oduvan-to-queue.lisp" :description "Posting to *highlight-event-queue*")
+               (:file "highlight-from-queue-to-tcl.lisp" :description "Sending highighting events to lisp")
                (:file "clcon-oduvanchik-commands" :description "Our lisp mode and other application-level oduvanchik commands for clcon"
                       )
                )

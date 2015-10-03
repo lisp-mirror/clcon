@@ -42,7 +42,7 @@
     ))
 
 (defun numbered-line-of-buffer-by-clcon (clcon_text number)
-  "Number starts from 1"
+  "Number starts from 1. See also "
   (let* ((first-line 
           (slot-value
            (slot-value
@@ -71,6 +71,13 @@
     ))
 
 
+(defun buffer-change-id (buffer)
+    "We believe that: 
+    oi::now-tick always grows
+    oi::buffer-modified-tick contains some value of (oi::tick) 
+    "
+    (oi::buffer-modified-tick buffer))
+
 (defmethod oi::recompute-syntax-marks :around (line tag)
   (let* ((result (call-next-method))
          (marks (oi::sy-font-marks result))
@@ -84,14 +91,25 @@
                           :current buffer))
              )
         (when (and clcon_text connection marks)
-          (let* ((cmd (with-output-to-string (ou)
+          (let* ((line-number (oi::tag-line-number (oi::%line-tag line)))
+                 (encoded-marks
+                  (with-output-to-string (ou)
+                    (encode-marks-for-line line ou :line-number line-number)))
+                 (change-id (buffer-change-id buffer)))
+            (clco::notify-highlight-single-line 
+             clcon_text encoded-marks line-number change-id)
+            )
+            
+
+           ; following code is for direct execution and system locks up with it
+          #| (let* ((cmd (with-output-to-string (ou)
                         (format ou "::edt::ApplyHighlightToLine ~A " clcon_text)
                         (encode-marks-for-line line ou)
                         )))
-            ;(format *trace-output* "~S" cmd)
+                                        ;(format *trace-output* "~S" cmd)
             (swank::with-connection (connection)
               ;; we should carefully synchronize them indeed
-              (clco:eval-in-tcl cmd :nowait nil))))))
+              (clco:eval-in-tcl cmd :nowait nil)))|# )))
     result))
 
 
