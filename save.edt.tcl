@@ -5,7 +5,9 @@ namespace eval ::edt {
     }
     
     proc DoSaveFile { clcon_text FileName } {
+        # We force UNIX eol style and utf-8 encoding on all files we save
         set f [open $FileName w]
+        fconfigure $f -translation {auto lf} -encoding utf-8
         puts $f [$clcon_text get 1.0 "end-1 char"] nonewline
         set mtime [file mtime $FileName]
         close $f
