@@ -246,8 +246,8 @@ proc ::tkcon::Init {args} {
 	gets		{congets}
 	overrideexit	1
 	usehistory	1
-        putd-enabled    0
         putd-output-file {}
+        putd-enabled    0
         oduvan-backend  1
         swank-ip        127.0.0.1
         swank-port      4009
@@ -437,9 +437,8 @@ proc ::tkcon::Init {args} {
 		-nontcl		{ set OPT(nontcl) [regexp -nocase $truth $val]}
 		-root		{ set PRIV(root) $val }
 		-font		{ set OPT(font) $val }
-                -putd-output-file { set OPT(putd-output-file) $val
-                    set OPT(putd-enabled) 1
-                }
+                -putd-output-file { set OPT(putd-output-file) $val }
+                -putd-enabled   { set OPT(putd-enabled) $val }
                 -oduvan-backend { set OPT(oduvan-backend) $val }
                 -swank-ip       { set OPT(swank-ip) $val }
                 -swank-port     { set OPT(swank-port) $val }
@@ -454,6 +453,10 @@ proc ::tkcon::Init {args} {
 	} else {
 	    lappend slaveargs $arg
 	}
+    }
+    # Check params compatibility
+    if {$OPT(putd-enabled) && ($OPT(putd-output-file) eq {})} {
+        error "You may only set -putd-enabled to 1 when you specify -putd-output-file"
     }
 
     ## Create slave executable
