@@ -20,15 +20,15 @@ proc ::tkcon::GenContinuationCounter {} {
 ## Continuations work for sync or async event
 # Code accepts event in $EventAsList variable which contains event unleashed one time
 proc ::mprs::EnqueueContinuation {ContinuationId code} {
-    if {$code eq {}} {
-        return
-    }
     variable ContinuationsDict
     # Having two events in the queue is normal sometimes. 
     set PrintContinuationsDict [expr [llength $ContinuationsDict]>2]
-    dict set ContinuationsDict $ContinuationId [list {EventAsList} $code]
+    if {$code ne {}} {
+        set code [list {EventAsList} $code]
+    }
+    dict set ContinuationsDict $ContinuationId $code
     if {$PrintContinuationsDict} {
-        showVar ContinuationsDict
+        showVarPutd ContinuationsDict
     }
 }
 
@@ -49,7 +49,12 @@ proc ::mprs::RunContinuation {ContinuationId EventAsList} {
     # which was lost
     set Continuation [dict get $ContinuationsDict $ContinuationId]
     dict unset ContinuationsDict $ContinuationId
-    apply $Continuation $EventAsList
+    #showVarPutd Continuation
+    if {$Continuation eq {}} {
+        return
+    } else {
+        apply $Continuation $EventAsList
+    }
 }
     
 proc ::mprs::ExtractContinuationId {EventAsList} {
