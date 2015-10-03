@@ -29,6 +29,10 @@ proc showVar {name} {
     puts "sV:$name=[uplevel 1 [string cat {format %s $} $name]]"
 }
 
+proc showVarPutd {name} {
+    putd "sV:$name=[uplevel 1 [string cat {format %s $} $name]]"
+}
+
 
 proc SubstituteSingleValueInListVarKeyEq {listVariable old new} {
     upvar 1 $listVariable var

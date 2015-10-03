@@ -354,12 +354,12 @@ namespace eval ::edt {
             proc*	{
                 $w.text insert 1.0 \
                     [::tkcon::EvalOther {} slave dump proc [list $word]]
-                after idle [::tkcon::Highlight $w.text tcl]
+                after idle [list ::tkcon::Highlight $w.text tcl]
             }
             var*	{
                 $w.text insert 1.0 \
                     [::tkcon::EvalOther {} slave dump var [list $word]]
-                after idle [::tkcon::Highlight $w.text tcl]
+                after idle [list ::tkcon::Highlight $w.text tcl]
             }
             file	{
 
@@ -375,12 +375,12 @@ namespace eval ::edt {
                 
                 $w.text insert 1.0 [::edt::ReadFileIntoString $word 0]
                 
-                after idle [::tkcon::Highlight $w.text \
+                after idle [list ::tkcon::Highlight $w.text \
                                 [string trimleft [file extension $word] .]]
             }
             error*	{
                 $w.text insert 1.0 [join $tail \n]
-                after idle [::tkcon::Highlight $w.text error]
+                after idle [list ::tkcon::Highlight $w.text error]
             }
             default	{
                 $w.text insert 1.0 [join $tail \n]
