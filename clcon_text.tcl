@@ -113,8 +113,9 @@ namespace eval ::clcon_text {
         }
 
         method Freeze {} {
-            ::mprs::AssertEq $options(-private_freezed) 0 "Freeze: must be unfreezed"
-            $self configure -private_freezed 1
+            # ::mprs::AssertEq $options(-private_freezed) 0 "Freeze: must be unfreezed"
+            set old $options(-private_freezed)
+            $self configure -private_freezed [expr {$old + 1}]
         }
         
         method Unfreeze {} {
@@ -122,15 +123,17 @@ namespace eval ::clcon_text {
             set script [lindex $q 0]
             set q [lrange $q 1 end]
             $self configure -private_freezed_events_queue $q
-            ::mprs::AssertEq $options(-private_freezed) 1 "Unfreeze: must be freezed"
+            ::mprs::AssertEq [expr {$options(-private_freezed)>0}] 1 "Unfreeze: must be freezed"
             if {$script ne {}} {
                 #putd "Unfreeze: about to eval $script"
+                showVarPutd script
                 eval $script
             }
             if {[llength $q]} {
                 after 50 event generate $win <<UnfreezeNext>>
             } else {
-                $self configure -private_freezed 0
+                set old $options(-private_freezed)
+                $self configure -private_freezed [expr {$old - 1}]
             }
         }
 

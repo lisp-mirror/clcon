@@ -49,7 +49,7 @@ proc ::mprs::RunContinuation {ContinuationId EventAsList} {
     # which was lost
     set Continuation [dict get $ContinuationsDict $ContinuationId]
     dict unset ContinuationsDict $ContinuationId
-    #showVarPutd Continuation
+    putd "RunContinuation $ContinuationId: Continuation = $Continuation"
     if {$Continuation eq {}} {
         return
     } else {
