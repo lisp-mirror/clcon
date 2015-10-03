@@ -119,7 +119,7 @@
   (let (result)      
     (let* ((oduvanchik-internals::*do-editing-on-tcl-side* t))
       (setf result (funcall fn nil))
-      (clco::compare-clcon_text-and-oduvanchik-buffer-contents clcon_text)
+      ;(clco::compare-clcon_text-and-oduvanchik-buffer-contents clcon_text)
       )
     (odu::send-buffer-point-to-clcon_text buffer)
     result
