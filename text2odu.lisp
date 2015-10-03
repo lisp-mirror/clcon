@@ -104,6 +104,7 @@
     :clcon_text-pathname clcon_text-pathname
     :beg (parse-row-col index)
     :string string
+    :swank-connection swank::*emacs-connection*
     )))
 
 (defun call-oduvanchik-function-with-clcon_text (clcon_text-pathname insert-index far_tcl_cont_id oduvanchik-function-name)
@@ -126,6 +127,7 @@
     :clcon_text-pathname clcon_text-pathname
     :beg (parse-row-col beg)
     :end (if (equal end "") nil (parse-row-col end))
+    :swank-connection swank::*emacs-connection*
     )))
 
 
@@ -135,6 +137,7 @@
    (make-text2odu-event
     :kind 'destroy-backend-buffer
     :clcon_text-pathname clcon_text-pathname
+    :swank-connection swank::*emacs-connection*
     )))
 
 
