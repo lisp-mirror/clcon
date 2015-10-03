@@ -317,7 +317,7 @@ namespace eval ::edt {
         $m add command -label "0.Compile and load" -underline 0 -command $cmd -accel "F5"
         bind $text <F5> $cmd
 
-        ::erbr::AddNextAndPreviousCompilerMessagesCommands $m $text
+        ::erbr::AddNextAndPreviousCompilerMessagesCommands $m $text 1
 
         $m add separator
         set cmd [OduFnMenuItem $w $m $text indent-new-line "<Shift-Return>"]

@@ -65,6 +65,7 @@ namespace eval ::tablelist_util {
         $tbl selection set $ind $ind
         $tbl activate $ind
         $tbl selection anchor $ind
+        $tbl see $ind
     }
 }
     

@@ -64,6 +64,21 @@ namespace eval ::erbr {
     #        -background {} \
 
 
+    proc JumpToLocation {tbl dataItem} {
+        set ctjl [dict get $dataItem {CodeToJumpToLocation}]
+        set lambda [list {w} $ctjl]
+        apply $lambda [list $tbl]  
+    }
+
+    # Jump to current source location if it is possible.
+    # Otherwise, issue a warning and stay in the message list
+    proc JumpToCurrentLocation {tbl} {
+        variable data
+        set rowName [$tbl rowcget anchor -name]
+        set dataItem [dict get $data $rowName]
+        JumpToLocation $tbl $dataItem
+    }
+    
     # Insert text from index into detail window, and raise it
     proc RefreshDetails {rowName} {
         variable data
@@ -94,10 +109,8 @@ namespace eval ::erbr {
         event generate $tv <<GoToTop>>
 
         if {$AutoShowSource} {
-            set ctjl [dict get $item {CodeToJumpToLocation}]
-            set lambda [list {w} $ctjl]
             set tbl [GetTitleListMenuTbl $TitleListWindow]
-            apply $lambda [list $tbl]  
+            JumpToLocation $tbl $item 
         }
     }
 
@@ -163,14 +176,27 @@ namespace eval ::erbr {
 
         # If we inserted first item, highlight it
         if {[dict size $data] == 1} {
-            after idle [::tablelist_util::GotoIndex $tbl 0]
+            after idle [list ::tablelist_util::GotoIndex $tbl 0]
         }
 
         DefaultSortHeaders $tbl
         # InsertDataToShowOrBeep $w $EventAsList
     }
 
-    proc EditOtherCompilerMessage {increment} {
+    proc GotoIndexAndMaybeShowSource {tbl wantedAnc ShowSource} {
+        variable data
+        ::tablelist_util::GotoIndex $tbl $wantedAnc
+        # It is important that JumpToLocation is issued
+        # after GotoIndex which shedules error detail window
+        # to pop up.
+        if {$ShowSource} {
+            set rowName [$tbl rowcget $wantedAnc -name]
+            set dataItem [dict get $data $rowName]
+            after idle [list ::erbr::JumpToLocation $tbl $dataItem]
+        }
+    }
+    
+    proc EditOtherCompilerMessage {increment ShowSource} {
         variable TitleListWindow
         if {[winfo exists $TitleListWindow]} {
             set tbl $TitleListWindow.tf.tbl
@@ -181,7 +207,7 @@ namespace eval ::erbr {
             } elseif {$wantedAnc >= [$tbl size]} {
                 bell
             } else {
-                after idle [list ::tablelist_util::GotoIndex $tbl $wantedAnc]
+                after idle ::erbr::GotoIndexAndMaybeShowSource $tbl $wantedAnc $ShowSource
             }
         }
     }
@@ -354,13 +380,14 @@ namespace eval ::erbr {
         DefaultSortHeaders $tbl
     }
 
-    proc AddNextAndPreviousCompilerMessagesCommands {menu tagListForKeys} {
+    # If ShowSource == 1, shows source after jumping
+    proc AddNextAndPreviousCompilerMessagesCommands {menu tagListForKeys ShowSource} {
         set m $menu
 
-        set cmdBack [list ::erbr::EditOtherCompilerMessage -1]
+        set cmdBack [list ::erbr::EditOtherCompilerMessage -1 $ShowSource]
         $m add command -label "Goto prev compiler message" -command $cmdBack -accel "Alt-F7"
 
-        set cmdForward [list ::erbr::EditOtherCompilerMessage 1]
+        set cmdForward [list ::erbr::EditOtherCompilerMessage 1 $ShowSource]
         $m add command -label "Goto next compiler message" -command $cmdForward -accel "Alt-F8"
         foreach tag $tagListForKeys {
             puts stderr $tag
@@ -401,7 +428,15 @@ namespace eval ::erbr {
 
         $m add separator
 
-        AddNextAndPreviousCompilerMessagesCommands $m [list [$tbl bodytag] $text]
+        set cmd [list ::erbr::JumpToCurrentLocation $tbl]
+        $m add command -label "Jump to current source location" -accel "<space>" -command $cmd
+        foreach tag [list [$tbl bodytag] $text] {
+            bind $tag <space> $cmd
+        }
+        
+        AddNextAndPreviousCompilerMessagesCommands $m [list [$tbl bodytag] $text] 0
+
+        
     }
 
     # proc SortOrderBooleanToWord {x} {
