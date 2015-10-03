@@ -20,7 +20,7 @@
                (:file "eval-in-tcl")
                (:file "swank-inspector" :description "inspector backend pieces")
                (:file "swank-compilation-errors")
-               (:file "text2odu" :description "outer inteface between clcon_text widget and oduvanchik"
+               (:file "text2odu-from-tcl-to-queue" :description "Receive editor events from swank and post them to *text2odu-event-queue*"
                       )
                #+clcon-oduvan (:file "text2odu-test-utils")
                #+clcon-oduvan (:file "oduvanchik-key-bindings" :description "fake key bindings to enable event sending from clcon"
