@@ -115,12 +115,22 @@ namespace eval ::tkcon {
 # ARGS:	string
 # Outputs:	the string with a color-coded text tag
 ## 
-proc putd arg1 {
+proc putd {arg1} {
     variable ::tkcon::OPT
-    if { $::tkcon::OPT(putd-enabled) == 1 } {
-        tkcon console insert output "$arg1\n" debug_string
-        tkcon console see output
-        update idletasks
+
+    if { $::tkcon::OPT(putd-enabled) } {
+        global putdChannel
+        global putdChannelOpen 
+        if {![info exists putdChannelOpen]} {
+            set outputFile $OPT(putd-output-file)
+            if {$outputFile eq {}} {
+                error "putd-output-file option is missing"
+            }
+            set putdChannel [open $outputFile w+]
+            set putdChannelOpen 1
+        }
+        puts $putdChannel $arg1
+        flush $putdChannel
     }
 }
 
@@ -237,6 +247,7 @@ proc ::tkcon::Init {args} {
 	overrideexit	1
 	usehistory	1
         putd-enabled    0
+        putd-output-file {}
         oduvan-backend  1
         swank-ip        127.0.0.1
         swank-port      4009
@@ -426,7 +437,9 @@ proc ::tkcon::Init {args} {
 		-nontcl		{ set OPT(nontcl) [regexp -nocase $truth $val]}
 		-root		{ set PRIV(root) $val }
 		-font		{ set OPT(font) $val }
-                -putd-enabled   { set OPT(putd-enabled) $val }
+                -putd-output-file { set OPT(putd-output-file) $val
+                    set OPT(putd-enabled) 1
+                }
                 -oduvan-backend { set OPT(oduvan-backend) $val }
                 -swank-ip       { set OPT(swank-ip) $val }
                 -swank-port     { set OPT(swank-port) $val }
@@ -1325,8 +1338,14 @@ proc ::tkcon::InitMenus {w title} {
     ## Prefs Menu
     ##
     foreach m [list [menu $w.prefs] [menu $w.pop.prefs]] {
+
+        if {$::tkcon::OPT(putd-output-file) ne {}} {
+            set PutdEnabledState normal
+        } else {
+            set PutdEnabledState disabled
+        }           
 	$m add check -label "1.Putd-enabled" \
-		-underline 0 -variable ::tkcon::OPT(putd-enabled)
+		-underline 0 -variable ::tkcon::OPT(putd-enabled) -state $PutdEnabledState
 	$m add check -label "2.Oduvan-backend" \
 		-underline 0 -variable ::tkcon::OPT(oduvan-backend)
 	$m add check -label "3.Non-Tcl Attachments (defunct)" \
