@@ -207,7 +207,7 @@ namespace eval ::erbr {
             } elseif {$wantedAnc >= [$tbl size]} {
                 bell
             } else {
-                after idle ::erbr::GotoIndexAndMaybeShowSource $tbl $wantedAnc $ShowSource
+                after idle [list ::erbr::GotoIndexAndMaybeShowSource $tbl $wantedAnc $ShowSource]
             }
         }
     }
@@ -253,11 +253,11 @@ namespace eval ::erbr {
         variable tv
         if {[winfo exists $tv]} {
             wm withdraw $tv
-            after idle destroy $tv
+            after idle [list destroy $tv]
         }
         if {[winfo exists $TitleListWindow]} {
             wm withdraw $TitleListWindow
-            after idle destroy $TitleListWindow
+            after idle [list destroy $TitleListWindow]
         }
     }
 

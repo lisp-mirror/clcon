@@ -563,7 +563,7 @@ namespace eval ::ldbg {
         ::tkcon::EvalInSwankAsync \
             "(swank:invoke-nth-restart-for-emacs $level $i)" \
             {} $thread
-        after idle destroy $MainWindow
+        after idle [list destroy $MainWindow]
     }
 
     proc Abort {w} {
@@ -575,7 +575,7 @@ namespace eval ::ldbg {
         ::tkcon::EvalInSwankAsync \
             "(swank:sldb-abort)" \
             {} $thread
-        after idle destroy $MainWindow
+        after idle [list destroy $MainWindow]
     }
     
     
