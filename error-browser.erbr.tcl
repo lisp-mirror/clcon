@@ -65,7 +65,7 @@ namespace eval ::erbr {
 
 
     # Insert text from index into detail window, and raise it
-    proc RefershDetails {rowName} {
+    proc RefreshDetails {rowName} {
         variable data
         variable tv
         variable AutoShowSource
@@ -104,7 +104,7 @@ namespace eval ::erbr {
 
     proc DoOnSelect {tbl idx} {
         set rowName [$tbl rowcget $idx -name]
-        after idle ::erbr::RefershDetails $rowName
+        after idle ::erbr::RefreshDetails $rowName
     }
 
 
