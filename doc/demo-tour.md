@@ -26,18 +26,19 @@ Switching between windows
 -----------
 Some tools contain `Window` menu. Watch the menu to see how to switch to other tools. E.g. press `Control-.` to switch back to console.
 
-Compilation conditions
+Compiling file from editor
 ------------
-At the console, type in:
+At the console, open test/error-browser-sample-file.lisp file for editing.
+There are two ways to do that: via file open dialog (Control-O)
+or via console ed command:
+```.ed /s2/clcon/test/error-browser-sample-file.lisp```
+While typing in filename, use Control-F3 for completion.
 
-```(clco::compile-file-for-tcl (merge-pathnames "test/error-browser-sample-file.lisp" clcon-server:*clcon-source-directory*) nil)```
+File will open in the editor. Press F5 (compile and load). Two new windows will pop up: list of compiler notes and error details. Also there will be some text above list of compiler notes. It will state that compilation is failed, but you can try load generated fasl file if you press "!".
 
-This function is a wireframe for a future "compile file" editor command. Compilation notes will be printed at the console. 
-Additionally, compilation condition browser will pop up. As you scroll through notes in the list, error details occur at another window. 
+You can browse through notes with arrow keys. As you press <space>, source code for error will be shown in the editor. Once you switched to editor, it is convenient to scroll through messages with Alt-F7/F8. 
 
-Warning! Due to random positioning of windows, notes list may be hidden below error details. Use your window manager to raise it. 
-
-Click on `[Go to source]` label at error details window and relevant source will open at the editor.
+Warning! Due to random positioning of windows, some views may be unpleasant tow ork with, so you might want to resize them manually. Your feedback and patches to solve this are welcome. 
 
 Switching between editor buffers
 ------------

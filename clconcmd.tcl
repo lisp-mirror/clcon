@@ -37,13 +37,9 @@ namespace eval clconcmd {
     proc insp* {} {
         tkcon main ::insp::SwankInspect "*"
     }
+
+    proc ed {filename} {
+        ::edt::edit -type file $filename
+    }
 }
     
-
-
-
-
-
-    
-
-
