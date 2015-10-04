@@ -5,8 +5,7 @@
 # compilation only. To serve compiling systems it must be redesigned somehow.
 #
 # To see browser in action, execute in console:
-# (clco::compile-file-for-tcl
-#    (at-lisp-root "clcon/test/error-browser-sample-file.lisp") nil)
+# (clco::compile-file-for-tcl "<PATH-TO-CLCON>/test/error-browser-sample-file.lisp") nil)
 #
 
 # Example of message: 
@@ -393,7 +392,7 @@ namespace eval ::erbr {
         set cmdForward [list ::erbr::EditOtherCompilerMessage 1 $ShowSource]
         $m add command -label "Goto next compiler message" -command $cmdForward -accel "Alt-F8"
         foreach tag $tagListForKeys {
-            puts stderr $tag
+            # puts stderr $tag
             bind $tag <Alt-Key-F7> $cmdBack
             bind $tag <Alt-Key-F8> $cmdForward
         }
