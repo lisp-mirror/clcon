@@ -152,6 +152,25 @@ proc ::mprs::ExtractSyncEventFromQueueIfExists {} {
     return {}
 }
 
+
+# Parses (:return (:ok x)) event to message or errs.
+# Returns x if all ok
+proc ::mprs::ParseReturnOk { EventAsList } {
+    set EventHead [lindex $EventAsList 0]
+    if { $EventHead ne {:return} } {
+        puts stderr "Something wrong: in SWANK reply we expected :return, but get $EventHead"
+    }
+    set SwankReply [::mprs::Unleash [lindex $EventAsList 1]]
+    set HeadSwankReply [lindex $SwankReply 0]
+    if {$HeadSwankReply eq {:ok}} {
+        set result [::mprs::Unleash [lindex $SwankReply 1]]
+        return $result
+    } else {
+        error "I don't know what is $HeadSwankReply while parsing swank reply $Event"
+    }
+}
+
+
 proc ::mprs::MaybeProcessSyncEventFromQueue {} {
     variable ::tkcon::SWANKIsInSyncMode
     # find if it is in SWANKSyncContinuation

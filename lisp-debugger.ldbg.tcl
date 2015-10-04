@@ -313,6 +313,15 @@ namespace eval ::ldbg {
             RowDblClick {
                 RowDblClick $tbl $RowName
             }
+            ReturnFromFrame {
+                ReturnFromFrame $RowName
+            }
+            EvalInFrame {
+                EvalInFrame $RowName
+            }
+            EvalInFramePrettyPrint {
+                EvalInFramePrettyPrint $RowName
+            }
             default {
                 error "Unknown CellCmd"
             }
@@ -402,6 +411,15 @@ namespace eval ::ldbg {
         #
         set cmd "::ldbg::InspectCurrentCondition"
         $m add command -label "1.Inspect current condition" -underline 0 -command $cmd
+
+        set cmd "::ldbg::CellCmdForActiveCell $tbl ReturnFromFrame"
+        $m add command -label "2.Return from frame" -underline 0 -command $cmd
+
+        set cmd "::ldbg::CellCmdForActiveCell $tbl EvalInFrame"
+        $m add command -label "3.Eval in frame" -underline 0 -command $cmd
+
+        set cmd "::ldbg::CellCmdForActiveCell $tbl EvalInFramePrettyPrint"
+        $m add command -label "4.Eval in frame (pretty print)" -underline 0 -command $cmd
     }
     
     proc MakeMainWindowEditMenu {w menu} {
@@ -548,11 +566,100 @@ namespace eval ::ldbg {
             " (swank:inspect-current-condition)"            \
             "::insp::SwankInspect1 \$EventAsList"           \
             $thread
-    }      
+    }
+
+    #(:emacs-rex
+    #(swank:sldb-return-from-frame 1 "(values nil nil)")
+    #"COMMON-LISP-USER" 2 21)
+    # (:return
+    #(:abort "nil")
+    # 21)
+    # (:debug-return 2 1 nil)
+
+    proc ReturnFromFrame {RowName} {
+        variable MainWindow
+        set FrameNo [RowNameToFrameNo $RowName]
+        #set level [GetDebuggerLevel]
+        set thread [GetDebuggerThreadId]
+        foreach {isok code}                                 \
+            [ LameAskForLispExpression $MainWindow          \
+                  "Enter lisp expr (shift-enter=new line) and press Enter: cl-user>"
+             ] break
+        if {$isok ne "ok"} {
+            return
+        }
+        set qCode [::tkcon::QuoteLispObjToString $code]
+        ::tkcon::EvalInSwankAsync \
+            "(swank:sldb-return-from-frame $FrameNo $qCode)" \
+            {} $thread
+        after idle [list destroy $MainWindow]
+    }
+
+#(:emacs-rex
+#  (swank:frame-package-name 0)
+#  "COMMON-LISP-USER" 11 24)
+# (:return
+#  (:ok "SB-KERNEL")
+#  24)
+# (:emacs-rex
+#  (swank:eval-string-in-frame "123" 0 "SB-KERNEL")
+#  "COMMON-LISP-USER" 11 25)
+# (:return
+#  (:ok "=> 123 (7 bits, #x7B, #o173, #b1111011)")
+#  25)
+
+    proc EvalInFrame {RowName} {
+        EvalInFrameInner $RowName 0
+    }
+
+    proc EvalInFramePrettyPrint {RowName} {
+        EvalInFrameInner $RowName 1
+    }
+
     
-    # (:emacs-rex
-    #  (swank:invoke-nth-restart-for-emacs 1 2)
-    #  "COMMON-LISP-USER" 17 33)
+    proc EvalInFrameInner {RowName PrettyPrint} {
+        set FrameNo [RowNameToFrameNo $RowName]
+        ::tkcon::EvalInSwankAsync                                 \
+            "(swank:frame-package-name $FrameNo)"                 \
+            [subst -nocommand {
+                ::ldbg::EvalInFrameC1 $FrameNo $PrettyPrint \$EventAsList
+            }] [GetDebuggerThreadId]
+    }
+
+    proc EvalInFrameC1 {FrameNo PrettyPrint EventAsList} {
+        variable MainWindow
+        set package [::mprs::ParseReturnOk $EventAsList]
+        set qPackage [::tkcon::QuoteLispObjToString $package]
+
+        #set level [GetDebuggerLevel]
+        foreach {isok code}                                      \
+            [LameAskForLispExpression $MainWindow                \
+                 "Eval in frame (shift-enter=new line)$package>" \
+                ] break
+        if {$isok ne "ok"} {
+            return
+        }
+        puts ";;Eval in frame $FrameNo:"
+        puts ";;$package> $code"
+        set qCode [::tkcon::QuoteLispObjToString $code]
+        set thread [GetDebuggerThreadId]
+        if {$PrettyPrint} {
+            set LispFn "swank:pprint-eval-string-in-frame"
+        } else {
+            set LispFn "swank:eval-string-in-frame"
+        }
+        ::tkcon::EvalInSwankAsync \
+            "($LispFn $qCode $FrameNo $qPackage)" \
+            {::ldbg::EvalInFrameC2 $EventAsList} $thread
+    }
+        
+
+    proc EvalInFrameC2 {EventAsList} {
+        set result [::mprs::ParseReturnOk $EventAsList]
+        ::tkcon::FocusConsole
+        puts $result
+    }
+    
 
     proc InvokeRestart {i} {
         variable DebugEvent

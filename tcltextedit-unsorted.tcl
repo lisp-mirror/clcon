@@ -44,6 +44,45 @@ proc powin {w relativeTo} {
     c [winfo width $w]
 }
 
+
+# This is very minimalistic feature, but it is good as it
+# does not bother swank server. This is essential at debug time.
+# Returns list of two elements:
+# First element is "ok" or "cancel".
+# Second is a line entered (if result is "ok")
+proc LameAskForLispExpression {parent title} {
+    global LameAskForLispExpressionReply
+    set ou [string cat $parent .ask_for_lisp_expression]
+    catch {destroy $ou}
+    toplevel $ou
+    wm title $ou $title
+    set text $ou.text
+    text $text -height 3
+    ::gui_util::ConfigureTextFonts $text
+    pack $text
+    set LameAskForLispExpressionReply 0
+    bind $text <Return> "set LameAskForLispExpressionReply ok; break"
+    bind $text <Escape> "set LameAskForLispExpressionReply cancel"
+    bind $text <Shift-Return> "$text insert insert \\n; break"
+
+    wm protocol $ou WM_DELETE_WINDOW "set LameAskForLispExpressionReply cancel"
+    wm attributes $ou -type dialog
+    wm transient $ou $parent
+
+    grab $ou
+    focus $text
+    
+    vwait LameAskForLispExpressionReply
+    set userInput [$text get 1.0 end-1c]
+    if {$LameAskForLispExpressionReply eq "ok"} {
+        set result [list $LameAskForLispExpressionReply $userInput]
+    } else {
+        set result [list $LameAskForLispExpressionReply]
+    }
+    destroy $ou
+    return $result
+}
+
 # Has local grab, returns 'yes','no' or 'cancel' 
 proc YesNoCancel {title message parent} {
     global r
