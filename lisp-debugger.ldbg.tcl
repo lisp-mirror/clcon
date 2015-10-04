@@ -485,7 +485,6 @@ namespace eval ::ldbg {
 
     # Responce to :debug-activate, stolen from slimv
     proc DebugActivate { EventAsList } {
-        puts "DebugActivate may go wrong"
         variable ::slimv::debug_active
         variable ::slimv::debug_activated
         variable ::slimv::current_thread
