@@ -30,6 +30,14 @@
             ;(format t "~%Sending real event ~S to oduvanchik keyboard buffer!" e)
             ;(clco-oduvanchik-key-bindings::highlight-dispatcher-to-editor-queue-put e)
             (warn "Send highlight ~S to tcl manually!" e)
+            #| (let* ((cmd (with-output-to-string (ou)
+                        (format ou "::edt::ApplyHighlightToLine ~A " clcon_text)
+                        (encode-marks-for-line line ou)
+                        )))
+                                        ;(format *trace-output* "~S" cmd)
+            (swank::with-connection (connection)
+              ;; we should carefully synchronize them indeed
+              (clco:eval-in-tcl cmd :nowait nil))) |#
             ))))))
 
 

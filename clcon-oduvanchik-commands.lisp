@@ -99,17 +99,7 @@
             (clco::notify-highlight-single-line 
              clcon_text encoded-marks line-number change-id)
             )
-            
-
-           ; following code is for direct execution and system locks up with it
-          #| (let* ((cmd (with-output-to-string (ou)
-                        (format ou "::edt::ApplyHighlightToLine ~A " clcon_text)
-                        (encode-marks-for-line line ou)
-                        )))
-                                        ;(format *trace-output* "~S" cmd)
-            (swank::with-connection (connection)
-              ;; we should carefully synchronize them indeed
-              (clco:eval-in-tcl cmd :nowait nil)))|# )))
+          )))
     result))
 
 
