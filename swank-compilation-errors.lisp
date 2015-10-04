@@ -43,18 +43,19 @@
   
 
 (defun compile-file-for-tcl (filename load-p &rest options)
-  "Later we must add load-p logic if compilation failed. Now we just ignore it. Otherwise we would need
-to decide how to organise dialog between parties. So we just compile, and return code to be evaluated to print result with hyperlinks"
+  "Backend for ::edt::CompileAndLoadTheFile . Rather untraditional c-s dialog. We normally do such things in tcl. It can be sometimes more convenient to edit though as we're in Lisp"
   (let* ((compilation-result (apply #'swank:compile-file-for-emacs filename load-p options))
          (success (swank::compilation-result-successp compilation-result))
          (notes (swank::compilation-result-notes compilation-result))
          (serial 0)
          )
-    ;(when notes (print notes))
+    (when (and success load-p)
+      (load (swank::compilation-result-faslfile compilation-result) :verbose t))
     (when (or notes (not success))
       (eval-in-tcl (format nil "::erbr::SwankBrowseErrors1 ~A" (CLCO::CONVERT-OBJECT-TO-TCL compilation-result)))
       (dolist (note notes)
         (eval-in-tcl (calc-details-code note (incf serial)))
-        ))))
+        ))
+    ))
 
 
