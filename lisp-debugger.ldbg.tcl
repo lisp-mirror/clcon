@@ -578,7 +578,21 @@ namespace eval ::ldbg {
             {} $thread
         after idle [list destroy $MainWindow]
     }
-        
+
+#(:emacs-rex
+#  (swank:frame-package-name 0)
+#  "COMMON-LISP-USER" 11 24)
+# (:return
+#  (:ok "SB-KERNEL")
+#  24)
+# (:emacs-rex
+#  (swank:eval-string-in-frame "123" 0 "SB-KERNEL")
+#  "COMMON-LISP-USER" 11 25)
+# (:return
+#  (:ok "=> 123 (7 bits, #x7B, #o173, #b1111011)")
+#  25)
+
+    
 
     proc InvokeRestart {i} {
         variable DebugEvent
