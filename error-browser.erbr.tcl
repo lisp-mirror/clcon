@@ -130,6 +130,9 @@ namespace eval ::erbr {
     }
 
     # FIXME we need full list of severities
+    # Maybe it is in swank/backend package :
+    # (deftype severity () '(member :error :read-error :warning :style-warning :note :redefinition))
+
     proc SeverityToSeverityNumber {severity} {
         switch -exact $severity {
             "style-warning" {return 0}
@@ -137,7 +140,7 @@ namespace eval ::erbr {
             "read-error"    -
             "error"         {return 2}
             default {
-                tk_messageBox -message "Unfinished function ::erbr::SeverityToNumber - $severityWord"
+                tk_messageBox -message "Unfinished function ::erbr::SeverityToSeverityNumber - $severityWord"
                 {return 2}
             }
         }

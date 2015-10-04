@@ -158,3 +158,11 @@ It can also be found in ActiveTCL help file.
  
 ## What if I want to contribute
 Read issues
+
+
+Thread list and debugging
+------------------
+У нас нет ГУЯ для отладки потоков. Но можно напечатать
+список потоков в консоль с помощью ```(swank:list-threads)```,
+а затем вызвать отладку треда по номеру ```(swank:debug-nth-thread <N>)```
+Но это не странно работает под windows :( 
