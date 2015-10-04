@@ -316,6 +316,12 @@ namespace eval ::ldbg {
             ReturnFromFrame {
                 ReturnFromFrame $RowName
             }
+            EvalInFrame {
+                EvalInFrame $RowName
+            }
+            EvalInFramePrettyPrint {
+                EvalInFramePrettyPrint $RowName
+            }
             default {
                 error "Unknown CellCmd"
             }
@@ -405,8 +411,15 @@ namespace eval ::ldbg {
         #
         set cmd "::ldbg::InspectCurrentCondition"
         $m add command -label "1.Inspect current condition" -underline 0 -command $cmd
+
         set cmd "::ldbg::CellCmdForActiveCell $tbl ReturnFromFrame"
         $m add command -label "2.Return from frame" -underline 0 -command $cmd
+
+        set cmd "::ldbg::CellCmdForActiveCell $tbl EvalInFrame"
+        $m add command -label "3.Eval in frame" -underline 0 -command $cmd
+
+        set cmd "::ldbg::CellCmdForActiveCell $tbl EvalInFramePrettyPrint"
+        $m add command -label "4.Eval in frame (pretty print)" -underline 0 -command $cmd
     }
     
     proc MakeMainWindowEditMenu {w menu} {
@@ -592,6 +605,31 @@ namespace eval ::ldbg {
 #  (:ok "=> 123 (7 bits, #x7B, #o173, #b1111011)")
 #  25)
 
+    proc EvalInFrame {RowName} {
+        set FrameNo [RowNameToFrameNo $RowName]
+        ::tkcon::EvalInSwankAsync \
+            "(swank:frame-package-name $FrameNo)" \
+            [subst -nocommand {::ldbg::EvalInFrameC1 $FrameNo \$EventAsList }] \
+            [GetDebuggerThreadId]
+    }
+
+    proc EvalInFrameC1 {FrameNo EventAsList} {
+        variable MainWindow
+        puts stderr $EventAsList
+        set package "CL-USER"
+        set qPackage [::tkcon::QuoteLispObjToString $package]
+
+        #set level [GetDebuggerLevel]
+        foreach {isok code} [LameAskForLispExpression $MainWindow] break
+        if {$isok ne "ok"} {
+            return
+        }
+        set qCode [::tkcon::QuoteLispObjToString $code]
+        set thread [GetDebuggerThreadId]
+        ::tkcon::EvalInSwankAsync \
+            "(swank:eval-string-in-frame $qCode $FrameNo $qPackage)" \
+            {puts stderr $EventAsList} $thread
+    }
     
 
     proc InvokeRestart {i} {
