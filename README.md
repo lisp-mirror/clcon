@@ -23,23 +23,27 @@ Code is completely platform-independent and should run on other platforms too. A
 - Simple, one-click installable CL environment for beginners
 
 ## Current state
-Overall state and quality is "working prototype".
+IDE slowly moves to maturity. The most problematic part is oduvanchik editor backend
+which has some "floating" crashes. Also some necessary things for serious development
+are still missing, e.g. working in other package than cl-user is hard now. 
+
 It is likely that you fall into trouble at any place. 
-So do not try to just "play around" with the IDE. Take
-a [demo tour](doc/demo-tour.md) instead.
+So if you want to take a look at clcon, do not try to just "play around" 
+with the IDE. Take a [demo tour](doc/demo-tour.md) instead.
 
-Features demonstrated are: 
-
+Current features are: 
 - REPL with command history and history substitution
-- Debugger (view stack, locals, goto source, invoke restarts, search)
+- Debugger (inspect stack, locals, goto source, invoke restarts, eval in frame, restart frame, search)
+- Editor (with some pitfalls, e.g. you can close buffer without save confirmation)
 - completion for lisp symbols and filenames in REPL
 - lisp mode with syntax-highlight, find-source, auto indent (not covered by demo tour)
 - inspector 
 - compilation notes browser
 - editor buffer list
+- recent files menu
 - "Find" and "Find next" commands for text and treeview
 - running of tcl code with special "escapes"
-- recent file list
+
 
 ## Installation and startup
 For windows, we even have [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.2.2.zip). 
