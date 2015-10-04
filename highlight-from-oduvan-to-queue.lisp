@@ -68,8 +68,8 @@
   nil
   )
 
-(defun notify-highlight-single-line (clcon_text-pathname encoded-marks line-no change-id)
-  "Called from RoDelete before really deleting text"
+(defun notify-highlight-single-line (clcon_text-pathname encoded-marks line-no change-id buffer)
+  "See also eval-highlight-single-line"
   (post-highlight-event
    (make-highlight-event
     :kind 'highlight-single-line
@@ -77,7 +77,7 @@
     :string encoded-marks
     :change-id change-id
     :end-line-no line-no
-    :swank-connection swank::*emacs-connection*
+    :swank-connection (oi::variable-value 'odu::swank-connection :current buffer)
     )))
 
 

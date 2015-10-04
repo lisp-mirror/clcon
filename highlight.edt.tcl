@@ -2,6 +2,7 @@
 
 namespace eval ::edt {
     variable ColorTable
+    variable NumberOfPendingHighlights 0
 
     set ColorTable {
         black blue red orange cyan
@@ -43,25 +44,40 @@ namespace eval ::edt {
             incr i
         }
     }
+
+    proc ApplyHighlightToLine {clcon_text s} {
+        variable NumberOfPendingHighlights
+        incr NumberOfPendingHighlights
+        after idle [list ::edt::DoApplyHighlightToLine $clcon_text $s]
+    }
+
+    proc DoApplyHighlightToLine {clcon_text s} {
+        # text could disappear
+        catch {
+            DoApplyHighlightToLineInner $clcon_text $s
+        }
+        incr NumberOfPendingHighlights -1
+    }   
     
     # Accepts string encoded by odu::encode-marks-for-line
-    proc ApplyHighlightToLine {text s} {
+    proc DoApplyHighlightToLineInner {clcon_text s} {
+        variable NumberOfPendingHighlights
         set i 0
         foreach e $s {
             if {$i == 0} {
                 set LineNumber $e
-                DeleteHighlightInLine $text $LineNumber
+                DeleteHighlightInLine $clcon_text $LineNumber
                 set PrevCharPos 0
                 set PrevFont 0
             } else {
                 set CharPos [lindex $e 0]
                 set Font [lindex $e 1]
-                ApplyHighlightToLineSegment $text $PrevCharPos $CharPos $PrevFont $LineNumber
+                ApplyHighlightToLineSegment $clcon_text $PrevCharPos $CharPos $PrevFont $LineNumber
                 set PrevCharPos $CharPos
                 set PrevFont $Font
             }
             incr i
         }
-        ApplyHighlightToLineSegment $text $PrevCharPos "end" $PrevFont $LineNumber
+        ApplyHighlightToLineSegment $clcon_text $PrevCharPos "end" $PrevFont $LineNumber
     }
 }

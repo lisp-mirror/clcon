@@ -88,7 +88,7 @@
   )
 
 (defun notify-oduvan-construct-backend-buffer (clcon_text-pathname)
-  "Called from tcl when text is created, from arbitrary thread"
+  "Called from tcl when text is created, from arbitrary thread. See also oduvanchik::eval-construct-backend-buffer"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'construct-backend-buffer

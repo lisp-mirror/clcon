@@ -97,7 +97,7 @@
                     (encode-marks-for-line line ou :line-number line-number)))
                  (change-id (buffer-change-id buffer)))
             (clco::notify-highlight-single-line 
-             clcon_text encoded-marks line-number change-id)
+             clcon_text encoded-marks line-number change-id buffer)
             )
           )))
     result))

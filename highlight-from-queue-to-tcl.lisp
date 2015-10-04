@@ -18,26 +18,25 @@
     (pop *highlight-event-queue*)))
 
 
+(defun eval-highlight-single-line (e)
+  (let* ((cmd (format nil "::edt::ApplyHighlightToLine ~A ~A"
+                      (highlight-event-clcon_text-pathname e)
+                      (--> e string))
+           ))
+    (swank::with-connection ((--> e swank-connection))
+      ;; we should carefully synchronize them indeed
+      (clco:eval-in-tcl cmd :nowait nil))))
+
 (defun highlight-dispatcher-thread-function ()
   (loop
      (let ((e (pop-highlight-event-queue)))
        (when e
-         (cond
-           ((eq (--> e kind) 'shutdown-highlight-dispatcher)
+         (ecase (highlight-event-kind e)
+           (shutdown-highlight-dispatcher
             (setf *highlight-dispatcher-thread* nil)
             (return-from highlight-dispatcher-thread-function nil))
-           (t
-            ;(format t "~%Sending real event ~S to oduvanchik keyboard buffer!" e)
-            ;(clco-oduvanchik-key-bindings::highlight-dispatcher-to-editor-queue-put e)
-            (warn "Send highlight ~S to tcl manually!" e)
-            #| (let* ((cmd (with-output-to-string (ou)
-                        (format ou "::edt::ApplyHighlightToLine ~A " clcon_text)
-                        (encode-marks-for-line line ou)
-                        )))
-                                        ;(format *trace-output* "~S" cmd)
-            (swank::with-connection (connection)
-              ;; we should carefully synchronize them indeed
-              (clco:eval-in-tcl cmd :nowait nil))) |#
+           (highlight-single-line
+            (eval-highlight-single-line e)
             ))))))
 
 
