@@ -50,7 +50,7 @@
 (pushnew :clcon-oduvan *features*)
 (pushnew :oduvanchik *features*)
 (pushnew :oduvan-invisible *features*)
-;; (pushnew :oduvan-enable-highlight *features*)
+(pushnew :oduvan-enable-highlight *features*)
 (pushnew :clcon *features*)
 
 ;; piece from swank
@@ -84,6 +84,9 @@
 (asdf:load-system :alexandria)
 (asdf:load-system :cl-fad)
 (asdf:load-system :budden-tools)
+
+(budden-tools:def-toplevel-progn "load winmerge-strings" ()
+  (load (at-clcon-root "quicklisp/local-projects/clcon/winmerge-strings.lisp")))
 
 (BUDDEN-TOOLS:def-toplevel-progn "load :see-packages system" ()
   (asdf:load-system :see-packages) 
