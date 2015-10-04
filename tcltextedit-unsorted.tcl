@@ -45,6 +45,23 @@ proc powin {w relativeTo} {
 }
 
 
+proc MakeWindowADialogAndGrab {win parent} {
+    global tcl_platform
+    if {$tcl_platform(platform) == "unix"} {
+        wm attributes $win -type dialog
+    } elseif {$tcl_platform(platform) == "windows"} {
+        # do nothing
+    }
+    wm transient $win $parent
+
+    #if {$parent ne {}} {
+    #    powin $win $parent
+    #}
+    
+    grab $win
+}
+
+
 # This is very minimalistic feature, but it is good as it
 # does not bother swank server. This is essential at debug time.
 # Returns list of two elements:
@@ -52,7 +69,6 @@ proc powin {w relativeTo} {
 # Second is a line entered (if result is "ok")
 proc LameAskForLispExpression {parent title} {
     global LameAskForLispExpressionReply
-    global tcl_platform
     set ou [string cat $parent .ask_for_lisp_expression]
     catch {destroy $ou}
     toplevel $ou
@@ -67,15 +83,9 @@ proc LameAskForLispExpression {parent title} {
     bind $text <Shift-Return> "$text insert insert \\n; break"
 
     wm protocol $ou WM_DELETE_WINDOW "set LameAskForLispExpressionReply cancel"
-    
-    if {$tcl_platform(platform) == "unix"} {
-        wm attributes $ou -type dialog
-    } elseif {$tcl_platform(platform) == "windows"} {
-        # do nothing
-    }
-    wm transient $ou $parent
 
-    grab $ou
+    MakeWindowADialogAndGrab $ou $parent
+
     focus $text
     
     vwait LameAskForLispExpressionReply
@@ -115,13 +125,9 @@ proc YesNoCancel {title message parent} {
     pack $ou.f
     focus $ou.f.yes
     wm protocol $ou WM_DELETE_WINDOW "set r cancel"
-    wm attributes $ou -type dialog
-    wm transient $ou $parent
 
-    #if {$parent ne {}} {
-    #    powin $ou $parent
-    #}
-    grab $ou
+    MakeWindowADialogAndGrab $ou $parent
+
     vwait r
     destroy $ou
     return $r
