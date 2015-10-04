@@ -388,6 +388,12 @@ namespace eval ::tkcon {
 
         set w $PRIV(console)
         if {![winfo exists $w]} { return }
+        # puts stderr [string cat < [$w get end-2c end-1c] >]
+        catch {
+            if { [$w get end-2c end-1c] ne "\n" } {
+               $w insert end "\n"
+            }
+        }
         if {$pre ne ""} { $w insert end $pre stdout }
         set i [$w index end-1c]
 
