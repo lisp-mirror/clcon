@@ -44,6 +44,35 @@ proc powin {w relativeTo} {
     c [winfo width $w]
 }
 
+
+# This is very minimalistic feature, but it is good as it
+# does not bother swank server. This is essential at debug time.
+proc LameAskForLispExpression {parent} {
+    global LameAskForLispExpressionReply
+    set ou [string cat $parent .ask_for_lisp_expression]
+    catch {destroy $ou}
+    toplevel $ou
+    wm title $ou "Type a lisp code (shift-enter=new line) and press Enter"
+    set text $ou.text
+    text $text -height 3
+    ::gui_util::ConfigureTextFonts $text
+    pack $text
+    set LameAskForLispExpressionReply 0
+    bind $text <Return> "set LameAskForLispExpressionReply ok; break"
+    bind $text <Escape> "set LameAskForLispExpressionReply cancel"
+    bind $text <Shift-Return> "$text insert insert \\n; break"
+
+    wm protocol $ou WM_DELETE_WINDOW "set r cancel"
+    wm attributes $ou -type dialog
+    wm transient $ou $parent
+
+    grab $ou
+    vwait LameAskForLispExpressionReply
+    set result [$text get 1.0 end]
+    destroy $ou
+    return $result
+}
+
 # Has local grab, returns 'yes','no' or 'cancel' 
 proc YesNoCancel {title message parent} {
     global r

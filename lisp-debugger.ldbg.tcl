@@ -548,11 +548,15 @@ namespace eval ::ldbg {
             " (swank:inspect-current-condition)"            \
             "::insp::SwankInspect1 \$EventAsList"           \
             $thread
-    }      
-    
-    # (:emacs-rex
-    #  (swank:invoke-nth-restart-for-emacs 1 2)
-    #  "COMMON-LISP-USER" 17 33)
+    }
+
+    #(:emacs-rex
+    #(swank:sldb-return-from-frame 1 "(values nil nil)")
+    #"COMMON-LISP-USER" 2 21)
+    # (:return
+    #(:abort "nil")
+    # 21)
+    # (:debug-return 2 1 nil)
 
     proc InvokeRestart {i} {
         variable DebugEvent
