@@ -50,12 +50,12 @@ proc powin {w relativeTo} {
 # Returns list of two elements:
 # First element is "ok" or "cancel".
 # Second is a line entered (if result is "ok")
-proc LameAskForLispExpression {parent} {
+proc LameAskForLispExpression {parent title} {
     global LameAskForLispExpressionReply
     set ou [string cat $parent .ask_for_lisp_expression]
     catch {destroy $ou}
     toplevel $ou
-    wm title $ou "Type a lisp code (shift-enter=new line) and press Enter"
+    wm title $ou $title
     set text $ou.text
     text $text -height 3
     ::gui_util::ConfigureTextFonts $text
@@ -65,7 +65,7 @@ proc LameAskForLispExpression {parent} {
     bind $text <Escape> "set LameAskForLispExpressionReply cancel"
     bind $text <Shift-Return> "$text insert insert \\n; break"
 
-    wm protocol $ou WM_DELETE_WINDOW "set r cancel"
+    wm protocol $ou WM_DELETE_WINDOW "set LameAskForLispExpressionReply cancel"
     wm attributes $ou -type dialog
     wm transient $ou $parent
 
@@ -73,8 +73,9 @@ proc LameAskForLispExpression {parent} {
     focus $text
     
     vwait LameAskForLispExpressionReply
+    set userInput [$text get 1.0 end-1c]
     if {$LameAskForLispExpressionReply eq "ok"} {
-        set result [list $LameAskForLispExpressionReply [$text get 1.0 end]]
+        set result [list $LameAskForLispExpressionReply $userInput]
     } else {
         set result [list $LameAskForLispExpressionReply]
     }

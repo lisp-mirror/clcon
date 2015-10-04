@@ -155,7 +155,6 @@ proc ::mprs::ExtractSyncEventFromQueueIfExists {} {
 
 # Parses (:return (:ok x)) event to message or errs.
 # Returns x if all ok
-# Use it as an util?
 proc ::mprs::ParseReturnOk { EventAsList } {
     set EventHead [lindex $EventAsList 0]
     if { $EventHead ne {:return} } {

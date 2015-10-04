@@ -581,7 +581,10 @@ namespace eval ::ldbg {
         set FrameNo [RowNameToFrameNo $RowName]
         #set level [GetDebuggerLevel]
         set thread [GetDebuggerThreadId]
-        foreach {isok code} [LameAskForLispExpression $MainWindow] break
+        foreach {isok code}                                 \
+            [ LameAskForLispExpression $MainWindow          \
+                  "Enter lisp expr (shift-enter=new line) and press Enter: cl-user>"
+             ] break
         if {$isok ne "ok"} {
             return
         }
@@ -606,29 +609,55 @@ namespace eval ::ldbg {
 #  25)
 
     proc EvalInFrame {RowName} {
-        set FrameNo [RowNameToFrameNo $RowName]
-        ::tkcon::EvalInSwankAsync \
-            "(swank:frame-package-name $FrameNo)" \
-            [subst -nocommand {::ldbg::EvalInFrameC1 $FrameNo \$EventAsList }] \
-            [GetDebuggerThreadId]
+        EvalInFrameInner $RowName 0
     }
 
-    proc EvalInFrameC1 {FrameNo EventAsList} {
+    proc EvalInFramePrettyPrint {RowName} {
+        EvalInFrameInner $RowName 1
+    }
+
+    
+    proc EvalInFrameInner {RowName PrettyPrint} {
+        set FrameNo [RowNameToFrameNo $RowName]
+        ::tkcon::EvalInSwankAsync                                 \
+            "(swank:frame-package-name $FrameNo)"                 \
+            [subst -nocommand {
+                ::ldbg::EvalInFrameC1 $FrameNo $PrettyPrint \$EventAsList
+            }] [GetDebuggerThreadId]
+    }
+
+    proc EvalInFrameC1 {FrameNo PrettyPrint EventAsList} {
         variable MainWindow
-        puts stderr $EventAsList
-        set package "CL-USER"
+        set package [::mprs::ParseReturnOk $EventAsList]
         set qPackage [::tkcon::QuoteLispObjToString $package]
 
         #set level [GetDebuggerLevel]
-        foreach {isok code} [LameAskForLispExpression $MainWindow] break
+        foreach {isok code}                                      \
+            [LameAskForLispExpression $MainWindow                \
+                 "Eval in frame (shift-enter=new line)$package>" \
+                ] break
         if {$isok ne "ok"} {
             return
         }
+        puts ";;Eval in frame $FrameNo:"
+        puts ";;$package> $code"
         set qCode [::tkcon::QuoteLispObjToString $code]
         set thread [GetDebuggerThreadId]
+        if {$PrettyPrint} {
+            set LispFn "swank:pprint-eval-string-in-frame"
+        } else {
+            set LispFn "swank:eval-string-in-frame"
+        }
         ::tkcon::EvalInSwankAsync \
-            "(swank:eval-string-in-frame $qCode $FrameNo $qPackage)" \
-            {puts stderr $EventAsList} $thread
+            "($LispFn $qCode $FrameNo $qPackage)" \
+            {::ldbg::EvalInFrameC2 $EventAsList} $thread
+    }
+        
+
+    proc EvalInFrameC2 {EventAsList} {
+        set result [::mprs::ParseReturnOk $EventAsList]
+        ::tkcon::FocusConsole
+        puts $result
     }
     
 
