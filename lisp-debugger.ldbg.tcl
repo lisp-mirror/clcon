@@ -313,6 +313,9 @@ namespace eval ::ldbg {
             RowDblClick {
                 RowDblClick $tbl $RowName
             }
+            ReturnFromFrame {
+                ReturnFromFrame $RowName
+            }
             default {
                 error "Unknown CellCmd"
             }
@@ -402,6 +405,8 @@ namespace eval ::ldbg {
         #
         set cmd "::ldbg::InspectCurrentCondition"
         $m add command -label "1.Inspect current condition" -underline 0 -command $cmd
+        set cmd "::ldbg::CellCmdForActiveCell $tbl ReturnFromFrame"
+        $m add command -label "2.Return from frame" -underline 0 -command $cmd
     }
     
     proc MakeMainWindowEditMenu {w menu} {
@@ -557,6 +562,23 @@ namespace eval ::ldbg {
     #(:abort "nil")
     # 21)
     # (:debug-return 2 1 nil)
+
+    proc ReturnFromFrame {RowName} {
+        variable MainWindow
+        set FrameNo [RowNameToFrameNo $RowName]
+        #set level [GetDebuggerLevel]
+        set thread [GetDebuggerThreadId]
+        foreach {isok code} [LameAskForLispExpression $MainWindow] break
+        if {$isok ne "ok"} {
+            return
+        }
+        set qCode [::tkcon::QuoteLispObjToString $code]
+        ::tkcon::EvalInSwankAsync \
+            "(swank:sldb-return-from-frame $FrameNo $qCode)" \
+            {} $thread
+        after idle [list destroy $MainWindow]
+    }
+        
 
     proc InvokeRestart {i} {
         variable DebugEvent

@@ -47,6 +47,9 @@ proc powin {w relativeTo} {
 
 # This is very minimalistic feature, but it is good as it
 # does not bother swank server. This is essential at debug time.
+# Returns list of two elements:
+# First element is "ok" or "cancel".
+# Second is a line entered (if result is "ok")
 proc LameAskForLispExpression {parent} {
     global LameAskForLispExpressionReply
     set ou [string cat $parent .ask_for_lisp_expression]
@@ -67,8 +70,14 @@ proc LameAskForLispExpression {parent} {
     wm transient $ou $parent
 
     grab $ou
+    focus $text
+    
     vwait LameAskForLispExpressionReply
-    set result [$text get 1.0 end]
+    if {$LameAskForLispExpressionReply eq "ok"} {
+        set result [list $LameAskForLispExpressionReply [$text get 1.0 end]]
+    } else {
+        set result [list $LameAskForLispExpressionReply]
+    }
     destroy $ou
     return $result
 }
