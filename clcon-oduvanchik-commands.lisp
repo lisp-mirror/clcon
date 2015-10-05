@@ -5,12 +5,24 @@
 ;; Прежде всего, надо подумать, как лучше организовать работу.
 ;; Вообще и для поиска определений в частнотси.
 
-(oduvanchik::defcommand "Find Source" (p)
-    ""
+(defcommand "Find Source" (p)
+    "Find source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
     ""
   (let* ((s (symbol-string-at-point))
          (code (clco::server-lookup-definition s)))
     code))
+
+
+(defcommand "Sync Cursor" (p)
+    "Debug-time command to sync cursor. There were no need to make it a command"
+    "Does nothing but printing current cursor position. The rely upon the fact that clco::call-oduvanchik-function-with-clcon_text syncs cursor of backend buffer with that of clcon_text"
+  (multiple-value-bind (row col)
+      (oi::mark-row-and-col (current-point))
+    (clco:eval-in-tcl
+     (format nil "puts {Oduvan: ~D.~D}" row col)
+     :nowait nil
+     )
+    ))
 
 (defun encode-marks-for-line (line stream &key line-number)
   "{linenumber {charpos0 font0} {charpos1 font1} ...} 
@@ -42,7 +54,7 @@
     ))
 
 (defun numbered-line-of-buffer-by-clcon (clcon_text number)
-  "Number starts from 1. See also "
+  "Number starts from 1. See also oi::mark-row-and-col"
   (let* ((first-line 
           (slot-value
            (slot-value

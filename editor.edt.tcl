@@ -522,7 +522,7 @@ namespace eval ::edt {
         $m add command -label "Check Oduvanchik Sync" -accel "F8" -command $cmd
         bind $w <F8> $cmd
 
-        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text "nop"]]
+        set cmd [wesppt [list ::edt::SyncCursor $text]]
         $m add command -label "Sync cursor" -accel "F9" -command $cmd
         bind $w <F9> $cmd
 
@@ -542,7 +542,11 @@ namespace eval ::edt {
         }
     }
 
-
+    proc SyncCursor {text} {
+        puts "Text Index Insert = [$text index insert]"
+        clcon_text::CallOduvanchikFunction $text "sync-cursor-command"
+    }
+    
     proc EnsureEditorWindow {tw} {
         if {![winfo exists $tw]} {
             toplevel $tw
