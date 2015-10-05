@@ -34,7 +34,7 @@
 
 package require Tk
 package require snit
-package require ctext
+# package require ctext
 
 # FIXME some options might be buffer-related, not text-related.
 namespace eval ::clcon_text {
@@ -63,7 +63,7 @@ namespace eval ::clcon_text {
         option -private_pending_far_tcl_continuations 0
         option -opened_file {}
         constructor {args} {
-            installhull using ctext
+            installhull using btext
             $self configure -opened_file [opened_file $self.opened_file]
             # Apply any options passed at creation time.
             $self configurelist $args
