@@ -73,9 +73,9 @@ namespace eval ::erbr {
     # Otherwise, issue a warning and stay in the message list
     proc JumpToCurrentLocation {tbl} {
         variable data
-        set rowName [$tbl rowcget anchor -name]
+        set rowName [$tbl rowcget active -name]
         set dataItem [dict get $data $rowName]
-        JumpToLocation $tbl $dataItem
+        JumpToLocation [$tbl bodypath] $dataItem
     }
     
     # Insert text from index into detail window, and raise it
@@ -113,7 +113,7 @@ namespace eval ::erbr {
         } else {
             after idle [subst -nocommands {
                 ::erbr::DoGoToTop $TitleListWindow
-                focus $tbl
+                focus [$tbl bodypath]
             } 
                        ]
         }
@@ -208,7 +208,7 @@ namespace eval ::erbr {
         variable TitleListWindow
         if {[winfo exists $TitleListWindow]} {
             set tbl $TitleListWindow.tf.tbl
-            set anc [$tbl index anchor]
+            set anc [$tbl index active]
             set wantedAnc [expr {$anc + $increment}]
             if {$wantedAnc < 0} {
                 bell
@@ -326,7 +326,7 @@ namespace eval ::erbr {
 
         DoGoToTop $w
         
-        focus $tbl
+        focus [$tbl bodypath]
 
         # after 100 {::erbr::AppendData "error 1" {
         #     $w RoInsert 1.0 "wow";
@@ -341,6 +341,7 @@ namespace eval ::erbr {
         
     }
 
+    # Raises toplevel window
     proc DoGoToTop {w} {
         wm deiconify $w
         raise $w
@@ -376,7 +377,7 @@ namespace eval ::erbr {
     # How do we transform severity to number? -sortmode , -sortcommand for column
     proc DefaultSortHeaders {tbl} {
         $tbl sortbycolumnlist {1 0} {decreasing increasing}
-        $tbl see anchor
+        $tbl see active
     }
     
     # Fills browser from data 
