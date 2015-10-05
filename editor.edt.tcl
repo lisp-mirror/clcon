@@ -627,10 +627,10 @@ namespace eval ::edt {
         wm deiconify $tw
 
         # this is for ctext
-        # focus $w.text.t 
+        focus $w.text.t 
 
         # this is for text
-        focus $w.text
+        # focus $w.text
         
         UpdateMRUAndBufferList $tw
     }

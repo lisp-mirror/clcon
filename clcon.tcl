@@ -869,7 +869,7 @@ proc ::tkcon::InitTab {w} {
 
     # text console
     set con $w.tab[incr PRIV(uid)]
-    ::clcon_text::clcon_text $con -wrap char -foreground $COLOR(stdin) \
+    text $con -wrap char -foreground $COLOR(stdin) \
 	-insertbackground $COLOR(cursor) -borderwidth 1 -highlightthickness 0
     $con mark set output 1.0
     $con mark set limit 1.0

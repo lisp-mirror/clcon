@@ -34,7 +34,7 @@
 
 package require Tk
 package require snit
-
+package require ctext
 
 # FIXME some options might be buffer-related, not text-related.
 namespace eval ::clcon_text {
@@ -63,7 +63,7 @@ namespace eval ::clcon_text {
         option -private_pending_far_tcl_continuations 0
         option -opened_file {}
         constructor {args} {
-            installhull using text
+            installhull using ctext
             $self configure -opened_file [opened_file $self.opened_file]
             # Apply any options passed at creation time.
             $self configurelist $args
@@ -199,7 +199,11 @@ namespace eval ::clcon_text {
         return $j
     }
     
-    
+
+    # ::clcon_text::MaybeSendToLisp
+    # Sends to lisp an event reflecting changes in text widget, or requesting
+    # to eval code on oduvanchik's side, or requesting to construct or destroy
+    # backend buffer.
     # Args
     # clcon_text - pathname of clcon_text widget
     # type - type of event, "i", "d", "ConstructBackendBuffer", "DestroyBackendBuffer"
