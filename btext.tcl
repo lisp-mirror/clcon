@@ -241,6 +241,9 @@ proc btext::buildArgParseTable win {
 }
 
 proc btext::commentsAfterIdle {win} {
+
+    return 
+
     btext::getAr $win config configAr
 
     if {"" eq $configAr(commentsAfterId)} {
@@ -250,6 +253,9 @@ proc btext::commentsAfterIdle {win} {
 }
 
 proc btext::highlightAfterIdle {win lineStart lineEnd} {
+
+    return 
+
     btext::getAr $win config configAr
 
     if {"" eq $configAr(highlightAfterId)} {
@@ -371,17 +377,17 @@ proc btext::instanceCmd {self cmd args} {
 		set removeStart $lineStart
 		set removeEnd $lineEnd
 
-		foreach tag [$self._t tag names] {
-		    if {[string equal $tag "_cComment"] != 1} {
-			$self._t tag remove $tag $removeStart $removeEnd
-		    }
-		}
+		# foreach tag [$self._t tag names] {
+		#     if {[string equal $tag "_cComment"] != 1} {
+		# 	$self._t tag remove $tag $removeStart $removeEnd
+		#     }
+		# }
 
-		set checkStr "$prevChar[set char]"
+		# set checkStr "$prevChar[set char]"
 
-		if {[regexp $commentRE $checkStr]} {
-		    btext::commentsAfterIdle $self
-		}
+		# if {[regexp $commentRE $checkStr]} {
+		#     btext::commentsAfterIdle $self
+		# }
 
 		btext::highlightAfterIdle $self $lineStart $lineEnd
 		btext::linemapUpdate $self
@@ -392,21 +398,21 @@ proc btext::instanceCmd {self cmd args} {
 
 		set data [$self._t get $deleteStartPos $deleteEndPos]
 
-		set lineStart [$self._t index "$deleteStartPos linestart"]
-		set lineEnd [$self._t index "$deleteEndPos + 1 chars lineend"]
-		eval \$self._t delete $args
+		# set lineStart [$self._t index "$deleteStartPos linestart"]
+		# set lineEnd [$self._t index "$deleteEndPos + 1 chars lineend"]
+		# eval \$self._t delete $args
 
-		foreach tag [$self._t tag names] {
-		    if {[string equal $tag "_cComment"] != 1} {
-			$self._t tag remove $tag $lineStart $lineEnd
-		    }
-		}
+		# foreach tag [$self._t tag names] {
+		#     if {[string equal $tag "_cComment"] != 1} {
+		# 	$self._t tag remove $tag $lineStart $lineEnd
+		#     }
+		# }
 
-		if {[regexp $commentRE $data]} {
-		    btext::commentsAfterIdle $self
-		}
+		# if {[regexp $commentRE $data]} {
+		#     btext::commentsAfterIdle $self
+		# }
 
-		btext::highlightAfterIdle $self $lineStart $lineEnd
+		# btext::highlightAfterIdle $self $lineStart $lineEnd
 		if {[string first "\n" $data] >= 0} {
 		    btext::linemapUpdate $self
 		}
@@ -429,8 +435,8 @@ proc btext::instanceCmd {self cmd args} {
 	}
 
 	highlight {
-	    btext::highlight $self [lindex $args 0] [lindex $args 1]
-	    btext::comments $self
+	    #btext::highlight $self [lindex $args 0] [lindex $args 1]
+	    #btext::comments $self
 	}
 
 	insert {
@@ -446,46 +452,46 @@ proc btext::instanceCmd {self cmd args} {
 	    set data [lindex $args 1]
 	    eval \$self._t insert $args
 
-	    set nextSpace [btext::findNextSpace $self._t insert]
-	    set lineEnd [$self._t index "insert lineend"]
+	    # set nextSpace [btext::findNextSpace $self._t insert]
+	    # set lineEnd [$self._t index "insert lineend"]
 
-	    if {[$self._t compare $prevSpace < $lineStart]} {
-		set prevSpace $lineStart
-	    }
+	    # if {[$self._t compare $prevSpace < $lineStart]} {
+	    #     set prevSpace $lineStart
+	    # }
 
-	    if {[$self._t compare $nextSpace > $lineEnd]} {
-		set nextSpace $lineEnd
-	    }
+	    # if {[$self._t compare $nextSpace > $lineEnd]} {
+	    #     set nextSpace $lineEnd
+	    # }
 
-	    foreach tag [$self._t tag names] {
-		if {[string equal $tag "_cComment"] != 1} {
-		    $self._t tag remove $tag $prevSpace $nextSpace
-		}
-	    }
+	    # foreach tag [$self._t tag names] {
+	    #     if {[string equal $tag "_cComment"] != 1} {
+	    #         $self._t tag remove $tag $prevSpace $nextSpace
+	    #     }
+	    # }
 
-	    set REData $prevChar
-	    append REData $data
-	    append REData $nextChar
-	    if {[regexp $commentRE $REData]} {
-		btext::commentsAfterIdle $self
-	    }
+	    # set REData $prevChar
+	    # append REData $data
+	    # append REData $nextChar
+	    # if {[regexp $commentRE $REData]} {
+	    #     btext::commentsAfterIdle $self
+	    # }
 
-	    btext::highlightAfterIdle $self $lineStart $lineEnd
+	    # btext::highlightAfterIdle $self $lineStart $lineEnd
 
-	    switch -- $data {
-		"\}" {
-		    btext::matchPair $self "\\\{" "\\\}" "\\"
-		}
-		"\]" {
-		    btext::matchPair $self "\\\[" "\\\]" "\\"
-		}
-		"\)" {
-		    btext::matchPair $self "\\(" "\\)" ""
-		}
-		"\"" {
-		    btext::matchQuote $self
-		}
-	    }
+	    # switch -- $data {
+	    #     "\}" {
+	    #         btext::matchPair $self "\\\{" "\\\}" "\\"
+	    #     }
+	    #     "\]" {
+	    #         btext::matchPair $self "\\\[" "\\\]" "\\"
+	    #     }
+	    #     "\)" {
+	    #         btext::matchPair $self "\\(" "\\)" ""
+	    #     }
+	    #     "\"" {
+	    #         btext::matchQuote $self
+	    #     }
+	    # }
 	    btext::modified $self 1
 	    btext::linemapUpdate $self
 	}
