@@ -200,7 +200,7 @@ namespace eval ::erbr {
         if {$ShowSource} {
             set rowName [$tbl rowcget $wantedAnc -name]
             set dataItem [dict get $data $rowName]
-            after idle [list ::erbr::JumpToLocation $tbl $dataItem]
+            after idle [list ::erbr::JumpToLocation [$tbl bodypath] $dataItem]
         }
     }
     
