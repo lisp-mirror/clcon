@@ -212,27 +212,16 @@ namespace eval ::clcon_text {
     # (destroy event in fact)
     proc MaybeSendToLisp {clcon_text type arglist {far_tcl_continuation_body {}} {UseGlobalPendingText2OduEventCounter 0}} {
         variable ::tkcon::OPT
-
-        # Culprit: error occurs when we call this from the destructor.
-        # FIXME what's the right way to do that? 
-        set errorCode [catch {$clcon_text cget -send_to_lisp} SendToLispOption]
-        if {$errorCode != 0} {
-            # Assume we must send.
-            puts stderr "Error '$errorCode' in destructor getting -send_to_lisp option of $clcon_text - assume 1"
-            set SendToLispOption 1
-        }
-
-        
-        if {!$SendToLispOption
-            ||
-            !$::tkcon::OPT(oduvan-backend) } {
+        if {!$::tkcon::OPT(oduvan-backend) } {
             return
         }
         # This is a temporary solution. This is a separate option indeed
         set qId [lq $clcon_text]
         switch -exact $type {
             i {
-                if {[$clcon_text cget -private_freezed]} {
+                if {[$clcon_text cget -private_freezed]
+                    ||
+                    ![$clcon_text cget -send_to_lisp] } {
                     return
                 }
                 set index [lindex $arglist 0]
@@ -241,7 +230,9 @@ namespace eval ::clcon_text {
                 set lispCmd "(clco:nti $qId $qIndex $qText)"
             }
             d {
-                if {[$clcon_text cget -private_freezed]} {
+                if {[$clcon_text cget -private_freezed]
+                    ||
+                    ![$clcon_text cget -send_to_lisp] } {
                     return
                 }
                 set b [lindex $arglist 0]
@@ -257,6 +248,10 @@ namespace eval ::clcon_text {
                 set lispCmd "(clco:notify-oduvan-destroy-backend-buffer $qId)"
             }
             CallOduvanchikFunction {
+                if {![$clcon_text cget -send_to_lisp] } {
+                    return
+                }
+                
                 set qB [::text2odu::CoerceIndex $clcon_text insert]
                 set qText [lq [lindex $arglist 0]]
 
