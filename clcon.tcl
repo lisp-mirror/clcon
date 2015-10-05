@@ -2075,7 +2075,7 @@ proc ::tkcon::OpenForEdit { {fn ""} } {
 	([catch {tk_getOpenFile -filetypes $types \
 		     -title "Source File"} fn] || $fn eq "")
     } { return }
-    ::edt::edit $fn
+    ::edt::edit -type file -wrap char -- $fn
     return $fn
 }
 

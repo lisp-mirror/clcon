@@ -39,7 +39,7 @@ namespace eval clconcmd {
     }
 
     proc ed {filename} {
-        ::edt::edit -type file $filename
+        ::edt::edit -type file -wrap char -- $filename
     }
 }
     
