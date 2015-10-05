@@ -322,6 +322,9 @@ namespace eval ::ldbg {
             EvalInFramePrettyPrint {
                 EvalInFramePrettyPrint $RowName
             }
+            #SwitchToNativeDebugger {
+            #    SwitchToNativeDebugger $RowName
+            #}    
             default {
                 error "Unknown CellCmd"
             }
@@ -658,7 +661,22 @@ namespace eval ::ldbg {
         ::tkcon::FocusConsole
         puts $result
     }
-    
+
+    # Does not work in SLIME for me. No sence to port. 
+    #(:emacs-rex
+    # (swank:sldb-break-with-default-debugger nil)
+    # nil 20 163)
+    #(:return
+    # (:abort "#<swank::invoke-default-debugger {E0CE4F1}>")
+    # 163)
+    #(:debug-return 20 1 nil)
+    #(:write-string "\n\ndebugger invoked on a DIVISION-BY-ZERO in thread\n#<THREAD \"new-repl-thread\" RUNNING {B90CE61}>:\n  arithmetic error DIVISION-BY-ZERO signalled\nOperation was SB-KERNEL::DIVISION, operands (1 0).\n")
+
+    #proc SwitchToNativeDebugger {i} {
+    #    set thread [GetDebuggerThreadId]
+    #    ::tkcon::EvalInSwankAsync "(swank:sldb-break-with-default-debugger nil)" {} $thread
+    #        after idle [list destroy $MainWindow]
+    #}
 
     proc InvokeRestart {i} {
         variable DebugEvent

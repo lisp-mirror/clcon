@@ -246,3 +246,7 @@ utf-8
 -----
 swank::asciify
 swank/backend:utf8-to-string
+
+sldb-break-with-default-debugger
+-----
+У меня не работает в обычном SLIME - нет смысла переносить. 
