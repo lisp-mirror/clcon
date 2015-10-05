@@ -360,11 +360,6 @@ proc btext::instanceCmd {self cmd args} {
 	    btext::linemapUpdate $self
 	}
 
-        paste {
-	    tk_textPaste $self
-	    btext::modified $self 1
-	}
-
 	edit {
 	    set subCmd [lindex $args 0]
 	    set argsLength [llength $args]
