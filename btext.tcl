@@ -102,7 +102,6 @@ proc btext {win args} {
 
     # If the user wants C comments they should call
     # btext::enableComments
-    btext::disableComments $win
     btext::modified $win 0
     btext::buildArgParseTable $win
 
@@ -131,7 +130,6 @@ proc btext::event:Destroy {win dWin} {
 
     catch {rename $win {}}
     interp alias {} $win.t {}
-    btext::clearHighlightClasses $win
     array unset [btext::getAr $win config ar]
 }
 
@@ -240,30 +238,6 @@ proc btext::buildArgParseTable win {
     set ar(argTable) $argTable
 }
 
-proc btext::commentsAfterIdle {win} {
-
-    return 
-
-    btext::getAr $win config configAr
-
-    if {"" eq $configAr(commentsAfterId)} {
-	set configAr(commentsAfterId) [after idle \
-	   [list btext::comments $win [set afterTriggered 1]]]
-    }
-}
-
-proc btext::highlightAfterIdle {win lineStart lineEnd} {
-
-    return 
-
-    btext::getAr $win config configAr
-
-    if {"" eq $configAr(highlightAfterId)} {
-	set configAr(highlightAfterId) [after idle \
-	    [list btext::highlight $win $lineStart $lineEnd [set afterTriggered 1]]]
-    }
-}
-
 proc btext::instanceCmd {self cmd args} {
     #slightly different than the RE used in btext::comments
     set commentRE {\"|\\|'|/|\*}
@@ -365,31 +339,9 @@ proc btext::instanceCmd {self cmd args} {
 		set lineStart [$self._t index "$deletePos linestart"]
 		set lineEnd [$self._t index "$deletePos + 1 chars lineend"]
 
-		#This pattern was used in 3.1.  We may want to investigate using it again
-		#eventually to reduce flicker.  It caused a bug with some patterns.
-		#if {[string equal $prevChar "#"] || [string equal $char "#"]} {
-		#	set removeStart $lineStart
-		#	set removeEnd $lineEnd
-		#} else {
-		#	set removeStart $prevSpace
-		#	set removeEnd $nextSpace
-		#}
 		set removeStart $lineStart
 		set removeEnd $lineEnd
 
-		# foreach tag [$self._t tag names] {
-		#     if {[string equal $tag "_cComment"] != 1} {
-		# 	$self._t tag remove $tag $removeStart $removeEnd
-		#     }
-		# }
-
-		# set checkStr "$prevChar[set char]"
-
-		# if {[regexp $commentRE $checkStr]} {
-		#     btext::commentsAfterIdle $self
-		# }
-
-		btext::highlightAfterIdle $self $lineStart $lineEnd
 		btext::linemapUpdate $self
 	    } elseif {$argsLength == 2} {
 		#now deal with delete n.n ?n.n?
@@ -398,21 +350,6 @@ proc btext::instanceCmd {self cmd args} {
 
 		set data [$self._t get $deleteStartPos $deleteEndPos]
 
-		# set lineStart [$self._t index "$deleteStartPos linestart"]
-		# set lineEnd [$self._t index "$deleteEndPos + 1 chars lineend"]
-		# eval \$self._t delete $args
-
-		# foreach tag [$self._t tag names] {
-		#     if {[string equal $tag "_cComment"] != 1} {
-		# 	$self._t tag remove $tag $lineStart $lineEnd
-		#     }
-		# }
-
-		# if {[regexp $commentRE $data]} {
-		#     btext::commentsAfterIdle $self
-		# }
-
-		# btext::highlightAfterIdle $self $lineStart $lineEnd
 		if {[string first "\n" $data] >= 0} {
 		    btext::linemapUpdate $self
 		}
@@ -434,11 +371,6 @@ proc btext::instanceCmd {self cmd args} {
 	    btext::linemapUpdate $self
 	}
 
-	highlight {
-	    #btext::highlight $self [lindex $args 0] [lindex $args 1]
-	    #btext::comments $self
-	}
-
 	insert {
 	    if {[llength $args] < 2} {
 		return -code error "please use at least 2 arguments to $self insert"
@@ -452,46 +384,6 @@ proc btext::instanceCmd {self cmd args} {
 	    set data [lindex $args 1]
 	    eval \$self._t insert $args
 
-	    # set nextSpace [btext::findNextSpace $self._t insert]
-	    # set lineEnd [$self._t index "insert lineend"]
-
-	    # if {[$self._t compare $prevSpace < $lineStart]} {
-	    #     set prevSpace $lineStart
-	    # }
-
-	    # if {[$self._t compare $nextSpace > $lineEnd]} {
-	    #     set nextSpace $lineEnd
-	    # }
-
-	    # foreach tag [$self._t tag names] {
-	    #     if {[string equal $tag "_cComment"] != 1} {
-	    #         $self._t tag remove $tag $prevSpace $nextSpace
-	    #     }
-	    # }
-
-	    # set REData $prevChar
-	    # append REData $data
-	    # append REData $nextChar
-	    # if {[regexp $commentRE $REData]} {
-	    #     btext::commentsAfterIdle $self
-	    # }
-
-	    # btext::highlightAfterIdle $self $lineStart $lineEnd
-
-	    # switch -- $data {
-	    #     "\}" {
-	    #         btext::matchPair $self "\\\{" "\\\}" "\\"
-	    #     }
-	    #     "\]" {
-	    #         btext::matchPair $self "\\\[" "\\\]" "\\"
-	    #     }
-	    #     "\)" {
-	    #         btext::matchPair $self "\\(" "\\)" ""
-	    #     }
-	    #     "\"" {
-	    #         btext::matchQuote $self
-	    #     }
-	    # }
 	    btext::modified $self 1
 	    btext::linemapUpdate $self
 	}
@@ -647,152 +539,6 @@ proc btext::matchQuote {win} {
     btext::tag:blink $win 0
 }
 
-proc btext::enableComments {win} {
-    $win tag configure _cComment -foreground khaki
-}
-proc btext::disableComments {win} {
-    catch {$win tag delete _cComment}
-}
-
-proc btext::comments {win {afterTriggered 0}} {
-    if {[catch {$win tag cget _cComment -foreground}]} {
-	#C comments are disabled
-	return
-    }
-
-    if {$afterTriggered} {
-	btext::getAr $win config configAr
-	set configAr(commentsAfterId) ""
-    }
-
-    set startIndex 1.0
-    set commentRE {\\\\|\"|\\\"|\\'|'|/\*|\*/}
-    set commentStart 0
-    set isQuote 0
-    set isSingleQuote 0
-    set isComment 0
-    $win tag remove _cComment 1.0 end
-    while 1 {
-	set index [$win search -count length -regexp $commentRE $startIndex end]
-
-	if {$index == ""} {
-	    break
-	}
-
-	set endIndex [$win index "$index + $length chars"]
-	set str [$win get $index $endIndex]
-	set startIndex $endIndex
-
-	if {$str == "\\\\"} {
-	    continue
-	} elseif {$str == "\\\""} {
-	    continue
-	} elseif {$str == "\\'"} {
-	    continue
-	} elseif {$str == "\"" && $isComment == 0 && $isSingleQuote == 0} {
-	    if {$isQuote} {
-		set isQuote 0
-	    } else {
-		set isQuote 1
-	    }
-	} elseif {$str == "'" && $isComment == 0 && $isQuote == 0} {
-	    if {$isSingleQuote} {
-		set isSingleQuote 0
-	    } else {
-		set isSingleQuote 1
-	    }
-	} elseif {$str == "/*" && $isQuote == 0 && $isSingleQuote == 0} {
-	    if {$isComment} {
-		#comment in comment
-		break
-	    } else {
-		set isComment 1
-		set commentStart $index
-	    }
-	} elseif {$str == "*/" && $isQuote == 0 && $isSingleQuote == 0} {
-	    if {$isComment} {
-		set isComment 0
-		$win tag add _cComment $commentStart $endIndex
-		$win tag raise _cComment
-	    } else {
-		#comment end without beginning
-		break
-	    }
-	}
-    }
-}
-
-proc btext::addHighlightClass {win class color keywords} {
-    set ref [btext::getAr $win highlight ar]
-    foreach word $keywords {
-	set ar($word) [list $class $color]
-    }
-    $win tag configure $class
-
-    btext::getAr $win classes classesAr
-    set classesAr($class) [list $ref $keywords]
-}
-
-#For [ ] { } # etc.
-proc btext::addHighlightClassForSpecialChars {win class color chars} {
-    set charList [split $chars ""]
-
-    set ref [btext::getAr $win highlightSpecialChars ar]
-    foreach char $charList {
-	set ar($char) [list $class $color]
-    }
-    $win tag configure $class
-
-    btext::getAr $win classes classesAr
-    set classesAr($class) [list $ref $charList]
-}
-
-proc btext::addHighlightClassForRegexp {win class color re} {
-    set ref [btext::getAr $win highlightRegexp ar]
-
-    set ar($class) [list $re $color]
-    $win tag configure $class
-
-    btext::getAr $win classes classesAr
-    set classesAr($class) [list $ref $class]
-}
-
-#For things like $blah
-proc btext::addHighlightClassWithOnlyCharStart {win class color char} {
-    set ref [btext::getAr $win highlightCharStart ar]
-
-    set ar($char) [list $class $color]
-    $win tag configure $class
-
-    btext::getAr $win classes classesAr
-    set classesAr($class) [list $ref $char]
-}
-
-proc btext::deleteHighlightClass {win classToDelete} {
-    btext::getAr $win classes classesAr
-
-    if {![info exists classesAr($classToDelete)]} {
-	return -code error "$classToDelete doesn't exist"
-    }
-
-    foreach {ref keyList} [set classesAr($classToDelete)] {
-	upvar #0 $ref refAr
-	foreach key $keyList {
-	    if {![info exists refAr($key)]} {
-		continue
-	    }
-	    unset refAr($key)
-	}
-    }
-    unset classesAr($classToDelete)
-}
-
-proc btext::getHighlightClasses win {
-    btext::getAr $win classes classesAr
-
-    array names classesAr
-}
-
 proc btext::findNextChar {win index char} {
     set i [$win index "$index + 1 chars"]
     set lineend [$win index "$i lineend"]
@@ -851,135 +597,6 @@ proc btext::findPreviousSpace {win index} {
 	set i [$win index "$i - 1 chars"]
     }
     return $i
-}
-
-proc btext::clearHighlightClasses {win} {
-    #no need to catch, because array unset doesn't complain
-    #puts [array exists ::btext::highlight$win]
-
-    btext::getAr $win highlight ar
-    array unset ar
-
-    btext::getAr $win highlightSpecialChars ar
-    array unset ar
-
-    btext::getAr $win highlightRegexp ar
-    array unset ar
-
-    btext::getAr $win highlightCharStart ar
-    array unset ar
-
-    btext::getAr $win classes ar
-    array unset ar
-}
-
-#This is a proc designed to be overwritten by the user.
-#It can be used to update a cursor or animation while
-#the text is being highlighted.
-proc btext::update {} {
-
-}
-
-proc btext::highlight {win start end {afterTriggered 0}} {
-    btext::getAr $win config configAr
-
-    if {$afterTriggered} {
-	set configAr(highlightAfterId) ""
-    }
-
-    if {!$configAr(-highlight)} {
-	return
-    }
-
-    set si $start
-    set twin "$win._t"
-
-    #The number of times the loop has run.
-    set numTimesLooped 0
-    set numUntilUpdate 600
-
-    btext::getAr $win highlight highlightAr
-    btext::getAr $win highlightSpecialChars highlightSpecialCharsAr
-    btext::getAr $win highlightRegexp highlightRegexpAr
-    btext::getAr $win highlightCharStart highlightCharStartAr
-
-    while 1 {
-	set res [$twin search -count length -regexp -- {([^\s\(\{\[\}\]\)\.\t\n\r;\"'\|,]+)} $si $end]
-	if {$res == ""} {
-	    break
-	}
-
-	set wordEnd [$twin index "$res + $length chars"]
-	set word [$twin get $res $wordEnd]
-	set firstOfWord [string index $word 0]
-
-	if {[info exists highlightAr($word)] == 1} {
-	    set wordAttributes [set highlightAr($word)]
-	    foreach {tagClass color} $wordAttributes break
-
-	    $twin tag add $tagClass $res $wordEnd
-	    $twin tag configure $tagClass -foreground $color
-
-	} elseif {[info exists highlightCharStartAr($firstOfWord)] == 1} {
-	    set wordAttributes [set highlightCharStartAr($firstOfWord)]
-	    foreach {tagClass color} $wordAttributes break
-
-	    $twin tag add $tagClass $res $wordEnd
-	    $twin tag configure $tagClass -foreground $color
-	}
-	set si $wordEnd
-
-	incr numTimesLooped
-	if {$numTimesLooped >= $numUntilUpdate} {
-	    btext::update
-	    set numTimesLooped 0
-	}
-    }
-
-    foreach {ichar tagInfo} [array get highlightSpecialCharsAr] {
-	set si $start
-	foreach {tagClass color} $tagInfo break
-
-	while 1 {
-	    set res [$twin search -- $ichar $si $end]
-	    if {"" == $res} {
-		break
-	    }
-	    set wordEnd [$twin index "$res + 1 chars"]
-
-	    $twin tag add $tagClass $res $wordEnd
-	    $twin tag configure $tagClass -foreground $color
-	    set si $wordEnd
-
-	    incr numTimesLooped
-	    if {$numTimesLooped >= $numUntilUpdate} {
-		btext::update
-		set numTimesLooped 0
-	    }
-	}
-    }
-
-    foreach {tagClass tagInfo} [array get highlightRegexpAr] {
-	set si $start
-	foreach {re color} $tagInfo break
-	while 1 {
-	    set res [$twin search -count length -regexp -- $re $si $end]
-	    if {"" == $res} {
-		break
-	    }
-
-	    set wordEnd [$twin index "$res + $length chars"]
-	    $twin tag add $tagClass $res $wordEnd
-	    $twin tag configure $tagClass -foreground $color
-	    set si $wordEnd
-
-	    incr numTimesLooped
-	    if {$numTimesLooped >= $numUntilUpdate} {
-		btext::update
-		set numTimesLooped 0
-	    }
-	}
-    }
 }
 
 proc btext::linemapToggleMark {win y} {
