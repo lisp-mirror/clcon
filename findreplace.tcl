@@ -174,7 +174,7 @@ namespace eval ::fndrpl {
                     set leng [string length $SearchString]
                     set SearchPos [ $text search $caset -$SearchDir -- $SearchString $SearchPos $limit]
                     if {$SearchPos != ""} {
-                        set sta "[lindex [split $SearchPos "."] 0].0"
+                        set sta "[lindex [split $SearchPos {.}] 0].0"
 
                         set str [list [string trim [$text get $sta "$sta+1 line"] "\n" ] ]
                         set greps "$greps $current_window $sta {$str} "
