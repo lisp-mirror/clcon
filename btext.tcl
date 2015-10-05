@@ -354,7 +354,7 @@ proc btext::instanceCmd {self cmd args} {
 	    btext::modified $self 1
 	}
 
-	fastinsert {
+	insert {
 	    eval \$self._t insert $args
 	    btext::modified $self 1
 	    btext::linemapUpdate $self
