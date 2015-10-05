@@ -148,6 +148,7 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
     TkconSourceHere util.tcl
     TkconSourceHere gui_util.tcl
     TkconSourceHere text2odu.tcl
+    TkconSourceHere btext.tcl
     TkconSourceHere clcon_text.tcl
     TkconSourceHere swank-connection.swcnn.tcl
     TkconSourceHere swank-io.tcl
