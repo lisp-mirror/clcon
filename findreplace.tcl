@@ -172,7 +172,7 @@ namespace eval ::fndrpl {
                 while {$found==1} {
 
                     set leng [string length $SearchString]
-                    set SearchPos [ $text search $caset -$SearchDir $SearchString $SearchPos $limit]
+                    set SearchPos [ $text search $caset -$SearchDir -- $SearchString $SearchPos $limit]
                     if {$SearchPos != ""} {
                         set sta "[lindex [split $SearchPos "."] 0].0"
 
@@ -249,7 +249,8 @@ namespace eval ::fndrpl {
             }
 
             set leng [string length $SearchString]
-            set SearchPos [ $text search $caset -$SearchDir $SearchString $SearchPos $limit]
+
+            set SearchPos [ $text search $caset -$SearchDir -- $SearchString $SearchPos $limit]
 
             if {$SearchPos != ""} {
                 $text see $SearchPos
@@ -298,7 +299,7 @@ namespace eval ::fndrpl {
         # set InternalWidget [RoTextGetInternalWidget $w]
         set InternalWidget $w
         while {[set ix [eval $InternalWidget search $opts -count numc -- \
-                            [list $str] findmark end]] ne ""} {
+                            $str findmark end]] ne ""} {
             $w tag add find $ix ${ix}+${numc}c
             $w mark set findmark ${ix}+1c
         }
@@ -359,7 +360,7 @@ namespace eval ::fndrpl {
         }
 
         set leng [string length $SearchString]
-        set SearchPos [ $text search $caset -$SearchDir $SearchString $SearchPos $limit]
+        set SearchPos [ $text search $caset -$SearchDir -- $SearchString $SearchPos $limit]
 
         if {$SearchPos != ""} {
             $text see $SearchPos
