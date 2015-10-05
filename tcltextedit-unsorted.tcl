@@ -22,11 +22,11 @@ proc c {args} {
 	} else { set result "Root --> $args"  }
 
 	# if {$debug_messages==2} Make putd-enabled allow for 2? 
-        if { 1 == 1 } {
+        if { 1 == 0 } {
             MaybeCreateLogger
             .logger.text insert end $result
             .logger.text see end
-	} else { puts stdout $result}
+	} else { putd $result}
 
     }
 }
