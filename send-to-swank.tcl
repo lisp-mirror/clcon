@@ -1,7 +1,7 @@
 ## Copyright (c) 2015 Denis Budyak
 ## MIT License
 ## Formatting and sending messages to SWANK
-
+## Reading from SWANK is in swank-io.tcl (e.g. ::tkcon::SwankReadMessageFromStream)
 
 namespace eval ::sts {
 }

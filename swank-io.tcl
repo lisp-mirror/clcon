@@ -366,13 +366,14 @@ proc ::tkcon::SwankReadMessageFromStream {stream} {
 
     set Length [SwankDecodeInteger $LengthString]
     set Buffer [read $stream $Length]
+    set DecodedString [encoding convertfrom utf-8 $Buffer]
 
     if {[eof $stream]} {
         EvalSocketClosed $stream
         return
     }
     
-    return $Buffer
+    return $DecodedString
 }
 
 ## from swank-protocol::read-message-string
