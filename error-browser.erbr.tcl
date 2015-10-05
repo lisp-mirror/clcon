@@ -107,9 +107,15 @@ namespace eval ::erbr {
         
         event generate $tv <<GoToTop>>
 
+	set tbl [GetTitleListMenuTbl $TitleListWindow]
         if {$AutoShowSource} {
-            set tbl [GetTitleListMenuTbl $TitleListWindow]
             JumpToLocation $tbl $item 
+        } else {
+            after idle [subst -nocommands {
+                ::erbr::DoGoToTop $TitleListWindow
+                focus $tbl
+            } 
+                       ]
         }
     }
 
@@ -370,6 +376,7 @@ namespace eval ::erbr {
     # How do we transform severity to number? -sortmode , -sortcommand for column
     proc DefaultSortHeaders {tbl} {
         $tbl sortbycolumnlist {1 0} {decreasing increasing}
+        $tbl see anchor
     }
     
     # Fills browser from data 
