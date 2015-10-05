@@ -331,24 +331,19 @@ proc btext::instanceCmd {self cmd args} {
 		set prevChar [$self._t get $deletePos]
 
 		$self._t delete $deletePos
-		set char [$self._t get $deletePos]
 
-		set prevSpace [btext::findPreviousSpace $self._t $deletePos]
-		set nextSpace [btext::findNextSpace $self._t $deletePos]
+                if {$prevChar eq "\n"} {
+                    btext::linemapUpdate $self
+                }
 
-		set lineStart [$self._t index "$deletePos linestart"]
-		set lineEnd [$self._t index "$deletePos + 1 chars lineend"]
-
-		set removeStart $lineStart
-		set removeEnd $lineEnd
-
-		btext::linemapUpdate $self
 	    } elseif {$argsLength == 2} {
 		#now deal with delete n.n ?n.n?
 		set deleteStartPos [lindex $args 0]
 		set deleteEndPos [lindex $args 1]
 
 		set data [$self._t get $deleteStartPos $deleteEndPos]
+
+                eval \$self._t delete $args
 
 		if {[string first "\n" $data] >= 0} {
 		    btext::linemapUpdate $self
@@ -359,36 +354,13 @@ proc btext::instanceCmd {self cmd args} {
 	    btext::modified $self 1
 	}
 
-	fastdelete {
-	    eval \$self._t delete $args
-	    btext::modified $self 1
-	    btext::linemapUpdate $self
-	}
-
 	fastinsert {
 	    eval \$self._t insert $args
 	    btext::modified $self 1
 	    btext::linemapUpdate $self
 	}
 
-	insert {
-	    if {[llength $args] < 2} {
-		return -code error "please use at least 2 arguments to $self insert"
-	    }
-
-	    set insertPos [lindex $args 0]
-	    set prevChar [$self._t get "$insertPos - 1 chars"]
-	    set nextChar [$self._t get $insertPos]
-	    set lineStart [$self._t index "$insertPos linestart"]
-	    set prevSpace [btext::findPreviousSpace $self._t ${insertPos}-1c]
-	    set data [lindex $args 1]
-	    eval \$self._t insert $args
-
-	    btext::modified $self 1
-	    btext::linemapUpdate $self
-	}
-
-	paste {
+        paste {
 	    tk_textPaste $self
 	    btext::modified $self 1
 	}
@@ -443,114 +415,6 @@ proc btext::tag:blink {win count {afterTriggered 0}} {
     if {"" eq $configAr(blinkAfterId)} {
 	set configAr(blinkAfterId) [after 50 \
 		[list btext::tag:blink $win $count [set afterTriggered 1]]]
-    }
-}
-
-proc btext::matchPair {win str1 str2 escape} {
-    set prevChar [$win get "insert - 2 chars"]
-
-    if {[string equal $prevChar $escape]} {
-	#The char that we thought might be the end is actually escaped.
-	return
-    }
-
-    set searchRE "[set str1]|[set str2]"
-    set count 1
-
-    set pos [$win index "insert - 1 chars"]
-    set endPair $pos
-    set lastFound ""
-    while 1 {
-	set found [$win search -backwards -regexp $searchRE $pos]
-
-	if {$found == "" || [$win compare $found > $pos]} {
-	    return
-	}
-
-	if {$lastFound != "" && [$win compare $found == $lastFound]} {
-	    #The search wrapped and found the previous search
-	    return
-	}
-
-	set lastFound $found
-	set char [$win get $found]
-	set prevChar [$win get "$found - 1 chars"]
-	set pos $found
-
-	if {[string equal $prevChar $escape]} {
-	    continue
-	} elseif {[string equal $char [subst $str2]]} {
-	    incr count
-	} elseif {[string equal $char [subst $str1]]} {
-	    incr count -1
-	    if {$count == 0} {
-		set startPair $found
-		break
-	    }
-	} else {
-	    # This shouldn't happen.  I may in the future make it
-	    # return -code error
-	    puts stderr "btext seems to have encountered a bug in btext::matchPair"
-	    return
-	}
-    }
-
-    $win tag add __btext_blink $startPair
-    $win tag add __btext_blink $endPair
-    btext::tag:blink $win 0
-}
-
-proc btext::matchQuote {win} {
-    set endQuote [$win index insert]
-    set start [$win index "insert - 1 chars"]
-
-    if {[$win get "$start - 1 chars"] == "\\"} {
-	#the quote really isn't the end
-	return
-    }
-    set lastFound ""
-    while 1 {
-	set startQuote [$win search -backwards \" $start]
-	if {$startQuote == "" || [$win compare $startQuote > $start]} {
-	    #The search found nothing or it wrapped.
-	    return
-	}
-
-	if {$lastFound != "" && [$win compare $lastFound == $startQuote]} {
-	    #We found the character we found before, so it wrapped.
-	    return
-	}
-	set lastFound $startQuote
-	set start [$win index "$startQuote - 1 chars"]
-	set prevChar [$win get $start]
-
-	if {$prevChar == "\\"} {
-	    continue
-	}
-	break
-    }
-
-    if {[$win compare $endQuote == $startQuote]} {
-	#probably just \"
-	return
-    }
-
-    $win tag add __btext_blink $startQuote $endQuote
-    btext::tag:blink $win 0
-}
-
-proc btext::findNextChar {win index char} {
-    set i [$win index "$index + 1 chars"]
-    set lineend [$win index "$i lineend"]
-    while 1 {
-	set ch [$win get $i]
-	if {[$win compare $i >= $lineend]} {
-	    return ""
-	}
-	if {$ch == $char} {
-	    return $i
-	}
-	set i [$win index "$i + 1 chars"]
     }
 }
 
