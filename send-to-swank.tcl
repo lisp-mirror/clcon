@@ -47,8 +47,13 @@ proc ::tkcon::FormatSwankRexEvalMessageInner {cmd ThreadDesignator ContinuationC
 }
 
 proc ::tkcon::EncodeAnySwankMessage {msgNoLen} {
-    set strLenHex [format "%06X" [string length $msgNoLen]]
-    set msgAndLen [string cat $strLenHex $msgNoLen]
+    set data [encoding convertto utf-8 $msgNoLen]
+    #set LenMsg [string length $msgNoLen]
+    set LenData [string length $data]
+    #showVar LenMsg
+    #showVar LenData
+    set strLenHex [format "%06X" $LenData]
+    set msgAndLen [string cat $strLenHex $data]
     return $msgAndLen
 }
 

@@ -241,3 +241,8 @@ oi::init-tty-screen-manager - точка входа в него.
 
 grep -nH -e :mini `cat /s2/oduvanchik/odu-files.grep` 2> /dev/null
 /s2/oduvanchik2/odugrep.sh :invisible
+
+utf-8
+-----
+swank::asciify
+swank/backend:utf8-to-string

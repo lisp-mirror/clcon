@@ -89,7 +89,8 @@ namespace eval ::swcnn {
         if {[catch {
             set sock [socket $host $port]
             set con(sock) $sock
-            fconfigure $sock -encoding utf-8
+            # fconfigure $sock -encoding utf-8
+            fconfigure $sock -translation binary -encoding binary
             set con(state) socket_only
         } err]} {
             tk_messageBox -title "Socket Connection Error" \
@@ -100,6 +101,9 @@ namespace eval ::swcnn {
             ::tkcon::AttachSwank $name
         }
     }
+
+    # Should test that this passes through socket well:
+    # (setf a "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ")
 
     # (defun ping-pong ()
     #   (let* ((tag (make-tag))
@@ -114,3 +118,5 @@ namespace eval ::swcnn {
         ::tkcon::SendEventToSwank $lispCmd {} 2 $threadId
     }
 }
+
+
