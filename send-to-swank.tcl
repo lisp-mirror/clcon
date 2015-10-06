@@ -13,8 +13,8 @@ proc ::tkcon::QuoteLispObjToString {str} {
     # return [string cat "\"" $str "\""]
 
     regsub -all {[\ \\\"]} $str {\\&} s2
-    regsub -all {\n} $s2 {\n} s3
-    set result [string cat \" $s3 \"]
+    # regsub -all {\n} $s2 {\n} s3
+    set result [string cat \" $s2 \"]
     return $result
 }
 
