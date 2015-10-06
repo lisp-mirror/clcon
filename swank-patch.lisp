@@ -120,19 +120,6 @@
 |#
      
 
-(defvar +newline-string+ (make-string 1 :initial-element #\Newline))
-
-(def-patched-swank-fun swank/rpc::read-form (string package)
-  (let ((new-string
-         (cond
-           ((tcl-connection-p swank::*emacs-connection*)
-            (budden-tools:search-and-replace-seq
-             'string string "\\n" +newline-string+
-             :all t :test 'equal))
-           (t
-            string))))
-    (swank/rpc::swank/rpc-original-read-form new-string package)))
-  
 (def-patched-swank-fun swank/rpc::prin1-to-string-for-emacs (object package)
   "Note that some events can be passed to tcl connection before we know it is a tcl connection. There can be a trouble parsing that kind of event on tcl side. Good practive would be to at least warn on tcl side if that kind of event would be received"
   (when (eq (car object) :write-string)
