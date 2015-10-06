@@ -249,4 +249,32 @@ swank/backend:utf8-to-string
 
 sldb-break-with-default-debugger
 -----
-У меня не работает в обычном SLIME - нет смысла переносить. 
+У меня не работает в обычном SLIME - нет смысла переносить. Работает только, если код запущен изначально в буфере *inferior-lisp*. вот как я пытался поправить, но не вышло ничего:
+
+```(defun default-lisp-stream-bindings ()
+  (let (result)
+    (bt:join-thread
+     (bt:make-thread
+      (lambda ()
+        (setf result
+              (mapcar (lambda (name) (cons name (eval name)))
+                      '(*standard-output* 
+                        *standard-input*  
+                        *trace-output*    
+                        *error-output*    
+                        *debug-io*        
+                        *query-io*        
+                        *terminal-io*))))
+      :name "default-lisp-stream-bindings-enquiry-thread")
+     )
+    result))
+
+ (swank::defslimefun swank::sldb-break-with-default-debugger (dont-unwind)
+  "Invoke the default debugger."
+  (setf dont-unwind t)
+  (swank::with-bindings (default-lisp-stream-bindings)
+    (cond (dont-unwind 
+           (swank::invoke-default-debugger swank::*swank-debugger-condition*))
+          (t
+           (signal 'swank::invoke-default-debugger)))))
+```
