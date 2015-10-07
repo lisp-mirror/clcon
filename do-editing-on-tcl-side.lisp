@@ -209,8 +209,21 @@
 
 
 (defmethod clcon_text-selection-coordinates (buffer)
+  "Returns list: rowbeg, colbeg, rowend, colend of selection, or nil if there is no selection"
   (let* ((clcon_text (buffer-to-clcon_text buffer))
-         (tcl-code (format nil "write me"))))) 
+         (tcl-code (format nil "::edt::TextSelectionCoordinates ~A" clcon_text))
+         (index-string (call-tcl-simple tcl-code))
+         )
+    (cond
+      ((string= index-string "")
+       nil
+       )
+      (t
+       (let* ((indices (split-sequence:split-sequence #\  index-string))
+              (ibeg (multiple-value-list (parse-tcl-text-index (first indices))))
+              (iend (multiple-value-list (parse-tcl-text-index (second indices)))))
+         (append ibeg iend))))))
+         
 
 #| tests: 
  (oduvanchik::send-mark-to-clcon_text ### (oduvanchik::buffer-start-mark (oduvanchik::current-buffer)) :remote-name "bb")
