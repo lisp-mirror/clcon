@@ -59,7 +59,7 @@
   "package must be bound to swank::*swank-io-package*, and with-standard-io-syntax must be around"
   (flet ((f (tag a)
            (format ou "~A~A " tag a)))
-    (etypecase val
+    (typecase val
       ; note that keywords are downcased
       (keyword (f #\: (cl-tk:tcl-escape (string-downcase (symbol-name val)))))
       (string (f #\s (cl-tk:tcl-escape val)))
@@ -71,7 +71,10 @@
        (format ou "{l")
        (dolist (y val)
          (my-tcl-form y ou (+ level 1)))
-       (format ou "} ")))))
+       (format ou "} "))
+      (t
+       (format ou "sERROR-IN-LISP--MY-TCL-FORM"
+       )))))
 
 (defun convert-object-to-tcl-inner (x ou)
                                         ;(prin1 (cl-tk::tcl-form x)  ou)
