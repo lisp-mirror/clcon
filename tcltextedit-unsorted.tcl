@@ -57,7 +57,8 @@ proc MakeWindowADialogAndGrab {win parent} {
     #if {$parent ne {}} {
     #    powin $win $parent
     #}
-    
+
+    raise $win
     grab $win
 }
 
