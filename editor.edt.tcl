@@ -673,6 +673,11 @@ namespace eval ::edt {
         $text tag add sel $from $to
     }
 
+    # Returns list of two indices
+    proc TextSelectionCoordinates {text} {
+        $text tag nextrange sel 1.0 end
+    }
+
     proc oImplementation {commandNameWoPrefix} {
         set fn [string cat $commandNameWoPrefix "-command"]
         set w [CurrentlyVisibleBuffer]

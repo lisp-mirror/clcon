@@ -206,7 +206,11 @@
     (call-tcl-simple
      (tcl-code-to-select-region clcon_text rb re)
      )))
-       
+
+
+(defmethod clcon_text-selection-coordinates (buffer)
+  (let* ((clcon_text (buffer-to-clcon_text buffer))
+         (tcl-code (format nil "write me"))))) 
 
 #| tests: 
  (oduvanchik::send-mark-to-clcon_text ### (oduvanchik::buffer-start-mark (oduvanchik::current-buffer)) :remote-name "bb")
