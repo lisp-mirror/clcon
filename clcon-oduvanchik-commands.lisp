@@ -1,9 +1,7 @@
 ;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
 ;; Our lisp mode and other application-level oduvanchik commands for clcon. 
 (in-package :oduvanchik)
-
-;; Прежде всего, надо подумать, как лучше организовать работу.
-;; Вообще и для поиска определений в частнотси.
+(named-readtables::in-readtable :oduvanchik-ext-readtable)
 
 (defcommand "Find Source" (p)
     "Find source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
