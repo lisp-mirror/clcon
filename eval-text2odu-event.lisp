@@ -125,8 +125,8 @@
     result
     ))
 
-(defun call-oduvanchik-function-with-clcon_text (e)
-  "see swank:eval-for-emacs as an example of error handling"
+(defun eval-call-oduvanchik-function-with-clcon_text (e)
+  "see swank:eval-for-emacs as an example of error handling. See clco:call-oduvanchik-function-with-clcon_text"
   (let* ((clcon_text (clco::text2odu-event-clcon_text-pathname e))
          (cur-row-col (clco::text2odu-event-beg e))
          (connection (clco::text2odu-event-swank-connection e))
@@ -171,7 +171,7 @@
         (error "clco::shutdown-text2odu-dispatcher event must not arrive here")
         )
        (clco::call-oduvanchik-function-with-clcon_text
-        (call-oduvanchik-function-with-clcon_text e))
+        (eval-call-oduvanchik-function-with-clcon_text e))
        ))))
      
 

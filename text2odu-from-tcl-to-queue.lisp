@@ -108,7 +108,7 @@
     )))
 
 (defun call-oduvanchik-function-with-clcon_text (clcon_text-pathname insert-index far_tcl_cont_id oduvanchik-function-name)
-  "Send call-oduvanchik-function-with-clcon_text event to oduvanchik. See oduvanchik::call-oduvanchik-function-with-clcon_text"
+  "Send call-oduvanchik-function-with-clcon_text event to oduvanchik. See oduvanchik::eval-call-oduvanchik-function-with-clcon_text"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'call-oduvanchik-function-with-clcon_text
