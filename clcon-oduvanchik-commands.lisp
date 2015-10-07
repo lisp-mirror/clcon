@@ -114,7 +114,24 @@
 
 
 
-
+(defun clcon-prompt-for-y-or-n (&rest args
+                                &key ((:must-exist must-exist) t)
+                                  (default nil defaultp)
+                                  default-string
+                                  ((:prompt prompt) "Y or N? ")
+                                  ((:help *parse-help*) "Type Y or N."))
+  "For oi::*clcon-prompt-for-y-or-n-hook*. See also oi::prompt-for-y-or-n"
+  (let ((tcl-result (clco:eval-in-tcl "::odu::prompt_for_y_or_n ...")))
+    (cond
+      ((string= tcl-result "yes")
+       #k"y"
+       )
+      ((string= tcl-result "no")
+       #k"n"
+       )
+      ((string= tcl-result "cancel")
+       (editor-error)
+       ))))
 
 
 ; (slot-value (slot-value (slot-value (slot-value (oi::clcon_text-to-buffer ".__edit1.text") 'oi::%region) 'oi::start) 'oi::line) 'oi::marks)

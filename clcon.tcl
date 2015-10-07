@@ -4952,6 +4952,7 @@ proc ::tkcon::ReloadSomeIDESources4 {} {
     TkconSourceHere lisp-debugger.ldbg.tcl
     TkconSourceHere tcltextedit-unsorted.tcl
     TkconSourceHere clconcmd.tcl
+    TkconSourceHere clcon-oduvanchik-commands.odu.tcl
 }
 
 ::tkcon::ReloadSomeIDESources4
