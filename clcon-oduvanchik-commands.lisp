@@ -114,6 +114,11 @@
 
 
 
+(defun cl-boolean-to-tcl (x)
+  "Returns 0 or 1 in numeric form"
+  (if x "1" "0")
+  )
+
 (defun clcon-prompt-for-y-or-n (&rest args
                                 &key ((:must-exist must-exist) t)
                                   (default nil defaultp)
@@ -121,7 +126,14 @@
                                   ((:prompt prompt) "Y or N? ")
                                   ((:help *parse-help*) "Type Y or N."))
   "For oi::*clcon-prompt-for-y-or-n-hook*. See also oi::prompt-for-y-or-n"
-  (let ((tcl-result (clco:eval-in-tcl "::odu::prompt_for_y_or_n ...")))
+  (declare (ignore args default defaultp default-string))
+  (let* ((q-must-exist (cl-boolean-to-tcl must-exist))
+         ;; default is ignored now. It is a boolean, if true,
+         ;; default value is true, otherwise it is false
+         (q-prompt (cl-tk:tcl-escape prompt))
+         (q-parse-help (cl-tk:tcl-escape *parse-help*))
+         (cmd (format nil "::odu::prompt_for_y_or_n ~A ~A ~A" q-must-exist q-prompt q-parse-help))
+         (tcl-result (clco:eval-in-tcl cmd :nowait nil)))
     (cond
       ((string= tcl-result "yes")
        #k"y"
@@ -132,6 +144,8 @@
       ((string= tcl-result "cancel")
        (editor-error)
        ))))
+
+(setf oi::*clcon-prompt-for-y-or-n-hook* 'clcon-prompt-for-y-or-n)
 
 
 ; (slot-value (slot-value (slot-value (slot-value (oi::clcon_text-to-buffer ".__edit1.text") 'oi::%region) 'oi::start) 'oi::line) 'oi::marks)
