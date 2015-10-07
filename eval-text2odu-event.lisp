@@ -109,13 +109,8 @@
 
 (defun nop (&rest args) (declare (ignore args)))
 
-(defun eval-for-emacs-clone-for-oduvanchik (fn id)
-  "Copy-paste from swank::eval-for-emacs with some additions"
-  (let (ok result condition)
-    ))
-
-
 (defun call-oduvanchik-fn-internal (fn clcon_text buffer)
+  (declare (ignorable clcon_text))
   (let (result)      
     (let* ((oduvanchik-internals::*do-editing-on-tcl-side* t))
       (setf result (funcall fn nil))
