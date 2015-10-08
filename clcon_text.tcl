@@ -268,7 +268,6 @@ namespace eval ::clcon_text {
                 set far_tcl_cont_id [::tkcon::GenContinuationCounter]
                 ::mprs::EnqueueContinuation $far_tcl_cont_id $far_tcl_continuation_body
                 set lispCmd "(clco:call-oduvanchik-function-with-clcon_text $qId $qB $far_tcl_cont_id '($FnAndArgs) '($qOptions))"
-                puts stderr $lispCmd
             }
             default {
                 error "Hurray! We found replace command $type with args $clcon_text $type $arglist!"
@@ -338,10 +337,8 @@ namespace eval ::clcon_text {
     }
 
     # UserContBody is a body of procedure to be called with two parameters: clcon_text and EventAsList.
-    # OduvanchikFunctionNameAndArgs is a lisp expression (with all packages specified).
-    # Expression is passed to lisp verbatim.
-    # Its car must be a function name with home-package named :oduvanchik.
-    # List is passed to funcall (note there might be more security hazargs in arguments)
+    # OduvanchikFunctionNameAndArgs represents function from :oduvanchik home-package and its arguments, in a readable form. All packages to symbols must be specified. All string must be quoted with ::tkcon::QuoteTclStringForLisp. Subforms are not evaluated. Consider it as aquote list without outermost '()
+    # Elements of list are passed to funcall. 
     # Options is a dict of options. Current known options are:
     # send_selection : if 1, selection is sent to odu at the beginning of command
     proc CallOduvanchikFunction {clcon_text OduvanchikFunctionNameAndArgs {UserContBody {}} {Options {}}} {

@@ -309,7 +309,7 @@ namespace eval ::edt {
         # It is too late hour to start show-mark
         # We have archietectural problems there (rompsite.lisp is too early on the build)
         # set oduCmd "lisp-insert-\)"
-        # set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text $oduCmd]]
+        # set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text ????]]
         # $m add command -label $oduCmd -accel "F11" -command $cmd
         # bind $w <F11> $cmd
 
@@ -679,14 +679,12 @@ namespace eval ::edt {
     }
 
     proc oImplementation {commandNameWoPrefix} {
-        set fn [string cat $commandNameWoPrefix "-command"]
+        set fn [string cat "odu::" $commandNameWoPrefix "-command"]
         set w [CurrentlyVisibleBuffer]
         set txt $w.text
-        set cmd [list clcon_text::CallOduvanchikFunction $txt $fn]
+        set cmd [list clcon_text::CallOduvanchikFunction $txt "$fn nil"]
         set wcmd [clcon_text::WrapEventScriptForFreezedText $cmd $txt]
         eval $wcmd
     }   
-    
-
 }
 
