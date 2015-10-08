@@ -22,7 +22,7 @@ Completion
 ----------
 Completion of lisp symbols works in console, use **Tab** to complete lisp symbol prefix (may contain package or part of package name).
 Use **Ctrl-F3** to complete filename (Unix-style, names containing space may not work). 
-Tcl completion is currently broken. 
+Use Control-Alt-u to complete tcl name. Be sure to type in a space after ".."  
 
 Find source command
 -------------------
@@ -71,7 +71,7 @@ Place dot (.) in the first position of the command to invoke named IDE command. 
 
 Tcl escapes
 -----------
-Place two dots (..) to pass arbitrary tcl command to tcl interpreter. E.g. this will display a message box.
+Place two dots (..) to pass arbitrary tcl command to tcl interpreter. E.g. this will display a message box. Use Control-Alt-U to complete tcl symbol. To use completion at first identifier at your command, type in on more space after two dots .
 
 ```
 ..tk_messageBox -title "clcon" -message "Wow, it works!" -parent $::tkcon::PRIV(console)
