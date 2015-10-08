@@ -39,7 +39,7 @@ proc ::tkcon::Expand {w {type ""}} {
 	    # XXX could be extended to allow the results of all matches
 	    # XXX to be amalgamted ... may be confusing to user
 	    set res {}
-	    foreach t $::tkcon::OPT(expandorder) {
+	    foreach t $::tkcon::OPT(tclexpandorder) {
 		set code [catch {Expand$t $str} res]
 		if {$code == 0 || $code == 3} { break }
 		set res {}

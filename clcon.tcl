@@ -210,7 +210,7 @@ proc ::tkcon::Init {args} {
         } 
     }
     
-    # expandorder could also include 'Methodname' for XOTcl/NSF methods
+    # tclexpandorder could also include 'Methodname' for XOTcl/NSF methods
     foreach {key default} {
 	autoload	{}
 	blinktime	500
@@ -431,7 +431,7 @@ proc ::tkcon::Init {args} {
 		    lappend OPT(autoload) $val
 		    if {$val eq "nsf" || $val eq "nx" || $val eq "XOTcl" } {
 			# If xotcl is loaded, prepend expand order for it
-			set OPT(expandorder) [concat Methodname $OPT(expandorder)]
+			set OPT(tclexpandorder) [concat Methodname $OPT(expandorder)]
 		    }
 		}
 		-slave		{ append OPT(slaveeval) \n$val\n }
