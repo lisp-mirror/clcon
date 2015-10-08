@@ -224,7 +224,7 @@ proc ::tkcon::Init {args} {
 	debugPrompt	{(level \#$level) debug [history nextid] > }
 	dead		{}
 	edit		::edt::edit
-	expandorder	{Pathname Variable Procname}
+	tclexpandorder	{Variable Procname}
 	font		{}
 	history		48
 	hoterrors	1
