@@ -274,7 +274,7 @@ namespace eval ::edt {
     
     proc FindSourceCommand {text} {
         set console [::tkcon::CurrentConsole]
-        ::clcon_text::CallOduvanchikFunction $text "find-source-command" {{
+        ::clcon_text::CallOduvanchikFunction $text "odu::find-source-command nil" {{
             ::edt::FindSourceContinuation $clcon_text $EventAsList
         }}
     }    
@@ -285,8 +285,8 @@ namespace eval ::edt {
     }
     
     proc OduFnMenuItem {w m text oduCmd {accel {}}} {
-        set oduFn [string cat $oduCmd "-command"]
-        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text $oduFn]]
+        set oduFn [string cat "odu::" $oduCmd "-command"]
+        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text "$oduFn nil"]]
         $m add command -label $oduCmd -accel $accel -command $cmd
         if {$accel ne {}} {
             bind $w $accel "$cmd; break"
@@ -544,7 +544,7 @@ namespace eval ::edt {
 
     proc SyncCursor {text} {
         puts "Text Index Insert = [$text index insert]"
-        clcon_text::CallOduvanchikFunction $text "sync-cursor-command"
+        clcon_text::CallOduvanchikFunction $text "odu::sync-cursor-command nil"
     }
     
     proc EnsureEditorWindow {tw} {

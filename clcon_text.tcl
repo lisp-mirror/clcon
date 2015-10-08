@@ -253,7 +253,8 @@ namespace eval ::clcon_text {
                 }
                 
                 set qB [::text2odu::CoerceIndex $clcon_text insert]
-                set qText [lq [lindex $arglist 0]]
+                set FnAndArgs [lindex $arglist 0]
+                set qOptions [::tkcon::QuoteTclListOfStringsForLisp [lindex $arglist 1]] 
 
                 if {$far_tcl_continuation_body ne {}} {
                     ::clcon_text::IncrPendingFarTclContinuations 1 $clcon_text
@@ -266,7 +267,8 @@ namespace eval ::clcon_text {
                 # set qC [lq $far_tcl_continuation_body]
                 set far_tcl_cont_id [::tkcon::GenContinuationCounter]
                 ::mprs::EnqueueContinuation $far_tcl_cont_id $far_tcl_continuation_body
-                set lispCmd "(clco:call-oduvanchik-function-with-clcon_text $qId $qB $far_tcl_cont_id $qText)"
+                set lispCmd "(clco:call-oduvanchik-function-with-clcon_text $qId $qB $far_tcl_cont_id '($FnAndArgs) '($qOptions))"
+                puts stderr $lispCmd
             }
             default {
                 error "Hurray! We found replace command $type with args $clcon_text $type $arglist!"
@@ -335,8 +337,14 @@ namespace eval ::clcon_text {
         }
     }
 
-    # UserContBody is a body of procedure to be called with two parameters: clcon_text and EventAsList. 
-    proc CallOduvanchikFunction {clcon_text OduvanchikFunctionName {UserContBody {}}} {
+    # UserContBody is a body of procedure to be called with two parameters: clcon_text and EventAsList.
+    # OduvanchikFunctionNameAndArgs is a lisp expression (with all packages specified).
+    # Expression is passed to lisp verbatim.
+    # Its car must be a function name with home-package named :oduvanchik.
+    # List is passed to funcall (note there might be more security hazargs in arguments)
+    # Options is a dict of options. Current known options are:
+    # send_selection : if 1, selection is sent to odu at the beginning of command
+    proc CallOduvanchikFunction {clcon_text OduvanchikFunctionNameAndArgs {UserContBody {}} {Options {}}} {
         variable ::tkcon::OPT
         if {!$::tkcon::OPT(oduvan-backend)} {
             error "Unable to call oduvanchik functions with oduvan-backend disabled"
@@ -348,7 +356,7 @@ namespace eval ::clcon_text {
             set ContBody [subst -nocommand {$clcon_text Unfreeze}]
         }
         showVarPutd ContBody
-        MaybeSendToLisp $clcon_text CallOduvanchikFunction [list $OduvanchikFunctionName] $ContBody
+        MaybeSendToLisp $clcon_text CallOduvanchikFunction [list $OduvanchikFunctionNameAndArgs $Options] $ContBody
     }
 
     # # To be called from oi::delete-region

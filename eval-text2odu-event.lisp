@@ -109,30 +109,68 @@
 
 (defun nop (&rest args) (declare (ignore args)))
 
-(defun call-oduvanchik-fn-internal (fn clcon_text buffer)
+(defun call-oduvanchik-fn-internal (fn-funcall-list options clcon_text buffer)
   (declare (ignorable clcon_text))
   (let (result)      
     (let* ((oduvanchik-internals::*do-editing-on-tcl-side* t))
-      (setf result (funcall fn nil))
-      ;(clco::compare-clcon_text-and-oduvanchik-buffer-contents clcon_text)
+      (cond
+        ((equal (getf options :send_selection) "1")
+         (oi::transfer-selection-from-clcon_text buffer)))
+      (setf result (apply 'funcall fn-funcall-list))
       )
     (odu::send-buffer-point-to-clcon_text buffer)
     result
     ))
 
+;; ;; Reads "(\"fn-name\" arg1 ... argN)" and converts to
+;; ;; (fn arg1 argN), where fn must be a function from :odu package
+;; (defun parse-ecofwct-string-to-fn-and-args (e)
+;;   "See comment near fn definition"
+;;   (let* (
+;;          (fn-name-and-args (clco::text2odu-event-fn-and-args e))
+;;          (fn-name (first fn-name-and-args))
+;;          (fn (find-symbol (string-upcase fn-name) :oduvanchik))
+;;          )
+;;     (assert (and
+;;              (eq (symbol-package fn) (find-package :oduvanchik)) ; security limitation
+;;              (fboundp fn)) () "Symbol ~S (~S) not found, funbound or have home-package different from :oduvanchik" fn-name fn)
+;;     (list fn (cdr fn-name-and-args))))
+
+
+(defun parse-ecofwct-options (options)
+  (let* (
+         (ov-pairs (budden-tools:splice-list options))
+         result
+         )
+    (dolist (ov-pair ov-pairs)
+      (destructuring-bind (option value) ov-pair
+        (let ((sym-option 
+               (alexandria:switch (option :test 'string=)
+                 ("send_selection" :send_selection)
+                 (t (error "Wrong option ~S in parse-ecofwct-options" option)))))
+          (push value result)
+          (push sym-option result))))
+    result))
+
+; test
+(assert (equalp (parse-ecofwct-options '("send_selection" "t"))
+                '(:send_selection "t")))
+        
 (defun eval-call-oduvanchik-function-with-clcon_text (e)
   "see swank:eval-for-emacs as an example of error handling. See clco:call-oduvanchik-function-with-clcon_text"
   (let* ((clcon_text (clco::text2odu-event-clcon_text-pathname e))
          (cur-row-col (clco::text2odu-event-beg e))
          (connection (clco::text2odu-event-swank-connection e))
          (buffer (oi::clcon_text-to-buffer clcon_text))
-         (fn-name (clco::text2odu-event-string e))
-         (fn (find-symbol (string-upcase fn-name) :oduvanchik))
+         (fn-funcall-list (clco::text2odu-event-fn-and-args e))
+         (fn (car fn-funcall-list))
+         (options (parse-ecofwct-options (clco::text2odu-event-options e)))
          (cont (clco::text2odu-event-far_tcl_cont_id e))
          )
     (assert (and
              (eq (symbol-package fn) (find-package :oduvanchik)) ; security limitation
-             (fboundp fn)) () "Symbol ~S (~S) not found, funbound or have home-package different from :oduvanchik" fn-name fn)
+             (fboundp fn)) () "Symbol ~S funbound or have home-package different from :oduvanchik" fn)
+
     (swank::with-connection (connection) 
       (use-buffer buffer
         (odu::set-mark-to-row-and-col (current-point)
@@ -140,7 +178,7 @@
                                       (clco::row-col-col cur-row-col))
         ;; (oi::sync-mark-from-clcon_text clcon_text (current-point) "insert")
         ;; known functions are indent-new-line-command and new-line-command
-        (swank::eval-for-emacs `(call-oduvanchik-fn-internal ',fn ',clcon_text ',buffer) :common-lisp-user cont)
+        (swank::eval-for-emacs `(call-oduvanchik-fn-internal ',fn-funcall-list ',options ',clcon_text ',buffer) :common-lisp-user cont)
         
         nil
         ))))

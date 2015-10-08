@@ -57,6 +57,8 @@
   (kind (budden-tools:mandatory-slot 'kind) :type text2odu-event-kind)
   (clcon_text-pathname nil :type (or null string)) 
   (string nil :type (or null string)) ; string to insert
+  (fn-and-args nil :type (or null (cons symbol t))) ; fn-and-args for call-oduvanchik-function-with-clcon_text
+  (options nil :type (or null (cons string t))) ; options for call-oduvanchik-function-with-clcon_text
   (beg nil :type (or null row-col)) ; begin index
   (end nil :type (or null row-col))   ; end index
   (far_tcl_cont_id nil :type (or null integer)) ; tcl continuation id to eval after event's action is processed
@@ -107,13 +109,14 @@
     :swank-connection swank::*emacs-connection*
     )))
 
-(defun call-oduvanchik-function-with-clcon_text (clcon_text-pathname insert-index far_tcl_cont_id oduvanchik-function-name)
+(defun call-oduvanchik-function-with-clcon_text (clcon_text-pathname insert-index far_tcl_cont_id oduvanchik-function-name-and-args options)
   "Send call-oduvanchik-function-with-clcon_text event to oduvanchik. See oduvanchik::eval-call-oduvanchik-function-with-clcon_text"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'call-oduvanchik-function-with-clcon_text
     :clcon_text-pathname clcon_text-pathname
-    :string oduvanchik-function-name
+    :fn-and-args oduvanchik-function-name-and-args
+    :options options
     :beg (parse-row-col insert-index) ; likely to be unused
     :far_tcl_cont_id far_tcl_cont_id
     :swank-connection swank::*emacs-connection*
