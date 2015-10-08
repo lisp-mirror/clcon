@@ -46,8 +46,6 @@ namespace eval tkcon {
             <<TkCon_ExpandVar>>	<Alt-v>
             <<TkCon_Tab>>		<Control-i>
             <<TkCon_Tab>>		<Alt-i>
-            <<TkCon_Newline>>	<Control-o>
-            <<TkCon_Newline>>	<Alt-o>
             <<TkCon_Newline>>	<Control-Key-Return>
             <<TkCon_Newline>>	<Control-Key-KP_Enter>
             <<TkCon_Eval>>		<Return>
@@ -59,7 +57,6 @@ namespace eval tkcon {
             <<TkCon_NextSearch>>	<Control-s>
             <<TkCon_Transpose>>	<Control-t>
             <<TkCon_ClearLine>>	<Control-u>
-            <<TkCon_SaveCommand>>	<Control-z>
         }
         if {$PRIV(AQUA)} {
             lappend bindings <<TkCon_Popup>> <Control-Button-1> \
