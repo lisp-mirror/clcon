@@ -320,8 +320,18 @@ namespace eval ::edt {
         ::erbr::AddNextAndPreviousCompilerMessagesCommands $m $text 1
 
         $m add separator
+
         set cmd [OduFnMenuItem $w $m $text indent-new-line "<Shift-Return>"]
         bind $text <Shift-Return> "$cmd; break"
+
+        OduFnMenuItem $w $m $text indent-form
+        
+        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text "odu::indent-region-command nil" {} {send_selection 1}]]
+        
+        $m add command -label "Indent Region" -accel "F11" -command $cmd
+        bind $w <F11> $cmd
+        
+        
         OduFnMenuItem $w $m $text transpose-forms
         $m add separator
         OduFnMenuItem $w $m $text beginning-of-defun

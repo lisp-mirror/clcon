@@ -209,9 +209,25 @@
 
 
 (defmethod transfer-selection-from-clcon_text (buffer)
-  (let ((coords (get-clcon_text-selection-coordinates buffer)))
-    (break "Write me"))
-  )
+  (let* ((coords (get-clcon_text-selection-coordinates buffer)))
+    (cond
+      ((null coords)
+       nil)
+      (t
+       (destructuring-bind (beg-row beg-col end-row end-col) coords
+         (multiple-value-bind (row col)
+             (oi::mark-row-and-col (current-point))
+           (cond
+             ((and (= row beg-row)
+                   (= col beg-col))
+              (odu::with-mark-in-row-col (m (clco::make-row-col :row end-row :col end-col))
+                (push-buffer-mark (copy-mark m) t)))
+             ((and (= row end-row)
+                   (= col end-col))
+              (odu::with-mark-in-row-col (m (clco::make-row-col :row beg-row :col beg-col))
+                (push-buffer-mark (copy-mark m) t)))
+             (t
+              (error "transfer-selection-from-clcon-text: current-point must coincide with either beginning of selection or with end of selection")))))))))
 
 
 (defun get-clcon_text-selection-coordinates (buffer)  

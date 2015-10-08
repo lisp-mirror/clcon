@@ -110,6 +110,7 @@
 (defun nop (&rest args) (declare (ignore args)))
 
 (defun call-oduvanchik-fn-internal (fn-funcall-list options clcon_text buffer)
+  "Called from eval-call-oduvanchik-function-with-clcon_text via eval-for-emacs"
   (declare (ignorable clcon_text))
   (let (result)      
     (let* ((oduvanchik-internals::*do-editing-on-tcl-side* t))
