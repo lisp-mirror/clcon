@@ -79,9 +79,16 @@ Place two dots (..) to pass arbitrary tcl command to tcl interpreter. E.g. this 
 
 Opening files for editing
 -------------------------
-There's no way to do that from the menu now. Use
-```..::edt::edit <filename>```
+Use "File" menu, Control-o keyboard shortcut or
+.ed IDE command: 
+```.ed <filename>```
 Press Ctrl-F3 to complete filename (at least it will work undex *nix).
+
+Saving files 
+-------------------------
+WARNING! As you close the IDE, there is no warning about unsaved files. Also there is no (yet) modified flag at editor window. Be careful! We currently sometimes use IDE to edit it's own source but we recommend that you avoid editing files until IDE is developed enough.
+Also note that as some part of IDE crash, editor might become crashed too. If you have crashed swank connection, first of all try to disable "Oduvan-backend" flag at prefs menu in the console. After that, try Secret/Unfreeze command if your editor appears hanged up. With two that measures, you have good chances to save your work. But, again, don't rely upon IDE. 
+Normally, to save files, use "File" menu or Control-s keyboard shortcut. 
 
 Debugger
 --------
@@ -109,8 +116,11 @@ several ways to leave a debugger, they are listed at `Restarts` menu. One of the
 and marked with an asteric `*`. If you close debugger window with a cross or by pressing `Alt-F4`,
 default restart will be invoked. 
 
-###TODO: Eval in frame
-Immediate or "eval in frame" is usually present in debuggers. Just wait for the next release or send a patch :) 
+###Eval in frame
+Evals code in the context of the frame selected on the stack and prints result at the console. Can be invoked via debugger "stack" menu.
+
+###Return from frame
+Prompts for lisp expression and returns it from the frame as if it was normal return. Found at "Stack" debugger menu. 
 
 ###Stepping, watches
 SBCL supports stepping, but it is not done yet and this can be hard to do. Watches are useless without stepping.
