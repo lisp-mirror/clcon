@@ -24,7 +24,6 @@ namespace eval tkcon {
         #bind TkConsole <<PrevLine>> {}
 
         ## Now make all our virtual event bindings
-        #	<<TkCon_Expand>>	<Key-Tab>
         set bindings {
             <<TkCon_Exit>>		<$PRIV(CTRL)-q>
             <<TkCon_New>>		<$PRIV(CTRL)-N>
@@ -38,12 +37,12 @@ namespace eval tkcon {
             <<TkCon_Master>>	<$PRIV(CTRL)Key-2>
             <<TkCon_Main>>		<$PRIV(CTRL)Key-3>
             <<TkCon_ExpandFile>>	<Control-Key-F3>
-            <<TkCon_ExpandProc>>	<Control-Alt-Key-u>
+            <<TkCon_ExpandTcl>>	        <Control-Alt-Key-u>
+            <<TkCon_ExpandTcl>>	        <Control-Alt-Key-Cyrillic_ghe>
             <<TkCon_ExpandLisp>>	<Control-Alt-Key-i>
             <<TkCon_ExpandLisp>>	<Key-Tab>
             <<TkCon_LispFindDefinition>> <Alt-period>
             <<TkCon_LispFindDefinition>> <Alt-Key-Cyrillic_yu>
-            <<TkCon_ExpandVar>>	<Alt-v>
             <<TkCon_Tab>>		<Control-i>
             <<TkCon_Tab>>		<Alt-i>
             <<TkCon_Newline>>	<Control-Key-Return>
@@ -228,7 +227,7 @@ namespace eval tkcon {
             if {[%W compare insert > limit]} {::tkcon::Expand %W var}
             break ; # could check "%K" == "Tab"
         }
-        bind TkConsole <<TkCon_Expand>> {
+        bind TkConsole <<TkCon_ExpandTcl>> {
             if {[%W compare insert > limit]} {::tkcon::Expand %W}
             break ; # could check "%K" == "Tab"
         }
