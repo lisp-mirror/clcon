@@ -6,16 +6,23 @@
 namespace eval ::sts {
 }
 
-
-# Pass something to lisp, quoted. Lame!
-proc ::tkcon::QuoteLispObjToString {str} {
-    # putd "We must quote string $str better!"
-    # return [string cat "\"" $str "\""]
-
+# We have tcl object (string). Quote it so that it can be sent to swank as string
+proc ::tkcon::QuoteTclStringForLisp {str} {
     regsub -all {[\ \\\"]} $str {\\&} s2
     # regsub -all {\n} $s2 {\n} s3
     set result [string cat \" $s2 \"]
     return $result
+}
+
+# Old misname for ::tkcon::QuoteTclStringForLisp
+proc ::tkcon::QuoteLispObjToString {str} {
+    return [QuoteTclStringForLisp $str]
+}
+
+
+# Given tcl list (of strings), quotes every strings and concatenates them space-separated.
+proc ::tkcon::QuoteTclListOfStringsForLisp {list} {
+    return [lmap x $list {lindex [::tkcon::QuoteLispObjToString $x] 0}]
 }
 
 
