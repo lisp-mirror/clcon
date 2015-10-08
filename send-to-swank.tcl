@@ -22,7 +22,14 @@ proc ::tkcon::QuoteLispObjToString {str} {
 
 # Given tcl list (of strings), quotes every strings and concatenates them space-separated.
 proc ::tkcon::QuoteTclListOfStringsForLisp {list} {
-    return [lmap x $list {lindex [::tkcon::QuoteLispObjToString $x] 0}]
+    set result ""
+    set delim ""
+    foreach x $list {
+        set result [string cat $delim $result [::tkcon::QuoteTclStringForLisp $x]]
+        set delim " "
+    }
+    puts stderr $result
+    return $result
 }
 
 
