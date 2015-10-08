@@ -208,7 +208,13 @@
      )))
 
 
-(defmethod clcon_text-selection-coordinates (buffer)
+(defmethod transfer-selection-from-clcon_text (buffer)
+  (let ((coords (get-clcon_text-selection-coordinates buffer)))
+    (break "Write me"))
+  )
+
+
+(defun get-clcon_text-selection-coordinates (buffer)  
   "Returns list: rowbeg, colbeg, rowend, colend of selection, or nil if there is no selection"
   (let* ((clcon_text (buffer-to-clcon_text buffer))
          (tcl-code (format nil "::edt::TextSelectionCoordinates ~A" clcon_text))
