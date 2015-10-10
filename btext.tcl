@@ -71,7 +71,6 @@ proc btext {win args} {
 	-relief $ar(-relief) -fg $ar(-linemapfg) \
 	-bg $ar(-linemapbg) -takefocus 0
 
-    $win.l configure -inactiveselectbackground [$win.l cget -selectbackground]    
 
     set topWin [winfo toplevel $win]
     bindtags $win.l [list $win.l $topWin all]
@@ -85,6 +84,8 @@ proc btext {win args} {
 
     #escape $win, because it could have a space
     eval text \$win.t -font \$ar(-font) $args
+
+    $win.t configure -inactiveselectbackground [$win.t cget -selectbackground]
 
     grid $win.t -row 0 -column 1 -sticky news
     grid rowconfigure $win 0 -weight 100
