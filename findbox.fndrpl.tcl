@@ -11,10 +11,7 @@ namespace eval ::fndrpl {
         variable ReplaceString
         variable findcase
         variable rconfirm
-        variable TreeSearchState
 
-        unset -nocomplain TreeSearchState
-        
         set find $area.find
         catch {destroy $find}
         toplevel $find

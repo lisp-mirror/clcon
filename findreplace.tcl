@@ -65,8 +65,12 @@ namespace eval ::fndrpl {
     variable r
     variable ReplaceString           ""
     variable rconfirm
-    # TreeSearchState is set after first search. Cleaned before opening a dialog box.
-    variable TreeSearchState        
+
+    # SearchState stores values of dialog box, position of search start or last found element, and helps to distinguish between first search and a continued search
+    variable SearchState [dict create -continueP 0 -direction 1 -findcase 0 -searchStringQ {}]
+    # Missing elements of SearchState are:
+    #     -widgetWhereSought                   widget pathname (tablelist or text)
+    #     -startFrom                           index 
 
     proc greplist { text greps } {
         variable glb
@@ -470,34 +474,31 @@ namespace eval ::fndrpl {
         variable SearchString
         variable SearchDir
         variable findcase
-        variable TreeSearchState
+        variable SearchState
         set searchStringQ [QuoteStringForRegexp $SearchString]
 
         if {$continueP ne {}} {
             set RealContinueP $continueP
-        } elseif {[info exists TreeSearchState]} { 
-            set RealContinueP 1
         } else {
-            set RealContinueP 0
+            set RealContinueP [dict get $SearchState -continueP]
         }
 
         # If direction changed, this is not a continue
-        if {[info exists TreeSearchState] && \
-                [dict get $TreeSearchState -direction] != $SearchDir} {
+        if {[dict get $SearchState -direction] != $SearchDir} {
             set RealContinueP 0
         }
 
-        set TreeSearchState                                                       \
-            [dict create                                                          \
-                 -widgetWhereSought                   $tablelist                  \
-                 -continueP                           $RealContinueP              \
-                 -startFrom                           [$tablelist index active]   \
-                 -direction                           $SearchDir                  \
-                 -searchStringQ                       $searchStringQ              \
-                 -findcase                            $findcase                   \
-                ]
-
-        ::srchtblst::TreeSearchText $tablelist $TreeSearchState $EnsurePopulatedCmd {
+        set SearchState                                            \
+            [dict create                                           \
+             -widgetWhereSought     $tablelist                     \
+             -continueP             $RealContinueP                 \
+             -startFrom             [$tablelist index active]      \
+             -direction             $SearchDir                     \
+             -searchStringQ         $searchStringQ                 \
+             -findcase              $findcase                      \
+            ]
+        
+        ::srchtblst::TreeSearchText $tablelist $SearchState $EnsurePopulatedCmd {
             ::fndrpl::ProcessFindItResult $found $SearchState
         }
     }
