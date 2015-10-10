@@ -31,7 +31,7 @@ Compiling file from editor
 At the console, open test/error-browser-sample-file.lisp file for editing.
 There are two ways to do that: via file open dialog (Control-O)
 or via console ed command:
-```.ed /s2/clcon/test/error-browser-sample-file.lisp```
+``.ed /s2/clcon/test/error-browser-sample-file.lisp``
 While typing in filename, use Control-F3 for completion.
 
 File will open in the editor. Press F5 (compile and load). Two new windows will pop up: list of compiler notes and error details. Also there will be some text above list of compiler notes. It will state that compilation is failed, but you can try load generated fasl file if you press "!".
@@ -48,11 +48,11 @@ Debugger
 ------
 At the console, type in the following:
 
-```(load (compile-file (merge-pathnames "test/dbgtest.lisp" clcon-server:*clcon-source-directory*)))```
+``(load (compile-file (merge-pathnames "test/dbgtest.lisp" clcon-server:*clcon-source-directory*)))``
 
 This would create two functions, `f` and `g`. Run `(f 5)` at the console. Debugger will pop up. This is real sldb, SWANK-based debugger with most of its features implemented. You can browse through the stack. As you press `Right Arrow` at any of the frames, you will see locals. Pressing `Return` on the frame leads you to frame's source, while pressing `Return` on the local opens an inspector. Yes, native SWANK-based inspector.
 
-There is also search in the stack list. Tree without a search is a dense forest! Type `Ctrl-F`, type in `)` and press `F3` to continue search (pressing `Return` will lead you to a known bug).
+There is also search in the stack list. Tree without a search is a dense forest! Type `Ctrl-F`, type in `)` and press `F3` or `Return` to continue search.
 
 Also we have "Restarts" menu at menubar. If jou just close debugger window with cross or with closing command of your Window Manager (e.g. Alt-F4), default restart will be invoked.
 
