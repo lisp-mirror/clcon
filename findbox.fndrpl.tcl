@@ -15,7 +15,6 @@ namespace eval ::fndrpl {
 
         unset -nocomplain TreeSearchState
         
-        c
         set find $area.find
         catch {destroy $find}
         toplevel $find
