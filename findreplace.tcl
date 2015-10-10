@@ -200,12 +200,26 @@ namespace eval ::fndrpl {
 
     ################################# Find proc #################################
 
+    proc ProcessFindItResult {found NewState} {
+        set widgetWhereSought [dict get $NewState -widgetWhereSought]
+        if {$found==1} {
+            return
+        } elseif {$found==-1} {
+            tk_messageBox -parent $widgetWhereSought -title "Find" \
+                -message "Empty search string"
+        } else {
+            tk_messageBox -parent $widgetWhereSought -title "Find" \
+                -message "Search string not found"
+        }
+    }
+
     proc FindIt {text} {
         variable SearchDir
         variable SearchString
         variable findcase
 
         set SearchState [dict create                       \
+                             -widgetWhereSought $text      \
                              -startFrom     insert         \
                              -direction     $SearchDir     \
                              -searchStringQ $SearchString  \
@@ -213,14 +227,9 @@ namespace eval ::fndrpl {
                         ]
 
         foreach {found NewState} [FindItInner $text $SearchState] {break}
+
+        ProcessFindItResult $found $NewState
         
-        if {$found==1} {
-            return
-        } elseif {$found==-1} {
-            tk_messageBox -parent $text -title "Find" -message "Empty search string"
-        } else {
-            tk_messageBox -parent $text -title "Find" -message "Search string not found"
-        }
     }
 
     # Returns two values:
@@ -480,6 +489,7 @@ namespace eval ::fndrpl {
 
         set TreeSearchState                                                       \
             [dict create                                                          \
+                 -widgetWhereSought                   $tablelist                  \
                  -continueP                           $RealContinueP              \
                  -startFrom                           [$tablelist index active]   \
                  -direction                           $SearchDir                  \
@@ -488,9 +498,7 @@ namespace eval ::fndrpl {
                 ]
 
         ::srchtblst::TreeSearchText $tablelist $TreeSearchState $EnsurePopulatedCmd {
-            if {!$found} {
-                tk_messageBox -title "Find" -message "Search string not found" -parent $tablelist
-            }
+            ::fndrpl::ProcessFindItResult $found $SearchState
         }
     }
 }

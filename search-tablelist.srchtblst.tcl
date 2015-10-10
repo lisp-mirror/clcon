@@ -94,6 +94,9 @@ namespace eval ::srchtblst {
                 error "unnamed row in a table"
             }
             set searchString [dict get $SearchState -searchStringQ]
+            if {$searchString eq {}} {
+                apply $lambda $tbl -1 $SearchState
+            }            
             set CmdWithCaseOption [SearchStateTableListCmdWithCaseOption $SearchState]
             set celltext [$tbl get $CurName]
             set cmd [string cat $CmdWithCaseOption " " [list $searchString [lindex $celltext 0]]]
@@ -139,7 +142,7 @@ namespace eval ::srchtblst {
     #
     # Args: tbl - tablelist widget
     # Feature: shows only once per cell
-    # After Search is finished, applies continuation with arguments bound:
+    # After Search is finished, applies ContinuationBody with arguments bound:
     # tablelist: widget
     # found: 1=found, 0=not found;
     # SearchState: new SearchState
