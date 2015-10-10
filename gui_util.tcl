@@ -55,4 +55,9 @@ namespace eval ::gui_util {
             -font $::tkcon::OPT(font) -borderwidth 1 -highlightthickness 0 \
             -undo 1
     }
+
+    # 
+    # proc NoteWidgetsChanged {widget suffix_list proc_body} {
+    # }
+    # See example in FindBox
 }
