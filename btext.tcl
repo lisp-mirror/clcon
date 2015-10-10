@@ -71,6 +71,8 @@ proc btext {win args} {
 	-relief $ar(-relief) -fg $ar(-linemapfg) \
 	-bg $ar(-linemapbg) -takefocus 0
 
+    $win.l configure -inactiveselectbackground [$win.l cget -selectbackground]    
+
     set topWin [winfo toplevel $win]
     bindtags $win.l [list $win.l $topWin all]
 
