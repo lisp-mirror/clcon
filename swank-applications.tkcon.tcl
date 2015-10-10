@@ -71,7 +71,7 @@ proc ::tkcon::CompileLispFileTmp filename {
 
 
 
-## ::tkcon::ExpandLispSymbol (currently known as ExpandProcname)
+## ::tkcon::ExpandLispSymbol
 # - expand a lisp symbol based on $str
 # ARGS:	str	- partial proc name to expand
 # Used to Call:	        ::tkcon::ExpandBestMatch

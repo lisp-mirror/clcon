@@ -30,6 +30,7 @@ proc ::tkcon::Expand {w {type ""}} {
     # Expand procs can return "break" to indicate not to try further
     # matches, otherwise "continue" says "I got nothing, continue on"
     # We can ignore return codes from the specific expand type checks
+    showVarPutd type
     switch -glob $type {
         li* { set code [catch {ExpandLispSymbol $str} res] }
 	pa* { set code [catch {ExpandPathname $str} res] }
@@ -38,17 +39,28 @@ proc ::tkcon::Expand {w {type ""}} {
 	default {
 	    # XXX could be extended to allow the results of all matches
 	    # XXX to be amalgamted ... may be confusing to user
-	    set res {}
+	    set match {}
 	    foreach t $::tkcon::OPT(tclexpandorder) {
-		set code [catch {Expand$t $str} res]
-		if {$code == 0 || $code == 3} { break }
-		set res {}
+		set matchN [Expand$t $str 0]
+                showVarPutd t
+                showVarPutd matchN
+                set match [concat $match $matchN]
 	    }
+            if {[llength $match] > 1} {
+                regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
+                set match [linsert $match 0 $str]
+            } else {
+                regsub -all {([^\\]) } $match {\1\\ } match
+            }
+            set res $match
 	}
     }
     set len [llength $res]
     if {$len} {
 	$w delete $tmp insert
+        set xxx [lindex $res 0]
+        showVarPutd res
+        showVarPutd xxx
 	$w insert $tmp [lindex $res 0]
 	if {$len > 1} {
 	    if {$::tkcon::OPT(showmultiple) && \
@@ -125,31 +137,39 @@ proc ::tkcon::ExpandPathname str {
 ## ::tkcon::ExpandProcname - expand a tcl proc name based on $str
 # ARGS:	str	- partial proc name to expand
 # Calls:	::tkcon::ExpandBestMatch
-# Returns:	list containing longest unique match followed by all the
-#		possible further matches
+# Returns:	If findUniqueMatch then
+#                 list containing longest unique match followed by all the
+#                 possible further matches
+#               else
+#                 list of all possible further matches
 ##
-proc ::tkcon::ExpandProcname str {
+proc ::tkcon::ExpandProcname {str {findUniqueMatch 1}} {
 
     # require at least a single character, otherwise continue
-    if {$str eq ""} {return -code continue}
+    if {$str eq ""} {return ""}
 
-    set match [EvalAttached [list info commands $str*]]
-    if {[llength $match] == 0} {
-	set ns [EvalAttached \
+    set match1 [EvalAttached [list info commands $str*]]
+    set ns [EvalAttached \
 		"namespace children \[namespace current\] [list $str*]"]
-	if {[llength $ns]==1} {
-	    set match [EvalAttached [list info commands ${ns}::*]]
-	} else {
-	    set match $ns
-	}
-    }
-    if {[llength $match] > 1} {
-	regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
-	set match [linsert $match 0 $str]
+    if {[llength $ns]==1} {
+        set match2 [EvalAttached [list info commands ${ns}::*]]
     } else {
-	regsub -all {([^\\]) } $match {\1\\ } match
+        set match2 $ns
     }
-    return -code [expr {$match eq "" ? "continue" : "break"}] $match
+    showVarPutd match1
+    showVarPutd match2
+    set match [concat $match1 $match2]
+    putd "Match in ExpandProcName"
+    showVarPutd match
+    if {$findUniqueMatch} {
+        if {[llength $match] > 1} {
+            regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
+            set match [linsert $match 0 $str]
+        } else {
+            regsub -all {([^\\]) } $match {\1\\ } match
+        }
+    }
+    return $match
 }
 
 ## ::tkcon::ExpandMethodname - expand an NSF/XOTcl method name based on $str
@@ -158,20 +178,20 @@ proc ::tkcon::ExpandProcname str {
 # Returns:	list containing longest unique match followed by all the
 #		possible further matches
 ##
-proc ::tkcon::ExpandMethodname str {
+proc ::tkcon::ExpandMethodname {str {findUniqueMatch 1}} {
 
     # In a first step, obtain the typed-in cmd from the console
     set typedCmd [::tkcon::CmdGet $::tkcon::PRIV(console)]
     set obj [lindex $typedCmd 0]
     if {$obj eq $typedCmd} {
 	# just a single word, can't be a method expansion
-        return -code continue
+        return ""
     }
     # Get the full string after the object
     set sub [string trimleft [string range $typedCmd [string length [list $obj]] end]]
     if {[EvalAttached [list info exists ::nsf::version]]} {
 	# Next Scripting Framework is loaded
-	if {![EvalAttached [list ::nsf::object::exists $obj]]} {return -code continue}
+	if {![EvalAttached [list ::nsf::object::exists $obj]]} {return ""}
 	if {[string match ::* $sub]} {
 	    # NSF allows dispatch of unregistered methods via absolute
 	    # paths
@@ -181,26 +201,28 @@ proc ::tkcon::ExpandMethodname str {
 	}
     } elseif {[EvalAttached [list info exists ::xotcl::version]]} {
 	# XOTcl < 2.* is loaded
-	if {![EvalAttached [list ::xotcl::Object isobject $obj]]} {return -code continue}
+	if {![EvalAttached [list ::xotcl::Object isobject $obj]]} {return ""}
 	set cmd [list $obj info methods $sub*]
     } else {
 	# No NSF/XOTcl loaded
-        return -code continue
+        return ""
     }
 
     set match [EvalAttached $cmd]
-    if {[llength $match] > 1} {
-	regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } bestMatch
-	if {$str eq "" && [string match "* " $bestMatch]} {
-	    set match [linsert $match 0 ""]
-	} else {
-	    regsub -all {\\ } $bestMatch { } bestMatch
-	    set match [linsert $match 0 [lindex $bestMatch end]]
-	}
-    } else {
-	set match [lindex [lindex $match 0] end]
+    if {$findUniqueMatch} {
+        if {[llength $match] > 1} {
+            regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } bestMatch
+            if {$str eq "" && [string match "* " $bestMatch]} {
+                set match [linsert $match 0 ""]
+            } else {
+                regsub -all {\\ } $bestMatch { } bestMatch
+                set match [linsert $match 0 [lindex $bestMatch end]]
+            }
+        } else {
+            set match [lindex [lindex $match 0] end]
+        }
     }
-    return -code break $match
+    return $match
 }
 
 ## ::tkcon::ExpandVariable - expand a tcl variable name based on $str
@@ -209,32 +231,38 @@ proc ::tkcon::ExpandMethodname str {
 # Returns:	list containing longest unique match followed by all the
 #		possible further matches
 ## 
-proc ::tkcon::ExpandVariable str {
+proc ::tkcon::ExpandVariable {str {findUniqueMatch 1}} {
 
     # require at least a single character, otherwise continue
-    if {$str eq ""} {return -code continue}
+    if {$str eq ""} {return ""}
 
     if {[regexp {([^\(]*)\((.*)} $str junk ary str]} {
 	## Looks like they're trying to expand an array.
 	set match [EvalAttached [list array names $ary $str*]]
-	if {[llength $match] > 1} {
-	    set vars $ary\([ExpandBestMatch $match $str]
-	    foreach var $match {lappend vars $ary\($var\)}
-	    return $vars
-	} elseif {[llength $match] == 1} {
-	    set match $ary\($match\)
-	}
+        if {$findUniqueMatch && ([llength $match] > 1)} {
+            set vars $ary\([ExpandBestMatch $match $str]
+            foreach var $match {lappend vars $ary\($var\)}
+            return $vars
+        } elseif {[llength $match] == 1} {
+            set match $ary\($match\)
+        } elseif {[llength $match] > 1} {
+            set vars {}
+            foreach var $match {lappend vars $ary\($var\)}
+            return $vars
+        }
 	## Space transformation avoided for array names.
     } else {
 	set match [EvalAttached [list info vars $str*]]
-	if {[llength $match] > 1} {
-	    regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
-	    set match [linsert $match 0 $str]
-	} else {
-	    regsub -all {([^\\]) } $match {\1\\ } match
-	}
+        if {$findUniqueMatch} {
+            if {[llength $match] > 1} {
+                regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
+                set match [linsert $match 0 $str]
+            } else {
+                regsub -all {([^\\]) } $match {\1\\ } match
+            }
+        }
     }
-    return -code [expr {$match eq "" ? "continue" : "break"}] $match
+    return $match
 }
 
 ## ::tkcon::ExpandBestMatch2 - finds the best unique match in a list of names
@@ -264,15 +292,22 @@ proc ::tkcon::ExpandBestMatch2 {l {e {}}} {
 # Returns:	longest unique match in the list
 ## 
 proc ::tkcon::ExpandBestMatch {l {e {}}} {
+    showVarPutd e
     set ec [lindex $l 0]
     if {[llength $l]>1} {
-	set e  [string length $e]; incr e -1
+	set eLength  [string length $e]; incr eLength -1
 	set ei [string length $ec]; incr ei -1
 	foreach l $l {
-	    while {$ei>=$e && [string first $ec $l]} {
+	    while {$ei>=$eLength && [string first $ec $l]} {
 		set ec [string range $ec 0 [incr ei -1]]
 	    }
 	}
     }
-    return $ec
+    # This can happen if e is both a namespace name and proc name
+    # In this case matches will be ::name and just name
+    if {[string length $e]>[string length $ec]} {
+        return $e
+    } else {
+        return $ec
+    }
 }
