@@ -53,7 +53,7 @@
 # Replace: untested, must not work, but code is kept for a future
 
 namespace eval ::fndrpl {
-    # These are variables for a dialog window
+    # These are variables for a dialog window. Move to separate namespace? 
     variable glb
     # variable c
     variable window
@@ -67,6 +67,13 @@ namespace eval ::fndrpl {
     variable r
     variable ReplaceString           ""
     variable rconfirm
+
+    # This variable is set to 1 when dialog appears and when
+    # some parameters (excluding direction) are modified by a user.
+    # Before the start of the search, tts value is set to continueP
+    # field of SearchState 
+    
+    variable SearchParamsChanged     1
 
     # SearchState may contain a copies of data from dialog. It is related to search process itself, not to a dialog box. 
     variable SearchState [dict create -continueP 0 -direction 1 -findcase 0 -searchStringQ {}]
