@@ -1,6 +1,6 @@
 (in-package :cl-user)
 
-(proclaim '(optimize debug))
+(declaim (optimize (debug 3) (speed 0) (compilation-speed 0) (space 0)))
 
 
 (defun f (x)
