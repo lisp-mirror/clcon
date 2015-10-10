@@ -214,15 +214,17 @@ namespace eval ::fndrpl {
 
         foreach {found NewState} [FindItInner $text $SearchState] {break}
         
-        if {$found} {
+        if {$found==1} {
             return
+        } elseif {$found==-1} {
+            tk_messageBox -parent $text -title "Find" -message "Empty search string"
         } else {
             tk_messageBox -parent $text -title "Find" -message "Search string not found"
         }
     }
 
     # Returns two values:
-    # 1) 0 if not found, 1 if found
+    # 1) 0 if not found, 1 if found, -1 if empty search string
     # 2) new SearchState
     # Side effects: moves insert, changes selection
     # ContinueP is irrelevant for text search, but we insert
@@ -234,44 +236,44 @@ namespace eval ::fndrpl {
         set SearchDir [dict get $SearchState -direction]
         set findcase [dict get $SearchState -findcase]
 
-        if {$SearchString!=""} {
-
-            if {$findcase=="1"} {
-                set caset "-exact"
-            } else {
-                set caset "-nocase"
-            }
-            
-            if {$SearchDir == "forwards"} {
-                set limit end
-            } else {
-                set limit 1.0
-            }
-
-            set leng [string length $SearchString]
-
-            set SearchPos [ $text search $caset -$SearchDir -- $SearchString $SearchPos $limit]
-
-            if {$SearchPos != ""} {
-                $text see $SearchPos
-
-                $text tag remove sel 1.0 end
-
-                if {$SearchDir == "forwards"} {
-                    tkTextSetCursor $text "$SearchPos+$leng char"        
-                } else { tkTextSetCursor $text $SearchPos }
-
-                $text tag add sel $SearchPos  "$SearchPos+$leng char"
-
-                dict set SearchState -continueP 1
-                dict set SearchState -startFrom $SearchPos
-                return [list 1 $SearchState]
-
-            } else {
-                return [list 0 $SearchState]
-            }
-
+        if {$SearchString eq ""} {
+            return [list -1 $SearchState]
         }
+        if {$findcase=="1"} {
+            set caset "-exact"
+        } else {
+            set caset "-nocase"
+        }
+            
+        if {$SearchDir == "forwards"} {
+            set limit end
+        } else {
+            set limit 1.0
+        }
+
+        set leng [string length $SearchString]
+
+        set SearchPos [ $text search $caset -$SearchDir -- $SearchString $SearchPos $limit]
+
+        if {$SearchPos != ""} {
+            $text see $SearchPos
+
+            $text tag remove sel 1.0 end
+
+            if {$SearchDir == "forwards"} {
+                tkTextSetCursor $text "$SearchPos+$leng char"        
+            } else { tkTextSetCursor $text $SearchPos }
+
+            $text tag add sel $SearchPos  "$SearchPos+$leng char"
+
+            dict set SearchState -continueP 1
+            dict set SearchState -startFrom $SearchPos
+            return [list 1 $SearchState]
+
+        } else {
+            return [list 0 $SearchState]
+        }
+
     }
 
 
