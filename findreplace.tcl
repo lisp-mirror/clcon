@@ -76,7 +76,7 @@ namespace eval ::fndrpl {
     variable SearchParamsChanged     1
 
     # SearchState may contain a copies of data from dialog. It is related to search process itself, not to a dialog box. 
-    variable SearchState [dict create -continueP 0 -direction 1 -findcase 0 -searchStringQ {}]
+    variable SearchState [dict create -continueP 0 -direction "forwards" -findcase 0 -searchStringQ {}]
     # Other necessary elements of SearchState are:
     #     -widgetWhereSought                   search area (tablelist or text)
     #     -startFrom                           index 
@@ -213,8 +213,9 @@ namespace eval ::fndrpl {
 
     ################################# Find proc #################################
 
-    proc ProcessFindItResult {found NewState} {
-        set widgetWhereSought [dict get $NewState -widgetWhereSought]
+    proc ProcessFindItResult {found} {
+        variable SearchState
+        set widgetWhereSought [dict get $SearchState -widgetWhereSought]
         if {$found==1} {
             return
         } elseif {$found==-1} {
@@ -230,6 +231,7 @@ namespace eval ::fndrpl {
         variable SearchDir
         variable SearchString
         variable findcase
+        variable SearchState
 
         set SearchState [dict create                       \
                              -widgetWhereSought $text      \
@@ -239,9 +241,9 @@ namespace eval ::fndrpl {
                              -findcase      $findcase      \
                         ]
 
-        foreach {found NewState} [FindItInner $text $SearchState] {break}
+        set found [FindItInner $text]
 
-        ProcessFindItResult $found $NewState
+        ProcessFindItResult $found 
         
     }
 
@@ -251,7 +253,8 @@ namespace eval ::fndrpl {
     # Side effects: moves insert, changes selection
     # ContinueP is irrelevant for text search, but we insert
     # ContinueP 1 in resulting searchstate.
-    proc FindItInner {text SearchState} {
+    proc FindItInner {text} {
+        variable SearchState
 
         set SearchPos [dict get $SearchState -startFrom]
         set SearchString [dict get $SearchState -searchStringQ]
@@ -259,7 +262,7 @@ namespace eval ::fndrpl {
         set findcase [dict get $SearchState -findcase]
 
         if {$SearchString eq ""} {
-            return [list -1 $SearchState]
+            return -1
         }
         if {$findcase=="1"} {
             set caset "-exact"
@@ -290,10 +293,10 @@ namespace eval ::fndrpl {
 
             dict set SearchState -continueP 1
             dict set SearchState -startFrom $SearchPos
-            return [list 1 $SearchState]
+            return 1
 
         } else {
-            return [list 0 $SearchState]
+            return 0
         }
 
     }
@@ -507,8 +510,8 @@ namespace eval ::fndrpl {
              -findcase              $findcase                      \
             ]
         
-        ::srchtblst::TreeSearchText $tablelist $SearchState $EnsurePopulatedCmd {
-            ::fndrpl::ProcessFindItResult $found $SearchState
+        ::srchtblst::TreeSearchText $tablelist $EnsurePopulatedCmd {
+            ::fndrpl::ProcessFindItResult $found 
         }
     }
 }

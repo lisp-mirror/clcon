@@ -1,14 +1,7 @@
 package require Tk
 package require tablelist
 # TkconSourceHere util.tcl
-# SearchState is a dict:
-#    -continueP
-#       1 - if this is a continuation of search, 0 otherwise
-#    -startFrom {}|key
-#       {} - start from current position, key - start from that position
-#    -direction {forwards}|{backwards}
-#    -findcase 
-#       1 - case sensitive, 0 - insensitive
+# ::fndrpl::SearchState is documented in findreplace.tcl:
 
 namespace eval ::srchtblst {
 
@@ -43,16 +36,19 @@ namespace eval ::srchtblst {
     }
 
     proc MakeDefaultSearchState {tbl searchString} {
-        return [dict create                                                       \
-                    -continueP     0                                              \
-                    -startFrom     [$tbl index active]                            \
-                    -direction     "forwards"                                     \
-                    -searchStringQ [QuoteStringForRegexp $searchString]           \
-                    -findcase      0                                              \
-                   ]
+        variable ::fndrpl::SearchState
+        set SearchState                                                        \
+            [dict create                                                       \
+                 -continueP     0                                              \
+                 -startFrom     [$tbl index active]                            \
+                 -direction     "forwards"                                     \
+                 -searchStringQ [QuoteStringForRegexp $searchString]           \
+                 -findcase      0                                              \
+                ]
     }
 
-    proc GetSearchStateIncrement {SearchState} {
+    proc GetSearchStateIncrement {} {
+        variable ::fndrpl::SearchState
         set direction [dict get $SearchState -direction]
         if {$direction eq "backwards"} {
             set increment -1
@@ -64,7 +60,8 @@ namespace eval ::srchtblst {
         return $increment
     }
 
-    proc SearchStateTableListCmdWithCaseOption {SearchState} {
+    proc SearchStateTableListCmdWithCaseOption {} {
+        variable ::fndrpl::SearchState
         set findcase [dict get $SearchState -findcase]
         if {$findcase eq "1"} {
             set result "regexp"
@@ -80,7 +77,8 @@ namespace eval ::srchtblst {
     # Continuation for TreeSearchText
     # kind=1 - first call (from TreeSearchText)
     # kind=0 - subsequent calls (loop iterations)
-    proc TreeSearchTextC1 {kind CurName lambda tbl SearchState EnsurePopulatedCmd ContinuationBody} {
+    proc TreeSearchTextC1 {kind CurName lambda tbl EnsurePopulatedCmd ContinuationBody} {
+        variable ::fndrpl::SearchState
         if {![winfo exists $tbl]} {
             return
         }
@@ -95,9 +93,9 @@ namespace eval ::srchtblst {
             }
             set searchString [dict get $SearchState -searchStringQ]
             if {$searchString eq {}} {
-                apply $lambda $tbl -1 $SearchState
+                apply $lambda $tbl -1
             }            
-            set CmdWithCaseOption [SearchStateTableListCmdWithCaseOption $SearchState]
+            set CmdWithCaseOption [SearchStateTableListCmdWithCaseOption]
             set celltext [$tbl get $CurName]
             set cmd [string cat $CmdWithCaseOption " " [list $searchString [lindex $celltext 0]]]
             putd "about to test row at $CurName = [$tbl index $CurName]"
@@ -106,11 +104,11 @@ namespace eval ::srchtblst {
                 ::tablelist_util::TreeSetTo $tbl $CurName
                 dict set SearchState -continueP 1
                 dict set SearchState -startFrom $CurName
-                apply $lambda $tbl 1 $SearchState
+                apply $lambda $tbl 1
                 return
             } else {
                 set index [$tbl index $CurName]
-                set increment [GetSearchStateIncrement $SearchState]
+                set increment [GetSearchStateIncrement]
                 set i [expr $index + $increment ]
                 putd "incremented i by $increment to be $i"
             }
@@ -119,7 +117,7 @@ namespace eval ::srchtblst {
         if {0 <= $i && $i < [$tbl index end]} {
             set CurName [$tbl rowcget $i -name]
             set ContinuationCall \
-                [list "after" "idle" [list "::srchtblst::TreeSearchTextC1" 0 $CurName $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody]]
+                [list "after" "idle" [list "::srchtblst::TreeSearchTextC1" 0 $CurName $lambda $tbl $EnsurePopulatedCmd $ContinuationBody]]
             if {$EnsurePopulatedCmd ne {}} {
                 putd "About to EnsurePopulatedCmd $EnsurePopulatedCmd $CurName"
                 set call [list $EnsurePopulatedCmd $tbl $CurName $ContinuationCall]
@@ -129,7 +127,7 @@ namespace eval ::srchtblst {
                 eval $ContinuationCall
             }
         } else { # hence out of index range
-            apply $lambda $tbl 0 $SearchState
+            apply $lambda $tbl 0 
         }
         return
     }
@@ -148,16 +146,17 @@ namespace eval ::srchtblst {
     # SearchState: new SearchState
     # Items must be named
     # !!!Searches in first column only!!!
-    proc TreeSearchText {tbl SearchState EnsurePopulatedCmd ContinuationBody} {
+    proc TreeSearchText {tbl EnsurePopulatedCmd ContinuationBody} {
+        variable ::fndrpl::SearchState
         set startFrom [dict get $SearchState -startFrom]
         set continueP [dict get $SearchState -continueP]
-        set increment [GetSearchStateIncrement $SearchState]
-        set lambda [list {tablelist found SearchState} $ContinuationBody]
+        set increment [GetSearchStateIncrement]
+        set lambda [list {tablelist found} $ContinuationBody]
         # Coerce key (which can be a name) to index
         set startFrom [$tbl index $startFrom]
         putd "TreeSearchTextInner: startFrom = $startFrom, continueP = $continueP"
         set i [expr $startFrom + $increment * $continueP]
-        ::srchtblst::TreeSearchTextC1 1 $i $lambda $tbl $SearchState $EnsurePopulatedCmd $ContinuationBody 
+        ::srchtblst::TreeSearchTextC1 1 $i $lambda $tbl $EnsurePopulatedCmd $ContinuationBody 
         return
     }
 
@@ -197,12 +196,13 @@ namespace eval ::srchtblst {
 
     # Must pring "found 1" and "found 2"
     proc TestFnMan1 {} {
+        variable ::fndrpl::SearchState
         MakeTestTableList
-        set state [MakeDefaultSearchState .w.t "t"]
+        [MakeDefaultSearchState .w.t "t"]
         dict set state -findcase 1
-        ::srchtblst::TreeSearchText .w.t $state ::srchtblst::ExampleEnsurePopulated {
+        ::srchtblst::TreeSearchText .w.t ::srchtblst::ExampleEnsurePopulated {
             if {!$found} {error "TableListTest1 failure 1"} else {puts "found 1"}
-            ::srchtblst::TreeSearchText .w.t $SearchState ::srchtblst::ExampleEnsurePopulated {
+            ::srchtblst::TreeSearchText .w.t ::srchtblst::ExampleEnsurePopulated {
                 if {!$found} {error "TableListTest1 failure 2"} else {puts "found 2"}
                 # after idle after idle destroy .w
             }
