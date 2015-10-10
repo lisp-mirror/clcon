@@ -53,9 +53,11 @@
 # Replace: untested, must not work, but code is kept for a future
 
 namespace eval ::fndrpl {
+    # These are variables for a dialog window
     variable glb
     # variable c
     variable window
+
     variable SearchString            ""
     variable SearchPos               "1.0"
     variable SearchDir               "forwards"
@@ -66,10 +68,10 @@ namespace eval ::fndrpl {
     variable ReplaceString           ""
     variable rconfirm
 
-    # SearchState stores values of dialog box, position of search start or last found element, and helps to distinguish between first search and a continued search
+    # SearchState may contain a copies of data from dialog. It is related to search process itself, not to a dialog box. 
     variable SearchState [dict create -continueP 0 -direction 1 -findcase 0 -searchStringQ {}]
-    # Missing elements of SearchState are:
-    #     -widgetWhereSought                   widget pathname (tablelist or text)
+    # Other necessary elements of SearchState are:
+    #     -widgetWhereSought                   search area (tablelist or text)
     #     -startFrom                           index 
 
     proc greplist { text greps } {
