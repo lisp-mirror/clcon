@@ -84,7 +84,16 @@ namespace eval ::fndrpl {
     variable SearchState [dict create -continueP 0 -direction "forwards" -findcase 0 -searchStringQ {}]
     # Other necessary elements of SearchState are:
     #     -widgetWhereSought                   search area (tablelist or text)
-    #     -startFrom                           index 
+    #     -startFrom                           index
+
+
+    proc WhenSomeOfSearchVariablesChanged {name1 name2 op} {
+        variable SearchParamsChanged 
+        set SearchParamsChanged 1
+    }
+    
+    trace add variable SearchString write ::fndrpl::WhenSomeOfSearchVariablesChanged
+    trace add variable findcase write ::fndrpl::WhenSomeOfSearchVariablesChanged
 
     proc greplist { text greps } {
         variable glb
