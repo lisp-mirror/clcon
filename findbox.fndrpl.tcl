@@ -12,6 +12,10 @@ namespace eval ::fndrpl {
         variable findcase
         variable rconfirm
 
+        variable SearchParamsChanged
+
+        set SearchParamsChanged 1
+
         set find $area.find
         catch {destroy $find}
         toplevel $find
@@ -37,7 +41,7 @@ namespace eval ::fndrpl {
             if {$AreaType=="text"} {
                 set SearchCmd "::fndrpl::FindIt $area"
             } elseif {$AreaType=="tablelist"} {
-                set SearchCmd "::fndrpl::TreeSearchTextOuter $area $EnsurePopulatedCmd \$tmpContinueP"
+                set SearchCmd "::fndrpl::TreeSearchTextOuter $area $EnsurePopulatedCmd"
             } else {
                 error "Unknown $AreaType"
             }
@@ -56,12 +60,13 @@ namespace eval ::fndrpl {
             bind $find.l.f.f2.entry2 <Return> "::fndrpl::ReplaceIt $area -" 
         } elseif {$FndOrRpl=="find"} {
             pack $find.l.f.f1
-            bind $find <Return> "set tmpContinueP 0; $SearchCmd"
-            bind $find <F3>     "set tmpContinueP 1; $SearchCmd"
+            # Is there a sense to have two distinct keys for the same command? 
+            bind $find <Return> "$SearchCmd"
+            bind $find <F3>     "$SearchCmd"
         }
         
         frame $find.f2
-        button $find.f2.button1 -text "Find Next" -command "set tmpContinueP {}; $SearchCmd" -width 10 -height 1 
+        button $find.f2.button1 -text "Find Next" -command "$SearchCmd" -width 10 -height 1 
         
         button $find.f2.button9 -text "Find allwindows" -command "destroy $find; ::fndrpl::GrepIt $area"  -width 10 -underline 0 -state disabled
 

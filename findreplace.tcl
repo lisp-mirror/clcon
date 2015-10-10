@@ -56,13 +56,18 @@ namespace eval ::fndrpl {
     # These are variables for a dialog window. Move to separate namespace? 
     variable glb
     # variable c
-    variable window
+
+    # used in grep
+    variable window 
 
     variable SearchString            ""
     variable SearchPos               "1.0"
     variable SearchDir               "forwards"
-    variable findcase                0 
+    variable findcase                0
+
+    # used in grep
     variable current_window          # 1
+    
     variable greps
     variable r
     variable ReplaceString           ""
@@ -227,6 +232,7 @@ namespace eval ::fndrpl {
         }
     }
 
+    # Entry from FindBox dialog box to search process 
     proc FindIt {text} {
         variable SearchDir
         variable SearchString
@@ -481,29 +487,23 @@ namespace eval ::fndrpl {
         destroy $w
     }
 
-    # async command - does not return
-    proc TreeSearchTextOuter {tablelist EnsurePopulatedCmd {continueP {}}} {
+    # Entry from FindBox to tree search process, bound to button
+    proc TreeSearchTextOuter {tablelist EnsurePopulatedCmd} {
         variable SearchString
         variable SearchDir
         variable findcase
         variable SearchState
+        variable SearchParamsChanged
+
         set searchStringQ [QuoteStringForRegexp $SearchString]
+        set NewContinueP [expr {1 - $SearchParamsChanged}]
 
-        if {$continueP ne {}} {
-            set RealContinueP $continueP
-        } else {
-            set RealContinueP [dict get $SearchState -continueP]
-        }
-
-        # If direction changed, this is not a continue
-        if {[dict get $SearchState -direction] != $SearchDir} {
-            set RealContinueP 0
-        }
+        set SearchParamsChanged 0
 
         set SearchState                                            \
             [dict create                                           \
              -widgetWhereSought     $tablelist                     \
-             -continueP             $RealContinueP                 \
+             -continueP             $NewContinueP                  \
              -startFrom             [$tablelist index active]      \
              -direction             $SearchDir                     \
              -searchStringQ         $searchStringQ                 \
