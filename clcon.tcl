@@ -1451,10 +1451,10 @@ proc ::tkcon::HistoryMenu m {
     if {$PRIV(histid)==$id} return
     set PRIV(histid) $id
     $m delete 0 end
-    while {($id>1) && ($id>$PRIV(histid)-10) && \
+    while {($id>1) && ($id>$PRIV(histid)-20) && \
 	    ![catch {EvalSlave history event [incr id -1]} tmp]} {
 	set lbl $tmp
-	if {[string len $lbl]>32} { set lbl [string range $tmp 0 28]... }
+	if {[string len $lbl]>60} { set lbl [string range $tmp 0 58]... }
 	$m add command -label "$id: $lbl" -command "
 	$::tkcon::PRIV(console) delete limit end
 	$::tkcon::PRIV(console) insert limit [list $tmp]
