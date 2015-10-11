@@ -29,7 +29,26 @@ exec wish "$0" ${1+"$@"}
 #budden } else {
 #budden     package require Tk 8.4
 #budden }
+
 encoding system utf-8
+
+# Try to load record_definition as early as possible to get access to all
+# source locations
+namespace eval ::tkcon {
+    variable ScriptDirectory 
+    set ScriptDirectory [file dirname [info script]]
+}
+
+## TkconSourceHere - buddens command to load file from the same dir where
+# clcon itself is located. Be sure to load into main interpreter when you need it:
+#
+proc TkconSourceHere { filename } {
+    variable ::tkcon::ScriptDirectory
+    source [file join $::tkcon::ScriptDirectory $filename]
+}
+
+# TkconSourceHere record_definition.tcl
+
 package require Tk 8.4
 # package require tablelist - it must work after toplevel window creation
 
@@ -63,6 +82,7 @@ namespace eval ::clconcmd {
     # we need to run them in context of one console
 }
 
+
 # Initialize the ::tkcon namespace
 #
 namespace eval ::tkcon {
@@ -73,9 +93,6 @@ namespace eval ::tkcon {
     # info to configure.  COLOR has the color data.
     variable OPT
     variable COLOR
-
-    variable ScriptDirectory 
-    set ScriptDirectory [file dirname [info script]]
 
     # PRIV is used for internal data that only tkcon should fiddle with.
     variable PRIV
@@ -135,16 +152,9 @@ proc putd {arg1} {
 }
 
 
-
-## TkconSourceHere - buddens command to load file from the same dir where
-# clcon itself is located. Be sure to load into main interpreter when you need it:
-#
-proc TkconSourceHere { filename } {
-    variable ::tkcon::ScriptDirectory
-    source [file join $::tkcon::ScriptDirectory $filename]
-}
-
 proc ::tkcon::ReloadSomeIDESources1 {} {
+    # also we need record_definition.tcl, but we never reload it
+    # as any error in it likely means a spoiled image.
     TkconSourceHere util.tcl
     TkconSourceHere gui_util.tcl
     TkconSourceHere text2odu.tcl
