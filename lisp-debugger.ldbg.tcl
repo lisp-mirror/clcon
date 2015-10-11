@@ -322,6 +322,9 @@ namespace eval ::ldbg {
             EvalInFramePrettyPrint {
                 EvalInFramePrettyPrint $RowName
             }
+            EnableStepping {
+                EnableStepping
+            }
             #SwitchToNativeDebugger {
             #    SwitchToNativeDebugger $RowName
             #}    
@@ -409,6 +412,8 @@ namespace eval ::ldbg {
     proc MakeMainWindowStackMenu {w menu} {
         set m [menu [::tkcon::MenuButton $menu "1.Stack" stack]]
         set tbl [GetFramesTablelist $w ]
+
+        # FIXME redo all that strings to lists as with EnableStepping
         set cmd "::ldbg::CellCmdForActiveCell $tbl RowDblClick"
         $m add command -label "Edit source/inspect local" -accel "Return" -command $cmd
         #
@@ -423,6 +428,9 @@ namespace eval ::ldbg {
 
         set cmd "::ldbg::CellCmdForActiveCell $tbl EvalInFramePrettyPrint"
         $m add command -label "4.Eval in frame (pretty print)" -underline 0 -command $cmd
+
+        set cmd [list ::ldbg::CellCmdForActiveCell $tbl EnableStepping]
+        $m add command -label "5.Switch to stepping mode" -underline 0 -command $cmd        
     }
     
     proc MakeMainWindowEditMenu {w menu} {
@@ -570,6 +578,15 @@ namespace eval ::ldbg {
             $thread
     }
 
+    proc EnableStepping {} {
+        set thread [GetDebuggerThreadId]                    
+        ::tkcon::EvalInSwankAsync                           \
+            " (swank:sldb-step 0)"                          \
+            {}                                              \
+            $thread
+    }
+
+    
     #(:emacs-rex
     #(swank:sldb-return-from-frame 1 "(values nil nil)")
     #"COMMON-LISP-USER" 2 21)
