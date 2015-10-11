@@ -187,5 +187,21 @@ proc ::tkcon::LispFindDefinition {w} {
     LispFindDefinitionInner $str
 }
 
-    
+
+
+## ::tkcon::LispFindDefinition - clone of ::tkcon::Expand - 
+# ARGS:	w	- text widget in which to expand str
+# See also: ::edt::FindSourceCommand
+## 
+proc ::tkcon::TclFindDefinition {w} {
+    set str [GetTclNameAtInsert $w]
+    if {$str eq {}} {
+        tk_messageBox -parent $w -message "trying to edit empty definition"
+    } else {
+        ::record_definition::EditProcedure $str
+    }
+    # LispFindDefinitionInner $str
+}
+
+
 

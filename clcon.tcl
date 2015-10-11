@@ -1344,6 +1344,22 @@ proc ::tkcon::InitMenus {w title} {
         set cmd [list ::fndrpl::FindIt $text]
 	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd 
         bind TkConsole <F3> $cmd
+
+        $m add separator
+        
+        set cmd "event generate $text <<TkCon_ExpandLisp>>; break"
+        $m add command -label "Lisp complete" -accel "Tab, Control-Alt-i" -command $cmd
+
+        set cmd "event generate $text <<TkCon_LispFindDefinition>>; break"
+        $m add command -label "Lisp find definition" -accel "Control-." -command $cmd
+
+        $m add separator
+        
+        set cmd "event generate $text  <<TkCon_ExpandTcl>>; break"
+        $m add command -label "Lisp complete" -accel "Control-Alt-u" -command $cmd
+
+        set cmd "event generate $text <<TkCon_TclFindDefinition>>; break"
+        $m add command -label "Lisp find definition" -accel "Control-F9" -command $cmd
     }
 
     ## Interp Menu
