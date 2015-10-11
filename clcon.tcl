@@ -47,7 +47,7 @@ proc TkconSourceHere { filename } {
     source [file join $::tkcon::ScriptDirectory $filename]
 }
 
-# TkconSourceHere record_definition.tcl
+TkconSourceHere record_definition.tcl
 
 package require Tk 8.4
 # package require tablelist - it must work after toplevel window creation
