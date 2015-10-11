@@ -86,10 +86,8 @@
       (auto-save-mode-command 0)
       (lisp-mode-command nil)
       (budden-tools::show-expr (clco::text2odu-event-swank-connection e))
-      (setf (oi::variable-value 'odu::swank-connection :current b)
+      (setf (oi::variable-value 'odu::swank-connection :buffer b)
             (clco::text2odu-event-swank-connection e))
-      (budden-tools::show-expr (oi::variable-value 'odu::swank-connection :current b))
-      (budden-tools::show-expr (oi::variable-value 'odu::swank-connection :buffer b))
       )))
 
 (defun eval-destroy-backend-buffer (e)
@@ -104,6 +102,7 @@
   "Sets insert mark at clcon_text to buffer-point of buffer"
   (let ((clcon_text (oi::buffer-to-clcon_text buffer))
         (p (buffer-point buffer)))
+    (assert clcon_text () "~S This is not a clcon_text backend buffer" buffer)
     (oi::send-mark-to-clcon_text clcon_text p :remote-name "insert")
     ))
 

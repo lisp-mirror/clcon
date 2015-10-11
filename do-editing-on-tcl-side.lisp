@@ -88,7 +88,7 @@
   (assert (= start 0))
   (assert (= end (length string)))
   (let* ((b (buffer-of-mark mark)))
-    (when (bufferp b)
+    (when (clcon_text-backend-buffer-p b)
       (let* ((clcon_text (oi::buffer-to-clcon_text b))
              (rmn (remote-mark-name mark "is")))
         (call-combined-tcl-editing
@@ -109,7 +109,7 @@
   (let* ((b (buffer-of-mark mark))
          (clcon_text (oi::buffer-to-clcon_text b))
          (rmn (remote-mark-name mark "ic")))
-    (when (bufferp b)
+    (when (clcon_text-backend-buffer-p b)
       (call-combined-tcl-editing
        (tcl-code-for-send-mark-to-clcon_text
         clcon_text mark :remote-name rmn)
@@ -144,7 +144,7 @@
          (length (line-length* line))
          (b (buffer-of-mark mark)))
     (cond
-      ((not (bufferp b))
+      ((not (clcon_text-backend-buffer-p b))
        nil)
       ((zerop n) t)
       ;; Deleting chars on one line, just bump the pointers.
@@ -203,9 +203,10 @@
          (re (region-end region))
          (buffer (buffer-of-mark rb))
          (clcon_text (buffer-to-clcon_text buffer)))
-    (call-tcl-simple
-     (tcl-code-to-select-region clcon_text rb re)
-     )))
+    (when clcon_text
+      (call-tcl-simple
+       (tcl-code-to-select-region clcon_text rb re)
+       ))))
 
 
 (defmethod transfer-selection-from-clcon_text (buffer)
@@ -236,6 +237,7 @@
          (tcl-code (format nil "::edt::TextSelectionCoordinates ~A" clcon_text))
          (index-string (call-tcl-simple tcl-code))
          )
+    (assert clcon_text () "~S is not a clcon_text backend buffer" buffer)
     (cond
       ((string= index-string "")
        nil

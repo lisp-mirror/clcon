@@ -96,10 +96,12 @@
     #+oduvan-enable-highlight
     (when (bufferp buffer)
       (let* ((clcon_text (oi::buffer-to-clcon_text buffer))
-             (connection (oduvanchik-interface:variable-value
-                          'odu::swank-connection ;"Swank Connection"
-                          :current buffer))
-             )
+             (connection (and clcon_text
+                              ; if not, this is not clcon_text backend buffer
+                              (oduvanchik-interface:variable-value
+                               'odu::swank-connection ;"Swank Connection"
+                               :buffer buffer))
+               ))
         (when (and clcon_text connection marks)
           (let* ((line-number (oi::tag-line-number (oi::%line-tag line)))
                  (encoded-marks
