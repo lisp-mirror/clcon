@@ -49,22 +49,34 @@
 (defun eval-before-tcl-text-insert (e)
   (etypecase e
     (clcon-server::text2odu-event
-     (with-mark-in-row-col (beg (clcon-server::text2odu-event-beg e))
-       (insert-string beg (clcon-server::text2odu-event-string e))))))
+     (let* ((clcon_text (clcon-server::text2odu-event-clcon_text-pathname e))
+            (buffer (oi::clcon_text-to-buffer clcon_text)))
+       (assert buffer)
+       (use-buffer buffer 
+         (odu::check-display-start-ok)
+         (with-mark-in-row-col (beg (clcon-server::text2odu-event-beg e))
+           (insert-string beg (clcon-server::text2odu-event-string e)))
+         (odu::check-display-start-ok)))))
+  nil
+  )
 
 (defun eval-before-tcl-text-delete (e)
   (etypecase e
     (clcon-server::text2odu-event
-     (let ((ebeg (clcon-server::text2odu-event-beg e))
-           (eend (clcon-server::text2odu-event-end e)))
-       (with-mark-in-row-col (beg ebeg)
-         (cond
-           (eend
-            (with-mark-in-row-col (end eend)
-              (delete-characters-between-marks beg end)))
-           (t
-            (delete-characters beg 1)
-            ))))))
+     (let* ((ebeg (clcon-server::text2odu-event-beg e))
+            (eend (clcon-server::text2odu-event-end e))
+            (clcon_text (clcon-server::text2odu-event-clcon_text-pathname e))
+            (buffer (oi::clcon_text-to-buffer clcon_text)))
+       (assert buffer)
+       (use-buffer buffer
+         (with-mark-in-row-col (beg ebeg)
+           (cond
+             (eend
+              (with-mark-in-row-col (end eend)
+                (delete-characters-between-marks beg end)))
+             (t
+              (delete-characters beg 1)
+              )))))))
   t)
 
 (defun find-buffer-by-name (buffer-name)
