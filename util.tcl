@@ -29,7 +29,8 @@ proc ProcExistsP p {
 
 # See also showVar defined in record_definition.tcl
 proc showVarPutd {name} {
-    putd "sV:$name=[uplevel 1 [string cat {format %s $} $name]]"
+    upvar 1 $name local
+    putd "sV:$name=$local" 
 }
 
 

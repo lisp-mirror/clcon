@@ -21,28 +21,40 @@
 # Side effects: prints <variable-name> = <variable value>
 # See also showVarPutd defined in util.tcl
 proc showVar {name} {
-    puts "sV:$name=[uplevel 1 [string cat {format %s $} $name]]"
-}
+      upvar 1 $name local
+      puts "sV:$name=$local" 
+  }
 
 
 ## A la common lisp's defvar, http://www.lispworks.com/documentation/lw60/CLHS/Body/m_defpar.htm
 # Assigns value to a variable only if variable does not "info exists"
 proc defvar {name delicate_value} {
-    if {$delicate_value eq ""} {
-        set rhs_code "{}"
+    if {![uplevel 1 [list info exists $name]]} {
+        uplevel 1 [list set $name $delicate_value]
     } else {
-        set rhs_code $delicate_value
+        return -code error "variable '$name' already exists"
     }
-    set code [subst -nocommands {
-        uplevel 1 {
-            variable $name
-            if {![info exists $name]} {
-                set $name $rhs_code
-            }
-        }
-    }]
-    eval $code
 }
+
+# proc defvar {name delicate_value} {
+#     if {$delicate_value eq ""} {
+#         set rhs_code "{}"
+#     } else {
+#         set rhs_code $delicate_value
+#     }
+#     set code [subst -nocommands {
+#         uplevel 1 {
+#             variable $name
+#             if {![info exists $name]} {
+#                 set $name $rhs_code
+#             }
+#         }
+#     }]
+#     eval $code
+# }
+
+
+
 
 namespace eval ::record_definition {
     # Definition locations database
