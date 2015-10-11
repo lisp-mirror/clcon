@@ -271,7 +271,8 @@ namespace eval ::edt {
         }
           
     }
-    
+
+    # See also ::tkcon::LispFindDefinition
     proc FindSourceCommand {text} {
         set console [::tkcon::CurrentConsole]
         ::clcon_text::CallOduvanchikFunction $text "odu::find-source-command nil" {{
