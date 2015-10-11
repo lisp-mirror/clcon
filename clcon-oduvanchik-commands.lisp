@@ -153,3 +153,14 @@
 ; (slot-value (slot-value (slot-value (slot-value (oi::clcon_text-to-buffer ".__edit1.text") 'oi::%region) 'oi::start) 'oi::line) 'oi::marks)
 
 ; (clco:eval-in-tcl (with-output-to-string (ou) (format ou "::edt::ApplyHighlightToLine .__edit1.text ") (odu::encode-marks-for-line (odu::numbered-line-of-buffer-by-clcon ".__edit1.text" 3) ou)))
+
+
+(defun check-display-start-mark-ok (window)
+  (let* ((mark (window-display-start window)))
+    (oi::check-mark-is-in-its-line mark)))
+
+
+(defun check-display-start-ok ()
+  (dolist (b oi::*buffer-list*)
+    (dolist (w (buffer-windows b))
+      (check-display-start-mark-ok w))))

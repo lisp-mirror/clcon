@@ -99,7 +99,7 @@
     )))
 
 (defun nti  (clcon_text-pathname index string)
-  "notify-oduvan-tcl-text-insert . Called from RoInsert"
+  "notify-oduvan-tcl-text-insert . Called from RoInsert. See oduvanchik::eval-before-tcl-text-insert"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'before-tcl-text-insert
