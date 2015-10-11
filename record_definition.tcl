@@ -28,12 +28,13 @@ proc showVar {name} {
 
 ## A la common lisp's defvar, http://www.lispworks.com/documentation/lw60/CLHS/Body/m_defpar.htm
 # Assigns value to a variable only if variable does not "info exists"
+# In CL, previously defined variable will remain unbound upon redefinition if it was unbound
+# Here in tcl we have no difference between "unbound" and "not existing"
+# So there is no strict semantic correspondence
 proc defvar {name delicate_value} {
     if {![uplevel 1 [list info exists $name]]} {
         uplevel 1 [list set $name $delicate_value]
-    } else {
-        return -code error "variable '$name' already exists"
-    }
+    } 
 }
 
 # proc defvar {name delicate_value} {
