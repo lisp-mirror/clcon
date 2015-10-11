@@ -2,15 +2,28 @@
 ;; evaluation of text2odu events. Takes place in editor thread.
 (in-package :oduvanchik)
 
+
+(defun check-mark-is-at-row-and-col (mark row col)
+  (multiple-value-bind (r c)
+      (oi::mark-row-and-col mark)
+    (assert (= row r) ()
+            "Mark ~S was expected to be at row ~A, but it is at ~A" mark row r)
+    (assert (= col c) ()
+            "Mark ~S was expected to be at column ~A, but it is at ~A" mark col c)
+    ))
+
 (defun set-mark-to-row-and-col (mark row col)
   "Row and col a given in clcon_text 's coordinate system"
   (let* ((line (mark-line mark))
          (buffer (line-buffer line)))
     (move-mark mark (buffer-start-mark buffer))
-    (line-offset mark (- row 1) col)))
+    (line-offset mark (- row 1) col)
+    (check-mark-is-at-row-and-col mark row col)
+    nil
+    ))
 
 (defmacro with-mark-in-row-col ((name row-col) &body body)
-  "Evaluates body in the scope where name is bound to right-inserting temporary mark placed at clco::row-col struct"
+  "Evaluates body in the scope where name is bound to right-inserting temporary mark placed at clco::row-col struct. See also oi::mark-row-and-col"
   ;(beginning-of-buffer-command)
                                         ;(line-next
   (alexandria:once-only (row-col)
