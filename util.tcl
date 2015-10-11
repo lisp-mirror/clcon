@@ -25,10 +25,9 @@ proc ProcExistsP p {
 }
 
 
-proc showVar {name} {
-    puts "sV:$name=[uplevel 1 [string cat {format %s $} $name]]"
-}
+# See also defvar defined in record_definition.tcl
 
+# See also showVar defined in record_definition.tcl
 proc showVarPutd {name} {
     putd "sV:$name=[uplevel 1 [string cat {format %s $} $name]]"
 }
@@ -71,3 +70,14 @@ proc tr {x} {
     catch { throw {ARITH DIVZERO {divide by zero}}} 
     tk_messageBox -message "$x [info errorstack]"
 }
+
+
+proc dump_all_frame_infos {} {
+    for {set x 0} {$x<100} {incr x} { 
+        catch { set frame$x [ info frame $x ] }
+        if {[info exists frame$x]} {
+            showVar frame$x
+        }
+    }
+}
+

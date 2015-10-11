@@ -311,3 +311,18 @@ proc ::tkcon::ExpandBestMatch {l {e {}}} {
         return $ec
     }
 }
+
+
+# Returns name at which insert stands
+proc ::tkcon::GetTclNameAtInsert {w} {
+    set exp_beg "\[^\\\\\]\[\[ \t\n\r\\\{\"$\]" 
+    set i_b [$w search -backwards -regexp $exp_beg insert-1c 1.0]
+    if {$i_b ne {}} {append i_b +2c} else {set i_b 1.0}
+    set exp_end "\[^\\\\\]\[\\\[\\\] \t\n\r\\\{\}\"$\]"
+    set i_e [$w search -forwards -regexp $exp_end insert end]
+    showVarPutd i_e
+    if {$i_e ne {}} {append i_e +1c} else {set i_e end-1c}
+    set result [$w get $i_b $i_e]
+    showVarPutd result
+    return $result
+}

@@ -153,6 +153,7 @@ proc ::tkcon::WritePassiveText {w text index} {
 }
 
 
+# Opens file at that offset (in chars). See also ::tkcon::EditFileAtLine
 proc ::tkcon::EditFileAtOffset {filename offset} {
     variable OPT
     $OPT(edit) -type file -offset $offset -- $filename
@@ -161,9 +162,13 @@ proc ::tkcon::EditFileAtOffset {filename offset} {
     # focus -force $editor
 }
 
+proc ::tkcon::EditFileAtLine {filename line} {
+    EditFileAtOffset $filename [string cat $line ".0"]
+}
 
 ## ::tkcon::LispFindDefinition - clone of ::tkcon::Expand - 
 # ARGS:	w	- text widget in which to expand str
+# See also: ::edt::FindSourceCommand
 ## 
 proc ::tkcon::LispFindDefinition {w} {
     set exp [::tkcon::BeginningOfLispSymbolRegexp]
@@ -182,5 +187,21 @@ proc ::tkcon::LispFindDefinition {w} {
     LispFindDefinitionInner $str
 }
 
-    
+
+
+## ::tkcon::LispFindDefinition - clone of ::tkcon::Expand - 
+# ARGS:	w	- text widget in which to expand str
+# See also: ::edt::FindSourceCommand
+## 
+proc ::tkcon::TclFindDefinition {w} {
+    set str [GetTclNameAtInsert $w]
+    if {$str eq {}} {
+        tk_messageBox -parent $w -message "trying to edit empty definition"
+    } else {
+        ::record_definition::EditProcedure $str
+    }
+    # LispFindDefinitionInner $str
+}
+
+
 

@@ -43,6 +43,7 @@ namespace eval tkcon {
             <<TkCon_ExpandLisp>>	<Key-Tab>
             <<TkCon_LispFindDefinition>> <Alt-period>
             <<TkCon_LispFindDefinition>> <Alt-Key-Cyrillic_yu>
+            <<TkCon_TclFindDefinition>> <Control-Key-F9>
             <<TkCon_Tab>>		<Control-i>
             <<TkCon_Tab>>		<Alt-i>
             <<TkCon_Newline>>	<Control-Key-Return>
@@ -221,6 +222,10 @@ namespace eval tkcon {
         }
         bind TkConsole <<TkCon_LispFindDefinition>> {
             ::tkcon::LispFindDefinition %W
+            break ; # could check "%K" == "Tab"
+        }
+        bind TkConsole <<TkCon_TclFindDefinition>> {
+            ::tkcon::TclFindDefinition %W
             break ; # could check "%K" == "Tab"
         }
         bind TkConsole <<TkCon_ExpandVar>> {
