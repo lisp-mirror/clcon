@@ -285,12 +285,12 @@ namespace eval ::edt {
         ::clcon_text::WrapEventScriptForFreezedText $script [uplevel 1 {string cat "$w.text"}]
     }
     
-    proc OduFnMenuItem {w m text oduCmd {accel {}}} {
+    proc OduFnMenuItem {w m btext oduCmd {accel {}} {bindtag {}}} {
         set oduFn [string cat "odu::" $oduCmd "-command"]
-        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text "$oduFn nil"]]
+        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $btext "$oduFn nil"]]
         $m add command -label $oduCmd -accel $accel -command $cmd
         if {$accel ne {}} {
-            bind $w $accel "$cmd; break"
+            bind $bindtag $accel "$cmd; break"
         }
         return $cmd
     }
@@ -304,55 +304,55 @@ namespace eval ::edt {
         ::tkcon::SendEventToSwank $form {} 1 {:find-existing}
     }
 
-    proc MakeLispModeMenu {menu w text} {
+    proc MakeLispModeMenu {menu w btext} {
         set m [menu [::tkcon::MenuButton $menu 3.Lisp lisp]]
 
         # It is too late hour to start show-mark
         # We have archietectural problems there (rompsite.lisp is too early on the build)
         # set oduCmd "lisp-insert-\)"
-        # set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text ????]]
+        # set cmd [wesppt [list clcon_text::CallOduvanchikFunction $btext ????]]
         # $m add command -label $oduCmd -accel "F11" -command $cmd
         # bind $w <F11> $cmd
 
-        set cmd [list ::edt::CompileAndLoadTheFile $text]
+        set cmd [list ::edt::CompileAndLoadTheFile $btext]
         $m add command -label "0.Compile and load" -underline 0 -command $cmd -accel "F5"
-        bind $text <F5> $cmd
+        bind NoMod$w <F5> $cmd
 
-        ::erbr::AddNextAndPreviousCompilerMessagesCommands $m $text 1
-
-        $m add separator
-
-        set cmd [OduFnMenuItem $w $m $text indent-new-line "<Shift-Return>"]
-        bind $text <Shift-Return> "$cmd; break"
-
-        OduFnMenuItem $w $m $text indent-form
-        
-        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $text "odu::indent-region-command nil" {} {send_selection 1}]]
-        
-        $m add command -label "Indent Region" -accel "F11" -command $cmd
-        bind $w <F11> $cmd
-        
-        
-        OduFnMenuItem $w $m $text transpose-forms
-        $m add separator
-        OduFnMenuItem $w $m $text beginning-of-defun
-        OduFnMenuItem $w $m $text end-of-defun
-        OduFnMenuItem $w $m $text mark-defun 
-        $m add separator
-        OduFnMenuItem $w $m $text forward-form
-        OduFnMenuItem $w $m $text backward-form
-        OduFnMenuItem $w $m $text forward-list
-        OduFnMenuItem $w $m $text backward-list
-        OduFnMenuItem $w $m $text forward-up-list
-        OduFnMenuItem $w $m $text backward-up-list
-        OduFnMenuItem $w $m $text down-list
+        ::erbr::AddNextAndPreviousCompilerMessagesCommands $m $btext 1
 
         $m add separator
 
-        set cmd [wesppt [list ::edt::FindSourceCommand $text]]
+        set cmd [OduFnMenuItem $w $m $btext indent-new-line "<Shift-Return>" SingleMod$w]
+        # bind SingleMod$w <Shift-Return> "$cmd; break"
+
+        OduFnMenuItem $w $m $btext indent-form
+        
+        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $btext "odu::indent-region-command nil" {} {send_selection 1}]]
+        
+        $m add command -label "Indent Region" -accel "F11" -command $cmd 
+        bind NoMod$w <F11> $cmd
+        
+        
+        OduFnMenuItem $w $m $btext transpose-forms
+        $m add separator
+        OduFnMenuItem $w $m $btext beginning-of-defun
+        OduFnMenuItem $w $m $btext end-of-defun
+        OduFnMenuItem $w $m $btext mark-defun 
+        $m add separator
+        OduFnMenuItem $w $m $btext forward-form
+        OduFnMenuItem $w $m $btext backward-form
+        OduFnMenuItem $w $m $btext forward-list
+        OduFnMenuItem $w $m $btext backward-list
+        OduFnMenuItem $w $m $btext forward-up-list
+        OduFnMenuItem $w $m $btext backward-up-list
+        OduFnMenuItem $w $m $btext down-list
+
+        $m add separator
+
+        set cmd [wesppt [list ::edt::FindSourceCommand $btext]]
         $m add command -label "Find Source" -accel "Alt-." -command $cmd
-        bind $w <Alt-period> $cmd
-        bind $w <Alt-Key-Cyrillic_yu> $cmd
+        bind SingleMod$w <Alt-period> $cmd
+        bind SingleMod$w <Alt-Key-Cyrillic_yu> $cmd
 
         
 
@@ -421,6 +421,17 @@ namespace eval ::edt {
     
     # Initializes editor GUI, loads text.
     # args are for error only
+    # Args:
+    # tw - editor window pathname, say ".__edit1",
+    # w === tw, but in the future it will be editor frame or smth like this
+    # opts - editor options
+    # tail - editor name argument (filename, procname, errorname, etc.)
+    # Important variables:
+    #  btext - clcon_text widget (currently is a btext wrapper)
+    #  textt - text itself
+    # Bindtags:
+    #  DoubleKey$w - for double modifiers. Assigned to w, btext, textt
+    #  SingleMod$w - for single modifiers. Assigned to w, btext, textt
     proc SetupEditorWindow {tw w word opts tail} {
         variable ::tkcon::PRIV
         variable ::tkcon::COLOR
@@ -434,13 +445,13 @@ namespace eval ::edt {
 
         wm protocol $tw WM_DELETE_WINDOW "::edt::HideEditorWindow $tw"
         
-        set txt [::clcon_text::clcon_text $w.text]
-        # $w.text configure -send_to_lisp 1
-        # ::btext::clearHighlightClasses $w.text
-
-        # set txt [text $w.text]
+        set btext [::clcon_text::clcon_text $w.text]
+        set textt $btext.t
         
-        $w.text configure -wrap [dict get $opts -wrap] \
+        # $tw.text configure -send_to_lisp 1
+        # ::btext::clearHighlightClasses $btext
+
+        $btext configure -wrap [dict get $opts -wrap] \
             -xscrollcommand [list $w.sx set] \
             -yscrollcommand [list $w.sy set] \
             -foreground $COLOR(stdin) \
@@ -451,7 +462,11 @@ namespace eval ::edt {
         catch {
             # 8.5+ stuff
             set tabsp [expr {$OPT(tabspace) * [font measure $OPT(font) 0]}]
-            $w.text configure -tabs [list $tabsp left] -tabstyle wordprocessor
+            $btext configure -tabs [list $tabsp left] -tabstyle wordprocessor
+        }
+
+        foreach path [list $w $btext $textt] {
+            bindtags $path [concat DoubleMod$w SingleMod$w NoMod$w [bindtags $path]]
         }
 
         scrollbar $w.sx -orient h -command [list $w.text xview]
@@ -459,7 +474,6 @@ namespace eval ::edt {
         
         set menu [menu $w.mbar]
         $w configure -menu $menu
-        set text $w.text
         
         ## File Menu
         ##
@@ -467,13 +481,13 @@ namespace eval ::edt {
 
         set cmd ::tkcon::OpenForEdit 
 	$m add command -label "Open" -command $cmd -accel "Control-O"
-        bind $text <Control-Key-o> "$cmd; break"
-        bind $text <Control-Key-Cyrillic_shcha> "$cmd; break"
+        bind SingleMod$w <Control-Key-o> "$cmd; break"
+        bind SingleMod$w <Control-Key-Cyrillic_shcha> "$cmd; break"
 
         set cmd [wesppt [list ::edt::Save $w.text]]
         $m add command -label "Save" -command $cmd -accel "Control-S"
-        bind $w <Control-Key-s> $cmd
-        bind $w <Control-Key-Cyrillic_yeru> $cmd
+        bind SingleMod$w <Control-Key-s> $cmd
+        bind SingleMod$w <Control-Key-Cyrillic_yeru> $cmd
         
         $m add command -label "Save As..."  -underline 0 \
             -command [wesppt [list ::tkcon::Save {} widget $w.text]]
@@ -481,7 +495,7 @@ namespace eval ::edt {
 
         set CloseFile [wesppt [list ::edt::EditCloseFile $tw $w]]
         $m add command -label "Close" -accel "Control-w" -command $CloseFile
-        bind $w <Control-Key-w> $CloseFile
+        bind SingleMod$w <Control-Key-w> $CloseFile
         
         set dismiss [wesppt [list wm withdraw $tw]]
         $m add command -label "Hide editor window" -underline 0 -command $dismiss
@@ -493,77 +507,73 @@ namespace eval ::edt {
         ##
         set m [menu [::tkcon::MenuButton $menu 2.Edit edit]]
         $m add command -label "Cut"   -under 2 \
-            -command [wesppt [list tk_textCut $text]]
+            -command [wesppt [list tk_textCut $btext]]
         $m add command -label "Copy"  -under 0 \
-            -command [wesppt [list tk_textCopy $text]]
+            -command [wesppt [list tk_textCopy $btext]]
         $m add command -label "Paste" -under 0 \
-            -command [wesppt [list tk_textPaste $text]]
+            -command [wesppt [list tk_textPaste $btext]]
         ##
         $m add separator
-	set cmd [wesppt [list ::fndrpl::OpenFindBox $text "text" "find" {}]]
+	set cmd [wesppt [list ::fndrpl::OpenFindBox $btext "text" "find" {}]]
         $m add command -label "Find" -under 0 -command $cmd -accel "Control-F"
-        bind $w <Control-Key-f> $cmd
-        bind $w <Control-Key-Cyrillic_a> $cmd
+        bind SingleMod$w <Control-Key-f> $cmd
+        bind SingleMod$w <Control-Key-Cyrillic_a> $cmd
 
-        set cmd [list ::fndrpl::FindIt $text]
+        set cmd [list ::fndrpl::FindIt $btext]
 	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd 
-        bind $w <F3> $cmd
-
-        $m add separator
-
-        set cmd "::edt::e_indent $text"
-        $m add command -label "Tcl indent new line" -accel <Control-Key-Return> -command $cmd
-        bind EdtControlKeys <Control-Key-Return> "$cmd; break"
-        bind EdtControlKeys <F4> "$cmd; break"
-
+        bind NoMod$w <F3> $cmd
 
         ## Lisp mode Menu
         ##
-        MakeLispModeMenu $menu $w $text
+        MakeLispModeMenu $menu $w $btext
         
-        ## Send To Menu
+        ## Tcl mode Menu
         ## 
-        # Try to keep Send menu by allowing to send to main interpreter only
-        set m [menu [::tkcon::MenuButton $menu "Send to..." send]]
-        set other [tkcon attach]
+        set m [menu [::tkcon::MenuButton $menu "4.Tcl" tcl]]
+        set SendToSlave [wesppt "::tkcon::EvalSlave \
+		    eval \[$btext get 1.0 end-1c\]"]
+        $m add command -label "&2. Send Text To Slave" \
+            -command $SendToSlave
 
-        set SendToOther [wesppt "::tkcon::EvalOther $other \
-		    eval \[$w.text get 1.0 end-1c\]"]
-        $m add command -label "Send To [lindex $other 0]" \
-            -command $SendToOther
+        $m add separator
 
+        set cmd "::edt::e_indent $btext"
+        $m add command -label "Tcl indent new line" -accel <Control-Key-Return> -command $cmd
+        bind DoubleMod$w <Control-Key-Return> "$cmd; break"
+        bind NoMod$w <F4> "puts WOW; $cmd; break"
+
+        
         ## Window Menu
         ##
         set m [menu [::tkcon::MenuButton $menu "7.Window" window]]
         set cmd [list ::clconcmd::bufferlist]
 	$m add command -label "Buffer list" -underline 0 -accel "Control-F12" \
             -command $cmd
-        bind $w <Control-Key-F12> $cmd
+        bind SingleMod$w <Control-Key-F12> $cmd
         #
         set cmd [list ::tkcon::FocusConsole]
 	$m add command -label "Console" -underline 0 -accel "Control-." \
             -command $cmd
-        bind $w <Control-Key-period> $cmd
+        bind SingleMod$w <Control-Key-period> $cmd
         
         ## Secret Menu
         ##
-        set text $w.text
         set m [menu [::tkcon::MenuButton $menu Secret secret]]
 
-        set cmd [list $text Unfreeze]
+        set cmd [list $btext Unfreeze]
         $m add command -label "1.Unfreeze (if oduvanchik hang)" -command $cmd
 
-        set cmd [list ::tkcon::EvalInSwankAsync "(clco::compare-clcon_text-and-oduvanchik-buffer-contents \"$text\")" {} {:find-existing}]
+        set cmd [list ::tkcon::EvalInSwankAsync "(clco::compare-clcon_text-and-oduvanchik-buffer-contents \"$btext\")" {} {:find-existing}]
         $m add command -label "Check Oduvanchik Sync" -accel "F8" -command $cmd
-        bind $w <F8> $cmd
+        bind NoMod$w <F8> $cmd
 
-        set cmd [wesppt [list ::edt::SyncCursor $text]]
+        set cmd [wesppt [list ::edt::SyncCursor $btext]]
         $m add command -label "Sync cursor" -accel "F9" -command $cmd
-        bind $w <F9> $cmd
+        bind NoMod$w <F9> $cmd
 
         
         # Layout
-        grid $w.text - $w.sy -sticky news
+        grid $btext - $w.sy -sticky news
         grid $w.sx - -sticky ew
         grid columnconfigure $w 0 -weight 1
         grid columnconfigure $w 1 -weight 1
