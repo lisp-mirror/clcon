@@ -432,6 +432,7 @@ namespace eval ::edt {
     # Bindtags:
     #  DoubleKey$w - for double modifiers. Assigned to w, btext, textt
     #  SingleMod$w - for single modifiers. Assigned to w, btext, textt
+    #  NoMod$w - for keys w/o modifiers
     proc SetupEditorWindow {tw w word opts tail} {
         variable ::tkcon::PRIV
         variable ::tkcon::COLOR
