@@ -3148,6 +3148,7 @@ proc tkcon_gets args {
 
 proc ::tkcon::ReloadSomeIDESources2 {} {
     TkconSourceHere eval.tkcon.tcl
+    TkconSourceHere editor_buffer.edt.tcl
     TkconSourceHere editor.edt.tcl
     TkconSourceHere menu.recent.tcl
     TkconSourceHere highlight.edt.tcl
