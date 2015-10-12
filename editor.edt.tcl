@@ -8,40 +8,13 @@
 #   -type proc or var or file
 #   -wrap wrap option for text widget
 #   -offset index to show
-#   BROKEN -attach interpreter - get data in that interpreter 
-#   type	proc/file/var
+#   type	proc/file/var (what about error?)
 #   options 
 # Returns:	nothing
 # Added by budden : -offset option, accepts index
 ##
 
 namespace eval ::edt {
-    
-    # always be global
-    variable ReuseCounter
-
-    # when we allow for several editor windows, this variable will be window-local
-    # Each element is a dict with keys and values:
-    # name - name of window
-    # type - type (file, var, proc, error)
-    # path - path to a file (with a name)
-    # w - window
-    variable EditorMRUWinList
-
-    # will always be global 
-    variable EditorReusableWindowDict
-
-    # when we allow for several editor windows,
-    # will split into global window counter and per window frame counter
-    variable EditorWindowCounter
-
-   
-    # This will be an option
-    # If true, we allow for only one editor window at a time, joungling frames in it
-    # New window to the same place where old one was
-    proc SingleEditorWindow {} {
-        return 1
-    }
 
     proc GenEditorWindowName {} {
         variable ::tkcon::PRIV
@@ -119,26 +92,6 @@ namespace eval ::edt {
             set window [dict get $p w]
             if {[winfo exists $window]} {
                 wm withdraw $window
-            }
-        }
-    }
-
-    proc RemoveWindowFromLists {tw w} {
-        variable EditorMRUWinList
-        variable EditorReusableWindowDict
-        set i 0
-        foreach p $EditorMRUWinList {
-            set window [dict get $p w]
-            if {$window eq $tw} {
-                set EditorMRUWinList [lreplace $EditorMRUWinList $i $i]
-                break
-            }
-            incr i
-        }
-        dict for {key window} $EditorReusableWindowDict {
-            if {$window eq $tw} {
-                set EditorReusableWindowDict [dict remove $EditorReusableWindowDict $key]
-                break
             }
         }
     }

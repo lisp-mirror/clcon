@@ -1,0 +1,81 @@
+## Editor internal buffer lists; mapping between widget structure and buffer id. 
+
+namespace eval ::edt {
+    
+    # always be global
+    variable ReuseCounter
+
+    # when we allow for several editor windows, this variable will be window-local
+    # Each element is a dict with keys and values:
+    # name - name of window
+    # type - type (file, var, proc, error)
+    # path - path to a file (with a name)
+    # w - window
+    variable EditorMRUWinList
+
+    # will always be global 
+    variable EditorReusableWindowDict
+
+    # when we allow for several editor windows,
+    # will split into global window counter and per window frame counter
+    variable EditorWindowCounter
+
+   
+    # Reuse counter increments when we open a non-reusable window
+    # This is required to know which window was opened earlier
+    proc GenReuseCounter {} {
+        variable ReuseCounter
+        if {![info exists ReuseCounter]} {
+            set ReuseCounter 0
+        }
+        return [incr ReuseCounter]
+    }
+
+    # We canonicalize edit args to key and then
+    # Store window into EditorReusableWindowDict by its key. 
+    # And we store it in EditorWindowList for selection (ordered by usage history)
+
+    # We have global variables to keep window list
+    proc InitEditorWindowLists {} {
+        variable EditorMRUWinList
+        variable EditorReusableWindowDict
+        if {![info exists EditorMRUWinList]} {
+            variable EditorWindowCounter
+            set EditorMRUWinList [list]
+            set EditorReusableWindowDict [dict create]
+            set EditorWindowCounter 0
+        }
+    }
+
+    # This function can be useful for some other tools, e.g. recent files menu
+    proc IsFileBeingEdited {filename} {
+        variable EditorReusableWindowDict
+        set key [list $filename -type file]
+        dict exists $EditorReusableWindowDict $key
+    }
+    
+
+    proc RemoveWindowFromLists {tw w} {
+        variable EditorMRUWinList
+        variable EditorReusableWindowDict
+        set i 0
+        foreach p $EditorMRUWinList {
+            set window [dict get $p w]
+            if {$window eq $tw} {
+                set EditorMRUWinList [lreplace $EditorMRUWinList $i $i]
+                break
+            }
+            incr i
+        }
+        dict for {key window} $EditorReusableWindowDict {
+            if {$window eq $tw} {
+                set EditorReusableWindowDict [dict remove $EditorReusableWindowDict $key]
+                break
+            }
+        }
+    }
+
+    InitEditorWindowLists
+
+}
+
