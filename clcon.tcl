@@ -1356,10 +1356,10 @@ proc ::tkcon::InitMenus {w title} {
         $m add separator
         
         set cmd "event generate $text  <<TkCon_ExpandTcl>>; break"
-        $m add command -label "Lisp complete" -accel "Control-Alt-u" -command $cmd
+        $m add command -label "Tcl complete" -accel "Control-Alt-u" -command $cmd
 
         set cmd "event generate $text <<TkCon_TclFindDefinition>>; break"
-        $m add command -label "Lisp find definition" -accel "Control-F9" -command $cmd
+        $m add command -label "Tcl find definition" -accel "Control-F9" -command $cmd
     }
 
     ## Interp Menu
