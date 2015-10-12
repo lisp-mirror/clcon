@@ -137,7 +137,7 @@ proc ::tkcon::WriteActiveText {w text index code} {
     set tag [UniqueTag $w]
     $w tag configure $tag -foreground ForestGreen
     # $w insert output $text [list stdout $tag] \n stdout
-    $w RoInsert $index $text $tag  
+    ::ro_out::I $w $index $text $tag  
     $w tag bind $tag <Enter> [list $w tag configure $tag -under 1]
     $w tag bind $tag <Leave> [list $w tag configure $tag -under 0]
     $w tag bind $tag <ButtonRelease-1> $code
@@ -149,7 +149,7 @@ proc ::tkcon::WriteActiveText {w text index code} {
 proc ::tkcon::WritePassiveText {w text index} {
     set tag [UniqueTag $w]
     $w tag configure $tag -foreground grey
-    $w RoInsert $index $text\n [list stdout $tag]
+    ::ro_out::I $w $index $text\n [list stdout $tag]
 }
 
 
