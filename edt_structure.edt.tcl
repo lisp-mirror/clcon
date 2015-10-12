@@ -15,7 +15,7 @@ namespace eval ::edt {
 
     # will always be global. Maps contents key (canonicalized edit args)
     # to buffer id. 
-    variable EditorReusableWindowDict
+    variable ContentKeyToBufIdDict
 
     # when we allow for several editor windows,
     # will split into global window counter and per window frame counter
@@ -33,32 +33,32 @@ namespace eval ::edt {
     }
 
     # We canonicalize edit args to key and then
-    # Store window into EditorReusableWindowDict by its key. 
+    # Store window into ContentKeyToBufIdDict by its key. 
     # And we store it in EditorWindowList for selection (ordered by usage history)
 
     # We have global variables to keep window list
     proc InitEditorWindowLists {} {
         variable EditorMRUWinList
-        variable EditorReusableWindowDict
+        variable ContentKeyToBufIdDict
         if {![info exists EditorMRUWinList]} {
             variable EditorWindowCounter
             set EditorMRUWinList [list]
-            set EditorReusableWindowDict [dict create]
+            set ContentKeyToBufIdDict [dict create]
             set EditorWindowCounter 0
         }
     }
 
     # This function can be useful for some other tools, e.g. recent files menu
     proc IsFileBeingEdited {filename} {
-        variable EditorReusableWindowDict
+        variable ContentKeyToBufIdDict
         set key [list $filename -type file]
-        dict exists $EditorReusableWindowDict $key
+        dict exists $ContentKeyToBufIdDict $key
     }
     
 
     proc RemoveWindowFromLists {tw w} {
         variable EditorMRUWinList
-        variable EditorReusableWindowDict
+        variable ContentKeyToBufIdDict
         set i 0
         foreach p $EditorMRUWinList {
             set window [dict get $p w]
@@ -68,9 +68,9 @@ namespace eval ::edt {
             }
             incr i
         }
-        dict for {key window} $EditorReusableWindowDict {
+        dict for {key window} $ContentKeyToBufIdDict {
             if {$window eq $tw} {
-                set EditorReusableWindowDict [dict remove $EditorReusableWindowDict $key]
+                set ContentKeyToBufIdDict [dict remove $ContentKeyToBufIdDict $key]
                 break
             }
         }
@@ -80,7 +80,7 @@ namespace eval ::edt {
     # Store window name for buffer list window
     proc AddToWindowLists {key w} {
         variable EditorMRUWinList
-        variable EditorReusableWindowDict
+        variable ContentKeyToBufIdDict
 
         set word [lindex $key 0]
         set options [lrange $key 1 end]
@@ -100,15 +100,15 @@ namespace eval ::edt {
         }
         
         lappend EditorMRUWinList [dict create name $name type $ty path $word w $w]
-        dict set EditorReusableWindowDict $key $w
+        dict set ContentKeyToBufIdDict $key $w
     }
 
     # Returns a window 
     proc FindOrMakeEditorWindow {word opts tail} {
-        variable EditorReusableWindowDict
+        variable ContentKeyToBufIdDict
         set key [CanonicalizeEditArgs $word $opts]
-        if { [dict exists $EditorReusableWindowDict $key] } {
-            return [dict get $EditorReusableWindowDict $key]
+        if { [dict exists $ContentKeyToBufIdDict $key] } {
+            return [dict get $ContentKeyToBufIdDict $key]
         }
         # If not, create one
         set tw [GenEditorWindowName]
