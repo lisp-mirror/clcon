@@ -119,6 +119,18 @@ namespace eval ::edt {
         return $tw
     }
 
+    # returns Window. When we use multiple frames, would return frame
+    proc CurrentlyVisibleBuffer {} {
+        variable EditorMRUWinList
+        foreach p $EditorMRUWinList {
+            set window [dict get $p w]
+            if {[winfo exists $window] && [winfo ismapped $window]} {
+                return $window
+            }
+        }
+        return {}
+    }
+
     
     InitEditorWindowLists
 
