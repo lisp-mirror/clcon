@@ -278,3 +278,11 @@ sldb-break-with-default-debugger
           (t
            (signal 'swank::invoke-default-debugger)))))
 ```
+
+
+
+Трассирвока tcl
+----------------
+proc trace_report {args} { puts stderr $args }
+trace add execution ::edt::Bi2W leave trace_report
+

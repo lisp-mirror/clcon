@@ -7,21 +7,78 @@ namespace eval ::edt {
 
     # when we allow for several editor windows, this variable will be window-local
     # Each element is a dict with keys and values:
-    # name - name of window (of kind buf<NN>)
+    # name - title of a window 
     # type - type (file, var, proc, error)
     # path - path to a file (with a name)
-    # w - window
+    # Bi - buffer id
+    # -- could also contain a window, but we now have only one editor window.
     variable EditorMRUWinList
 
     # will always be global. Maps contents key (canonicalized edit args)
-    # to buffer id. 
+    # to Bi (buffer id). 
     variable ContentKeyToBufIdDict
 
     # when we allow for several editor windows,
     # will split into global window counter and per window frame counter
-    variable EditorWindowCounter
+    variable EditorWindowCounter 
 
-   
+    # current buffer id - Bi of currently active buffer
+    variable internal_cBi
+
+    proc cBi {} {
+        variable internal_cBi
+        checkValidBi $internal_cBi
+        return $internal_cBi
+    }
+
+    proc checkValidBi {Bi} {
+        if {![regexp {^buf[0-9]+} $Bi]} {
+            puts stderr "wriong Bi $Bi"
+            idebug on
+            idebug break
+            idebug off
+        }
+    }
+
+    proc Bi2W {Bi} {
+        variable ::tkcon::PRIV
+        checkValidBi $Bi
+        if {$Bi eq {}} {
+            return ""
+        } else {
+            return [string cat $PRIV(base). $Bi]
+        }
+    }
+
+    proc Bi2TW {Bi} {
+        checkValidBi $Bi
+        return [Bi2W $Bi]
+    }
+
+
+    proc Bi2btext {Bi} {
+        checkValidBi $Bi
+        return [string cat [Bi2W $Bi] ".text"]
+    }
+
+    proc Bi2_text {Bi} {
+        checkValidBi $Bi
+        return [string cat [Bi2W $Bi] ".text.t"]
+    }
+    
+    
+    # current editing widget (e.g. frame, but now - just window)
+    proc cW {} {
+        variable internal_cBi
+        return [Bi2W $internal_cBi]
+    }
+
+    # current editing window (not a frame)
+    proc cTW {} {
+        variable internal_cBi
+        return [Bi2TW $internal_cBi]
+    }
+
     # Reuse counter increments when we open a non-reusable window
     # This is required to know which window was opened earlier
     proc GenReuseCounter {} {
@@ -42,6 +99,8 @@ namespace eval ::edt {
         variable ContentKeyToBufIdDict
         if {![info exists EditorMRUWinList]} {
             variable EditorWindowCounter
+            variable internal_cBi
+            set internal_cBi ""
             set EditorMRUWinList [list]
             set ContentKeyToBufIdDict [dict create]
             set EditorWindowCounter 0
@@ -56,20 +115,20 @@ namespace eval ::edt {
     }
     
 
-    proc RemoveWindowFromLists {tw w} {
+    proc RemoveWindowFromLists {Bi} {
         variable EditorMRUWinList
         variable ContentKeyToBufIdDict
         set i 0
         foreach p $EditorMRUWinList {
-            set window [dict get $p w]
-            if {$window eq $tw} {
+            set thisBi [dict get $p "Bi"]
+            if {$thisBi eq $Bi} {
                 set EditorMRUWinList [lreplace $EditorMRUWinList $i $i]
                 break
             }
             incr i
         }
-        dict for {key window} $ContentKeyToBufIdDict {
-            if {$window eq $tw} {
+        dict for {key thisBi} $ContentKeyToBufIdDict {
+            if {$thisBi eq $Bi} {
                 set ContentKeyToBufIdDict [dict remove $ContentKeyToBufIdDict $key]
                 break
             }
@@ -78,7 +137,7 @@ namespace eval ::edt {
 
 
     # Store window name for buffer list window
-    proc AddToWindowLists {key w} {
+    proc AddToWindowLists {key Bi} {
         variable EditorMRUWinList
         variable ContentKeyToBufIdDict
 
@@ -99,36 +158,47 @@ namespace eval ::edt {
             set name "$word $no"
         }
         
-        lappend EditorMRUWinList [dict create name $name type $ty path $word w $w]
-        dict set ContentKeyToBufIdDict $key $w
+        lappend EditorMRUWinList [dict create name $name type $ty path $word Bi $Bi]
+        dict set ContentKeyToBufIdDict $key $Bi
     }
 
-    # Returns a window 
+    # generates new, unique Bi. 
+    proc GenNewBi {} {
+        variable EditorWindowCounter
+        incr EditorWindowCounter
+        set result [string cat "buf" $EditorWindowCounter]
+        return $result
+    }
+    
+    # Word is filename,procname, etc.
+    # Opts are options from edit command
+    # Tail is as returned from EditorParseArgs 
+    # Returns Bi
     proc FindOrMakeEditorWindow {word opts tail} {
         variable ContentKeyToBufIdDict
+        variable internal_cBi
         set key [CanonicalizeEditArgs $word $opts]
         if { [dict exists $ContentKeyToBufIdDict $key] } {
             return [dict get $ContentKeyToBufIdDict $key]
         }
         # If not, create one
-        set tw [GenEditorWindowName]
-        set w $tw
+        set Bi [GenNewBi]
+        set w [Bi2W $Bi]
+        set tw $w
         EnsureEditorWindow $tw
-        AddToWindowLists $key $w
+        AddToWindowLists $key $Bi
         SetupEditorWindow $tw $w $word $opts $tail
-        return $tw
+        set internal_cBi $Bi
+        return $Bi
     }
 
-    # returns Window. When we use multiple frames, would return frame
+    proc CurrentlyVisibleBi {} {
+        return [cBi]
+    }
+    
+    # returns Window. Assume window is always visible. 
     proc CurrentlyVisibleBuffer {} {
-        variable EditorMRUWinList
-        foreach p $EditorMRUWinList {
-            set window [dict get $p w]
-            if {[winfo exists $window] && [winfo ismapped $window]} {
-                return $window
-            }
-        }
-        return {}
+        return [cW]
     }
 
     

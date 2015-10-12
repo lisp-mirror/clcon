@@ -24,7 +24,7 @@ namespace eval ::buli {
     # This was desired for error-browser and this can also be desired
     # for buffer-list. E.g. we would like to remove deleted window
     # without moving keyboard focus on the list. 
-    proc AppendData {name type path w} {
+    proc AppendData {name type path Bi} {
         variable TitleListWindow
         variable data
 
@@ -33,7 +33,7 @@ namespace eval ::buli {
             return
         }
 
-        set NewItem [dict create name $name type $type path $path w $w]
+        set NewItem [dict create name $name type $type path $path Bi $Bi]
         lappend data $NewItem
 
         set tbl $TitleListWindow.tf.tbl    
@@ -47,8 +47,8 @@ namespace eval ::buli {
             set name [dict get $p name]
             set type [dict get $p type]
             set path [dict get $p path]
-            set w [dict get $p w]
-            AppendData $name $type $path $w
+            set Bi [dict get $p Bi]
+            AppendData $name $type $path $Bi
         }
     }
 
@@ -56,13 +56,13 @@ namespace eval ::buli {
         variable EditorMRUWinList
         variable data
         variable TitleListWindow
-        set tw [::edt::CurrentlyVisibleBuffer]
-        if {$tw eq {}} return
+        set cBi [::edt::cBi]
+        if {$cBi eq {}} return
         set i 0
         foreach d $data {
-            set w [dict get $d w]
-            set tbl $TitleListWindow.tf.tbl
-            if {$w eq $tw} {
+            set thisBi [dict get $d Bi]
+            if {$thisBi eq $cBi} {
+                set tbl $TitleListWindow.tf.tbl
                 after idle "$tbl activate $i; $tbl selection set $i $i"
                 return
             }
@@ -86,17 +86,17 @@ namespace eval ::buli {
         variable ::edt::EditorMRUWinList
         variable TitleListWindow
         set p [lindex $EditorMRUWinList $row]
-        set w [dict get $p w]
+        set Bi [dict get $p Bi]
         switch -exact $action {
             ShowBuffer {
-                ::edt::ShowExistingBuffer $w
+                ::edt::ShowExistingBuffer $Bi
             }
             HideListAndShowBuffer {
                 wm withdraw $TitleListWindow
-                ::edt::ShowExistingBuffer $w
+                ::edt::ShowExistingBuffer $Bi
             }
             CloseBuffer {
-                ::edt::EditCloseFile $w $w
+                error "extract Bi here and close file by Bi"
             }
             default {
                 error "Unknown CellCmd"

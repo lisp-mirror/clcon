@@ -16,18 +16,8 @@
 
 namespace eval ::edt {
 
-    proc GenEditorWindowName {} {
-        variable ::tkcon::PRIV
-        variable EditorWindowCounter
-        incr EditorWindowCounter
-        set result [string cat $PRIV(base).__edit $EditorWindowCounter]
-        set SomeEditorWindowName $result
-        return $result
-    }
-
     proc ShowSomeEditor {} {
-        set tw [CurrentlyVisibleBuffer]
-        ::tkcon::FocusWindowByName $tw $tw.text
+        ::tkcon::FocusWindowByName [cTW] [cW]
         return 
     }
 
@@ -35,39 +25,32 @@ namespace eval ::edt {
         puts stderr "REWRITE HideAllEditorWindows"
         variable EditorMRUWinList
         foreach p $EditorMRUWinList {
-            set window [dict get $p w]
+            set window [Bi2TW [dict get $p "Bi"]]
             if {[winfo exists $window]} {
                 wm withdraw $window
             }
         }
     }
 
-    # close file (without saving for now) and open MRU 
-    proc EditCloseFile {tw w} {
+    # close file (without saving for now)  
+    proc EditCloseCurrentFile {} {
+        set Bi [cBi]
+        set tw [cTW]
         if {[winfo exists $tw]} {
             wm withdraw $tw
         }
         putd "Saving file if omitted!" 
-        RemoveWindowFromLists $tw $w
-        destroy $w
+        RemoveWindowFromLists $Bi
+        destroy $tw
         UpdateMRUAndBufferList {}
         ::recent::RedrawRecentMenuForConsole
     }
 
-    proc MaybeDestroyEditorWindow {tw} {
-        puts stderr "REWRITE MaybeDestroyEditorWindow"
-        variable EditorMRUWinList
-        if {![llength $EditorMRUWinList]} {
-            wm destroy $tw
-        }
-    }
-        
     # Hides editor window. 
     proc HideEditorWindow {tw} {
         puts stderr "REWRITE HideEditorWindow"
         puts stderr "Normally hiding editor windows assumes closing all files. We are wrong"
         wm withdraw $tw
-        after idle "::edt::MaybeDestroyEditorWindow $tw"
     }
 
     # Wrapped for freezed text, for menu only
@@ -275,7 +258,7 @@ namespace eval ::edt {
             -command [wesppt [list ::tkcon::Save {} widget $w.text]]
         $m add separator
 
-        set CloseFile [wesppt [list ::edt::EditCloseFile $tw $w]]
+        set CloseFile [wesppt [list ::edt::EditCloseCurrentFile]]
         $m add command -label "Close" -accel "Control-w" -command $CloseFile
         bind SingleMod$w <Control-Key-w> $CloseFile
         
@@ -397,21 +380,22 @@ namespace eval ::edt {
     
     # Shows buffer identified by its w (window; in the future - a frame).
     # Does not check existence
-    proc ShowExistingBuffer {w} {
+    proc ShowExistingBuffer {Bi} {
 
         # Do not remove this, see usages before!
-        set tw [w2tw $w]
+        set w [Bi2W $Bi]
+        set tw [Bi2TW $Bi]
         
         HideAllEditorWindows
         wm deiconify $tw
 
         # this is for ctext
-        focus $w.text.t 
+        focus [Bi2_text $Bi]
 
         # this is for text
         # focus $w.text
         
-        UpdateMRUAndBufferList $tw
+        UpdateMRUAndBufferList $Bi
     }
 
     # See docs at the beginning of file
@@ -426,10 +410,11 @@ namespace eval ::edt {
 
         
         # Find old edit window if there is one
-        set tw [FindOrMakeEditorWindow $word $opts $tail]
-        set w $tw
+        set Bi [FindOrMakeEditorWindow $word $opts $tail]
+        set w [Bi2W $Bi]
+        set tw [Bi2TW $Bi]
 
-        ShowExistingBuffer $w
+        ShowExistingBuffer $Bi
        
         if {[string compare [dict get $opts -find] {}]} {
             ::fndrpl::OldTkconFind $w.text [dict get $opts -find] -case 1
