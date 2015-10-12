@@ -32,6 +32,7 @@ namespace eval ::edt {
     }
 
     proc HideAllEditorWindows {} {
+        puts stderr "REWRITE HideAllEditorWindows"
         variable EditorMRUWinList
         foreach p $EditorMRUWinList {
             set window [dict get $p w]
@@ -54,6 +55,7 @@ namespace eval ::edt {
     }
 
     proc MaybeDestroyEditorWindow {tw} {
+        puts stderr "REWRITE MaybeDestroyEditorWindow"
         variable EditorMRUWinList
         if {![llength $EditorMRUWinList]} {
             wm destroy $tw
@@ -61,9 +63,9 @@ namespace eval ::edt {
     }
         
     # Hides editor window. 
-    # If EditorMRUWinList is empty, destroys it
     proc HideEditorWindow {tw} {
-        putd "Normally hiding editor windows assumes closing all files. We are wrong"
+        puts stderr "REWRITE HideEditorWindow"
+        puts stderr "Normally hiding editor windows assumes closing all files. We are wrong"
         wm withdraw $tw
         after idle "::edt::MaybeDestroyEditorWindow $tw"
     }
