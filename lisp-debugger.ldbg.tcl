@@ -301,9 +301,7 @@ namespace eval ::ldbg {
     }            
     
     proc CellCmd {row action} {
-        variable ::edt::EditorMRUWinList
         variable MainWindow
-        set p [lindex $EditorMRUWinList $row]
         set tbl [GetFramesTablelist $MainWindow]
         set RowName [$tbl rowcget $row -name]
         switch -exact $action {
