@@ -7,13 +7,14 @@ namespace eval ::edt {
 
     # when we allow for several editor windows, this variable will be window-local
     # Each element is a dict with keys and values:
-    # name - name of window
+    # name - name of window (of kind buf<NN>)
     # type - type (file, var, proc, error)
     # path - path to a file (with a name)
     # w - window
     variable EditorMRUWinList
 
-    # will always be global 
+    # will always be global. Maps contents key (canonicalized edit args)
+    # to buffer id. 
     variable EditorReusableWindowDict
 
     # when we allow for several editor windows,
@@ -75,6 +76,50 @@ namespace eval ::edt {
         }
     }
 
+
+    # Store window name for buffer list window
+    proc AddToWindowLists {key w} {
+        variable EditorMRUWinList
+        variable EditorReusableWindowDict
+
+        set word [lindex $key 0]
+        set options [lrange $key 1 end]
+        set type [dict get $options -type]
+        if {[dict exists $options -no]} {
+            set no [dict get $options -no]
+        } else {
+            set no ""
+        }
+
+        set ty [EncodeTypeForBufferList $type]
+
+        if {$type eq {file}} {
+            set name [lindex [file split $word] end]
+        } else {
+            set name "$word $no"
+        }
+        
+        lappend EditorMRUWinList [dict create name $name type $ty path $word w $w]
+        dict set EditorReusableWindowDict $key $w
+    }
+
+    # Returns a window 
+    proc FindOrMakeEditorWindow {word opts tail} {
+        variable EditorReusableWindowDict
+        set key [CanonicalizeEditArgs $word $opts]
+        if { [dict exists $EditorReusableWindowDict $key] } {
+            return [dict get $EditorReusableWindowDict $key]
+        }
+        # If not, create one
+        set tw [GenEditorWindowName]
+        set w $tw
+        EnsureEditorWindow $tw
+        AddToWindowLists $key $w
+        SetupEditorWindow $tw $w $word $opts $tail
+        return $tw
+    }
+
+    
     InitEditorWindowLists
 
 }
