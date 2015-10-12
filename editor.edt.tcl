@@ -358,7 +358,23 @@ namespace eval ::edt {
 
     }
 
-
+    proc e_indent {w {extra "    "}} {
+        set lineno [expr {int([$w index insert])}]
+        set line [$w get $lineno.0 $lineno.end]
+        regexp {^(\s*)} $line -> prefix
+        if {[string index $line end] eq "\{"} {
+            tk::TextInsert $w "\n$prefix$extra"
+        } elseif {[string index $line end] eq "\}"} {
+            if {[regexp {^\s+\}} $line]} {
+                $w delete insert-[expr [string length $extra]+1]c insert-1c
+                tk::TextInsert $w "\n[string range $prefix 0 end-[string length $extra]]"
+            } else {
+                tk::TextInsert $w "\n$prefix"
+            }
+        } else {
+            tk::TextInsert $w "\n$prefix"
+        }
+    }
 
     proc LoadContents {w word opts tail} {
         switch -glob -- [dict get $opts -type] {
@@ -492,6 +508,14 @@ namespace eval ::edt {
         set cmd [list ::fndrpl::FindIt $text]
 	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd 
         bind $w <F3> $cmd
+
+        $m add separator
+
+        set cmd "::edt::e_indent $text"
+        $m add command -label "Tcl indent new line" -accel <Control-Key-Return> -command $cmd
+        bind EdtControlKeys <Control-Key-Return> "$cmd; break"
+        bind EdtControlKeys <F4> "$cmd; break"
+
 
         ## Lisp mode Menu
         ##
