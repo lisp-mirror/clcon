@@ -224,7 +224,16 @@ namespace eval ::edt {
        
         UpdateMRUAndBufferList [cBi]
     }
- 
+
+    proc EnsureSingleEditorWindowExists {} {
+        set tw [Bi2TW asdfasdf]
+        if {![winfo exists $tw]} {
+            EnsureToplevelWindowWithPathname $tw
+            SetupEditorWindowCommon $tw
+        }
+    }
+
+    
     # Word is filename,procname, etc.
     # Opts are options from edit command
     # Tail is as returned from EditorParseArgs 
@@ -252,8 +261,7 @@ namespace eval ::edt {
             set tw [cTW]
             set w [cW]
 
-            EnsureToplevelWindowWithPathname $tw
-            SetupEditorWindowCommon $tw
+            EnsureSingleEditorWindowExists
             
             SetupEditorWindowWhenCreatedBuffer $opts
 
