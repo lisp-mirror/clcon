@@ -57,7 +57,49 @@ namespace eval ::edt {
     proc wesppt {script} {
         ::clcon_text::WrapEventScriptForFreezedText $script [uplevel 1 {string cat "$w.text"}]
     }
-    
+
+    proc LoadContents {w word opts tail} {
+        switch -glob -- [dict get $opts -type] {
+            proc*	{
+                $w.text insert 1.0 \
+                    [::tkcon::EvalOther {} slave dump proc [list $word]]
+                after idle [list ::tkcon::Highlight $w.text tcl]
+            }
+            var*	{
+                $w.text insert 1.0 \
+                    [::tkcon::EvalOther {} slave dump var [list $word]]
+                after idle [list ::tkcon::Highlight $w.text tcl]
+            }
+            file	{
+
+                if {$word ne {}} {
+                    set filemtime [file mtime $word]
+                } else {
+                    set filemtime {}
+                }
+                
+                [$w.text cget -opened_file] configure -filename $word -filemtime $filemtime
+                
+                ::clcon_text::ConstructBackendBuffer $w.text
+                
+                $w.text insert 1.0 [::edt::ReadFileIntoString $word 0]
+                
+                after idle [list ::tkcon::Highlight $w.text \
+                                [string trimleft [file extension $word] .]]
+            }
+            error*	{
+                $w.text insert 1.0 [join $tail \n]
+                after idle [list ::tkcon::Highlight $w.text error]
+            }
+            default	{
+                $w.text insert 1.0 [join $tail \n]
+            }
+        }
+        $w.text edit reset
+        $w.text edit modified 0
+        $w.text mark set insert 1.0
+    }
+
     proc OduFnMenuItem {w m btext oduCmd {accel {}} {bindtag {}}} {
         set oduFn [string cat "odu::" $oduCmd "-command"]
         set cmd [wesppt [list clcon_text::CallOduvanchikFunction $btext "$oduFn nil"]]
@@ -121,51 +163,6 @@ namespace eval ::edt {
         $m add command -label "Find Source" -accel "Alt-." -command $cmd
         bind SingleMod$w <Alt-period> $cmd
         bind SingleMod$w <Alt-Key-Cyrillic_yu> $cmd
-
-        
-
-    }
-
-    proc LoadContents {w word opts tail} {
-        switch -glob -- [dict get $opts -type] {
-            proc*	{
-                $w.text insert 1.0 \
-                    [::tkcon::EvalOther {} slave dump proc [list $word]]
-                after idle [list ::tkcon::Highlight $w.text tcl]
-            }
-            var*	{
-                $w.text insert 1.0 \
-                    [::tkcon::EvalOther {} slave dump var [list $word]]
-                after idle [list ::tkcon::Highlight $w.text tcl]
-            }
-            file	{
-
-                if {$word ne {}} {
-                    set filemtime [file mtime $word]
-                } else {
-                    set filemtime {}
-                }
-                
-                [$w.text cget -opened_file] configure -filename $word -filemtime $filemtime
-                
-                ::clcon_text::ConstructBackendBuffer $w.text
-                
-                $w.text insert 1.0 [::edt::ReadFileIntoString $word 0]
-                
-                after idle [list ::tkcon::Highlight $w.text \
-                                [string trimleft [file extension $word] .]]
-            }
-            error*	{
-                $w.text insert 1.0 [join $tail \n]
-                after idle [list ::tkcon::Highlight $w.text error]
-            }
-            default	{
-                $w.text insert 1.0 [join $tail \n]
-            }
-        }
-        $w.text edit reset
-        $w.text edit modified 0
-        $w.text mark set insert 1.0
     }
 
     # Empties menu (except menu bar) and fills it again
