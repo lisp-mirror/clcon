@@ -196,7 +196,6 @@ namespace eval ::edt {
                 }
             }
         }
-        showVar result
         bindtags $path $result
     }
 
