@@ -216,12 +216,13 @@ namespace eval ::edt {
         variable ::tkcon::COLOR
         variable ::tkcon::OPT
 
-        wm protocol $tw WM_DELETE_WINDOW [list tk_messageBox -parent $tw -title "Attempt to close editor" -message "To remove editr window, close all edit buffers or just quit clcon"]
+        wm protocol $tw WM_DELETE_WINDOW [list tk_messageBox -parent $tw -title "Attempt to close editor" -message "To remove editor window, close all edit buffers or just quit clcon"]
 
         # See also Bi2W
-        set w $tw.frammy
-        frame $w
-        pack $w
+        set nb $tw.frammy
+        ttk::notebook $nb
+        pack $nb
+        ttk::notebook::enableTraversal $nb 
 
         set menu [menu [cMenuBar]]
         $tw configure -menu $menu

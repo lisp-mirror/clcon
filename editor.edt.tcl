@@ -108,12 +108,13 @@ namespace eval ::edt {
         variable ::tkcon::OPT
         
         set MRUWinListEntry [lindex [SearchBiInMRUWinList [cBi]] 1]
-        set word [dict get $MRUWinListEntry path]
+        set tab_name [dict get $MRUWinListEntry name]
 
         set tw [cTW]
         set w [cW]
         set btext [c_btext]
         set textt [c_text]
+        set notebook $tw.frammy
 
         frame $w
         ::clcon_text::clcon_text $btext
@@ -143,7 +144,8 @@ namespace eval ::edt {
         grid columnconfigure $w 0 -weight 1
         grid columnconfigure $w 1 -weight 1
         grid rowconfigure $w 0 -weight 1
-        
+
+        $notebook add $w -text $tab_name
     }
 
     
@@ -182,12 +184,6 @@ namespace eval ::edt {
 
         RebuildMenu  
 
-        foreach slave [pack slaves [string cat [cTW] .frammy]] {
-            puts stderr "pack forget $slave"
-            pack forget $slave
-        }
-        pack $w
-        
     }
 
     proc SyncCursor {text} {
