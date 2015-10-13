@@ -342,6 +342,10 @@ namespace eval ::edt {
         RebuildMenu  
         
         # Layout
+        foreach slave [grid slaves $w] {
+            grid remove $slave
+        }
+        
         grid $btext - $w.sy -sticky news
         grid $w.sx - -sticky ew
         grid columnconfigure $w 0 -weight 1
