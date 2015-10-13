@@ -52,8 +52,13 @@ namespace eval ::edt {
 
     # See also SetupEditorWindowCommon
     proc Bi2W {Bi} {
+        variable ::tkcon::PRIV
         checkValidBi $Bi
-        return [string cat [Bi2TW $Bi] ".fram"]
+        if {$Bi eq {}} {
+            return ""
+        } else {
+            return [string cat $PRIV(base). $Bi .fram]
+        }
     }
 
 
