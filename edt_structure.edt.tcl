@@ -187,16 +187,19 @@ namespace eval ::edt {
         putd "We should have reordered windows here. See recent.tcl"
         after idle ::buli::RefreshData
     }
-    
-    # Shows buffer identified by its buffer id Bi
-    # Does not check existence
-    proc ShowExistingBuffer {Bi} {
-        variable internal_cBi
-        # Do not remove this, see usages before!
 
+    proc SwitchToBuffer {Bi} {
+        variable internal_cBi
         checkValidBi $Bi
         set internal_cBi $Bi
-        
+        ShowExistingBuffer        
+    }
+    
+    # Shows buffer identified by internal_cBi
+    # Does not check existence
+    proc ShowExistingBuffer {} {
+        # Do not remove this, see usages before!
+
         set w [cW]
         set tw [cTW]
         
@@ -208,7 +211,7 @@ namespace eval ::edt {
         # this is for text
         # focus $w.text
         
-        UpdateMRUAndBufferList $Bi
+        UpdateMRUAndBufferList [cBi]
     }
 
     
@@ -221,10 +224,14 @@ namespace eval ::edt {
         variable internal_cBi
         set key [CanonicalizeEditArgs $word $opts]
         if { [dict exists $ContentKeyToBufIdDict $key] } {
+            set Bi [dict get $ContentKeyToBufIdDict $key]
+            checkValidBi $Bi
             set internal_cBi $Bi
         } else {
             # If not, create one
             set Bi [GenNewBi]
+
+            checkValidBi $Bi
             set internal_cBi $Bi
             
             AddToWindowLists $key $Bi
@@ -232,7 +239,6 @@ namespace eval ::edt {
             SetupEditorWindow $word $opts $tail
         }
 
-        checkValidBi $internal_cBi
         return $internal_cBi
     }
 

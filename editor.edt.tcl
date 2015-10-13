@@ -387,7 +387,7 @@ namespace eval ::edt {
         set w [Bi2W $Bi]
         set tw [Bi2TW $Bi]
 
-        ShowExistingBuffer $Bi
+        ShowExistingBuffer
        
         if {[string compare [dict get $opts -find] {}]} {
             ::fndrpl::OldTkconFind $w.text [dict get $opts -find] -case 1
