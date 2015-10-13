@@ -68,9 +68,11 @@ namespace eval ::edt {
         return $cmd
     }
 
-    proc MakeLispModeMenu {menu w btext} {
-        set m [menu [::tkcon::MenuButton $menu 3.Lisp lisp]]
+    proc MakeLispModeMenu {w btext} {
 
+        set m [cMenuBar .lisp]
+        ClearMenu $m
+        
         # It is too late hour to start show-mark
         # We have archietectural problems there (rompsite.lisp is too early on the build)
         # set oduCmd "lisp-insert-\)"
@@ -227,12 +229,12 @@ namespace eval ::edt {
             SetEditorBindtags $path $w
         }
 
-        set menu [cMenuBar]
+        # set menu [cMenuBar]
         
         ## File Menu
-        ##
-        set m [menu [::tkcon::MenuButton $menu 1.File file]]
-        showVar m
+        ## Note that this is not a menu creation command!
+        set m [cMenuBar .file]
+        ClearMenu $m
 
         set cmd ::tkcon::OpenForEdit 
 	$m add command -label "Open" -command $cmd -accel "Control-O"
@@ -260,7 +262,9 @@ namespace eval ::edt {
         
         ## Edit Menu
         ##
-        set m [menu [::tkcon::MenuButton $menu 2.Edit edit]]
+        set m [cMenuBar .edit]
+        ClearMenu $m
+
         $m add command -label "Cut"   -under 2 \
             -command [wesppt [list tk_textCut $btext]]
         $m add command -label "Copy"  -under 0 \
@@ -280,11 +284,13 @@ namespace eval ::edt {
 
         ## Lisp mode Menu
         ##
-        MakeLispModeMenu $menu $w $btext
+        MakeLispModeMenu $w $btext
         
         ## Tcl mode Menu
         ## 
-        set m [menu [::tkcon::MenuButton $menu "4.Tcl" tcl]]
+        set m [cMenuBar .tcl]
+        ClearMenu $m
+        
         set SendToSlave [wesppt "::tkcon::EvalSlave \
 		    eval \[$btext get 1.0 end-1c\]"]
         $m add command -label "&2. Send Text To Slave" \
@@ -300,7 +306,9 @@ namespace eval ::edt {
         
         ## Window Menu
         ##
-        set m [menu [::tkcon::MenuButton $menu "7.Window" window]]
+        set m [cMenuBar .window]
+        ClearMenu $m
+        
         set cmd [list ::clconcmd::bufferlist]
 	$m add command -label "Buffer list" -underline 0 -accel "Control-F12" \
             -command $cmd
@@ -313,8 +321,9 @@ namespace eval ::edt {
         
         ## Secret Menu
         ##
-        set m [menu [::tkcon::MenuButton $menu Secret secret]]
-
+        set m [cMenuBar .secret]
+        ClearMenu $m
+        
         set cmd [list $btext Unfreeze]
         $m add command -label "1.Unfreeze (if oduvanchik hang)" -command $cmd
 

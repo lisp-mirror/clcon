@@ -200,8 +200,12 @@ namespace eval ::edt {
         bindtags $path $result
     }
 
-    proc cMenuBar {} {
-        string cat [cTW] ".mbar"
+    proc cMenuBar {{SubMenuSuffix {}}} {
+        string cat [cTW] ".mbar" $SubMenuSuffix
+    }
+
+    proc ClearMenu {m} {
+        $m delete 0 end
     }
   
     # Initialization of editor GUI, buffer-independent part.
@@ -215,11 +219,14 @@ namespace eval ::edt {
         set menu [menu [cMenuBar]]
         $tw configure -menu $menu
 
-        
-        
+        # Make menu bar
+        menu [::tkcon::MenuButton $menu "1.File" file]
+        menu [::tkcon::MenuButton $menu "2.Edit" edit]
+        menu [::tkcon::MenuButton $menu "3.Lisp" lisp]
+        menu [::tkcon::MenuButton $menu "4.Tcl" tcl]
+        menu [::tkcon::MenuButton $menu "7.Window" window]        
+        menu [::tkcon::MenuButton $menu "Secret" secret]
         
     }
-    
-
     
 }
