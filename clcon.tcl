@@ -3150,8 +3150,9 @@ proc ::tkcon::ReloadSomeIDESources2 {} {
     TkconSourceHere eval.tkcon.tcl
     TkconSourceHere edt_structure.edt.tcl
     TkconSourceHere editor_buffer.edt.tcl
-    TkconSourceHere editor.edt.tcl
     TkconSourceHere menu.recent.tcl
+    TkconSourceHere edt_menu.edt.tcl
+    TkconSourceHere editor.edt.tcl
     TkconSourceHere highlight.edt.tcl
     TkconSourceHere inspector.insp.tcl
     TkconSourceHere save.edt.tcl
