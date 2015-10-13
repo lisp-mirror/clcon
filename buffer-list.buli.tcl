@@ -96,7 +96,7 @@ namespace eval ::buli {
                 ::edt::SwitchToBuffer $Bi
             }
             CloseBuffer {
-                error "extract Bi here and close file by Bi"
+                ::edt::EditCloseFile $Bi
             }
             default {
                 error "Unknown CellCmd"

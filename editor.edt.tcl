@@ -32,17 +32,30 @@ namespace eval ::edt {
         }
     }
 
-    # close file (without saving for now)  
-    proc EditCloseCurrentFile {} {
-        set Bi [cBi]
-        set tw [cTW]
-        if {[winfo exists $tw]} {
-            wm withdraw $tw
+    proc AnyBufferBi {} {
+        variable EditorMRUWinList
+        set p [lindex $EditorMRUWinList 0]
+        if {$p eq {}} {
+            return {}
+        } else {
+            return [dict get $p "Bi"]
         }
+    }
+    
+    # close file (without saving for now)  
+    proc EditCloseFile {Bi} {
+        set w [Bi2W $Bi]
         putd "Saving file if omitted!" 
         RemoveWindowFromLists $Bi
-        destroy $tw
         UpdateMRUAndBufferList {}
+        set newBi [AnyBufferBi]
+        if {$newBi eq {}} {
+            # no more buffers - let's kill the editor window
+            after idle [list destroy [cTW]]
+        } else {
+            SwitchToBuffer $newBi
+            after idle [list destroy $w]
+        }
         ::recent::RedrawRecentMenuForConsole
     }
 

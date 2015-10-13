@@ -70,6 +70,7 @@ namespace eval ::edt {
         
         ## File Menu
         ## Note that this is not a menu creation command!
+        set Bi [cBi]
         set w [cW]
         set btext [c_btext]
         
@@ -90,7 +91,7 @@ namespace eval ::edt {
             -command [wesppt [list ::tkcon::Save {} widget $btext]]
         $m add separator
 
-        set CloseFile [wesppt [list ::edt::EditCloseCurrentFile]]
+        set CloseFile [wesppt [list ::edt::EditCloseFile $Bi]]
         $m add command -label "Close" -accel "Control-w" -command $CloseFile
         bind SingleMod$w <Control-Key-w> $CloseFile
         
