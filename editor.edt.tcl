@@ -164,8 +164,28 @@ namespace eval ::edt {
         $w.text mark set insert 1.0
     }
 
+
+    proc EnsureEditorWindow {tw} {
+        if {![winfo exists $tw]} {
+            toplevel $tw
+            wm withdraw $tw
+        }
+        return $tw
+    }    
+        
+    # Initialization of editor GUI, buffer-independent part.
+    proc SetupEditorWindowCommon {tw} {
+        variable ::tkcon::PRIV
+        variable ::tkcon::COLOR
+        variable ::tkcon::OPT
+
+        wm protocol $tw WM_DELETE_WINDOW "::edt::HideEditorWindow $tw"
+        
+        
+    }
     
     # Initializes editor GUI, loads text.
+    # variable internal_cBi is set already
     # args are for error only
     # Args:
     # tw - editor window pathname, say ".__edit1",
@@ -179,10 +199,15 @@ namespace eval ::edt {
     #  DoubleKey$w - for double modifiers. Assigned to w, btext, textt
     #  SingleMod$w - for single modifiers. Assigned to w, btext, textt
     #  NoMod$w - for keys w/o modifiers
-    proc SetupEditorWindow {tw w word opts tail} {
+    proc SetupEditorWindow {word opts tail} {
         variable ::tkcon::PRIV
         variable ::tkcon::COLOR
         variable ::tkcon::OPT
+
+        set tw [cTW]
+        set w [cW]
+        EnsureEditorWindow $tw
+        SetupEditorWindowCommon $tw
 
         if {[string length $word] > 50} {
             wm title $tw "Editor $w.text - ...[string range $word end-48 end]"
@@ -190,8 +215,6 @@ namespace eval ::edt {
             wm title $tw "Editor $w.text - $word"
         }
 
-        wm protocol $tw WM_DELETE_WINDOW "::edt::HideEditorWindow $tw"
-        
         set btext [::clcon_text::clcon_text $w.text]
         set textt $btext.t
         
@@ -339,14 +362,6 @@ namespace eval ::edt {
         clcon_text::CallOduvanchikFunction $text "odu::sync-cursor-command nil"
     }
     
-    proc EnsureEditorWindow {tw} {
-        if {![winfo exists $tw]} {
-            toplevel $tw
-            wm withdraw $tw
-        }
-        return $tw
-    }    
-
     # When we allow for several windows, we will have to keep correspondence
     # between widgets and windows. E.g. by namespace relationship? 
     proc w2tw {w} {

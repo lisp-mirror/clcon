@@ -194,12 +194,12 @@ namespace eval ::edt {
         }
         # If not, create one
         set Bi [GenNewBi]
-        set w [Bi2W $Bi]
-        set tw $w
-        EnsureEditorWindow $tw
-        AddToWindowLists $key $Bi
-        SetupEditorWindow $tw $w $word $opts $tail
         set internal_cBi $Bi
+
+        AddToWindowLists $key $Bi
+
+        SetupEditorWindow $word $opts $tail
+
         return $Bi
     }
 
