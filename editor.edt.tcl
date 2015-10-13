@@ -166,26 +166,6 @@ namespace eval ::edt {
         $w.text mark set insert 1.0
     }
 
-
-    proc EnsureEditorWindow {tw} {
-        if {![winfo exists $tw]} {
-            toplevel $tw
-            wm withdraw $tw
-        }
-        return $tw
-    }    
-        
-    # Initialization of editor GUI, buffer-independent part.
-    proc SetupEditorWindowCommon {tw} {
-        variable ::tkcon::PRIV
-        variable ::tkcon::COLOR
-        variable ::tkcon::OPT
-
-        wm protocol $tw WM_DELETE_WINDOW "::edt::HideEditorWindow $tw"
-        
-        
-    }
-    
     # Initializes editor GUI, loads text.
     # variable internal_cBi is set already
     # args are for error only
@@ -239,19 +219,20 @@ namespace eval ::edt {
             $btext configure -tabs [list $tabsp left] -tabstyle wordprocessor
         }
 
-        foreach path [list $w $btext $textt] {
-            bindtags $path [concat DoubleMod$w SingleMod$w NoMod$w [bindtags $path]]
-        }
-
+ 
         scrollbar $w.sx -orient h -command [list $w.text xview]
         scrollbar $w.sy -orient v -command [list $w.text yview]
         
-        set menu [menu $w.mbar]
-        $w configure -menu $menu
+        foreach path [list $tw $w $btext $textt] {
+            SetEditorBindtags $path $w
+        }
+
+        set menu [cMenuBar]
         
         ## File Menu
         ##
         set m [menu [::tkcon::MenuButton $menu 1.File file]]
+        showVar m
 
         set cmd ::tkcon::OpenForEdit 
 	$m add command -label "Open" -command $cmd -accel "Control-O"

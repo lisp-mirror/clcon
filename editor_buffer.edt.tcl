@@ -172,6 +172,54 @@ namespace eval ::edt {
         }
     }
 
+    proc EnsureEditorWindow {tw} {
+        if {![winfo exists $tw]} {
+            toplevel $tw
+            wm withdraw $tw
+        }
+        return $tw
+    }
+
+    # Removes old editor bindtags and set new ones
+    proc SetEditorBindtags {path suffix} {
+        set s $suffix
+        set result [list DoubleMod$s SingleMod$s NoMod$s]
+        foreach bindtag [bindtags $path] {
+            switch -glob -- $bindtag {
+                DoubleMod* -
+                SingleMod* -
+                NoMod* {
+                    # do nothing
+                }
+                default {
+                    set result [linsert $result end $bindtag]
+                }
+            }
+        }
+        showVar result
+        bindtags $path $result
+    }
+
+    proc cMenuBar {} {
+        string cat [cTW] ".mbar"
+    }
+  
+    # Initialization of editor GUI, buffer-independent part.
+    proc SetupEditorWindowCommon {tw} {
+        variable ::tkcon::PRIV
+        variable ::tkcon::COLOR
+        variable ::tkcon::OPT
+
+        wm protocol $tw WM_DELETE_WINDOW "::edt::HideEditorWindow $tw"
+
+        set menu [menu [cMenuBar]]
+        $tw configure -menu $menu
+
+        
+        
+        
+    }
+    
 
     
 }
