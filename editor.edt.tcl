@@ -103,7 +103,9 @@ namespace eval ::edt {
         OduFnMenuItem $w $m $btext end-of-defun
         OduFnMenuItem $w $m $btext mark-defun 
         $m add separator
-        OduFnMenuItem $w $m $btext forward-form
+
+        OduFnMenuItem $w $m $btext forward-form <Control-Key-Right> SingleMod$w
+        
         OduFnMenuItem $w $m $btext backward-form
         OduFnMenuItem $w $m $btext forward-list
         OduFnMenuItem $w $m $btext backward-list
@@ -215,9 +217,11 @@ namespace eval ::edt {
             wm title $tw "Editor $w.text - $word"
         }
 
-        set btext [::clcon_text::clcon_text $w.text]
-        set textt $btext.t
-        
+        set btext [c_btext]
+        set textt [c_text]
+
+        ::clcon_text::clcon_text $w.text
+       
         # $tw.text configure -send_to_lisp 1
         # ::btext::clearHighlightClasses $btext
 
