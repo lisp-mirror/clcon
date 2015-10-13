@@ -277,6 +277,9 @@ namespace eval ::edt {
             set Bi [dict get $ContentKeyToBufIdDict $key]
             checkValidBi $Bi
             set internal_cBi $Bi
+
+            SetupEditorWindowWhenSwitchingToIt
+
         } else {
             # If not, create one
             set Bi [GenNewBi]
@@ -288,10 +291,12 @@ namespace eval ::edt {
 
             set tw [cTW]
             set w [cW]
+
             EnsureToplevelWindowWithPathname $tw
             SetupEditorWindowCommon $tw
             
             SetupEditorWindowWhenCreatedBuffer $opts
+
             SetupEditorWindowWhenSwitchingToIt
 
             LoadContentsAndUpdateRecent $w $word $opts $tail
