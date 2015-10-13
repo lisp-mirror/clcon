@@ -9,7 +9,7 @@ namespace eval ::edt {
     # Each element is a dict with keys and values:
     # name - title of a window 
     # type - type (file, var, proc, error)
-    # path - path to a file (with a name)
+    # path - path to a file (with a name) or a full identifier of proc or error
     # Bi - buffer id
     # -- could also contain a window, but we now have only one editor window.
     variable EditorMRUWinList
@@ -243,7 +243,7 @@ namespace eval ::edt {
             EnsureEditorWindow $tw
             SetupEditorWindowCommon $tw
             
-            SetupEditorWindow $word $opts 
+            SetupEditorWindow $opts 
 
             LoadContentsAndUpdateRecent $w $word $opts $tail
         }

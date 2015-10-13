@@ -108,10 +108,8 @@ namespace eval ::edt {
     # variable internal_cBi is set already
     # args are for error only
     # Args:
-    # tw - editor window pathname, say ".__edit1",
-    # w === tw, but in the future it will be editor frame or smth like this
+    # word - word in the sence of EditorMRUWinList
     # opts - editor options
-    # tail - editor name argument (filename, procname, errorname, etc.)
     # Important variables:
     #  btext - clcon_text widget (currently is a btext wrapper)
     #  textt - text itself
@@ -119,13 +117,16 @@ namespace eval ::edt {
     #  DoubleKey$w - for double modifiers. Assigned to w, btext, textt
     #  SingleMod$w - for single modifiers. Assigned to w, btext, textt
     #  NoMod$w - for keys w/o modifiers
-    proc SetupEditorWindow {word opts} {
+    proc SetupEditorWindow {opts} {
         variable ::tkcon::PRIV
         variable ::tkcon::COLOR
         variable ::tkcon::OPT
 
         set tw [cTW]
         set w [cW]
+
+        set MRUWinListEntry [lindex [SearchBiInMRUWinList [cBi]] 1]
+        set word [dict get $MRUWinListEntry path]
 
         if {[string length $word] > 50} {
             wm title $tw "Editor $w.text - ...[string range $word end-48 end]"
