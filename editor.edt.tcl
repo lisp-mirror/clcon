@@ -122,9 +122,9 @@ namespace eval ::edt {
         set textt [c_text]
 
         if {[string length $word] > 50} {
-            wm title $tw "Editor $w.text - ...[string range $word end-48 end]"
+            wm title $tw "Editor $btext - ...[string range $word end-48 end]"
         } else {
-            wm title $tw "Editor $w.text - $word"
+            wm title $tw "Editor $btext - $word"
         }
         
         ::clcon_text::clcon_text $w.text
