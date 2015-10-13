@@ -215,56 +215,7 @@ namespace eval ::edt {
        
         UpdateMRUAndBufferList [cBi]
     }
-
-
-    # Initializes editor GUI, part 1 - done when buffer is activated at the first time
-    # variable internal_cBi is set already
-    # Args:
-    # opts - editor options
-    proc SetupEditorWindowWhenCreatedBuffer {opts} {
-        variable ::tkcon::PRIV
-        variable ::tkcon::COLOR
-        variable ::tkcon::OPT
-        
-        set tw [cTW]
-        set w [cW]
-        
-        set MRUWinListEntry [lindex [SearchBiInMRUWinList [cBi]] 1]
-        set word [dict get $MRUWinListEntry path]
-
-        set btext [c_btext]
-        set textt [c_text]
-
-        if {[string length $word] > 50} {
-            wm title $tw "Editor $w.text - ...[string range $word end-48 end]"
-        } else {
-            wm title $tw "Editor $w.text - $word"
-        }
-        
-        ::clcon_text::clcon_text $w.text
-        
-        # $tw.text configure -send_to_lisp 1
-        # ::btext::clearHighlightClasses $btext
-        
-        $btext configure -wrap [dict get $opts -wrap] \
-            -xscrollcommand [list $w.sx set] \
-            -yscrollcommand [list $w.sy set] \
-            -foreground $COLOR(stdin) \
-            -background $COLOR(bg) \
-            -insertbackground $COLOR(cursor) \
-            -font $::tkcon::OPT(font) -borderwidth 1 -highlightthickness 0 \
-            -undo 1
-        catch {
-            # 8.5+ stuff
-            set tabsp [expr {$OPT(tabspace) * [font measure $OPT(font) 0]}]
-            $btext configure -tabs [list $tabsp left] -tabstyle wordprocessor
-        }
-
-        scrollbar $w.sx -orient h -command [list $w.text xview]
-        scrollbar $w.sy -orient v -command [list $w.text yview]
-    }
-
-   
+ 
     # Word is filename,procname, etc.
     # Opts are options from edit command
     # Tail is as returned from EditorParseArgs 
