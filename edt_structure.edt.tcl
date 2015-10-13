@@ -134,6 +134,7 @@ namespace eval ::edt {
             if {$thisBi eq $Bi} {
                 return [list $i $p]
             }
+            incr i
         }
         return [list -1 {}]
     }
