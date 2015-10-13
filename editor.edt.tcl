@@ -112,20 +112,13 @@ namespace eval ::edt {
         variable ::tkcon::COLOR
         variable ::tkcon::OPT
         
-        set tw [cTW]
-        set w [cW]
-        
         set MRUWinListEntry [lindex [SearchBiInMRUWinList [cBi]] 1]
         set word [dict get $MRUWinListEntry path]
 
+        set tw [cTW]
+        set w [cW]
         set btext [c_btext]
         set textt [c_text]
-
-        if {[string length $word] > 50} {
-            wm title $tw "Editor $btext - ...[string range $word end-48 end]"
-        } else {
-            wm title $tw "Editor $btext - $word"
-        }
 
         frame $w
         ::clcon_text::clcon_text $btext
@@ -149,6 +142,13 @@ namespace eval ::edt {
 
         scrollbar $w.sx -orient h -command [list $w.text xview]
         scrollbar $w.sy -orient v -command [list $w.text yview]
+
+        grid $btext - $w.sy -sticky news
+        grid $w.sx - -sticky ew
+        grid columnconfigure $w 0 -weight 1
+        grid columnconfigure $w 1 -weight 1
+        grid rowconfigure $w 0 -weight 1
+        
     }
 
     
@@ -167,14 +167,19 @@ namespace eval ::edt {
         variable ::tkcon::COLOR
         variable ::tkcon::OPT
 
-        set tw [cTW]
-        set w [cW]
-
         set MRUWinListEntry [lindex [SearchBiInMRUWinList [cBi]] 1]
         set word [dict get $MRUWinListEntry path]
 
+        set tw [cTW]
+        set w [cW]
         set btext [c_btext]
         set textt [c_text]
+
+        if {[string length $word] > 50} {
+            wm title $tw "Editor $btext - ...[string range $word end-48 end]"
+        } else {
+            wm title $tw "Editor $btext - $word"
+        }
 
         foreach path [list $tw $w $btext $textt] {
             SetEditorBindtags $path $w
@@ -188,17 +193,6 @@ namespace eval ::edt {
         }
         pack $w
         
-        # Layout
-        foreach slave [grid slaves $w] {
-            puts stderr "grid forget $slave"
-            grid forget $slave
-        }
-        
-        grid $btext - $w.sy -sticky news
-        grid $w.sx - -sticky ew
-        grid columnconfigure $w 0 -weight 1
-        grid columnconfigure $w 1 -weight 1
-        grid rowconfigure $w 0 -weight 1
     }
 
     proc SyncCursor {text} {
