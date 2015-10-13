@@ -124,20 +124,25 @@ namespace eval ::edt {
         set key [list $filename -type file]
         dict exists $ContentKeyToBufIdDict $key
     }
-    
 
-    proc RemoveWindowFromLists {Bi} {
+    # Returns list of index and entry of EditorMRUWinList for buffer id Bi
+    proc SearchBiInMRUWinList {Bi} {
         variable EditorMRUWinList
-        variable ContentKeyToBufIdDict
         set i 0
         foreach p $EditorMRUWinList {
             set thisBi [dict get $p "Bi"]
             if {$thisBi eq $Bi} {
-                set EditorMRUWinList [lreplace $EditorMRUWinList $i $i]
-                break
+                return [list $i $p]
             }
-            incr i
         }
+        return [list -1 {}]
+    }
+
+    proc RemoveWindowFromLists {Bi} {
+        variable EditorMRUWinList
+        variable ContentKeyToBufIdDict
+        set i [lindex [SearchBiInMRUWinList $Bi] 0]
+        set EditorMRUWinList [lreplace $EditorMRUWinList $i $i]
         dict for {key thisBi} $ContentKeyToBufIdDict {
             if {$thisBi eq $Bi} {
                 set ContentKeyToBufIdDict [dict remove $ContentKeyToBufIdDict $key]
