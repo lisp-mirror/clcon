@@ -40,7 +40,7 @@ namespace eval ::edt {
         }
     }
 
-    proc Bi2W {Bi} {
+    proc Bi2TW {Bi} {
         variable ::tkcon::PRIV
         checkValidBi $Bi
         if {$Bi eq {}} {
@@ -50,9 +50,9 @@ namespace eval ::edt {
         }
     }
 
-    proc Bi2TW {Bi} {
+    proc Bi2W {Bi} {
         checkValidBi $Bi
-        return [Bi2W $Bi]
+        return [Bi2TW $Bi]
     }
 
 
