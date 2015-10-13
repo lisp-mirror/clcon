@@ -168,71 +168,15 @@ namespace eval ::edt {
         $w.text mark set insert 1.0
     }
 
-    # Initializes editor GUI, loads text.
-    # variable internal_cBi is set already
-    # args are for error only
-    # Args:
-    # tw - editor window pathname, say ".__edit1",
-    # w === tw, but in the future it will be editor frame or smth like this
-    # opts - editor options
-    # tail - editor name argument (filename, procname, errorname, etc.)
-    # Important variables:
-    #  btext - clcon_text widget (currently is a btext wrapper)
-    #  textt - text itself
-    # Bindtags:
-    #  DoubleKey$w - for double modifiers. Assigned to w, btext, textt
-    #  SingleMod$w - for single modifiers. Assigned to w, btext, textt
-    #  NoMod$w - for keys w/o modifiers
-    proc SetupEditorWindow {word opts tail} {
-        variable ::tkcon::PRIV
-        variable ::tkcon::COLOR
-        variable ::tkcon::OPT
-
-        set tw [cTW]
-        set w [cW]
-        EnsureEditorWindow $tw
-        SetupEditorWindowCommon $tw
-
-        if {[string length $word] > 50} {
-            wm title $tw "Editor $w.text - ...[string range $word end-48 end]"
-        } else {
-            wm title $tw "Editor $w.text - $word"
-        }
-
-        set btext [c_btext]
-        set textt [c_text]
-
-        ::clcon_text::clcon_text $w.text
-       
-        # $tw.text configure -send_to_lisp 1
-        # ::btext::clearHighlightClasses $btext
-
-        $btext configure -wrap [dict get $opts -wrap] \
-            -xscrollcommand [list $w.sx set] \
-            -yscrollcommand [list $w.sy set] \
-            -foreground $COLOR(stdin) \
-            -background $COLOR(bg) \
-            -insertbackground $COLOR(cursor) \
-            -font $::tkcon::OPT(font) -borderwidth 1 -highlightthickness 0 \
-            -undo 1
-        catch {
-            # 8.5+ stuff
-            set tabsp [expr {$OPT(tabspace) * [font measure $OPT(font) 0]}]
-            $btext configure -tabs [list $tabsp left] -tabstyle wordprocessor
-        }
-
- 
-        scrollbar $w.sx -orient h -command [list $w.text xview]
-        scrollbar $w.sy -orient v -command [list $w.text yview]
-        
-        foreach path [list $tw $w $btext $textt] {
-            SetEditorBindtags $path $w
-        }
-
+    # Empties menu (except menu bar) and fills it again
+    proc RebuildMenu {} {
         # set menu [cMenuBar]
         
         ## File Menu
         ## Note that this is not a menu creation command!
+        set w [cW]
+        set btext [c_btext]
+        
         set m [cMenuBar .file]
         ClearMenu $m
 
@@ -247,14 +191,14 @@ namespace eval ::edt {
         bind SingleMod$w <Control-Key-Cyrillic_yeru> $cmd
         
         $m add command -label "Save As..."  -underline 0 \
-            -command [wesppt [list ::tkcon::Save {} widget $w.text]]
+            -command [wesppt [list ::tkcon::Save {} widget $btext]]
         $m add separator
 
         set CloseFile [wesppt [list ::edt::EditCloseCurrentFile]]
         $m add command -label "Close" -accel "Control-w" -command $CloseFile
         bind SingleMod$w <Control-Key-w> $CloseFile
         
-        set dismiss [wesppt [list wm withdraw $tw]]
+        set dismiss [wesppt [list ::edt::HideEditorWindow [cTW]]]
         $m add command -label "Hide editor window" -underline 0 -command $dismiss
         $m add command -label "4.Reload some of IDE sources" -underline 0 \
 	    -command ::tkcon::ReloadSomeIDESources
@@ -334,7 +278,71 @@ namespace eval ::edt {
         set cmd [wesppt [list ::edt::SyncCursor $btext]]
         $m add command -label "Sync cursor" -accel "F9" -command $cmd
         bind NoMod$w <F9> $cmd
+}
 
+    
+    # Initializes editor GUI, loads text.
+    # variable internal_cBi is set already
+    # args are for error only
+    # Args:
+    # tw - editor window pathname, say ".__edit1",
+    # w === tw, but in the future it will be editor frame or smth like this
+    # opts - editor options
+    # tail - editor name argument (filename, procname, errorname, etc.)
+    # Important variables:
+    #  btext - clcon_text widget (currently is a btext wrapper)
+    #  textt - text itself
+    # Bindtags:
+    #  DoubleKey$w - for double modifiers. Assigned to w, btext, textt
+    #  SingleMod$w - for single modifiers. Assigned to w, btext, textt
+    #  NoMod$w - for keys w/o modifiers
+    proc SetupEditorWindow {word opts tail} {
+        variable ::tkcon::PRIV
+        variable ::tkcon::COLOR
+        variable ::tkcon::OPT
+
+        set tw [cTW]
+        set w [cW]
+        EnsureEditorWindow $tw
+        SetupEditorWindowCommon $tw
+
+        if {[string length $word] > 50} {
+            wm title $tw "Editor $w.text - ...[string range $word end-48 end]"
+        } else {
+            wm title $tw "Editor $w.text - $word"
+        }
+
+        set btext [c_btext]
+        set textt [c_text]
+
+        ::clcon_text::clcon_text $w.text
+       
+        # $tw.text configure -send_to_lisp 1
+        # ::btext::clearHighlightClasses $btext
+
+        $btext configure -wrap [dict get $opts -wrap] \
+            -xscrollcommand [list $w.sx set] \
+            -yscrollcommand [list $w.sy set] \
+            -foreground $COLOR(stdin) \
+            -background $COLOR(bg) \
+            -insertbackground $COLOR(cursor) \
+            -font $::tkcon::OPT(font) -borderwidth 1 -highlightthickness 0 \
+            -undo 1
+        catch {
+            # 8.5+ stuff
+            set tabsp [expr {$OPT(tabspace) * [font measure $OPT(font) 0]}]
+            $btext configure -tabs [list $tabsp left] -tabstyle wordprocessor
+        }
+
+ 
+        scrollbar $w.sx -orient h -command [list $w.text xview]
+        scrollbar $w.sy -orient v -command [list $w.text yview]
+        
+        foreach path [list $tw $w $btext $textt] {
+            SetEditorBindtags $path $w
+        }
+
+        RebuildMenu  
         
         # Layout
         grid $btext - $w.sy -sticky news
