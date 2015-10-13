@@ -264,13 +264,7 @@ namespace eval ::edt {
         scrollbar $w.sy -orient v -command [list $w.text yview]
     }
 
-    proc SetupEditorWindow {opts} {
-        SetupEditorWindowWhenCreatedBuffer $opts
-        SetupEditorWindowWhenSwitchingToIt
-    }
-    
-
-    
+   
     # Word is filename,procname, etc.
     # Opts are options from edit command
     # Tail is as returned from EditorParseArgs 
@@ -297,7 +291,8 @@ namespace eval ::edt {
             EnsureEditorWindow $tw
             SetupEditorWindowCommon $tw
             
-            SetupEditorWindow $opts 
+            SetupEditorWindowWhenCreatedBuffer $opts
+            SetupEditorWindowWhenSwitchingToIt
 
             LoadContentsAndUpdateRecent $w $word $opts $tail
         }
