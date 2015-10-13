@@ -218,11 +218,11 @@ namespace eval ::edt {
 
         wm protocol $tw WM_DELETE_WINDOW [list tk_messageBox -parent $tw -title "Attempt to close editor" -message "To remove editor window, close all edit buffers or just quit clcon"]
 
-        # See also Bi2W
-        set nb $tw.frammy
-        ttk::notebook $nb
-        pack $nb
-        ttk::notebook::enableTraversal $nb 
+        set notebook [theNotebook]
+        ttk::notebook $notebook
+        pack $notebook
+        bind $notebook <<NotebookTabChanged>> ::edt::SwitchToThisTab
+        ttk::notebook::enableTraversal $notebook 
 
         set menu [menu [cMenuBar]]
         $tw configure -menu $menu

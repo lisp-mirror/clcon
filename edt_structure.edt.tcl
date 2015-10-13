@@ -44,12 +44,6 @@ namespace eval ::edt {
     proc Bi2TW {Bi} {
         variable ::tkcon::PRIV
         string cat $PRIV(base) .editorry
-        # checkValidBi $Bi
-        # if {$Bi eq {}} {
-        #     return ""
-        # } else {
-        #     return [string cat $PRIV(base). $Bi]
-        # }
     }
 
     # See also grep for -w frammy, 
@@ -62,6 +56,14 @@ namespace eval ::edt {
             return [string cat $PRIV(base) .editorry.frammy. $Bi]
         }
     }
+
+    proc W2Bi {w} {
+        if {[winfo parent $w] ne [theNotebook]} {
+            error "$w must have been a name of window in a notebook"
+        }
+        lindex [split $w .] end
+    }
+               
 
 
     proc Bi2btext {Bi} {
@@ -81,10 +83,13 @@ namespace eval ::edt {
         return [Bi2W $internal_cBi]
     }
 
-    # current editing window (not a frame)
+    # the only editing window 
     proc cTW {} {
-        variable internal_cBi
-        return [Bi2TW $internal_cBi]
+        return [Bi2TW {}]
+    }
+
+    proc theNotebook {} {
+        string cat [cTW] .frammy
     }
 
     proc c_btext {} {
@@ -202,17 +207,17 @@ namespace eval ::edt {
         after idle ::buli::RefreshData
     }
 
-    # Switch to existing buffer identified by buffer id.
+    # Switch to existing buffer identified by buffer id, or
+    # reflect the fact that user switchted to that tab
     proc SwitchToBuffer {Bi} {
-        variable internal_cBi
-        checkValidBi $Bi
-        set internal_cBi $Bi
-        ShowExistingBuffer        
+        [theNotebook] select [Bi2W $Bi]
     }
     
-    # Shows buffer identified by internal_cBi
+    # Calls to set things up when existing buffer is shown at the tab.
+    # Buffer is identified by internal_cBi
     # Does not check existence
-    proc ShowExistingBuffer {} {
+    # It is caller responsibility to ensure that buffer is visible
+    proc ShowingBufferChanged {} {
 
         set w [cW]
         set tw [cTW]
@@ -262,7 +267,7 @@ namespace eval ::edt {
             
             SetupEditorWindowWhenCreatedBuffer $opts
 
-            SetupEditorWindowWhenSwitchingToIt
+            # SetupEditorWindowWhenSwitchingToIt
 
             LoadContentsAndUpdateRecent $w $word $opts $tail
         }

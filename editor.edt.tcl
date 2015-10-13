@@ -186,6 +186,18 @@ namespace eval ::edt {
 
     }
 
+    proc SwitchToThisTab {} {
+        variable internal_cBi
+
+        set notebook [theNotebook]
+        set Bi [W2Bi [$notebook select]]
+
+        checkValidBi $Bi
+        set internal_cBi $Bi
+
+        ShowingBufferChanged        
+    }
+
     proc SyncCursor {text} {
         puts "Text Index Insert = [$text index insert]"
         clcon_text::CallOduvanchikFunction $text "odu::sync-cursor-command nil"
@@ -213,7 +225,7 @@ namespace eval ::edt {
         set w [Bi2W $Bi]
         set tw [Bi2TW $Bi]
 
-        ShowExistingBuffer
+        SwitchToBuffer $Bi
        
         if {[string compare [dict get $opts -find] {}]} {
             ::fndrpl::OldTkconFind $w.text [dict get $opts -find] -case 1
