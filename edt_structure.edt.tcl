@@ -79,6 +79,17 @@ namespace eval ::edt {
         return [Bi2TW $internal_cBi]
     }
 
+    proc c_btext {} {
+        variable internal_cBi
+        return [Bi2btext $internal_cBi]
+    }
+
+    proc c_text {} {
+        variable internal_cBi
+        return [Bi2_text $internal_cBi]
+    }
+
+    
     # Reuse counter increments when we open a non-reusable window
     # This is required to know which window was opened earlier
     proc GenReuseCounter {} {
