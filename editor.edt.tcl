@@ -126,8 +126,9 @@ namespace eval ::edt {
         } else {
             wm title $tw "Editor $btext - $word"
         }
-        
-        ::clcon_text::clcon_text $w.text
+
+        frame $w
+        ::clcon_text::clcon_text $btext
         
         # $tw.text configure -send_to_lisp 1
         # ::btext::clearHighlightClasses $btext
@@ -191,6 +192,7 @@ namespace eval ::edt {
         grid columnconfigure $w 0 -weight 1
         grid columnconfigure $w 1 -weight 1
         grid rowconfigure $w 0 -weight 1
+        pack $w
     }
 
     proc SyncCursor {text} {
