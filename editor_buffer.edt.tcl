@@ -216,6 +216,7 @@ namespace eval ::edt {
 
         wm protocol $tw WM_DELETE_WINDOW "::edt::HideEditorWindow $tw"
 
+        # See also Bi2W
         set w $tw.fram
         frame $w
         pack $w
