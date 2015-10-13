@@ -216,7 +216,7 @@ namespace eval ::edt {
         variable ::tkcon::COLOR
         variable ::tkcon::OPT
 
-        wm protocol $tw WM_DELETE_WINDOW "::edt::HideEditorWindow $tw"
+        wm protocol $tw WM_DELETE_WINDOW [list tk_messageBox -parent $tw -title "Attempt to close editor" -message "To remove editr window, close all edit buffers or just quit clcon"]
 
         # See also Bi2W
         set w $tw.frammy

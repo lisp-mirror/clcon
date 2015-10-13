@@ -21,17 +21,6 @@ namespace eval ::edt {
         return 
     }
 
-    proc HideAllEditorWindows {} {
-        puts stderr "REWRITE HideAllEditorWindows"
-        variable EditorMRUWinList
-        foreach p $EditorMRUWinList {
-            set window [Bi2TW [dict get $p "Bi"]]
-            if {[winfo exists $window]} {
-                wm withdraw $window
-            }
-        }
-    }
-
     proc AnyBufferBi {} {
         variable EditorMRUWinList
         set p [lindex $EditorMRUWinList 0]
@@ -57,13 +46,6 @@ namespace eval ::edt {
             after idle [list destroy $w]
         }
         ::recent::RedrawRecentMenuForConsole
-    }
-
-    # Hides editor window. 
-    proc HideEditorWindow {tw} {
-        puts stderr "REWRITE HideEditorWindow"
-        puts stderr "Normally hiding editor windows assumes closing all files. We are wrong"
-        wm withdraw $tw
     }
 
     # Wrapped for freezed text, for menu only

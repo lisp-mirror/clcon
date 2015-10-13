@@ -217,10 +217,9 @@ namespace eval ::edt {
         set w [cW]
         set tw [cTW]
         
-        HideAllEditorWindows
-        wm deiconify $tw
-
         SetupEditorWindowWhenSwitchingToIt
+
+        wm deiconify $tw
 
         focus [c_text]
        
