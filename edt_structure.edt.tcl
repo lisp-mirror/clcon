@@ -40,6 +40,7 @@ namespace eval ::edt {
         }
     }
 
+    # See also grep for -w editorry
     proc Bi2TW {Bi} {
         variable ::tkcon::PRIV
         checkValidBi $Bi
@@ -50,14 +51,14 @@ namespace eval ::edt {
         }
     }
 
-    # See also SetupEditorWindowCommon
+    # See also grep for -w frammy, 
     proc Bi2W {Bi} {
         variable ::tkcon::PRIV
         checkValidBi $Bi
         if {$Bi eq {}} {
             return ""
         } else {
-            return [string cat $PRIV(base). $Bi .fram]
+            return [string cat $PRIV(base) .editorry.frammy. $Bi]
         }
     }
 
