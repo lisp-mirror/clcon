@@ -180,6 +180,37 @@ namespace eval ::edt {
         set result [string cat "buf" $EditorWindowCounter]
         return $result
     }
+
+    # Reorganizes windows according to their usage order
+    # Refreshes buffer list. LastUsedTw can be {} when deleting window!
+    proc UpdateMRUAndBufferList {LastUsedTw} {
+        putd "We should have reordered windows here. See recent.tcl"
+        after idle ::buli::RefreshData
+    }
+    
+    # Shows buffer identified by its buffer id Bi
+    # Does not check existence
+    proc ShowExistingBuffer {Bi} {
+        variable internal_cBi
+        # Do not remove this, see usages before!
+
+        checkValidBi $Bi
+        set internal_cBi $Bi
+        
+        set w [cW]
+        set tw [cTW]
+        
+        HideAllEditorWindows
+        wm deiconify $tw
+
+        focus [c_text]
+
+        # this is for text
+        # focus $w.text
+        
+        UpdateMRUAndBufferList $Bi
+    }
+
     
     # Word is filename,procname, etc.
     # Opts are options from edit command
