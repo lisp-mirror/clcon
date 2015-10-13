@@ -381,16 +381,19 @@ namespace eval ::edt {
     # Shows buffer identified by its w (window; in the future - a frame).
     # Does not check existence
     proc ShowExistingBuffer {Bi} {
-
+        variable internal_cBi
         # Do not remove this, see usages before!
-        set w [Bi2W $Bi]
-        set tw [Bi2TW $Bi]
+
+        checkValidBi $Bi
+        set internal_cBi $Bi
+        
+        set w [cW]
+        set tw [cTW]
         
         HideAllEditorWindows
         wm deiconify $tw
 
-        # this is for ctext
-        focus [Bi2_text $Bi]
+        focus [c_text]
 
         # this is for text
         # focus $w.text

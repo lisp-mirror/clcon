@@ -184,23 +184,25 @@ namespace eval ::edt {
     # Word is filename,procname, etc.
     # Opts are options from edit command
     # Tail is as returned from EditorParseArgs 
-    # Returns Bi
+    # Sets internal_cBi and returns it
     proc FindOrMakeEditorWindow {word opts tail} {
         variable ContentKeyToBufIdDict
         variable internal_cBi
         set key [CanonicalizeEditArgs $word $opts]
         if { [dict exists $ContentKeyToBufIdDict $key] } {
-            return [dict get $ContentKeyToBufIdDict $key]
+            set internal_cBi $Bi
+        } else {
+            # If not, create one
+            set Bi [GenNewBi]
+            set internal_cBi $Bi
+            
+            AddToWindowLists $key $Bi
+
+            SetupEditorWindow $word $opts $tail
         }
-        # If not, create one
-        set Bi [GenNewBi]
-        set internal_cBi $Bi
 
-        AddToWindowLists $key $Bi
-
-        SetupEditorWindow $word $opts $tail
-
-        return $Bi
+        checkValidBi $internal_cBi
+        return $internal_cBi
     }
 
     proc CurrentlyVisibleBi {} {
