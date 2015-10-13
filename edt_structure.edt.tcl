@@ -188,6 +188,7 @@ namespace eval ::edt {
         after idle ::buli::RefreshData
     }
 
+    # Switch to existing buffer identified by buffer id.
     proc SwitchToBuffer {Bi} {
         variable internal_cBi
         checkValidBi $Bi
@@ -198,7 +199,6 @@ namespace eval ::edt {
     # Shows buffer identified by internal_cBi
     # Does not check existence
     proc ShowExistingBuffer {} {
-        # Do not remove this, see usages before!
 
         set w [cW]
         set tw [cTW]
@@ -207,10 +207,7 @@ namespace eval ::edt {
         wm deiconify $tw
 
         focus [c_text]
-
-        # this is for text
-        # focus $w.text
-        
+       
         UpdateMRUAndBufferList [cBi]
     }
 
@@ -236,6 +233,11 @@ namespace eval ::edt {
             
             AddToWindowLists $key $Bi
 
+            set tw [cTW]
+            set w [cW]
+            EnsureEditorWindow $tw
+            SetupEditorWindowCommon $tw
+            
             SetupEditorWindow $word $opts $tail
         }
 

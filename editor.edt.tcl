@@ -300,8 +300,6 @@ namespace eval ::edt {
 
         set tw [cTW]
         set w [cW]
-        EnsureEditorWindow $tw
-        SetupEditorWindowCommon $tw
 
         if {[string length $word] > 50} {
             wm title $tw "Editor $w.text - ...[string range $word end-48 end]"
