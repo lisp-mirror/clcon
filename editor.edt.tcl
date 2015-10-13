@@ -181,10 +181,17 @@ namespace eval ::edt {
         }
 
         RebuildMenu  
+
+        foreach slave [pack slaves [string cat [cTW] .frammy]] {
+            puts stderr "pack forget $slave"
+            pack forget $slave
+        }
+        pack $w
         
         # Layout
         foreach slave [grid slaves $w] {
-            grid remove $slave
+            puts stderr "grid forget $slave"
+            grid forget $slave
         }
         
         grid $btext - $w.sy -sticky news
@@ -192,7 +199,6 @@ namespace eval ::edt {
         grid columnconfigure $w 0 -weight 1
         grid columnconfigure $w 1 -weight 1
         grid rowconfigure $w 0 -weight 1
-        pack $w
     }
 
     proc SyncCursor {text} {

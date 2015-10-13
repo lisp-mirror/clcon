@@ -220,6 +220,8 @@ namespace eval ::edt {
         HideAllEditorWindows
         wm deiconify $tw
 
+        SetupEditorWindowWhenSwitchingToIt
+
         focus [c_text]
        
         UpdateMRUAndBufferList [cBi]
@@ -244,11 +246,7 @@ namespace eval ::edt {
         set key [CanonicalizeEditArgs $word $opts]
         if { [dict exists $ContentKeyToBufIdDict $key] } {
             set Bi [dict get $ContentKeyToBufIdDict $key]
-            checkValidBi $Bi
-            set internal_cBi $Bi
-
-            SetupEditorWindowWhenSwitchingToIt
-
+            SwitchToBuffer $Bi
         } else {
             # If not, create one
             set Bi [GenNewBi]
