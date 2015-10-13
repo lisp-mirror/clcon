@@ -238,7 +238,9 @@ namespace eval ::edt {
             EnsureEditorWindow $tw
             SetupEditorWindowCommon $tw
             
-            SetupEditorWindow $word $opts $tail
+            SetupEditorWindow $word $opts 
+
+            LoadContentsAndUpdateRecent $w $word $opts $tail
         }
 
         return $internal_cBi

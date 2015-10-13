@@ -58,7 +58,7 @@ namespace eval ::edt {
         ::clcon_text::WrapEventScriptForFreezedText $script [uplevel 1 {string cat "$w.text"}]
     }
 
-    proc LoadContents {w word opts tail} {
+    proc LoadContentsAndUpdateRecent {w word opts tail} {
         switch -glob -- [dict get $opts -type] {
             proc*	{
                 $w.text insert 1.0 \
@@ -86,6 +86,8 @@ namespace eval ::edt {
                 
                 after idle [list ::tkcon::Highlight $w.text \
                                 [string trimleft [file extension $word] .]]
+
+                ::recent::AddRecent $word
             }
             error*	{
                 $w.text insert 1.0 [join $tail \n]
@@ -293,7 +295,7 @@ namespace eval ::edt {
     #  DoubleKey$w - for double modifiers. Assigned to w, btext, textt
     #  SingleMod$w - for single modifiers. Assigned to w, btext, textt
     #  NoMod$w - for keys w/o modifiers
-    proc SetupEditorWindow {word opts tail} {
+    proc SetupEditorWindow {word opts} {
         variable ::tkcon::PRIV
         variable ::tkcon::COLOR
         variable ::tkcon::OPT
@@ -349,13 +351,6 @@ namespace eval ::edt {
         grid columnconfigure $w 0 -weight 1
         grid columnconfigure $w 1 -weight 1
         grid rowconfigure $w 0 -weight 1
-
-        
-        LoadContents $w $word $opts $tail
-
-        if {[dict get $opts -type] == "file"} {
-            ::recent::AddRecent $word
-        }
     }
 
     proc SyncCursor {text} {
