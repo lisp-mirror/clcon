@@ -50,9 +50,10 @@ namespace eval ::edt {
         }
     }
 
+    # See also SetupEditorWindowCommon
     proc Bi2W {Bi} {
         checkValidBi $Bi
-        return [Bi2TW $Bi]
+        return [string cat [Bi2TW $Bi] ".fram"]
     }
 
 

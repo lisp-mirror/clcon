@@ -216,6 +216,10 @@ namespace eval ::edt {
 
         wm protocol $tw WM_DELETE_WINDOW "::edt::HideEditorWindow $tw"
 
+        set w $tw.fram
+        frame $w
+        pack $w
+
         set menu [menu [cMenuBar]]
         $tw configure -menu $menu
 
