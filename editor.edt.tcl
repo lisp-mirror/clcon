@@ -104,20 +104,17 @@ namespace eval ::edt {
 
 
     
-    # Initializes editor GUI, loads text.
+    # Initializes editor GUI, part 1 - done when buffer is activated at the first time
     # variable internal_cBi is set already
-    # args are for error only
     # Args:
-    # word - word in the sence of EditorMRUWinList
     # opts - editor options
     # Important variables:
     #  btext - clcon_text widget (currently is a btext wrapper)
-    #  textt - text itself
     # Bindtags:
     #  DoubleKey$w - for double modifiers. Assigned to w, btext, textt
     #  SingleMod$w - for single modifiers. Assigned to w, btext, textt
     #  NoMod$w - for keys w/o modifiers
-    proc SetupEditorWindow {opts} {
+    proc SetupEditorWindowWhenSwitchingToIt {} {
         variable ::tkcon::PRIV
         variable ::tkcon::COLOR
         variable ::tkcon::OPT
@@ -128,38 +125,9 @@ namespace eval ::edt {
         set MRUWinListEntry [lindex [SearchBiInMRUWinList [cBi]] 1]
         set word [dict get $MRUWinListEntry path]
 
-        if {[string length $word] > 50} {
-            wm title $tw "Editor $w.text - ...[string range $word end-48 end]"
-        } else {
-            wm title $tw "Editor $w.text - $word"
-        }
-
         set btext [c_btext]
         set textt [c_text]
 
-        ::clcon_text::clcon_text $w.text
-       
-        # $tw.text configure -send_to_lisp 1
-        # ::btext::clearHighlightClasses $btext
-
-        $btext configure -wrap [dict get $opts -wrap] \
-            -xscrollcommand [list $w.sx set] \
-            -yscrollcommand [list $w.sy set] \
-            -foreground $COLOR(stdin) \
-            -background $COLOR(bg) \
-            -insertbackground $COLOR(cursor) \
-            -font $::tkcon::OPT(font) -borderwidth 1 -highlightthickness 0 \
-            -undo 1
-        catch {
-            # 8.5+ stuff
-            set tabsp [expr {$OPT(tabspace) * [font measure $OPT(font) 0]}]
-            $btext configure -tabs [list $tabsp left] -tabstyle wordprocessor
-        }
-
- 
-        scrollbar $w.sx -orient h -command [list $w.text xview]
-        scrollbar $w.sy -orient v -command [list $w.text yview]
-        
         foreach path [list $tw $w $btext $textt] {
             SetEditorBindtags $path $w
         }
