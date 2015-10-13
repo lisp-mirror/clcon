@@ -172,7 +172,7 @@ namespace eval ::edt {
         }
     }
 
-    proc EnsureEditorWindow {tw} {
+    proc EnsureToplevelWindowWithPathname {tw} {
         if {![winfo exists $tw]} {
             toplevel $tw
             wm withdraw $tw

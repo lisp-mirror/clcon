@@ -288,7 +288,7 @@ namespace eval ::edt {
 
             set tw [cTW]
             set w [cW]
-            EnsureEditorWindow $tw
+            EnsureToplevelWindowWithPathname $tw
             SetupEditorWindowCommon $tw
             
             SetupEditorWindowWhenCreatedBuffer $opts
