@@ -156,7 +156,7 @@ proc ::tkcon::WritePassiveText {w text index} {
 # Opens file at that offset (in chars). See also ::tkcon::EditFileAtLine
 proc ::tkcon::EditFileAtOffset {filename offset} {
     variable OPT
-    $OPT(edit) -type file -offset $offset -- $filename
+    $OPT(edit) -type file -wrap char -offset $offset -- $filename
     #see offset - incoroporate it into edit.
     # $w mark set insert "1.0+ $offset chars"
     # focus -force $editor

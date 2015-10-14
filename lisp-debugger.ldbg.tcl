@@ -581,7 +581,6 @@ namespace eval ::ldbg {
     # Responce to :debug-return, stolen from slimv and melted with our
     # normal continuation-based responce processing 
     proc DebugReturn { EventAsList ContinuationId } {
-        puts "DebugReturn may go wrong"
         variable ::slimv::debug_active
         variable ::slimv::Ssldb_level
         #vim.command('let s:sldb_level=-1')
