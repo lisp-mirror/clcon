@@ -29,6 +29,19 @@ namespace eval ::edt {
 
         $m add separator
 
+        # Stepper menu
+        set StepperMenu $m.stepper
+        catch { destroy $StepperMenu }
+        $m add cascade -label [::ldbg::StepperMenuTitle] -state disabled -menu $StepperMenu
+        menu $StepperMenu
+        # This is not very correct as we have some stepper commands with single mod.
+        # But we avoid complification of things this way
+        # FIXME if we use special bindtags and reconfigure tags when stepper enabled/disabled,
+        # we can reuse that keys.
+        ::ldbg::FillStepperMenu $StepperMenu [list NoMod$w] 
+        
+        $m add separator
+
         set cmd [OduFnMenuItem $w $m $btext indent-new-line "<Shift-Return>" SingleMod$w]
         # bind SingleMod$w <Shift-Return> "$cmd; break"
 
@@ -64,6 +77,18 @@ namespace eval ::edt {
         bind SingleMod$w <Alt-Key-Cyrillic_yu> $cmd
     }
 
+    proc EnableDisableMenuItems {} {
+        variable ::ldbg::InTheDebugger
+        variable ::ldbg::StepperMode
+        if {$InTheDebugger && $StepperMode} {
+            set st normal
+        } else {
+            set st disabled
+        }
+        set stepperMenu [cMenuBar .lisp]
+        $stepperMenu entryconfigure [::ldbg::StepperMenuTitle] -state $st
+    }
+    
     # Empties menu (except menu bar) and fills it again
     proc RebuildMenu {} {
         # set menu [cMenuBar]

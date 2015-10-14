@@ -9,6 +9,8 @@ namespace eval ::ldbg {
     # list of leashed lists of two elements - short and long name of a restart
     variable Restarts
 
+    # we try to keep this var 1 when debugger is active and 0 when it is inactive
+    defvar InTheDebugger 1
     # stepper mode is 1 when we are in stepper
     defvar StepperMode 0
     
@@ -31,6 +33,10 @@ namespace eval ::ldbg {
     variable LispDebuggerGeometry 
 
     catch {font create tkconfixed -family Courier -size -20}
+
+    proc StepperMenuTitle {} {
+        return "Stepper"
+    }
 
     proc InitData {} {
         variable StackFrameHeaders
@@ -384,7 +390,7 @@ namespace eval ::ldbg {
         }
         # showVar StepperMenuPathname
         
-        .ldbgTlv.mbar entryconfigure Stepper -state $state
+        .ldbgTlv.mbar entryconfigure [StepperMenuTitle] -state $state
     }
     
     # This is a contiuation assigned on reply on initialization request 
@@ -393,6 +399,7 @@ namespace eval ::ldbg {
         variable Restarts
         variable StepperMode
         variable LispDebuggerGeometry
+        variable InTheDebugger
 
         set DebugEvent $EventAsList
 
@@ -414,7 +421,8 @@ namespace eval ::ldbg {
         #HighlightCurrentlyVisibleBuffer
 
         EnableDisableMenus $w
-        
+
+        set InTheDebugger 1
         DoGoToTop $w
         
         # if {[info exists LispDebuggerGeometry]} {
@@ -643,8 +651,10 @@ namespace eval ::ldbg {
     # 21)
     # (:debug-return 2 1 nil)
 
-    # Remove debugger window from the screen
+    # Remove debugger window from the screen and sets InTheDebugger to 0
+    # FIXME rename to CloseDebugger
     proc CloseDebuggerWindow {MainWindow} {
+        variable InTheDebugger 0
         # We keep window so that it could recall its size and position.
         wm withdraw $MainWindow
     }
@@ -665,7 +675,7 @@ namespace eval ::ldbg {
         ::tkcon::EvalInSwankAsync \
             "(swank:sldb-return-from-frame $FrameNo $qCode)" \
             {} $thread
-        after idle [list ::ldbg::CloseDebuggerWindow $MainWindow]
+        ::ldbg::CloseDebuggerWindow $MainWindow
     }
 
 #(:emacs-rex
@@ -746,7 +756,7 @@ namespace eval ::ldbg {
     #proc SwitchToNativeDebugger {i} {
     #    set thread [GetDebuggerThreadId]
     #    ::tkcon::EvalInSwankAsync "(swank:sldb-break-with-default-debugger nil)" {} $thread
-    #        after idle [list ::ldbg::CloseDebuggerWindow $MainWindow]
+    #        ::ldbg::CloseDebuggerWindow $MainWindow
     #}
 
     proc InvokeRestart {i} {
@@ -758,17 +768,21 @@ namespace eval ::ldbg {
         ::tkcon::EvalInSwankAsync \
             "(swank:invoke-nth-restart-for-emacs $level $i)" \
             {} $thread
-        after idle [list ::ldbg::CloseDebuggerWindow $MainWindow]
+        ::ldbg::CloseDebuggerWindow $MainWindow
     }
 
 
     proc InvokeStepperRestart {name} {
         variable StepperMode
+        variable InTheDebugger
         variable MainWindow
-        if {!$StepperMode} {
-            tk_messageBox -parent $MainWindow -title "Stepper" -message "Stepper not active"
+        if {!$InTheDebugger} {
+            tk_messageBox -parent $MainWindow -title "Stepper" -message "Debugger is not active"
+        } elseif {!$StepperMode} {
+            tk_messageBox -parent $MainWindow -title "Stepper" -message "Stepper is not active"
+        } else {
+            InvokeSldbRestartByName $name
         }
-        InvokeSldbRestartByName $name
     }
     
     # Name must be a readable qualified lisp symbol, e.g. sb-ext:step-out
@@ -806,7 +820,7 @@ namespace eval ::ldbg {
         ::tkcon::EvalInSwankAsync \
             "(swank:sldb-abort)" \
             {} $thread
-        after idle [list ::ldbg::CloseDebuggerWindow $MainWindow]
+        ::ldbg::CloseDebuggerWindow $MainWindow
     }
     
     
@@ -848,26 +862,34 @@ namespace eval ::ldbg {
             -postcommand [list ::ldbg::FillRestartsMenu $m]
     }
 
-    proc StepperMenuItem {m name label accel} {
+    # For menu m, adds stepper command with label starting named restart and
+    # binds it to each of bindtags
+    proc StepperMenuItem {m bindtags name label accel} {
         variable MainWindow
         set w $MainWindow
-        set tbl [GetFramesTablelist $w]
-        set bodytag [$tbl bodytag]
         set cmd [list ::ldbg::InvokeStepperRestart $name]
         set cmdBreak "$cmd; break"
         $m add command -label $name -command $cmd -accel $accel
-        bind $bodytag $accel $cmdBreak
-        bind $tbl $accel $cmdBreak
+        foreach bt $bindtags {
+            bind $bt $accel $cmdBreak
+        }
+    }
+
+    # m is a menu. It can be in other window!
+    proc FillStepperMenu {m bindtags} {
+        StepperMenuItem $m $bindtags "sb-ext:step-continue" "continue" <F5>
+        StepperMenuItem $m $bindtags "sb-ext:step-out" "step out" <Shift-F11>
+        StepperMenuItem $m $bindtags "sb-ext:step-next" "next" <F10>
+        StepperMenuItem $m $bindtags "sb-ext:step-into" "step into" <F11>
     }
     
     proc MakeMainWindowStepperMenu {w menu} {
         variable StepperMenuPathname
-        set m [menu [::tkcon::MenuButton $menu "Stepper" stepper]]
+        set tbl [GetFramesTablelist $w]
+        set bodytag [$tbl bodytag]
+        set m [menu [::tkcon::MenuButton $menu [StepperMenuTitle] stepper]]
         set StepperMenuPathname $m
-        StepperMenuItem $m "sb-ext:step-continue" "continue" <F5>
-        StepperMenuItem $m "sb-ext:step-out" "step out" <Shift-F11>
-        StepperMenuItem $m "sb-ext:step-next" "next" <F10>
-        StepperMenuItem $m "sb-ext:step-into" "step into" <F11>
+        FillStepperMenu $m [list $tbl $bodytag]
     }
         
     proc ClearStackFramesTableList {} {

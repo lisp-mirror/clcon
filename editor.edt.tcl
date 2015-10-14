@@ -182,7 +182,9 @@ namespace eval ::edt {
             SetEditorBindtags $path $w
         }
 
-        RebuildMenu  
+        RebuildMenu
+
+        EnableDisableMenuItems
 
     }
 

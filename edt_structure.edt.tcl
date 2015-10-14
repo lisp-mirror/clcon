@@ -83,7 +83,8 @@ namespace eval ::edt {
         return [Bi2W $internal_cBi]
     }
 
-    # the only editing window 
+    # the only editing window
+    # FIXME rename to something other, as window the only one. E.g. to theTW
     proc cTW {} {
         return [Bi2TW {}]
     }
@@ -102,7 +103,7 @@ namespace eval ::edt {
         return [Bi2_text $internal_cBi]
     }
 
-    
+   
     # Reuse counter increments when we open a non-reusable window
     # This is required to know which window was opened earlier
     proc GenReuseCounter {} {
