@@ -19,6 +19,7 @@
                (:file "swank-patch")
                (:file "eval-in-tcl")
                (:file "swank-inspector" :description "inspector backend pieces")
+               (:file "stepper-support")
                (:file "swank-compilation-errors")
                (:file "text2odu-from-tcl-to-queue" :description "Receive editor events from swank and post them to *text2odu-event-queue*"
                       )

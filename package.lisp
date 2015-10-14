@@ -16,6 +16,8 @@
            #:notify-oduvan-destroy-backend-buffer
            #:call-oduvanchik-function-with-clcon_text 
            #:start-oduvanchik ; start oduvanchik in another thread
+           #:restart-with-name-exists-p
+           #:invoke-sldb-restart-by-name
            )
   )
 
