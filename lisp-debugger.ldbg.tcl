@@ -7,7 +7,10 @@ namespace eval ::ldbg {
     variable DebugEvent
 
     # list of leashed lists of two elements - short and long name of a restart
-    variable Restarts 
+    variable Restarts
+
+    # stepper mode is 1 when we are in stepper
+    defvar StepperMode 0
     
     variable MainWindow
 
@@ -364,15 +367,23 @@ namespace eval ::ldbg {
     proc ExtractStackFrames { EventAsList } {
         set frames [lindex $EventAsList 5]
     }
+
+    proc EnableDisableMenus { DbgToplevelWindow } {
+        
+    }
     
     # This is a contiuation assigned on reply on initialization request 
     proc ldbg { EventAsList } {
         variable DebugEvent
         variable Restarts
+        variable StepperMode
         variable LispDebuggerGeometry
 
         set DebugEvent $EventAsList
-        set Restarts [ParseRestarts]
+
+        set rasm [ParseRestarts]
+        set Restarts [lindex $rasm 0]
+        set StepperMode [lindex $rasm 1]
         
         InitData
 
@@ -386,7 +397,8 @@ namespace eval ::ldbg {
         set frames [ExtractStackFrames $EventAsList]
         InsertSeveralFramesIntoTree $frames
         #HighlightCurrentlyVisibleBuffer
-        
+
+        EnableDisableMenus $w
         DoGoToTop $w
         
         # if {[info exists LispDebuggerGeometry]} {
@@ -404,13 +416,6 @@ namespace eval ::ldbg {
         wm deiconify $w
         raise $w
     }
-
-    # proc TitleListFileMenu {w menu} {
-    #      set m [menu [::tkcon::MenuButton $menu "1.File" file]]
-    #      $m add command -label "1.Close" -underline 0 -accel "Escape" -command [list destroy $w]
-    #     bind $w <Escape>		[list destroy $w]
-    # }
-
 
     proc CellCmdForActiveCell {tbl Cmd} {
         CellCmd [$tbl index active] $Cmd
@@ -493,12 +498,14 @@ namespace eval ::ldbg {
     # Fills Restarts variable
     proc ParseRestarts {} {
         variable DebugEvent
-        variable Restarts 
         set RestartsL [lindex $DebugEvent 4]
         if {![::mprs::Consp $RestartsL]} {
             error "Expected cons: $RestartsL"
         }
-        set Restarts [::mprs::Unleash $RestartsL]
+        set restarts [::mprs::Unleash $RestartsL]
+        showVar restarts
+        set stepperMode 1
+        list $restarts $stepperMode
     }
 
     # Responce to :debug-activate, stolen from slimv
@@ -602,6 +609,12 @@ namespace eval ::ldbg {
     # 21)
     # (:debug-return 2 1 nil)
 
+    # Remove debugger window from the screen
+    proc CloseDebuggerWindow {MainWindow} {
+        # We keep window so that it could recall its size and position.
+        wm withdraw $MainWindow
+    }
+    
     proc ReturnFromFrame {RowName} {
         variable MainWindow
         set FrameNo [RowNameToFrameNo $RowName]
@@ -618,7 +631,7 @@ namespace eval ::ldbg {
         ::tkcon::EvalInSwankAsync \
             "(swank:sldb-return-from-frame $FrameNo $qCode)" \
             {} $thread
-        after idle [list destroy $MainWindow]
+        after idle [list ::ldbg::CloseDebuggerWindow $MainWindow]
     }
 
 #(:emacs-rex
@@ -699,7 +712,7 @@ namespace eval ::ldbg {
     #proc SwitchToNativeDebugger {i} {
     #    set thread [GetDebuggerThreadId]
     #    ::tkcon::EvalInSwankAsync "(swank:sldb-break-with-default-debugger nil)" {} $thread
-    #        after idle [list destroy $MainWindow]
+    #        after idle [list ::ldbg::CloseDebuggerWindow $MainWindow]
     #}
 
     proc InvokeRestart {i} {
@@ -711,9 +724,34 @@ namespace eval ::ldbg {
         ::tkcon::EvalInSwankAsync \
             "(swank:invoke-nth-restart-for-emacs $level $i)" \
             {} $thread
-        after idle [list destroy $MainWindow]
+        after idle [list ::ldbg::CloseDebuggerWindow $MainWindow]
     }
 
+    # Name must be a readable qualified lisp symbol, e.g. sb-ext:step-out
+    proc InvokeSldbRestartByName {name} {
+        set thread [GetDebuggerThreadId]
+        set LispCmd "(clco::restart-with-name-exists-p '$name)"
+        ::tkcon::EvalInSwankAsync $LispCmd \
+            [subst -nocommands {
+                ::ldbg::InvokeSldbRestartByNameC1 $name \$EventAsList
+            }] $thread
+    }
+
+
+    proc InvokeSldbRestartByNameC1 {name EventAsList} {
+        variable MainWindow
+        set thread [GetDebuggerThreadId]
+        set existsp [::mprs::ParseReturnOk $EventAsList]
+        showVar existsp
+        if {$existsp} {
+            set LispCmd "(clco::invoke-sldb-restart-by-name '$name)"
+            ::tkcon::EvalInSwankAsync $LispCmd {} $thread
+        }
+        # Note we close the window just now, not after idle, as this can be stepper restart
+        ::ldbg::CloseDebuggerWindow $MainWindow
+    }
+
+    
     proc Abort {w} {
         variable DebugEvent
         variable Restarts
@@ -723,7 +761,7 @@ namespace eval ::ldbg {
         ::tkcon::EvalInSwankAsync \
             "(swank:sldb-abort)" \
             {} $thread
-        after idle [list destroy $MainWindow]
+        after idle [list ::ldbg::CloseDebuggerWindow $MainWindow]
     }
     
     
@@ -765,6 +803,26 @@ namespace eval ::ldbg {
             -postcommand [list ::ldbg::FillRestartsMenu $m]
     }
 
+    proc StepperMenuItem {m name label accel} {
+        variable MainWindow
+        set w $MainWindow
+        set tbl [GetFramesTablelist $w]
+        set bodytag [$tbl bodytag]
+        set cmd [list ::ldbg::InvokeSldbRestartByName $name]
+        set cmdBreak "$cmd; break"
+        $m add command -label $name -command $cmd -accel $accel
+        bind $bodytag $accel $cmdBreak
+        bind $tbl $accel $cmdBreak
+    }
+    
+    proc MakeMainWindowStepperMenu {w menu} {
+        set m [menu [::tkcon::MenuButton $menu "Stepper" stepper]]
+        StepperMenuItem $m "sb-ext:step-continue" "continue" <F5>
+        StepperMenuItem $m "sb-ext:step-out" "step out" <Shift-F11>
+        StepperMenuItem $m "sb-ext:step-next" "next" <F10>
+        StepperMenuItem $m "sb-ext:step-into" "step into" <F11>
+    }
+        
     proc ClearStackFramesTableList {} {
         variable MainWindow
         if {[winfo exists $MainWindow]} {
@@ -801,6 +859,7 @@ namespace eval ::ldbg {
     proc PrepareGui1 {} {
         variable MainWindow
         variable LispDebuggerGeometry
+        variable StepperMode
 
         # ---------------------------- make toplevel window MainWindow -----------    
         variable ::tkcon::PRIV
@@ -866,9 +925,13 @@ namespace eval ::ldbg {
         MakeMainWindowWindowMenu $w $menu
         MakeMainWindowRestartsMenu $w $menu
 
+        # StepperMode is set in the caller fn.
+        MakeMainWindowStepperMenu $w $menu
+
         # ------------------------------ bindings -------------
         MakeBindings $w
         wm protocol $w WM_DELETE_WINDOW "::ldbg::Abort $w"
+        
         # -------------------------- layout -------------------
         
         # now layout title elements in title

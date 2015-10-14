@@ -6,8 +6,8 @@
   "Might be useful for activating/deactivating menu items"
   (if 
    (find name swank::*sldb-restarts* :key #'restart-name)
-   t
-   nil))
+   1
+   0))
 
 (defun invoke-sldb-restart-by-name (name)
    (invoke-restart (find name swank::*sldb-restarts* :key #'restart-name)))
