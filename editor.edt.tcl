@@ -42,7 +42,7 @@ namespace eval ::edt {
             # no more buffers - let's kill the editor window
             after idle [list destroy [cTW]]
         } else {
-            SwitchToBuffer $newBi
+            SwitchToBuffer $newBi do_nothing
             after idle [list destroy $w]
         }
         ::recent::RedrawRecentMenuForConsole
@@ -186,7 +186,7 @@ namespace eval ::edt {
 
     }
 
-    proc SwitchToThisTab {} {
+    proc SwitchToThisTab {{action "focus"}} {
         variable internal_cBi
 
         set notebook [theNotebook]
@@ -195,7 +195,10 @@ namespace eval ::edt {
         checkValidBi $Bi
         set internal_cBi $Bi
 
-        ShowingBufferChanged        
+        # We might avoid this call if the new that no switch is actually done,
+        ShowingBufferChanged
+
+        after idle [list ::edt::PerformSwitchToBufferAction $action]
     }
 
     proc SyncCursor {text} {
@@ -224,18 +227,20 @@ namespace eval ::edt {
         set Bi [FindOrMakeEditorWindow $word $opts $tail]
         set w [Bi2W $Bi]
         set tw [Bi2TW $Bi]
+        set btext [Bi2btext $Bi]
 
-        SwitchToBuffer $Bi
-       
+        # This is partially async command, not sure see insert would work now
+        SwitchToBuffer $Bi focus
+
         if {[string compare [dict get $opts -find] {}]} {
-            ::fndrpl::OldTkconFind $w.text [dict get $opts -find] -case 1
+            ::fndrpl::OldTkconFind $btext [dict get $opts -find] -case 1
         }
         if {[dict get $opts -offset] ne {}} {
-            $w.text mark set insert [dict get $opts -offset]
-            $w.text see insert
+            $btext mark set insert [dict get $opts -offset]
+            $btext see insert
         }
 
-        return $w.text
+        return $btext
     }
 
     proc oImplementation {commandNameWoPrefix} {

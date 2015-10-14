@@ -207,11 +207,46 @@ namespace eval ::edt {
         after idle ::buli::RefreshData
     }
 
+
+    proc PerformSwitchToBufferAction {action} {
+        set tw [cTW]
+        switch -exact $action {
+            "" -
+            focus {
+                ::tkcon::FocusWindowByName $tw [c_text]
+            }
+            deiconify {
+                wm deiconify $tw
+            }
+            do_nothing {
+                # do nothing
+            }
+            default {
+                error "PerformSwitchToBufferAction: wrong action $action"
+            }
+        }
+    }
+
     # Switch to existing buffer identified by buffer id, or
     # reflect the fact that user switchted to that tab
-    proc SwitchToBuffer {Bi} {
-        [theNotebook] select [Bi2W $Bi]
+    # action is "", "focus", "deiconify" or "do_nothing", see PerformSwitchToBufferAction.
+    # "" is an equialent to "focus"
+    # Action specified is performed only if we do not need to change a tab.
+    # If we switch to another tab, action is always "focus"
+    proc SwitchToBuffer {Bi {action "focus"}} {
+        set nb [theNotebook]
+        set w [Bi2W $Bi]
+        if {[$nb select] eq $w} {
+            event generate $nb <<NotebookTabChanged>> -data $action
+        } else {
+            # We can not pass user data to that event, so
+            # its action will be "", that is, "focus"
+            [theNotebook] select [Bi2W $Bi]
+        }
     }
+
+    ## event generate [theNotebook] <???> -data string
+    ## %d
     
     # Calls to set things up when existing buffer is shown at the tab.
     # Buffer is identified by internal_cBi
@@ -249,8 +284,11 @@ namespace eval ::edt {
         variable internal_cBi
         set key [CanonicalizeEditArgs $word $opts]
         if { [dict exists $ContentKeyToBufIdDict $key] } {
+
             set Bi [dict get $ContentKeyToBufIdDict $key]
-            SwitchToBuffer $Bi
+            checkValidBi $Bi
+            set internal_cBi $Bi
+
         } else {
             # If not, create one
             set Bi [GenNewBi]
