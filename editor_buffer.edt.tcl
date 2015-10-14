@@ -203,10 +203,6 @@ namespace eval ::edt {
         string cat [cTW] ".mbar" $SubMenuSuffix
     }
 
-    proc ClearMenu {m} {
-        $m delete 0 end
-    }
-  
     # Initialization of editor GUI, buffer-independent part.
     # Called only once when we create first editor window.
     # So if you change it, restart clcon 

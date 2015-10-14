@@ -12,7 +12,7 @@ namespace eval ::edt {
     proc MakeLispModeMenu {w btext} {
 
         set m [cMenuBar .lisp]
-        ClearMenu $m
+        ::gui_util::ClearMenu $m
         
         # It is too late hour to start show-mark
         # We have archietectural problems there (rompsite.lisp is too early on the build)
@@ -75,7 +75,7 @@ namespace eval ::edt {
         set btext [c_btext]
         
         set m [cMenuBar .file]
-        ClearMenu $m
+        ::gui_util::ClearMenu $m
 
         set cmd ::tkcon::OpenForEdit 
 	$m add command -label "Open" -command $cmd -accel "Control-O"
@@ -104,7 +104,7 @@ namespace eval ::edt {
         ## Edit Menu
         ##
         set m [cMenuBar .edit]
-        ClearMenu $m
+        ::gui_util::ClearMenu $m
 
         $m add command -label "Cut"   -under 2 \
             -command [wesppt [list tk_textCut $btext]]
@@ -130,7 +130,7 @@ namespace eval ::edt {
         ## Tcl mode Menu
         ## 
         set m [cMenuBar .tcl]
-        ClearMenu $m
+        ::gui_util::ClearMenu $m
         
         set SendToSlave [wesppt "::tkcon::EvalSlave \
 		    eval \[$btext get 1.0 end-1c\]"]
@@ -148,7 +148,7 @@ namespace eval ::edt {
         ## Window Menu
         ##
         set m [cMenuBar .window]
-        ClearMenu $m
+        ::gui_util::ClearMenu $m
         
         set cmd [list ::clconcmd::bufferlist]
 	$m add command -label "Buffer list" -underline 0 -accel "Control-F12" \
@@ -163,7 +163,7 @@ namespace eval ::edt {
         ## Secret Menu
         ##
         set m [cMenuBar .secret]
-        ClearMenu $m
+        ::gui_util::ClearMenu $m
         
         set cmd [list $btext Unfreeze]
         $m add command -label "1.Unfreeze (if oduvanchik hang)" -command $cmd

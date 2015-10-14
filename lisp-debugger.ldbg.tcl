@@ -16,7 +16,10 @@ namespace eval ::ldbg {
 
     # dictionary of StackFrameHeaders being filled.
     # dictionary $FrameNo -> [list of continuation bodies to call after filling]
-    variable StackFrameHeadersBeingFilled 
+    variable StackFrameHeadersBeingFilled
+
+    # stores a location of debugger window (for current session only)
+    variable LispDebuggerGeometry 
 
     catch {font create tkconfixed -family Courier -size -20}
 
@@ -366,6 +369,7 @@ namespace eval ::ldbg {
     proc ldbg { EventAsList } {
         variable DebugEvent
         variable Restarts
+        variable LispDebuggerGeometry
 
         set DebugEvent $EventAsList
         set Restarts [ParseRestarts]
@@ -384,6 +388,11 @@ namespace eval ::ldbg {
         #HighlightCurrentlyVisibleBuffer
         
         DoGoToTop $w
+        
+        # if {[info exists LispDebuggerGeometry]} {
+        #     showVar LispDebuggerGeometry
+        #     wm geometry $w $LispDebuggerGeometry
+        # }
         
         focus $tbl
         
@@ -781,7 +790,7 @@ namespace eval ::ldbg {
         bind $bodytag <Return> {::ldbg::KbdCellCmd %W %x %y RowDblClick; break}
         #bind $bodytag <Delete> {::ldbg::KbdCellCmd %W %x %y CloseBuffer; break}
         bind $bodytag <Double-Button-1> {::ldbg::MouseCellCmd %W %x %y RowDblClick; break}
-        
+        # bind $w <Configure> "gui_util::RememberPositionOnConfigureEvent $w %W %x %y %h %w ::ldbg::LispDebuggerGeometry"
         #    bind $w.tf.tbl <<TablelistCellUpdated>> [list DoOnSelect $w.tf.tbl]
         #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
     }
@@ -791,6 +800,7 @@ namespace eval ::ldbg {
     # Returns window
     proc PrepareGui1 {} {
         variable MainWindow
+        variable LispDebuggerGeometry
 
         # ---------------------------- make toplevel window MainWindow -----------    
         variable ::tkcon::PRIV

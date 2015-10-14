@@ -56,6 +56,26 @@ namespace eval ::gui_util {
             -undo 1
     }
 
+    proc ClearMenu {m} {
+        $m delete 0 end
+    }
+  
+
+    # # To be bound on configure event of toplevel window $w as
+    # #  bind . <Configure> "gui_util::RememberPositionOnConfigureEvent $w %W %x %y %h %w"
+    # # so that it records window position and size into a variable
+    # # later use wm geometry $toplevel $thatvar to restore window geometry
+    # ONE PROBLEM - DOES NOT WORK
+    # Just not destroy window to fix the problem
+    # proc RememberPositionOnConfigureEvent { target w x y height width varname } {
+    #     variable $varname
+    #     upvar \#0 $varname store
+    #     if { $w eq $target && [wm state $w] eq "normal" } {
+    #         set store [join [list $width x $height + $x + $y] ""]
+    #     }
+    # }
+        
+
     # 
     # proc NoteWidgetsChanged {widget suffix_list proc_body} {
     # }
