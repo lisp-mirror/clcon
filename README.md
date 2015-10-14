@@ -32,26 +32,24 @@ So if you want to take a look at clcon, do not try to just "play around"
 with the IDE. Take a [demo tour](doc/demo-tour.md) instead.
 
 Current features are: 
-- REPL with command history and history substitution
-- Debugger (inspect stack, locals, goto source, invoke restarts, eval in frame, restart frame, search)
-- Editor (with some pitfalls, e.g. you can close buffer without save confirmation)
-- completion for lisp symbols and filenames in REPL
-- lisp mode with syntax-highlight, find-source, auto indent (not covered by demo tour)
-- inspector 
-- compilation notes browser
-- editor buffer list
-- recent files menu
-- "Find" and "Find next" commands for text and treeview
-- running of tcl code with special "escapes"
 
+- REPL for Lisp and Tcl with history
+- Debugger 
+- Stepper
+- Multitabbed Editor (currenty have no save confirmation when quitting, beware!)
+- Completion for Lisp, Tcl and filenames in REPL
+- Find Source for Lisp and Tcl. Find source for TCL seem to be rather unique feature of clcon
+- Some commands of lisp mode (navigate through forms, auto-indent, have bugs...)
+- Inspector
+- Compilation error browser
 
 ## Installation and startup
-For windows, we even have [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.2.2.zip). 
+For windows, we have rather outdated [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.2.2.zip). 
 Anyway, see [doc/INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/INSTALL.md) for installation instructions. 
 
 ## Documentation
 
-[Demo tour](doc/demo-tour.md) - narrow footpath through best views of all currently working features of clcon
+[Demo tour](doc/demo-tour.md) - narrow footpath through best views of some features of clcon (a bit outdated)
 
 [User manual](https://bitbucket.org/budden/clcon/src/default/doc/user-manual.md)
 
@@ -68,7 +66,6 @@ MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 - fix bugs in lisp mode 
 - paren highlighting
 - use as a GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine)
-- eval-in-frame
 - cross-reference navigation
 - better editor functionality
 - thread list with thread debugging
