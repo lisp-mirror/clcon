@@ -219,7 +219,7 @@ namespace eval ::edt {
 
         set notebook [theNotebook]
         ttk::notebook $notebook
-        pack $notebook
+        pack $notebook -fill both -expand 1
         bind $notebook <<NotebookTabChanged>> "::edt::SwitchToThisTab %d"
         ttk::notebook::enableTraversal $notebook 
 
