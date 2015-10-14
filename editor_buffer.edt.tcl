@@ -220,7 +220,7 @@ namespace eval ::edt {
         set notebook [theNotebook]
         ttk::notebook $notebook
         pack $notebook
-        bind $notebook <<NotebookTabChanged>> ::edt::SwitchToThisTab
+        bind $notebook <<NotebookTabChanged>> "::edt::SwitchToThisTab %d"
         ttk::notebook::enableTraversal $notebook 
 
         set menu [menu [cMenuBar]]

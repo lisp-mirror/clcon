@@ -89,11 +89,11 @@ namespace eval ::buli {
         set Bi [dict get $p Bi]
         switch -exact $action {
             ShowBuffer {
-                ::edt::SwitchToBuffer $Bi
+                ::edt::SwitchToBuffer $Bi focus
             }
             HideListAndShowBuffer {
                 wm withdraw $TitleListWindow
-                ::edt::SwitchToBuffer $Bi
+                ::edt::SwitchToBuffer $Bi deiconify
             }
             CloseBuffer {
                 ::edt::EditCloseFile $Bi
