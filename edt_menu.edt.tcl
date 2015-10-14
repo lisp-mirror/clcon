@@ -49,10 +49,8 @@ namespace eval ::edt {
         
         set cmd [wesppt [list clcon_text::CallOduvanchikFunction $btext "odu::indent-region-command nil" {} {send_selection 1}]]
         
-        $m add command -label "Indent Region" -accel "F11" -command $cmd 
-        bind NoMod$w <F11> $cmd
-        
-        
+        $m add command -label "Indent Region" -command $cmd 
+       
         OduFnMenuItem $w $m $btext transpose-forms
         $m add separator
         OduFnMenuItem $w $m $btext beginning-of-defun
