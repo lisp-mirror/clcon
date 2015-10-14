@@ -154,7 +154,7 @@ proc ::mprs::ExtractSyncEventFromQueueIfExists {} {
 
 
 # Parses (:return (:ok x)) event to message or errs.
-# Returns x if all ok
+# Returns unleashed x if all ok
 proc ::mprs::ParseReturnOk { EventAsList } {
     set EventHead [lindex $EventAsList 0]
     if { $EventHead ne {:return} } {
