@@ -8,8 +8,8 @@
   "Outer function"
   (+ (g x) (+ x x)))
 
-(defun g (x)
+(defun g (y)
   "Inner function"
   (break)
-  (+ x 4)
+  (+ y 4)
   )

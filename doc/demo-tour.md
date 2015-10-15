@@ -64,7 +64,7 @@ This would create two functions, `f` and `g`. Run `(f 5)` at the console. Debugg
 There is also search in the stack list. Tree without a search is a dense forest! Type `Ctrl-F`, type in `)` and press `F3` or `Return` to continue search.
 
 You can evaluate values in the context of stack frame. Choose `Stack/Eval in frame` from debugger menu bar. New window titled "eval in frame"
-will pop up. Note package is prompted at window's title. Type in `X` into the window and press `Return`. Console will be activated and result of your evaluation
+will pop up. Note package is prompted at window's title. Type `y` in the window and press `Return`. Console will be activated and result of your evaluation
 will be printed there. 
 
 Also we have "Restarts" menu at menubar. We could call either of them.
