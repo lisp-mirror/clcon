@@ -44,7 +44,7 @@ Current features are:
 - Compilation error browser
 
 ## Installation and startup
-For windows, we have rather outdated [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.2.2.zip). 
+For windows, we have [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.2.4.zip). 
 Anyway, see [doc/INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/INSTALL.md) for installation instructions. 
 
 ## Documentation
