@@ -1,4 +1,4 @@
-Clcon user manual
+﻿Clcon user manual
 ===========
 
 Command line options
@@ -175,3 +175,4 @@ Thread list and debugging
 У нас нет ГУЯ для отладки потоков. Но можно напечатать
 список потоков в консоль с помощью ```(swank:list-threads)```,
 а затем вызвать отладку треда по номеру в списке (не по id-у треда) ```(swank:debug-nth-thread <N>)``` . Номер в списке начинается с нуля (заголовок не считаем).
+ 
