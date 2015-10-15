@@ -146,7 +146,7 @@ All is simple - don't use them. They are broken. I plan remove them soon.
 
 What if my REPL hang up?
 ------------------------
-menu ber/Connection/Disconnect from swank
+menu bar/Connection/Disconnect from swank
 menu bar/Connection/Connect to swank
 - this can help
 
