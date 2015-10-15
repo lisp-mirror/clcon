@@ -22,8 +22,8 @@ namespace eval ::edt {
         # bind $w <F11> $cmd
 
         set cmd [list ::edt::CompileAndLoadTheFile $btext]
-        $m add command -label "0.Compile and load" -underline 0 -command $cmd -accel "F5"
-        bind NoMod$w <F5> $cmd
+        $m add command -label "0.Compile and load" -underline 0 -command $cmd -accel "F7"
+        bind NoMod$w <F7> $cmd
 
         ::erbr::AddNextAndPreviousCompilerMessagesCommands $m $btext 1
 
