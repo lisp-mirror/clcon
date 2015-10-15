@@ -63,8 +63,19 @@ This would create two functions, `f` and `g`. Run `(f 5)` at the console. Debugg
 
 There is also search in the stack list. Tree without a search is a dense forest! Type `Ctrl-F`, type in `)` and press `F3` or `Return` to continue search.
 
-Also we have "Restarts" menu at menubar. If jou just close debugger window with cross or with closing command of your Window Manager (e.g. Alt-F4), default restart will be invoked.
+You can evaluate values in the context of stack frame. Choose `Stack/Eval in frame` from debugger menu bar. New window titled "eval in frame"
+will pop up. Note package is prompted at window's title. Type in `X` into the window and press `Return`. Console will be activated and result of your evaluation
+will be printed there. 
 
+Also we have "Restarts" menu at menubar. We could call either of them.
+Or we could just close debugger window with cross or with closing command of your Window Manager (e.g. Alt-F4),
+to call default restart, marked by asterik in restarts menu. Let's invoke "continue" restart and watch result of `f` (19) at the console. 
+
+Now let's try stepper. 
+
+Warning! To make stepper work correctly, you need to load swank with stepper support disabled. This is true with windows release, but it depends on your initialization file on Linux. Hope to document it later, or see windows file release as an example.
+
+Bring up last command with `Control-Up` at the console, and press `Return` to call it again. As debugger occurs, choose `Stack/Switch to stepping mode` from menu bar. Editor window will pop up and current source will be highlighted. Press "F10" (Step next, or "Step over") watch how execution proceeds. Also note that stack and locals are shown in the debugger window. Press "f10" two more times, and then press "F5" (Continue, or resume to normal execution) to quit stepper mode. 
 
 IDE commands. 
 ---------------------
@@ -73,16 +84,10 @@ Type `.help` to see list of those.
 
 One of useful commands is `.history`. It shows history of last commands you entered. You can invoke several last commands via history menu. 
 
-
 Standalone inspector
 ----------
 Eval something, say `'defun`, at the console. And then type in `.insp*` (this is IDE command) to inspect `*`, that is, result of last REPL evaluation. You can see the symbol's properties and follow hyperlinks. 
 
 Invoking tcl
 --------
-Commands starting from `..` are interpreted by tcl. E.g. type in ``..puts "Wow!"`` to see string printed at the console. There is also a way to invoke tcl from lisp, but it has security hazard and can be disabled in the future. Type in `(clcon-server:eval-in-tcl "tk_messageBox -message WOW")` at the console and you'll see message box, which was invoked from the lisp side. For now, `eval-in-tcl` is used for quick-and-dirty implementation of some clcon features.
-
-
-
-
-
+Commands starting from `..` are interpreted by tcl. E.g. type in ``.. tk_messageBox -message "Wow!"`` to try. There is also a way to invoke tcl from lisp. Type in `(clcon-server:eval-in-tcl "tk_messageBox -message WOW")` at the console and you'll see message box, which was invoked from the lisp side. 
