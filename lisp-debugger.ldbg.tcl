@@ -542,9 +542,12 @@ namespace eval ::ldbg {
         set stepperMode 0
 
         foreach r $restarts {
-            if {[::mprs::Unleash [::mprs::Car $r]] eq {step-continue}} {
-                set stepperMode 1
-                break
+            set restartName [::mprs::Unleash [::mprs::Car $r]]
+            switch -nocase $restartName {
+                step-continue {
+                    set stepperMode 1
+                    break
+                }
             }
         }
         list $restarts $stepperMode
