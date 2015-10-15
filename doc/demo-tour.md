@@ -37,10 +37,11 @@ In the editor, press `Control-.` to switch back to console. In the console, pres
 Compiling file from editor
 ------------
 At the console, open test/error-browser-sample-file.lisp file for editing.
-There are two ways to do that: via file open dialog (Control-O)
+There are at least two ways to do that: via file open dialog (Control-O)
 or via console ed command:
-``.ed /s2/clcon/test/error-browser-sample-file.lisp``
-While typing in filename, use Control-F3 for completion.
+``.ed /s2/clcon/test/error-browser-sample-file.lisp`` or 
+``.ed c:/clcon/quicklisp/local-projects/clcon/test/error-browser-sample-file.lisp``
+for Windows file release. While typing in filename, use Control-F3 for completion.
 
 File will open in the editor. From the menu, choose `Lisp/Compile and load`. Two new windows will pop up: list of compiler notes 
 and error details. Also there will be some text above list of compiler notes. It will state that compilation is failed, 
@@ -52,7 +53,7 @@ Once you switched to editor, it is convenient to scroll through messages with Al
 Warning! Due to random positioning of windows, some views may be unpleasant to work with, so you might want to 
 resize/reposition them manually. Your feedback and patches to solve this are welcome, see the debugger for a good sample.
 
-Debugger
+Debugger and stepper
 ------
 At the console, type in the following:
 
