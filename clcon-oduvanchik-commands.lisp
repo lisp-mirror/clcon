@@ -164,3 +164,15 @@
   (dolist (b oi::*buffer-list*)
     (dolist (w (buffer-windows b))
       (check-display-start-mark-ok w))))
+
+
+(defun count-marks-in-current-buffer ()
+  "{linenumber {charpos0 font0} {charpos1 font1} ...} 
+  If we know line-number, we can pass it"
+  (let* ((b (current-buffer))
+         (m (buffer-start-mark b))
+         (l (mark-line m))
+         (count 0))
+    (do ((ll l (line-next ll)))
+        ((null ll) count)
+      (incf count (length (oi::line-marks ll))))))
