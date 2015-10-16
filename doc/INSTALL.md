@@ -33,13 +33,15 @@ Alternative way: loading sources and building (Linux & Windows)
 cd ~/quicklisp/local-projects
 hg clone https://bitbucket.org/budden/budden-tools
 ```  
-- good version of clcon itself, put it where convenient. No "installation" procedure exists yet. 
-
-- put fresh version of [oduvanchik](https://bitbucket.org/budden/oduvanchik) under local-projects directory of quicklisp. E.g. (Linux)
-```
+- good version of clcon and [oduvanchik](https://bitbucket.org/budden/oduvanchik), 
+put them under local-projects directory of quicklisp. Trunk can contain arbitrary debug
+features and code, or be badly broken. We recommend updating to
+lateset tagged "release", e.g. 0.2.4. At Linux this can look like:
+``
 cd ~/quicklisp/local-projects
-hg clone https://bitbucket.org/budden/oduvanchik
-```
+hg clone -u 0.2.4 https://bitbucket.org/budden/oduvanchik
+hg clone -u 0.2.4 https://bitbucket.org/budden/clcon
+``
 
 ### Start your SBCL and install dependencies. 
 
