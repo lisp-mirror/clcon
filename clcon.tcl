@@ -50,6 +50,9 @@ proc TkconSourceHere { filename } {
 TkconSourceHere record_definition.tcl
 
 package require Tk 8.4
+
+option add *tearOff 0
+
 # package require tablelist - it must work after toplevel window creation
 
 
