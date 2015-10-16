@@ -91,7 +91,7 @@ proc ::tkcon::ExpandLispSymbol str {
     # string quoting is a bullshit here!
     set Quoted [QuoteLispObjToString $str]
     if { $OPT(putd-enabled) == 1 } {
-        set LispCmd "(cl:progn (cl::sleep 0.5) (swank:simple-completions $Quoted '\"COMMON-LISP-USER\"))"
+        set LispCmd "(cl:progn (swank:simple-completions $Quoted '\"COMMON-LISP-USER\"))"
     } else {
         set LispCmd "(swank:simple-completions $Quoted '\"COMMON-LISP-USER\")"
     }
