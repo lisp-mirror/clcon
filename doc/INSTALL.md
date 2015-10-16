@@ -71,6 +71,11 @@ To load server-side code to lisp, use
 ; May be needed sometimes for the debugging. 
 ; (pushnew :oduvan-use-sleep-in-dispatch *features*)
 
+; For debugging editor with client-server communcation enabled for
+; only single buffer. 
+; (pushnew :use-oduvan-for-first-clcon_text-pathname-only *features*)
+
+
 ; uncomment next line to see highlight (oduvanchik would hangs up soon)
 ; (pushnew :oduvan-enable-highlight *features*) 
 
