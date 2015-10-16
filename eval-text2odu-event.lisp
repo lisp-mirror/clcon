@@ -6,10 +6,10 @@
 (defun check-mark-is-at-row-and-col (mark row col)
   (multiple-value-bind (r c)
       (oi::mark-row-and-col mark)
-    (assert (= row r) ()
-            "Mark ~S was expected to be at row ~A, but it is at ~A" mark row r)
-    (assert (= col c) ()
-            "Mark ~S was expected to be at column ~A, but it is at ~A" mark col c)
+    (unless (= row r) 
+            (break "Mark ~S was expected to be at row ~A, but it is at ~A" mark row r))
+    (unless (= col c) 
+            (break "Mark ~S was expected to be at column ~A, but it is at ~A" mark col c))
     ))
 
 (defun set-mark-to-row-and-col (mark row col)
@@ -197,6 +197,7 @@
              (fboundp fn)) () "Symbol ~S funbound or have home-package different from :oduvanchik" fn)
 
     (swank::with-connection (connection) 
+      ;(break)
       (use-buffer buffer
         (odu::set-mark-to-row-and-col (current-point)
                                       (clco::row-col-row cur-row-col)
