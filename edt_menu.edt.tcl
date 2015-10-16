@@ -1,7 +1,12 @@
 namespace eval ::edt {
-    proc OduFnMenuItem {w m btext oduCmd {accel {}} {bindtag {}}} {
+    proc OduFnMenuItem {w m btext oduCmd {accel {}} {bindtag {}} {ContinueIfNoBackend 0}} {
         set oduFn [string cat "odu::" $oduCmd "-command"]
-        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $btext "$oduFn nil"]]
+        set ScriptWhenBackendEnabled [wesppt [list clcon_text::CallOduvanchikFunction $btext "$oduFn nil"]] 
+        if {$ContinueIfNoBackend} {
+            set cmd "if {\$::tkcon::OPT(oduvan-backend)} {$ScriptWhenBackendEnabled} else { continue }"
+        } else {
+            set cmd $ScriptWhenBackendEnabled
+        }
         $m add command -label $oduCmd -accel $accel -command $cmd
         if {$accel ne {}} {
             bind $bindtag $accel "$cmd; break"
@@ -58,7 +63,7 @@ namespace eval ::edt {
         OduFnMenuItem $w $m $btext mark-defun 
         $m add separator
 
-        OduFnMenuItem $w $m $btext forward-form <Control-Key-Right> SingleMod$w
+        OduFnMenuItem $w $m $btext forward-form <Control-Key-Right> SingleMod$w 1
         
         OduFnMenuItem $w $m $btext backward-form
         OduFnMenuItem $w $m $btext forward-list
@@ -162,8 +167,8 @@ namespace eval ::edt {
         
         set SendToSlave [wesppt "::tkcon::EvalSlave \
 		    eval \[$btext get 1.0 end-1c\]"]
-        $m add command -label "&2. Send Text To Slave" \
-            -command $SendToSlave
+        $m add command -label "1. Send Text To Slave" \
+            -underline 0 -command $SendToSlave
 
         $m add separator
 
