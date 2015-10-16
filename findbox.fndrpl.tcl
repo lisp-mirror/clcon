@@ -33,6 +33,7 @@ namespace eval ::fndrpl {
 
         if {$FndOrRpl=="replace"} {
             if {$AreaType=="text"} {
+                set SearchCmd "::fndrpl::ReplaceIt $area"
                 # later make similar to "find" case.
             } else {
                 error "Unsupported AreaType $AreaType"
@@ -57,7 +58,7 @@ namespace eval ::fndrpl {
             pack $find.l.f.f2.label2 $find.l.f.f2.entry2 -side left
 
             pack $find.l.f.f1 $find.l.f.f2 -side top
-            bind $find.l.f.f2.entry2 <Return> "::fndrpl::ReplaceIt $area -" 
+            bind $find.l.f.f2.entry2 <Return> "::fndrpl::ReplaceIt $area" 
         } elseif {$FndOrRpl=="find"} {
             pack $find.l.f.f1
             # Is there a sense to have two distinct keys for the same command? 
@@ -74,8 +75,14 @@ namespace eval ::fndrpl {
         button $find.f2.button2 -text "Cancel" -command "::fndrpl::CancelFind $area $find" -width 10 -underline 0 -state disabled
 
         if {$FndOrRpl=="replace"} {
-            button $find.f2.button3 -text "Replace" -command "::fndrpl::ReplaceIt $area -" -width 10 -height 1 -underline 0
-            button $find.f2.button4 -text "Replace All" -command "::fndrpl::ReplaceAll $area" -width 10 -height 1 -underline 8
+            set cmd "::fndrpl::ReplaceIt $area"
+            button $find.f2.button3 -text "replace" -command $cmd -width 10 -height 1 
+
+            set cmd "::fndrpl::ReplaceAll $area"
+            button $find.f2.button4 -text "replace all" -command $cmd -width 10 -height 1 -underline 8
+            bind $find <Alt-Key-a>  $cmd
+            bind $find <Alt-Key-Cyrillic_ef>  $cmd
+            
             pack $find.f2.button3 $find.f2.button4 $find.f2.button2  -pady 4
         } else {
             pack $find.f2.button1 $find.f2.button9 $find.f2.button2  -pady 4

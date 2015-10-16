@@ -351,42 +351,20 @@ namespace eval ::fndrpl {
     }
 
     
-    proc question {text} {
-        variable r
-        set q .question
-        set r "0"
-        catch {destroy $q}
-        toplevel $q
-        wm title $q "Replace ?"
-        label $q.label -text "Replace this occurance ?"
-        frame $q.buttons
-        button $q.buttons.yes -text "Yes" -command "set r 1" 
-        button $q.buttons.no  -text "No" -command  "set r 0"
-        pack $q.buttons.yes $q.buttons.no -side left
-        pack $q.label $q.buttons
-        powin $q $text
-        grab $q
-        vwait r
-        destroy $q
-        return $r
-    }
-
-
-
     # Was not updated to namespace. Unlikely to work
-    proc ReplaceIt {text n} {
+    proc ReplaceIt {text} {
         variable SearchString
         variable SearchDir
         variable ReplaceString
         variable findcase
-        variable window
-        variable current_window
+        #variable window
+        #variable current_window
         variable rconfirm
+        variable SearchPos
 
         set SearchPos insert
-        c 
-        set window($current_window,echange) 1
-        set window($current_window,change) 1
+        #set window($current_window,echange) 1
+        #set window($current_window,change) 1
 
         if {$findcase=="1"} {
             set caset "-exact"
@@ -409,11 +387,22 @@ namespace eval ::fndrpl {
 
             if {$rconfirm==1} { 
                 $text tag add sel $SearchPos  "$SearchPos+$leng char"
-                if {[question $text]==1} {
-                    $text delete $SearchPos "$SearchPos+$leng char"
-                    $text insert $SearchPos $ReplaceString
+                set reply [YesNoCancel "Replace" "Replace this match?" $text]
+                switch -exact $reply {
+                    yes { 
+                        $text delete $SearchPos "$SearchPos+$leng char"
+                        $text insert $SearchPos $ReplaceString
+                        $text tag remove sel $SearchPos
+                    }
+                    no {
+                        $text tag remove sel $SearchPos
+                    }
+                    cancel {
+                        $text tag remove sel $SearchPos
+                        set SearchPos "1.0"
+                        return
+                    }
                 }
-                $text tag remove sel $SearchPos
             } else {
                 $text delete $SearchPos "$SearchPos+$leng char"
                 $text insert $SearchPos $ReplaceString
@@ -431,20 +420,20 @@ namespace eval ::fndrpl {
 
     # Was not updated to namespace. Unlikely to work
     proc ReplaceAll {text} {
-        variable SearchString
-        variable SearchDir
-        variable ReplaceString
-        variable findcase
-        variable window
-        variable current_window
+        #variable SearchString
+        #variable SearchDir
+        #variable ReplaceString
+        #variable findcase
+        #variable window
+        #variable current_window
 
-        set window($current_window,echange) 1
-        set window($current_window,change) 1
+        #set window($current_window,echange) 1
+        #set window($current_window,change) 1
 
-        c
-        ReplaceIt $text norec
+        variable SearchPos
+        ReplaceIt $text 
         while {$SearchPos!="1.0"} {
-            ReplaceIt $text norec
+            ReplaceIt $text 
         }
     }
 

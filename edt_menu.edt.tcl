@@ -146,6 +146,11 @@ namespace eval ::edt {
 	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd 
         bind NoMod$w <F3> $cmd
 
+	set cmd [wesppt [list ::fndrpl::OpenFindBox $btext "text" "replace" {}]]
+        $m add command -label "Replace" -under 0 -command $cmd -accel "Control-h"
+        bind SingleMod$w <Control-Key-h> $cmd
+        bind SingleMod$w <Control-Key-Cyrillic_er> $cmd
+        
         ## Lisp mode Menu
         ##
         MakeLispModeMenu $w $btext
