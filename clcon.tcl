@@ -48,6 +48,7 @@ proc TkconSourceHere { filename } {
 }
 
 TkconSourceHere record_definition.tcl
+TkconSourceHere named_args.tcl
 
 package require Tk 8.4
 
