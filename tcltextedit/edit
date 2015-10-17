@@ -1,0 +1,2 @@
+#!/bin/sh
+wish /s2/clcon/tcltextedit/edit.tcl "$@"
