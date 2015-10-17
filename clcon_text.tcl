@@ -283,6 +283,23 @@ namespace eval ::clcon_text {
         #putd "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
     }
 
+    proc CheckIfScriptDoesNotContainBreakOrContinue {script check_break_context} {
+        if {[string match *break* $script]} {
+            if {$check_break_context eq ""} {
+                error "script contains break: $script"
+            } else {
+                puts stderr "$check_break_context: script contains break: $script"
+            }
+        }
+        if {[string match *continue* $script]} {
+            if {$check_break_context eq ""} {
+                error "script contains continue: $script"
+            } else {
+                puts stderr "$check_break_context: script contains continue: $script"
+            }
+        }
+    }
+    
     # In freezable text, all event handler scripts must be processed
     # with this function to support freezing protocol.
     # Optional destination is required when event is bound not to
@@ -290,7 +307,8 @@ namespace eval ::clcon_text {
     # must expand to pathName of text.
     # Note: macro is not hygienic, $W can be captured, this is why
     # it is protected with namespace prefix.
-    proc WrapEventScriptForFreezedText {script {destination "%W"}} {
+    proc WrapEventScriptForFreezedText {script check_break_context {destination "%W"}} {
+        CheckIfScriptDoesNotContainBreakOrContinue $script $check_break_context        
         set Template {
             if {[<<<<destination>>>> cget -private_freezed]} {
                 <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>>}
@@ -307,15 +325,14 @@ namespace eval ::clcon_text {
 
     proc WrapFreezableHandlerScript {ev} {
         set script [bind Text $ev]
-        set script2 [WrapEventScriptForFreezedText $script]
+        set script2 [WrapEventScriptForFreezedText $script $ev]
         bind FreezableText $ev $script2
     }
-    
 
     # Fills FreezableText bindtag with wrapped bindings of Text
     proc InitBindingsOfFreezableText {} {
         foreach ev [bind Text] {
-            WrapFreezableHandlerScript $ev
+            WrapFreezableHandlerScript $ev 
         }
         return
     }
