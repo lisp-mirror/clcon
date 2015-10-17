@@ -463,32 +463,9 @@ namespace eval ::clcon_text {
 }
 
 ######################## Example of readonly text ###############
-#  # Initialization (readonly set to 1)
-# ::clcon_text::clcon_text .text -readonly 1
-#  # Changing readonly after creation
-# .text configure -readonly 0
-# .text configure -readonly 1
-
-# .text insert 1.0 "this line will be ignored"
-
-# for {set x 0} {$x<10} {incr x} { 
-#     .text RoInsert end "line $x\n"
-# }
-
-# ::clcon_text::clcon_text .text2
-# .text2 insert end "Line inserted by 'insert'\n"
-# .text2 RoInsert end "Line inserted by 'RoInsert'\n"
-
-# pack .text   -side top
-# pack .text2 -side bottom
-
+# See test/freezing-test-2.tcl
 
 ################### Example of freezing ########################
 # See test/freezing-test-1.tcl
 
-############ Test case in clcon ###########
-#..set ed [::edt::edit /s2/clcon/clcon_text.tcl]
-#..$ed Freeze
-# Now type something and try to do something
-#..$ed Unfreeze
 
