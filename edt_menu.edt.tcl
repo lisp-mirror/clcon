@@ -2,15 +2,16 @@ namespace eval ::edt {
 
     # This is a primitive for commands which behave differently. If there is oduvan backend,
     # script is called at uplevel 1. Otherwise, continue is called at uplevel 1
-    proc CallBackendOrContinue {script_when_backend} {
-        variable ::tkcon::OPT
-        if {$::tkcon::OPT(oduvan-backend)} {
-            uplevel 1 $script_when_backend
-        } else {
-            return -code continue
-        }
+    proc CodeToCallBackendOrContinue {script_when_backend} {
+        set result \
+       "if {\$::tkcon::OPT(oduvan-backend)} {
+  $script_when_backend
+ } else {
+  continue
+ }"
+        return $result
     }
-    
+        
     # If ContinueIfNoBackend, binding would check precense of oduvan-backend,
     # and if it is absend, would call continue so that other bindings would work.
     # Returns cmd with break. 
@@ -23,17 +24,14 @@ namespace eval ::edt {
             [wesppt [list clcon_text::CallOduvanchikFunction $btext "$oduFn nil"] \
                  -add-break 1] 
         if {$(-ContinueIfNoBackend)} {
-            set cmd \
-                [list ::edt::CallBackendOrContinue $ScriptForBackend]
-            set cmdBreak \
-                [list ::edt::CallBackendOrContinue $ScriptForBackendBreak]
+            set cmd [CodeToCallBackendOrContinue $ScriptForBackend]
+            set cmdBreak [CodeToCallBackendOrContinue $ScriptForBackendBreak]
         } else {
             set cmd $ScriptForBackend
             set cmdBreak $ScriptForBackendBreak
         }
         $m add command -label $oduCmd -accel $(-accel) -command $cmd
         if {$(-accel) ne {}} {
-            showVar cmdBreak
             bind $(-bindtag) $(-accel) $cmdBreak
         }
         return $cmdBreak
