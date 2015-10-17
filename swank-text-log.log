@@ -1,0 +1,676 @@
+entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C1EEF51}>)#<swank::multithreaded-connection {C01F5C1}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C01F5C1}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C01F5C1}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C01F5C1}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C01F5C1}>)#<swank::multithreaded-connection {C6BBE99}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C6BBE99}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C6BBE99}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C6BBE99}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C6BBE99}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)#<swank::multithreaded-connection {E8044F1}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E8044F1}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)#<swank::multithreaded-connection {BCD7591}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BCD7591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)#<swank::multithreaded-connection {EB0BC01}>#<swank::multithreaded-connection {102BDE51}>#<swank::multithreaded-connection {BB55B91}>#<swank::multithreaded-connection {10552591}>#<swank::multithreaded-connection {E0F2591}>#<swank::multithreaded-connection {ECA4291}>#<swank::multithreaded-connection {C545571}>#<swank::multithreaded-connection {C173571}>#<swank::multithreaded-connection {CCA0DB1}>#<swank::multithreaded-connection {D43DE01}>#<swank::multithreaded-connection {D93D309}>#<swank::multithreaded-connection {E982999}>#<swank::multithreaded-connection {F51A551}>#<swank::multithreaded-connection {FB05051}>#<swank::multithreaded-connection {F1C8101}>#<swank::multithreaded-connection {F920571}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)#<swank::multithreaded-connection {B967571}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B967571}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B967571}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B967571}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B967571}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B967571}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B967571}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)#<swank::multithreaded-connection {11337B61}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {11337B61}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {11337B61}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)#<swank::multithreaded-connection {DEC9999}>#<swank::multithreaded-connection {DA09999}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)#<swank::multithreaded-connection {B7B7599}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B7B7599}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B7B7599}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B7B7599}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)#<swank::multithreaded-connection {E5FE599}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)#<swank::multithreaded-connection {C59D999}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C59D999}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)#<swank::multithreaded-connection {C16D981}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C16D981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C16D981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C16D981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C16D981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C16D981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C16D981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C16D981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C16D981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)#<swank::multithreaded-connection {1034D999}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)#<swank::multithreaded-connection {10361981}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10361981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10361981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10361981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10361981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10361981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10361981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10361981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)#<swank::multithreaded-connection {BFE4599}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BFE4599}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BFE4599}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BFE4599}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BFE4599}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BFE4599}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BFE4599}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BFE4599}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BFE4599}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BB08769}>)#<swank::multithreaded-connection {E0B2839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B2839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B2839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B2839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B2839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B2839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B2839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B2839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B2839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B2839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B2839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B2839}>)#<swank::multithreaded-connection {D7AB779}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {1025E769}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {C125001}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C125001}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C125001}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C125001}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C125001}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C125001}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C125001}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C125001}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C125001}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C125001}>)#<swank::multithreaded-connection {DA22839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {DA22839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {106D6769}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {106D6769}>)#<swank::multithreaded-connection {D0A6839}>#<swank::multithreaded-connection {B7C8779}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B7C8779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B7C8779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B7C8779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B7C8779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B7C8779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B7C8779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {C362769}>#<swank::multithreaded-connection {11801769}>#<swank::multithreaded-connection {10C1D839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10C1D839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {11407B71}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {BA65779}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BA65779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BA65779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BA65779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BA65779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BA65779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BA65779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {11997981}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {11997981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {C3ACC99}>#<swank::multithreaded-connection {C029591}>#<swank::multithreaded-connection {BDA4779}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {BDA4779}>)#<swank::multithreaded-connection {BD36999}>#<swank::multithreaded-connection {C031591}>#<swank::multithreaded-connection {CBBF571}>#<swank::multithreaded-connection {D3BB571}>#<swank::multithreaded-connection {C5B1821}>#<swank::multithreaded-connection {DBDD591}>#<swank::multithreaded-connection {D040599}>#<swank::multithreaded-connection {D3915A1}>#<swank::multithreaded-connection {D9ED571}>#<swank::multithreaded-connection {BA9D591}>#<swank::multithreaded-connection {104DBC99}>#<swank::multithreaded-connection {C2C2591}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C2C2591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C2C2591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C2C2591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C2C2591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C2C2591}>)#<swank::multithreaded-connection {10893571}>#<swank::multithreaded-connection {C38E5A1}>#<swank::multithreaded-connection {C5CF571}>#<swank::multithreaded-connection {11926001}>#<swank::multithreaded-connection {C5C7591}>#<swank::multithreaded-connection {C24B591}>#<swank::multithreaded-connection {E1F4591}>#<swank::multithreaded-connection {FD95571}>#<swank::multithreaded-connection {10671599}>#<swank::multithreaded-connection {10BEE591}>#<swank::multithreaded-connection {107D9591}>#<swank::multithreaded-connection {F94C591}>#<swank::multithreaded-connection {11791599}>#<swank::multithreaded-connection {C1C75A1}>#<swank::multithreaded-connection {B8585A1}>#<swank::multithreaded-connection {BC4F591}>#<swank::multithreaded-connection {10AF4571}>#<swank::multithreaded-connection {C02F571}>#<swank::multithreaded-connection {115C6599}>#<swank::multithreaded-connection {11BB6571}>#<swank::multithreaded-connection {11B3F5A1}>#<swank::multithreaded-connection {11D60599}>#<swank::multithreaded-connection {11B3C599}>#<swank::multithreaded-connection {11589571}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {11589571}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {11589571}>)#<swank::multithreaded-connection {BABE591}>#<swank::multithreaded-connection {FD905A1}>#<swank::multithreaded-connection {119A4591}>#<swank::multithreaded-connection {C8CD571}>#<swank::multithreaded-connection {C02B591}>#<swank::multithreaded-connection {105D7F81}>#<swank::multithreaded-connection {10BAF5A1}>#<swank::multithreaded-connection {DCDE591}>#<swank::multithreaded-connection {CE08591}>#<swank::multithreaded-connection {DB44571}>#<swank::multithreaded-connection {E6A2591}>#<swank::multithreaded-connection {D20F5A1}>#<swank::multithreaded-connection {E483901}>#<swank::multithreaded-connection {D79A571}>#<swank::multithreaded-connection {E2D7571}>#<swank::multithreaded-connection {CA25551}>#<swank::multithreaded-connection {E7275A1}>#<swank::multithreaded-connection {D6255A1}>#<swank::multithreaded-connection {D0C6571}>#<swank::multithreaded-connection {E21A571}>#<swank::multithreaded-connection {CB9B591}>#<swank::multithreaded-connection {E9A45A1}>#<swank::multithreaded-connection {D082599}>#<swank::multithreaded-connection {D669599}>#<swank::multithreaded-connection {E83C599}>#<swank::multithreaded-connection {CC1F571}>#<swank::multithreaded-connection {E777591}>#<swank::multithreaded-connection {D461571}>#<swank::multithreaded-connection {D9D4599}>#<swank::multithreaded-connection {EB78F21}>#<swank::multithreaded-connection {DA955A1}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {DA955A1}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {DA955A1}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {DA955A1}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {DA955A1}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {DA955A1}>)#<swank::multithreaded-connection {E0E5591}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0E5591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0E5591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0E5591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0E5591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0E5591}>)#<swank::multithreaded-connection {C3C6591}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C3C6591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C3C6591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C3C6591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C3C6591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C3C6591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C3C6591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C3C6591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C3C6591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C3C6591}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C3C6591}>)#<swank::multithreaded-connection {C418769}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C418769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C418769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C418769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C418769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C418769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C418769}>)#<swank::multithreaded-connection {1036D981}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {C45B599}>#<swank::multithreaded-connection {11679F79}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {11679F79}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {11679F79}>)#<swank::multithreaded-connection {E158599}>#<swank::multithreaded-connection {1022B591}>#<swank::multithreaded-connection {102DAEF9}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {102DAEF9}>)#<swank::multithreaded-connection {C309591}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C309591}>)#<swank::multithreaded-connection {11825591}>#<swank::multithreaded-connection {E0E7571}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0E7571}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0E7571}>)#<swank::multithreaded-connection {DC70571}>#<swank::multithreaded-connection {CE64591}>#<swank::multithreaded-connection {CC88571}>#<swank::multithreaded-connection {D9FE591}>#<swank::multithreaded-connection {C2015A1}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C2015A1}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C2015A1}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C2015A1}>)#<swank::multithreaded-connection {CD2A401}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {CD2A401}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {CD2A401}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {CD2A401}>)#<swank::multithreaded-connection {CE0FF49}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {CE0FF49}>)#<swank::multithreaded-connection {E0B8779}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B8779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B8779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B8779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B8779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B8779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B8779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0B8779}>)#<swank::multithreaded-connection {DE05981}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {DE05981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {DE05981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {DE05981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {DE05981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {DE05981}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {DE05981}>)#<swank::multithreaded-connection {B89BA01}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B89BA01}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B89BA01}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B89BA01}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B89BA01}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B89BA01}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B89BA01}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B89BA01}>)#<swank::multithreaded-connection {116E3779}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {116E3779}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {116E3779}>)#<swank::multithreaded-connection {10AE1779}>#<swank::multithreaded-connection {B9F6839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {C600A01}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C600A01}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C600A01}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C600A01}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C600A01}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C600A01}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C600A01}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C600A01}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {C600A01}>)#<swank::multithreaded-connection {129F1839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {129F1839}>)#<swank::multithreaded-connection {12DBE839}>#<swank::multithreaded-connection {124CF839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {10A81769}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10A81769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10A81769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10A81769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10A81769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10A81769}>)#<swank::multithreaded-connection {145AB839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {BFF6B61}>#<swank::multithreaded-connection {12654E71}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {D18F839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D18F839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D18F839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D18F839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D18F839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {E0C8839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0C8839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {E0C8839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {1423B839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {1423B839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {1423B839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {1423B839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {1423B839}>)#<swank::multithreaded-connection {D518769}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D518769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D518769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D518769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D518769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D518769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D518769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D518769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D518769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D518769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D518769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D518769}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D518769}>)#<swank::multithreaded-connection {D30E981}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {1118BB49}>#<swank::multithreaded-connection {B972839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B972839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B972839}>)#<swank::multithreaded-connection {C1DE839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {D9B9839}>#<swank::multithreaded-connection {113AD839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {10B8A779}>#<swank::multithreaded-connection {1196C889}>#<swank::multithreaded-connection {CFF5E11}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {C941769}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {C63D839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {D671839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {12D86839}>#<swank::multithreaded-connection {B7CE839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {10E1D839}>#<swank::multithreaded-connection {12BA6839}>#<swank::multithreaded-connection {B7A9799}>#<swank::multithreaded-connection {E385839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {10E75839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10E75839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {10E75839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {110FA839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {110FA839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {110FA839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {110FA839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {110FA839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {110FA839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {110FA839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {110FA839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {110FA839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {110FA839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {110FA839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {110FA839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {110FA839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {110FA839}>)#<swank::multithreaded-connection {12608839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {12608839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {12608839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {12608839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {12608839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {12608839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {12608839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {12608839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {12608839}>)#<swank::multithreaded-connection {B993839}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B993839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B993839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B993839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {B993839}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {1161D769}>#<swank::multithreaded-connection {B9AF839}>#<swank::multithreaded-connection {10CE1839}>#<swank::multithreaded-connection {D4F9999}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)#<swank::multithreaded-connection {C3C7839}>#<swank::multithreaded-connection {10AD5999}>#<swank::multithreaded-connection {10630571}>#<swank::multithreaded-connection {C723591}>entered prin1-to-string-for-emacs with (#<swank::multithreaded-connection
+                                          {D19B699}>)
