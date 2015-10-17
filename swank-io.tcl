@@ -75,18 +75,18 @@ proc ::mprs::EvalInSwankSyncInner {lispcode} {
     # Delay all async events from lisp. Process sync events. 
     while {1 == 1} {
 
-        putd "EvalInSwankSyncInner goes vwait for SWANKEventQueue"
+        # putd "EvalInSwankSyncInner goes vwait for SWANKEventQueue"
 
         vwait ::tkcon::SWANKEventQueue
 
-        putd "EvalInSwankSyncInner woke up on vwait SWANKEventQueue"
+        # putd "EvalInSwankSyncInner woke up on vwait SWANKEventQueue"
 
         set processed [MaybeProcessSyncEventFromQueue]
 
-        putd "MaybeProcessSyncEventFromQueue returned $processed"
+        # putd "MaybeProcessSyncEventFromQueue returned $processed"
         if { [lindex $processed 0] == 1} {
             set result [lindex $processed 1]
-            putd "EvalInSwankSyncInner: about to return $result"
+            # putd "EvalInSwankSyncInner: about to return $result"
             return $result
         } else {
             # this was async event, it is now in the queue. Lets sleep further
@@ -138,10 +138,10 @@ proc ::mprs::ExtractSyncEventFromQueueIfExists {} {
     foreach Event $SWANKEventQueue {
         incr i
 
-        putd "Checking if $Event is sync = $SWANKSyncContinuation"
+        # putd "Checking if $Event is sync = $SWANKSyncContinuation"
         
         AssertEq [Consp $Event] 1
-        putd "Passed AssertEq"
+        # putd "Passed AssertEq"
         set EventAsList [Unleash $Event]
         set ContinuationId [ExtractContinuationId $EventAsList]
         if { $ContinuationId == $SWANKSyncContinuation } {
@@ -189,14 +189,14 @@ proc ::mprs::MaybeProcessSyncEventFromQueue {} {
     set EventAsList [Unleash $Event]
     set EventHead [lindex $EventAsList 0]
 
-    putd "EventHead = $EventHead"
+    # putd "EventHead = $EventHead"
 
     if {$EventHead eq ":abort"} {
         putd "Processing of :abort sync return is not done yet, throwing"
         throw "abort of sync eval"
     } elseif {$EventHead eq ":return"} {
         set Body [lindex $EventAsList 1]
-        putd "Body = $Body"
+        # putd "Body = $Body"
         return [list 1 $Body]
     } else {
         putd "Unknown head $EventHead in sync reply $Event"
@@ -210,7 +210,7 @@ proc ::mprs::EvalInTclSync {EventAsList} {
     set ThreadId [Unleash [lindex $EventAsList 1]]
     set Tag [Unleash [lindex $EventAsList 2]]
     set Code [Unleash [lindex $EventAsList 3]]
-    #puts stderr "Entered EvalInTclSync with $EventAsList"
+    putd "Entered EvalInTclSync with $Tag, $Code"
     set Result [eval $Code]
     # set errorCode [catch {eval $Code} Result]
     # if {$errorCode} {
@@ -222,6 +222,7 @@ proc ::mprs::EvalInTclSync {EventAsList} {
     #showVar EvalInTclValueForm
     #puts stderr "Returning from EvalInTclSync"
     ::tkcon::SendEventToSwank $EvalInTclValueForm {} 3 $ThreadId $Tag
+    putd "Returning from EvalInTclSync with $Tag"
     return     
 }
 
@@ -285,7 +286,7 @@ proc ::mprs::ProcessFirstEventFromQueueAsyncrhonously {} {
     set EventHead [lindex $EventAsList 0]
     set ContinuationId [ExtractContinuationId $EventAsList]
 
-    putd "ContinuationId = $ContinuationId"
+    # putd "ContinuationId = $ContinuationId"
     
     ProcessAsyncEvent $EventAsList 
 }
