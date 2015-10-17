@@ -283,6 +283,8 @@ namespace eval ::clcon_text {
         #putd "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
     }
 
+    # This is "static" protection. And what if script calls function which returns code?
+    # It can also return numeric value of a code, in which case we fail. 
     proc CheckIfScriptDoesNotContainBreakOrContinue {script check_break_context} {
         if {[string match *break* $script]} {
             if {$check_break_context eq ""} {
