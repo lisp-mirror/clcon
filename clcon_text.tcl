@@ -477,26 +477,11 @@ namespace eval ::clcon_text {
 
 
 ################### Example of freezing ########################
-# catch { destroy .freezingExample }
-# toplevel .freezingExample
-
-# set txt .freezingExample.text
-# ::clcon_text::clcon_text $txt
-
-# for {set x 0} {$x<10} {incr x} { 
-#     $txt insert end "line $x\n"
-# }
-
-# pack $txt -side top -fill both
-# focus $txt
-
-# # Do .freezingExample.text Freeze
-# # to start buffering input
-# # Do .freezingExample.text Unfreeze
-# # to finish
+# See test/freezing-test-1.tcl
 
 ############ Test case in clcon ###########
 #..set ed [::edt::edit /s2/clcon/clcon_text.tcl]
 #..$ed Freeze
 # Now type something and try to do something
 #..$ed Unfreeze
+
