@@ -381,15 +381,15 @@ namespace eval ::clcon_text {
         named_args $args {-destination "%W" -add-break 0}
         CheckIfScriptDoesNotContainBreakContinueOrReturn $script 
         set Template [lindex \
-            {"if {[<<<<destination>>>> cget -private_freezed]} {\
-   <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>>}\
- } else {\
+            {"if {[<<<<destination>>>> cget -private_freezed]} {
+   <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>>}
+ } else {
    putd 444444
    putd {<<<<OldEventBody>>>>}
-   <<<<OldEventBody>>>>\
+   <<<<OldEventBody>>>>
  }<<<<MaybeBreak>>>>"} 0]
         if {$(-add-break)} {
-            set MaybeBreak "\
+            set MaybeBreak " 
  break"
         } else {
             set MaybeBreak ""

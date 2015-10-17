@@ -1,17 +1,42 @@
 namespace eval ::edt {
-    proc OduFnMenuItem {w m btext oduCmd {accel {}} {bindtag {}} {ContinueIfNoBackend 0}} {
-        set oduFn [string cat "odu::" $oduCmd "-command"]
-        set ScriptWhenBackendEnabled [wesppt [list clcon_text::CallOduvanchikFunction $btext "$oduFn nil"]] 
-        if {$ContinueIfNoBackend} {
-            set cmd "if {\$::tkcon::OPT(oduvan-backend)} {$ScriptWhenBackendEnabled} else { continue }"
+
+    # This is a primitive for commands which behave differently. If there is oduvan backend,
+    # script is called at uplevel 1. Otherwise, continue is called at uplevel 1
+    proc CallBackendOrContinue {script_when_backend} {
+        variable ::tkcon::OPT
+        if {$OPT(oduvan-backend)} {
+            uplevel 1 {*}$script_when_backend
         } else {
-            set cmd $ScriptWhenBackendEnabled
+            return -code continue
         }
-        $m add command -label $oduCmd -accel $accel -command $cmd
-        if {$accel ne {}} {
-            bind $bindtag $accel "$cmd; break"
+    }
+    
+    # If ContinueIfNoBackend, binding would check precense of oduvan-backend,
+    # and if it is absend, would call continue so that other bindings would work.
+    # Returns cmd with break. 
+    proc OduFnMenuItem {w m btext oduCmd args} {
+        named_args $args {-accel {} -bindtag {} -ContinueIfNoBackend 0} 
+        set oduFn [string cat "odu::" $oduCmd "-command"]
+        set ScriptForBackend \
+            [wesppt [list clcon_text::CallOduvanchikFunction $btext "$oduFn nil"]] 
+        set ScriptForBackendBreak \
+            [wesppt [list clcon_text::CallOduvanchikFunction $btext "$oduFn nil"] \
+                 -add-break 1] 
+        if {$(-ContinueIfNoBackend)} {
+            set cmd \
+                [list ::edt::CallBackendOrContinue $ScriptForBackend]
+            set cmdBreak \
+                [list ::edt::CallBackendOrContinue $ScriptForBackendBreak]
+        } else {
+            set cmd $ScriptForBackend
+            set cmdBreak $ScriptForBackendBreak
         }
-        return $cmd
+        $m add command -label $oduCmd -accel $(-accel) -command $cmd
+        if {$(-accel) ne {}} {
+            showVar cmdBreak
+            bind $(-bindtag) $(-accel) $cmdBreak
+        }
+        return $cmdBreak
     }
 
     proc MakeLispModeMenu {w btext} {
@@ -47,8 +72,7 @@ namespace eval ::edt {
         
         $m add separator
 
-        set cmd [OduFnMenuItem $w $m $btext indent-new-line "<Shift-Return>" SingleMod$w]
-        # bind SingleMod$w <Shift-Return> "$cmd; break"
+        OduFnMenuItem $w $m $btext indent-new-line -accel "<Shift-Return>" -bindtag SingleMod$w
 
         OduFnMenuItem $w $m $btext indent-form
         
@@ -63,7 +87,8 @@ namespace eval ::edt {
         OduFnMenuItem $w $m $btext mark-defun 
         $m add separator
 
-        OduFnMenuItem $w $m $btext forward-form <Control-Key-Right> SingleMod$w 1
+        OduFnMenuItem $w $m $btext forward-form \
+            -accel <Control-Key-Right> -bindtag SingleMod$w -ContinueIfNoBackend 1
         
         OduFnMenuItem $w $m $btext backward-form
         OduFnMenuItem $w $m $btext forward-list

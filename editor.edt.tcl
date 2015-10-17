@@ -49,8 +49,9 @@ namespace eval ::edt {
     }
 
     # Wrapped for freezed text, for menu only
-    proc wesppt {script} {
-        ::clcon_text::WrapEventScriptForFreezedText $script -destination [uplevel 1 {string cat "$w.text"}]
+    proc wesppt {script args} {
+        named_args $args {-add-break 0}
+        ::clcon_text::WrapEventScriptForFreezedText $script -destination [uplevel 1 {string cat "$w.text"}] -add-break $(-add-break)
     }
 
     proc LoadContentsAndUpdateRecent {w word opts tail} {
