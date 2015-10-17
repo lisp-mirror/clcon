@@ -285,12 +285,15 @@ namespace eval ::clcon_text {
 
     # This is "static" protection. And what if script calls function which returns code?
     # It can also return numeric value of a code, in which case we fail. 
-    proc CheckIfScriptDoesNotContainBreakOrContinue {script} {
+    proc CheckIfScriptDoesNotContainBreakContinueOrReturn {script} {
         if {[string match *break* $script]} {
             error "script contains break: $script"
         }
         if {[string match *continue* $script]} {
             error "script contains continue: $script"
+        }
+        if {[string match *return* $script]} {
+            error "script contains return: $script"
         }
     }
     
@@ -304,7 +307,7 @@ namespace eval ::clcon_text {
     # If you need continue, add another named arg.
     proc WrapEventScriptForFreezedText {script args} {
         named_args $args {-destination "%W" -add-break 0}
-        CheckIfScriptDoesNotContainBreakOrContinue $script 
+        CheckIfScriptDoesNotContainBreakContinueOrReturn $script 
         set Template [lindex \
             {"if {[<<<<destination>>>> cget -private_freezed]} {\
    <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>>}\
@@ -320,7 +323,6 @@ namespace eval ::clcon_text {
         set t1 [regsub -all <<<<OldEventBody>>>> $Template $script]
         set t2 [regsub -all <<<<destination>>>> $t1 $(-destination)]
         set t3 [regsub -all <<<<MaybeBreak>>>> $t2 $MaybeBreak]
-        puts stderr $t3
         return $t3
     }
 
