@@ -305,14 +305,6 @@ namespace eval ::clcon_text {
     }
 
 
-    # By calling this function we ensure freezing of the
-    # buffer before processing the event.
-    # Unfreezing must be arranged by event itself
-    proc WrapFreezingAndFreezableHandlerScript {script} {
-        error "write me like WrapEventScriptForFreezedText"
-    }
-
-    
     proc WrapFreezableHandlerScript {ev} {
         set script [bind Text $ev]
         set script2 [WrapEventScriptForFreezedText $script]
