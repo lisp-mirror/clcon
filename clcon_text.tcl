@@ -55,6 +55,7 @@ namespace eval ::clcon_text {
         option -send_to_lisp -default 0
         # Input is put into a special queue instead of applying to widget
         # This might be instance variable, but we need it in wrappers
+        # This variable has three states: 0=normal,1=freezed,2=unfreezing
         option -private_freezed -default 0
         # It is private. Don't write to it
         option -private_freezed_events_queue [list]
@@ -323,12 +324,12 @@ namespace eval ::clcon_text {
         }
 
         IncrPendingSentNotifications 1 $clcon_text $UseGlobalPendingText2OduEventCounter
-        ::tkcon::EvalInSwankAsync $lispCmd [subst -nocommands {
-            putd \$EventAsList
+        set continuation [subst -nocommands {
             ::clcon_text::IncrPendingSentNotifications \
                 -1 $clcon_text $UseGlobalPendingText2OduEventCounter
-        }] {:find-existing}
-        #putd "::clcon_text::MaybeSendToLisp: $clcon_text $type $arglist"
+        }]
+        putd "MaybeSendToLisp: about to send $lispCmd with cont $continuation"
+        ::tkcon::EvalInSwankAsync $lispCmd $continuation {:find-existing}
     }
 
     # This is "static" protection. And what if script calls function which returns code?
