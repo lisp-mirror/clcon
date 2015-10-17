@@ -301,19 +301,27 @@ namespace eval ::clcon_text {
     # must expand to pathName of text.
     # Note: macro is not hygienic, $W can be captured, this is why
     # it is protected with namespace prefix.
-    proc WrapEventScriptForFreezedText {script {destination "%W"}} {
+    # If you need continue, add another named arg.
+    proc WrapEventScriptForFreezedText {script args} {
+        named_args $args {-destination "%W" -add-break 0}
         CheckIfScriptDoesNotContainBreakOrContinue $script 
-        set Template {
-            if {[<<<<destination>>>> cget -private_freezed]} {
-                <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>>}
-                break 
-            } else {
-                <<<<OldEventBody>>>>
-            }
+        set Template [lindex \
+            {"if {[<<<<destination>>>> cget -private_freezed]} {\
+   <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>>}\
+ } else {\
+   <<<<OldEventBody>>>>\
+ }<<<<MaybeBreak>>>>"} 0]
+        if {$(-add-break)} {
+            set MaybeBreak "\
+ break"
+        } else {
+            set MaybeBreak ""
         }
         set t1 [regsub -all <<<<OldEventBody>>>> $Template $script]
-        set t2 [regsub -all <<<<destination>>>> $t1 $destination]
-        return $t2
+        set t2 [regsub -all <<<<destination>>>> $t1 $(-destination)]
+        set t3 [regsub -all <<<<MaybeBreak>>>> $t2 $MaybeBreak]
+        puts stderr $t3
+        return $t3
     }
 
 
