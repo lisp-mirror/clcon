@@ -4,8 +4,8 @@ namespace eval ::edt {
     # script is called at uplevel 1. Otherwise, continue is called at uplevel 1
     proc CallBackendOrContinue {script_when_backend} {
         variable ::tkcon::OPT
-        if {$OPT(oduvan-backend)} {
-            uplevel 1 {*}$script_when_backend
+        if {$::tkcon::OPT(oduvan-backend)} {
+            uplevel 1 $script_when_backend
         } else {
             return -code continue
         }
