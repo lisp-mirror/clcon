@@ -71,7 +71,7 @@ namespace eval ::clcon_text {
             set CurrentBindTags [bindtags $win]
             set NewBindTags [SubstituteSingleValueInListVarKeyEq CurrentBindTags Text FreezableText]
             bindtags $win $NewBindTags
-            bind $win <<UnfreezeNext>> "$self Unfreeze"
+            bind $win <<ContinueUnfreeze>> "$self Unfreeze"
             ::edt::CreateHighlightTags $self
         }
         destructor {
@@ -119,21 +119,43 @@ namespace eval ::clcon_text {
         }
         
         method Unfreeze {} {
-            set q $options(-private_freezed_events_queue)
-            set script [lindex $q 0]
-            set q [lrange $q 1 end]
-            $self configure -private_freezed_events_queue $q
-            ::mprs::AssertEq [expr {$options(-private_freezed)>0}] 1 "Unfreeze: must be freezed"
-            if {$script ne {}} {
-                #putd "Unfreeze: about to eval $script"
-                showVarPutd script
-                eval $script
+            set current_freezed_state $options(-private_freezed)
+            ::mprs::AssertEq [expr {$current_freezed_state>0}] 1 "Unfreeze: must be freezed"
+            switch -exact $current_freezed_state {
+                0 { putd "Unfreeze: error - wrong state 0. Can continue" }
+                1 { $self configure -private_freezed 2
+                    $self ContinueUnfreeze
+                }
+                2 { error "Unfreeze: it looks like we need multi-level freezing counter"
+                }
             }
-            if {[llength $q]} {
-                after 50 event generate $win <<UnfreezeNext>>
-            } else {
-                set old $options(-private_freezed)
-                $self configure -private_freezed [expr {$old - 1}]
+        }
+
+        method ContinueUnfreeze {} {
+            set current_freezed_state $options(-private_freezed)
+            switch -exact $current_freezed_state {
+                0 {
+                    puts stderr "Losing queued events: $options(-private_freezed_events_queue)"
+                    $self configure -private_freezed_events_queue {}
+                    error "ContinueUnfreeze: expected -private_freezed = 0 or 2. All queued events will be lost"
+                }
+                1 {
+                    # do nothing - we are in freezed state again
+                }
+                2 {
+                    set q $options(-private_freezed_events_queue)
+                    set script [lindex $q 0]
+                    set q [lrange $q 1 end]
+                    $self configure -private_freezed_events_queue $q
+                    if {$script ne {}} {
+                        #putd "Unfreeze: about to eval $script"
+                        catch {eval $script} code
+                        if {$code ne {}} { putd "Error when unfreezing, will try to proceed: $code" }
+                        after 50 event generate $win <<ContinueUnfreeze>>
+                    } else {
+                        $self configure -private_freezed 0
+                    }
+                }
             }
         }
 
