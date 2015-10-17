@@ -70,9 +70,11 @@ namespace eval ::clcon_text {
             # Apply any options passed at creation time.
             $self configurelist $args
             # Set FreezableText tags at first place (maybe should have placed to other place)
-            set CurrentBindTags [bindtags $win]
+            set w [$self RealText]
+            set CurrentBindTags [bindtags $w]
             set NewBindTags [SubstituteSingleValueInListVarKeyEq CurrentBindTags Text FreezableText]
             bindtags $win $NewBindTags
+            bindtags $w $NewBindTags
             bind $win <<ContinueUnfreeze>> "$self Unfreeze"
             ::edt::CreateHighlightTags $self
         }
@@ -87,6 +89,11 @@ namespace eval ::clcon_text {
         method delete {args} { if {!$options(-readonly)} { $self RoDelete {*}$args }}
         method replace {args} { if {!$options(-readonly)} { $self RoReplace {*}$args }}
 
+        # Returns real text widget (this is not $self in case of btext)
+        method RealText {} {
+            return $self.t
+        }
+        
         # Enable synonyms, so the program can operate on readonly text
         method RoInsert {args} {
             putd "RoInsert $args"
