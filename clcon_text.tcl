@@ -85,9 +85,7 @@ namespace eval ::clcon_text {
         method delete {args} { if {!$options(-readonly)} { $self RoDelete {*}$args }}
         method replace {args} { if {!$options(-readonly)} { $self RoReplace {*}$args }}
 
-        # Enable synonyms, so the program can operate on text
-        # Pass all other methods and options to the real text widget, so
-        # that the remaining behavior is as expected.
+        # Enable synonyms, so the program can operate on readonly text
         method RoInsert {args} {
             MaybeSendToLisp $self i $args
             set result [$hull insert {*}$args]
@@ -103,6 +101,18 @@ namespace eval ::clcon_text {
             set result [$hull replace {*}$args]
             return $result
         }
+
+        # NSL stands for "not send to lisp". Especially for oduvanchik commands which
+        # do text editings, see do-editing-on-tcl-side.lisp
+        method RoInsertNSL {args} {
+            putd "RoInsertNSL $args"
+            $hull insert {*}$args
+        }
+        method RoDeleteNSL {args} {
+            putd "RoDeleteNSL $args"
+            $hull delete {*}$args
+        }
+        # It looks like we don't need Replace at all
 
         method RememberEvent {script} {
             set q $options(-private_freezed_events_queue)
