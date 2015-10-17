@@ -115,12 +115,23 @@ namespace eval ::clcon_text {
         method Freeze {} {
             # ::mprs::AssertEq $options(-private_freezed) 0 "Freeze: must be unfreezed"
             set old $options(-private_freezed)
-            $self configure -private_freezed [expr {$old + 1}]
+            switch -exact $old {
+                0 {
+                    putd "Called Freeze from 0. Will freeze"
+                }
+                1 { error "We need multi-level freezing" }
+                2 {
+                    putd "I guess we called Freeze from Unfreeze. Lets freeze again"
+                }
+            }
+            $self configure -private_freezed 1
         }
         
         method Unfreeze {} {
+            putd "Entering Unfreeze"
             set current_freezed_state $options(-private_freezed)
             ::mprs::AssertEq [expr {$current_freezed_state>0}] 1 "Unfreeze: must be freezed"
+            showVarPutd current_freezed_state
             switch -exact $current_freezed_state {
                 0 { putd "Unfreeze: error - wrong state 0. Can continue" }
                 1 { $self configure -private_freezed 2
@@ -132,6 +143,7 @@ namespace eval ::clcon_text {
         }
 
         method ContinueUnfreeze {} {
+            putd "Entering ContinueUnfreeze"
             set current_freezed_state $options(-private_freezed)
             switch -exact $current_freezed_state {
                 0 {
@@ -148,11 +160,14 @@ namespace eval ::clcon_text {
                     set q [lrange $q 1 end]
                     $self configure -private_freezed_events_queue $q
                     if {$script ne {}} {
-                        #putd "Unfreeze: about to eval $script"
+                        putd "Unfreeze: about to eval $script"
                         catch {eval $script} code
                         if {$code ne {}} { putd "Error when unfreezing, will try to proceed: $code" }
+                    }
+                    if {[llength $q]} {
                         after 50 event generate $win <<ContinueUnfreeze>>
                     } else {
+                        putd "Finished unfreezing"
                         $self configure -private_freezed 0
                     }
                 }
