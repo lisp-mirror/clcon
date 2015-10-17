@@ -50,7 +50,7 @@ namespace eval ::edt {
 
     # Wrapped for freezed text, for menu only
     proc wesppt {script} {
-        ::clcon_text::WrapEventScriptForFreezedText $script "" [uplevel 1 {string cat "$w.text"}]
+        ::clcon_text::WrapEventScriptForFreezedText $script [uplevel 1 {string cat "$w.text"}]
     }
 
     proc LoadContentsAndUpdateRecent {w word opts tail} {
@@ -250,7 +250,7 @@ namespace eval ::edt {
         set w [CurrentlyVisibleBuffer]
         set txt $w.text
         set cmd [list clcon_text::CallOduvanchikFunction $txt "$fn nil"]
-        set wcmd [clcon_text::WrapEventScriptForFreezedText $cmd "" $txt]
+        set wcmd [clcon_text::WrapEventScriptForFreezedText $cmd $txt]
         eval $wcmd
     }   
 }

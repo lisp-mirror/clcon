@@ -285,20 +285,12 @@ namespace eval ::clcon_text {
 
     # This is "static" protection. And what if script calls function which returns code?
     # It can also return numeric value of a code, in which case we fail. 
-    proc CheckIfScriptDoesNotContainBreakOrContinue {script check_break_context} {
+    proc CheckIfScriptDoesNotContainBreakOrContinue {script} {
         if {[string match *break* $script]} {
-            if {$check_break_context eq ""} {
-                error "script contains break: $script"
-            } else {
-                puts stderr "$check_break_context: script contains break: $script"
-            }
+            error "script contains break: $script"
         }
         if {[string match *continue* $script]} {
-            if {$check_break_context eq ""} {
-                error "script contains continue: $script"
-            } else {
-                puts stderr "$check_break_context: script contains continue: $script"
-            }
+            error "script contains continue: $script"
         }
     }
     
@@ -309,8 +301,8 @@ namespace eval ::clcon_text {
     # must expand to pathName of text.
     # Note: macro is not hygienic, $W can be captured, this is why
     # it is protected with namespace prefix.
-    proc WrapEventScriptForFreezedText {script check_break_context {destination "%W"}} {
-        CheckIfScriptDoesNotContainBreakOrContinue $script $check_break_context        
+    proc WrapEventScriptForFreezedText {script {destination "%W"}} {
+        CheckIfScriptDoesNotContainBreakOrContinue $script 
         set Template {
             if {[<<<<destination>>>> cget -private_freezed]} {
                 <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>>}
@@ -327,7 +319,7 @@ namespace eval ::clcon_text {
 
     proc WrapFreezableHandlerScript {ev} {
         set script [bind Text $ev]
-        set script2 [WrapEventScriptForFreezedText $script $ev]
+        set script2 [WrapEventScriptForFreezedText $script]
         bind FreezableText $ev $script2
     }
 
