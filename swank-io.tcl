@@ -252,7 +252,7 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
         # we should have generated event which would evaluate continuation later.
         # but what we will do with sync events then?
         # we must either run all continations asynchronously, either run all continuations synchronously.
-        putd "About to RunContinuation for $ContinuationId"
+        # putd "About to RunContinuation for $ContinuationId"
         RunContinuation $ContinuationId $EventAsList
     } else {
         puts stderr "ProcessAsyncEvent: skipping async event from lisp: $EventAsList" 
@@ -327,7 +327,7 @@ proc ::tkcon::TempSwankChannelReadable {sock} {
     set Event [SwankReadMessageString]
 
     # just for debugging 
-    putd "message from socket: $Event"
+    # putd "message from socket: $Event"
 
     if { [string index $Event 0] eq "(" } {
         puts stderr "Skipping lisp-formed event $Event"
