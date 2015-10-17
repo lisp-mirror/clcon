@@ -57,7 +57,8 @@ namespace eval ::clcon_text {
         # This might be instance variable, but we need it in wrappers
         # This variable has three states: 0=normal,1=freezed,2=unfreezing
         option -private_freezed -default 0
-        # It is private. Don't write to it
+        # Levels of nested freezing
+        option -private_freeze_level 0 
         option -private_freezed_events_queue [list]
         # PRIVATE. Number of modifications sent which were not processed by oduvanchik yet
         option -private_pending_sent_modifications 0
@@ -88,11 +89,13 @@ namespace eval ::clcon_text {
 
         # Enable synonyms, so the program can operate on readonly text
         method RoInsert {args} {
+            putd "RoInsert $args"
             MaybeSendToLisp $self i $args
             set result [$hull insert {*}$args]
             return $result
         }
         method RoDelete {args} {
+            putd "RoDelete $args"
             MaybeSendToLisp $self d $args
             set result [$hull delete {*}$args]
             return $result
@@ -128,34 +131,45 @@ namespace eval ::clcon_text {
             set old $options(-private_freezed)
             switch -exact $old {
                 0 {
-                    putd "Called Freeze from 0. Will freeze"
+                    #putd "Called Freeze from 0. Will freeze"
                 }
                 1 { error "We need multi-level freezing" }
                 2 {
-                    putd "I guess we called Freeze from Unfreeze. Lets freeze again"
+                    #putd "I guess we called Freeze from Unfreeze. Lets freeze again"
                 }
             }
-            $self configure -private_freezed 1
+            $self configure \
+                -private_freezed 1 \
+                -private_freeze_level [expr {1 + $options(-private_freeze_level)}]
         }
         
         method Unfreeze {} {
-            putd "Entering Unfreeze"
-            set current_freezed_state $options(-private_freezed)
-            ::mprs::AssertEq [expr {$current_freezed_state>0}] 1 "Unfreeze: must be freezed"
-            showVarPutd current_freezed_state
-            switch -exact $current_freezed_state {
-                0 { putd "Unfreeze: error - wrong state 0. Can continue" }
-                1 { $self configure -private_freezed 2
-                    $self ContinueUnfreeze
+            #putd "Entering Unfreeze"
+            set pfl -private_freeze_level
+            switch -exact $options($pfl) {
+                0 { putd "Unfreeze: error - must be freezed" }
+                1 {
+                    if {$options($pfl)==1} {
+                        $self configure -private_freezed 2
+                        $self ContinueUnfreeze
+                    }
                 }
-                2 { error "Unfreeze: it looks like we need multi-level freezing counter"
+                default {
+                    $self configure $pfl [expr {$options($pfl) - 1}]
                 }
             }
         }
 
         method ContinueUnfreeze {} {
-            putd "Entering ContinueUnfreeze"
+            #putd "Entering ContinueUnfreeze"
+            set pfl -private_freeze_level
             set current_freezed_state $options(-private_freezed)
+            if {$options($pfl)>1} {
+                # Someone have refrozen us. Do not unfreeze anymore, but decrease locking level                
+                $self configure -private_freezed 1 \
+                    $pfl [expr {$options($pfl) - 1}]
+                return
+            }
             switch -exact $current_freezed_state {
                 0 {
                     puts stderr "Losing queued events: $options(-private_freezed_events_queue)"
@@ -167,27 +181,29 @@ namespace eval ::clcon_text {
                 }
                 2 {
                     set q $options(-private_freezed_events_queue)
-                    set script [lindex $q 0]
-                    set q [lrange $q 1 end]
-                    $self configure -private_freezed_events_queue $q
-                    if {$script ne {}} {
-                        putd "444444 Unfreeze: about to eval $script"
-                        catch {eval $script} code
-                        if {$code ne {}} { putd "Error when unfreezing, will try to proceed: $code" }
-                    }
                     if {[llength $q]} {
-                        putd "Now will shedule ContinueUnfreeze"
+                        set script [lindex $q 0]
+                        set q [lrange $q 1 end]
+                        $self configure -private_freezed_events_queue $q
+                        if {$script ne {}} {
+                            putd "444444 Unfreeze: about to eval $script"
+                            catch {eval $script} code
+                            if {$code ne {}} { putd "Error when unfreezing, will try to proceed: $code" }
+                        }
+                        #putd "Now will shedule ContinueUnfreeze"
                         after 50 event generate $win <<ContinueUnfreeze>>
                     } else {
-                        putd "Finished unfreezing"
-                        $self configure -private_freezed 0
+                        # Event queue empty, state is 2. just check that level is 1 and exit
+                        ::mprs::AssertEq 1 $options($pfl)
+                        $self configure -private_freezed 0 $pfl [expr {$options($pfl) - 1}]
                     }
                 }
             }
         }
 
         
-        # Enqueue into associated event list
+        # Pass all other methods and options to the real text widget, so
+        # that the remaining behavior is as expected.
         delegate method * to hull
         delegate option * to hull
     }
@@ -232,7 +248,7 @@ namespace eval ::clcon_text {
             incr j $increment
             $clcon_text configure -private_pending_sent_modifications $j
             if {$j>1} {
-                putd "-private_pending_sent_modifications = $j"
+                #putd "-private_pending_sent_modifications = $j"
             }
             return $j
         }
@@ -243,7 +259,7 @@ namespace eval ::clcon_text {
         incr j $increment
         $clcon_text configure -private_pending_far_tcl_continuations $j
         if {$j>1} {
-            putd "-private_pending_far_tcl_continuations = $j"
+            #putd "-private_pending_far_tcl_continuations = $j"
         }
         return $j
     }
