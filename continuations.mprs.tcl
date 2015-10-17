@@ -28,7 +28,7 @@ proc ::mprs::EnqueueContinuation {ContinuationId code} {
     }
     dict set ContinuationsDict $ContinuationId $code
     if {$PrintContinuationsDict} {
-        showVarPutd ContinuationsDict
+        # showVarPutd ContinuationsDict
     }
 }
 
@@ -49,7 +49,7 @@ proc ::mprs::RunContinuation {ContinuationId EventAsList} {
     # which was lost
     set Continuation [dict get $ContinuationsDict $ContinuationId]
     dict unset ContinuationsDict $ContinuationId
-    putd "RunContinuation $ContinuationId: Continuation = $Continuation"
+    # putd "RunContinuation $ContinuationId: Continuation = $Continuation"
     if {$Continuation eq {}} {
         return
     } else {

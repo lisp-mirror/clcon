@@ -106,7 +106,7 @@ namespace eval ::clcon_text {
 
         method RememberEvent {script} {
             set q $options(-private_freezed_events_queue)
-            #putd "Remembering script $script"
+            putd "444444 Remembering script $script"
             lappend q $script
             $self configure -private_freezed_events_queue $q
             #putd "[llength $q] events remembered]" 
@@ -160,11 +160,12 @@ namespace eval ::clcon_text {
                     set q [lrange $q 1 end]
                     $self configure -private_freezed_events_queue $q
                     if {$script ne {}} {
-                        putd "Unfreeze: about to eval $script"
+                        putd "444444 Unfreeze: about to eval $script"
                         catch {eval $script} code
                         if {$code ne {}} { putd "Error when unfreezing, will try to proceed: $code" }
                     }
                     if {[llength $q]} {
+                        putd "Now will shedule ContinueUnfreeze"
                         after 50 event generate $win <<ContinueUnfreeze>>
                     } else {
                         putd "Finished unfreezing"
@@ -349,6 +350,8 @@ namespace eval ::clcon_text {
             {"if {[<<<<destination>>>> cget -private_freezed]} {\
    <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>>}\
  } else {\
+   putd 444444
+   putd {<<<<OldEventBody>>>>}
    <<<<OldEventBody>>>>\
  }<<<<MaybeBreak>>>>"} 0]
         if {$(-add-break)} {
@@ -391,7 +394,7 @@ namespace eval ::clcon_text {
         }
     }
 
-    # UserContBody is a body of procedure to be called with two parameters: clcon_text and EventAsList.
+    # UserContBody is a body of procedure to be called with two parameters: clcon_text and EventAsList. Beware UserContBody is called after unfreezing!
     # OduvanchikFunctionNameAndArgs represents function from :oduvanchik home-package and its arguments, in a readable form. All packages to symbols must be specified. All string must be quoted with ::tkcon::QuoteTclStringForLisp. Subforms are not evaluated. Consider it as aquote list without outermost '()
     # Elements of list are passed to funcall. 
     # Options is a dict of options. Current known options are:
