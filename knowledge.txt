@@ -286,3 +286,13 @@ sldb-break-with-default-debugger
 ..proc trace_report {args} { puts stderr $args }
 ..trace add execution ::edt::Bi2W leave trace_report
 
+
+пытаемся сделать один trace-output на всё
+-------------------------------------------
+В .sbclrc
+(defvar *initial-standard-output* *standard-output*)
+; здесь где-то загружаем swank.
+(defun redirect-trace-output-to-inferior-lisp (c)
+  (setf (slot-value c 'swank::trace-output) *initial-standard-output*))
+(push 'redirect-trace-output-to-inferior-lisp swank::*new-connection-hook*)
+
