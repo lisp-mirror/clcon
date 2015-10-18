@@ -28,7 +28,6 @@ proc ::tkcon::QuoteTclListOfStringsForLisp {list} {
         set result [string cat $delim $result [::tkcon::QuoteTclStringForLisp $x]]
         set delim " "
     }
-    puts stderr $result
     return $result
 }
 
