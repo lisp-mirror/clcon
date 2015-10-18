@@ -197,7 +197,6 @@
              (fboundp fn)) () "Symbol ~S funbound or have home-package different from :oduvanchik" fn)
 
     (swank::with-connection (connection) 
-      ;(break)
       (use-buffer buffer
         (odu::set-mark-to-row-and-col (current-point)
                                       (clco::row-col-row cur-row-col)
