@@ -63,7 +63,7 @@ This would create two functions, `f` and `g`. Run `(f 5)` at the console. Debugg
 
 There is also search in the stack list. Tree without a search is a dense forest! Type `Ctrl-F`, type in `)` and press `F3` or `Return` to continue search.
 
-You can evaluate values in the context of stack frame. Choose `Stack/Eval in frame` from debugger menu bar. New window titled "eval in frame"
+You can evaluate values in the context of stack frame. Select topmost stack frame in the frame list and choose `Stack/Eval in frame` from debugger menu bar. New window titled "eval in frame"
 will pop up. Note package is prompted at window's title. Type `y` in the window and press `Return`. Console will be activated and result of your evaluation
 will be printed there. 
 
@@ -75,7 +75,7 @@ Now let's try stepper.
 
 Warning! To make stepper work correctly, you need to load swank with stepper support disabled. This is true with windows release, but it depends on your initialization file on Linux. Hope to document it later, or see windows file release as an example.
 
-Bring up last command with `Control-Up` at the console, and press `Return` to call it again. As debugger occurs, choose `Stack/Switch to stepping mode` from menu bar. Editor window will pop up and current source will be highlighted. Press "F10" (Step next, or "Step over") watch how execution proceeds. Also note that stack and locals are shown in the debugger window. Press "f10" two more times, and then press "F5" (Continue, or resume to normal execution) to quit stepper mode. 
+Bring up last command with `Control-Up` at the console, and press `Return` to call it again. As debugger occurs, choose `Stack/Switch to stepping mode` from menu bar. Editor window will pop up and current source will be highlighted. Press "F10" (Step next, or "Step over") watch how execution proceeds. Also note that stack and locals are shown in the debugger window. Press "f10" one more time, watch how execution proceeds. Then press "F5" (Continue, or resume to normal execution) to quit stepper mode. 
 
 IDE commands. 
 ---------------------
@@ -91,3 +91,7 @@ Eval something, say `'defun`, at the console. And then type in `.insp*` (this is
 Invoking tcl
 --------
 Commands starting from `..` are interpreted by tcl. E.g. type in ``.. tk_messageBox -message "Wow!"`` to try. There is also a way to invoke tcl from lisp. Type in `(clcon-server:eval-in-tcl "tk_messageBox -message WOW")` at the console and you'll see message box, which was invoked from the lisp side. 
+
+Editing files
+---------
+You can see lisp files are highlighted according to lisp mode, but editing is permanently broken. 
