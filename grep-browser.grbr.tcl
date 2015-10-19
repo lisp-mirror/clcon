@@ -1,6 +1,6 @@
 # Grep browser. Currently it is indeed for one file only
 # Backend is in grep.lisp
-# Example: (clco::present-text-filtering-results (clco::filter-one-file (merge-pathnames "test/dbgtest.lisp" clcon-server:*clcon-source-directory*) "defun"))
+# Example1: (clco::present-text-filtering-results (clco::filter-one-file (merge-pathnames "test/dbgtest.lisp" clcon-server:*clcon-source-directory*) "defun"))
 # Example2: (clco::find-in-clcon-sources "defun") 
 
 namespace eval ::grbr {

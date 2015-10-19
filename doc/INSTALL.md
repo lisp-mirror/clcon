@@ -76,6 +76,7 @@ To load server-side code to lisp, use
 ; For debugging editor with client-server communcation enabled for
 ; only single buffer. 
 ; (pushnew :use-oduvan-for-first-clcon_text-pathname-only *features*)
+; if you are using trunk, you can also grep "buf1" in *.tcl to disable some debugging code in the editor.
 
 
 ; uncomment next line to see highlight (oduvanchik would hangs up soon)
