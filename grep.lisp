@@ -51,7 +51,7 @@
     :appending r)
   )
           
-(defun calc-code-for-filter-match (match serial)
+(defun calc-code-for-filter-match (grbr match serial)
   (let* ((code-to-jump-to-location
           (with-output-to-string (ou2)
             (write-code-to-pass-to-file-line-char
@@ -60,7 +60,8 @@
              (filter-match-line-number match)
              (or (filter-match-start-position match) 0)
              ))))
-    (format nil "::grbr::AppendData ~A ~A ~A ~A ~A ~A ~A"
+    (format nil "::grbr::AppendData ~A ~A ~A ~A ~A ~A ~A ~A"
+            grbr
             serial
             (cl-tk:tcl-escape (filter-match-line match))
             (cl-tk:tcl-escape (filter-match-filename match))
@@ -72,10 +73,10 @@
 
 (defun present-text-filtering-results (results)
   "Gets results from, say, filter-one-file and present them to tcl"
-  (eval-in-tcl (format nil "::grbr::OpenGrepBrowser"))
-  (let ((serial 0))
+  (let* ((grbr (eval-in-tcl (format nil "::grbr::OpenGrepBrowser") :nowait nil))
+         (serial 0))
     (dolist (match results)
-      (eval-in-tcl (calc-code-for-filter-match match (incf serial)))
+      (eval-in-tcl (calc-code-for-filter-match grbr match (incf serial)))
       )))
 
 

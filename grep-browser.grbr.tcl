@@ -7,16 +7,9 @@ package require snit
 
 namespace eval ::grbr {
 
-
-    variable TitleListWindow 
-
-    # If 1, source is shown as entry is selected in TitleList
-    variable AutoShowSource 0
-    
-    # dict serial -> item
-    variable data
-
     ::snit::widgetadaptor grep_browser {
+        # dict serial -> item
+        option -data -default [dict create]
         constructor {args} {
             installhull using toplevel
         }
@@ -47,8 +40,9 @@ namespace eval ::grbr {
 
     # Jump to current source location if it is possible.
     # Otherwise, issue a warning and stay in the message list
-    proc JumpToCurrentLocation {tbl} {
-        variable data
+    proc JumpToCurrentLocation {grbr} {
+        set data [$grbr cget -data]
+        set tbl [GetTitleListMenuTbl $grbr]
         set rowName [$tbl rowcget active -name]
         set dataItem [dict get $data $rowName]
         JumpToLocation [$tbl bodypath] $dataItem
@@ -60,17 +54,13 @@ namespace eval ::grbr {
     }
 
 
-    proc InitData { EventAsList } {
-        variable data
-        
-        set data [dict create]
-        
-
+    proc InitData { grbr } {
+        $grbr configure -data [dict create]
     }
 
-    proc AppendData {serial line filename LineNumber StartPosition EndPosition CodeToJumpToLocation} {
-        variable TitleListWindow
-        variable data
+    proc AppendData {grbr serial line filename LineNumber StartPosition EndPosition CodeToJumpToLocation} {
+        set TitleListWindow $grbr
+        set data [$grbr cget -data]
         set RowName [string cat "n" $serial]
         set NewItem [dict create                                    \
                          serial $serial                             \
@@ -93,11 +83,13 @@ namespace eval ::grbr {
         }
 
         DefaultSortHeaders $tbl
+
+        $grbr configure -data $data
         # InsertDataToShowOrBeep $w $EventAsList
     }
 
-    proc GotoIndexAndMaybeShowSource {tbl wantedAnc ShowSource} {
-        variable data
+    proc GotoIndexAndMaybeShowSource {grbr tbl wantedAnc ShowSource} {
+        set data [$grbr cget -data]
         ::tablelist_util::GotoIndex $tbl $wantedAnc
         # It is important that JumpToLocation is issued
         # after GotoIndex which shedules error detail window
@@ -109,8 +101,8 @@ namespace eval ::grbr {
         }
     }
     
-    proc EditOtherCompilerMessage {increment ShowSource} {
-        variable TitleListWindow
+    proc EditOtherCompilerMessage {grbr increment ShowSource} {
+        set TitleListWindow $grbr
         if {[winfo exists $TitleListWindow]} {
             set tbl $TitleListWindow.tf.tbl
             set anc [$tbl index active]
@@ -126,36 +118,38 @@ namespace eval ::grbr {
     }
 
     # It is unspecified (yet) whether we destroy it. Let's delete them for debugging purposes
-    proc CloseErrorBrowser {} {
-        variable TitleListWindow
+    proc CloseErrorBrowser {grbr} {
+        set TitleListWindow $grbr
         if {[winfo exists $TitleListWindow]} {
             wm withdraw $TitleListWindow
             after idle [list destroy $TitleListWindow]
         }
     }
 
-    proc FillHeaderText { clcon_text } {
+    proc FillHeaderText { grbr clcon_text } {
     }
 
     # Called from lisp, see clco::present-text-filtering-results
-    # returns widget. 
+    # Returns (toplevel = grep_browser) widget pathname
     proc OpenGrepBrowser { } {
 
-        InitData {}
+        set grbr [MakeNewGrbr]
+
+        InitData $grbr
         
-        set w [PrepareGui1]
+        PrepareGui1 $grbr
 
-        FillHeaderText $w.header.text 
+        FillHeaderText $grbr [HeaderOfErrorBrowser $grbr]
 
-        set tbl $w.tf.tbl
+        set tbl [GetTitleListMenuTbl $grbr]
         
         wcb::callback $tbl before activate ::grbr::DoOnSelect
         
-        ::erbr::DoGoToTop $w
+        ::erbr::DoGoToTop $grbr
         
         focus [$tbl bodypath]
 
-        return
+        return $grbr
         
     }
 
@@ -167,8 +161,8 @@ namespace eval ::grbr {
     }
     
     # Fills browser from data 
-    proc FillHeaders {tbl} {
-        variable data
+    proc FillHeaders {grbr tbl} {
+        set data [$grbr cget -data]
         dict map {rowName item} $data {
             set title [dict get $item {title}]
             $tbl insert end [list $title]
@@ -200,7 +194,8 @@ namespace eval ::grbr {
         bind $w <Control-Key-w>		[list destroy $w]
     }
 
-    proc TitleListEditMenu {w menu} {
+    proc TitleListEditMenu {grbr menu} {
+        set w $grbr
         set tbl [GetTitleListMenuTbl $w]
         set text [HeaderOfErrorBrowser $w]
         set m [menu [::tkcon::MenuButton $menu "2.Edit" edit]]
@@ -214,7 +209,7 @@ namespace eval ::grbr {
 
         $m add separator
 
-        set cmd [list ::grbr::JumpToCurrentLocation $tbl]
+        set cmd [list ::grbr::JumpToCurrentLocation $grbr]
         $m add command -label "Jump to current source location" -accel "<space>" -command $cmd
         foreach tag [list [$tbl bodytag] $text] {
             bind $tag <space> $cmd
@@ -225,36 +220,39 @@ namespace eval ::grbr {
         
     }
 
-    proc ClearTitleList {} {
-        variable TitleListWindow
+    proc ClearTitleList {grbr} {
+        set TitleListWindow $grbr
         
         [::grbr::GetTitleListMenuTbl $TitleListWindow] delete 0 end
     }
 
-        
-    # Make toplevel widget and its children 
-    proc PrepareGui1 {} {
-        variable TitleListWindow
 
-        # ---------------------------- make toplevel window TitleListWindow -----------    
+    # Creates grbr and returns it
+    proc MakeNewGrbr {  } {
         variable ::tkcon::PRIV
-        # Create unique edit window toplevel
-        
-        # set GrBrId [GenNamedCounter "grbrTlv"]
-        set GrBrId ""
-	
-        set w [string cat $PRIV(base) ".grbrTlv" $GrBrId]
 
+        set GrBrId [GenNamedCounter "grep_browser"]
+       
+        set w [string cat $PRIV(base) ".grbrTlv" $GrBrId]
 
         # puts $w
         if {[winfo exists $w]} {
-            ClearTitleList
-            return $w
+            error "Grep browser window $w already exists"
         }
 
         grep_browser $w
         wm withdraw $w
         
+        return $w
+    }
+
+    # Make toplevel widget and its children 
+    proc PrepareGui1 {grbr} {
+        
+        set TitleListWindow $grbr
+        set w $grbr
+
+
         # title 
         set word "File search matches browser"
 	wm title $w "$word"
@@ -308,19 +306,13 @@ namespace eval ::grbr {
     }
 
     # Returns tablelist by main error browser window
-    proc GetTitleListMenuTbl {w} {
-        return $w.tf.tbl
+    proc GetTitleListMenuTbl {grbr} {
+        return $grbr.tf.tbl
     }
 
         
-    proc HeaderOfErrorBrowser {w} {
-        return $w.header.text 
-    }
-
-    proc BodyTextOfErrorBrowser {w} {
-        set f1 $w.pane.title
-        set f2 $w.pane.body
-        return $f2.text
+    proc HeaderOfErrorBrowser {grbr} {
+        return $grbr.header.text 
     }
 
 }
