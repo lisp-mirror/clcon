@@ -14,10 +14,6 @@ proc btext::getAr {win suffix name} {
 }
 
 proc btext {win args} {
-    #if {[::edt::Bi2btext "buf1"] eq "buf1"} {
-    #    putd "btext $args"
-    #    }
-
     if {[llength $args] & 1} {
 	return -code error \
 	    "invalid number of arguments given to btext (uneven number after window) : $args"
@@ -246,6 +242,11 @@ proc btext::buildArgParseTable win {
 }
 
 proc btext::instanceCmd {self cmd args} {
+
+    if {[::edt::Bi2btext "buf1"] eq $self} {
+        putd "INVOKED_BTEXT_INSTANCE_CMD $cmd $args"
+        }
+
     #slightly different than the RE used in btext::comments
     set commentRE {\"|\\|'|/|\*}
 
