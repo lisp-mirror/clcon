@@ -50,7 +50,7 @@
 (pushnew :clcon-oduvan *features*)
 (pushnew :oduvanchik *features*)
 (pushnew :oduvan-invisible *features*)
-(pushnew :oduvan-enable-highlight *features*)
+; (pushnew :oduvan-enable-highlight *features*)
 (pushnew :clcon *features*)
 
 ;; piece from swank
