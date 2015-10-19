@@ -3,30 +3,28 @@
 # Example1: (clco::present-text-filtering-results (clco::filter-one-file (merge-pathnames "test/dbgtest.lisp" clcon-server:*clcon-source-directory*) "defun"))
 # Example2: (clco::find-in-clcon-sources "defun") 
 
+package require snit
+
 namespace eval ::grbr {
 
-    # dict serial -> item
-    variable data
 
     variable TitleListWindow 
-
-    # Compilation successful 
-    variable successp
-
-    # Duration, sec
-    variable duration
-
-    # Fasl file 
-    variable faslfile
-
-    # Compilation failed, but fasl can be loaded
-    variable ForceLoadingMakesSence 0
-
 
     # If 1, source is shown as entry is selected in TitleList
     variable AutoShowSource 0
     
+    # dict serial -> item
+    variable data
 
+    ::snit::widgetadaptor grep_browser {
+        constructor {args} {
+            installhull using toplevel
+        }
+        delegate method * to hull
+        delegate option * to hull
+    }
+
+    
     proc WidgetParent { w } {
         set lst [split $w .]
         set sublist [lrange $lst 0 end-1]
@@ -72,7 +70,6 @@ namespace eval ::grbr {
 
     proc AppendData {serial line filename LineNumber StartPosition EndPosition CodeToJumpToLocation} {
         variable TitleListWindow
-        variable tv
         variable data
         set RowName [string cat "n" $serial]
         set NewItem [dict create                                    \
@@ -131,11 +128,6 @@ namespace eval ::grbr {
     # It is unspecified (yet) whether we destroy it. Let's delete them for debugging purposes
     proc CloseErrorBrowser {} {
         variable TitleListWindow
-        variable tv
-        if {[winfo exists $tv]} {
-            wm withdraw $tv
-            after idle [list destroy $tv]
-        }
         if {[winfo exists $TitleListWindow]} {
             wm withdraw $TitleListWindow
             after idle [list destroy $TitleListWindow]
@@ -146,8 +138,8 @@ namespace eval ::grbr {
     }
 
     # Called from lisp, see clco::present-text-filtering-results
+    # returns widget. 
     proc OpenGrepBrowser { } {
-        variable tv
 
         InitData {}
         
@@ -260,7 +252,7 @@ namespace eval ::grbr {
             return $w
         }
 
-        toplevel $w
+        grep_browser $w
         wm withdraw $w
         
         # title 
