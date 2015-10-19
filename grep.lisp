@@ -1,33 +1,16 @@
 ;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
-
-;; general concept of testing:
-#|
-1. In tcl, programmatically open file
-2. Do some sequence of edits (programmatically)
-3. Compare result strings. 
-|#
+;; backend for grep-browser.grbr.tcl
+;; and toplevel search functions, e.g. clco::find-in-clcon-sources
 
 (in-package :clco)
 
-#| (defun make-filtered-file-list (pathname &rest keyargs &key dir-options (file-test #'identity) (dir-test #'identity) (subdirs :recurse))
-  "Returns list of pathnames. Args are as in budden-tools:map-dir"
-  "Subdirs can be :recurse, :skip, :msp (fn is called for subdirs too) :map-and-recurse (fn is called and recursion occurs). Output format is ((pathname . (fn pathname)) ... (:subdir pathname ((pathname . (fn pathname)) ...))). directory structure should not be modified by fn except by deletion of pathname"
-  (
-    (budden-tools:map-dir (constantly nil)
-
- (defun grep (map-dir-args string-filter-args title)
-  (with-output-to-string (r)
-    
-  (budden-tools::map-dir 
-  grep-one-file file 
-
-|#
 
 (defstruct filter-match
-  (filename (budden-tools:mandatory-slot 'filename) :type (or string pathname))
+  (filename (budden-tools:mandatory-slot 'filename) :type string)
   (line-number (budden-tools:mandatory-slot 'line-number) :type alexandria:positive-integer)
   (line (budden-tools:mandatory-slot 'line) :type string)
-  start-position ; reserved
+  (start-position 0) ; reserved
+  (end-position 1) ; reserved
   )
 
 (defun filter-one-file (infile expr &key (mode :nocase))
@@ -35,6 +18,7 @@
   (assert (eq mode :nocase) () "Only :nocase mode is supported")
   (with-open-file (in infile :direction :input)
     (do* ((result nil result)
+          (filename (namestring infile) filename)
           (line (read-line in nil nil) (read-line in nil nil))
           (line-number 1 (+ line-number 1))
           (position nil nil))
@@ -43,26 +27,58 @@
       (setf position (search expr line :test 'char-equal))    
       (when position
         (push (make-filter-match
-               :filename infile
+               :filename filename
                :line-number line-number
                :line line
                :start-position nil
                ; when more than one match, we will have two matches,
                ; loop complicates. Skip this for now.
                ) result)))))
+
+
+(defun clcon-sources ()
+  "Returns an approximate list of clcon source files"
+  (let ((filelist nil))
+    (dolist (mask '("**/*.lisp" "**/*.tcl" "**/*.asd" "**/*.md"))
+      (dolist (file (directory (merge-pathnames mask *clcon-source-directory*)))
+        (push file filelist)))
+    (nreverse filelist)))
+
+(defun filter-many-files (files expr &rest keyargs &key (mode :nocase))
+  "Filters list of files and appends all results"
+  (declare (ignore mode)) ; it is used as part of keyargs
+  (loop :for f :in files :for r = (apply #'filter-one-file f expr keyargs)
+    :appending r)
+  )
           
-(defun calc-code-for-one-entry (match)
+(defun calc-code-for-filter-match (match serial)
   (let* ((code-to-jump-to-location
-	   (with-output-to-string (ou2)
-             (write-code-to-pass-to-loc ou2 (location :mode :eval)))
-            (t
-             "{}")))
-         )
-    (format nil "::erbr::AppendData ~A ~A ~A ~A ~A"
+          (with-output-to-string (ou2)
+            (write-code-to-pass-to-file-line-char
+             ou2
+             (filter-match-filename match)
+             (filter-match-line-number match)
+             (or (filter-match-start-position match) 0)
+             ))))
+    (format nil "::grbr::AppendData ~A ~A ~A ~A ~A ~A ~A"
             serial
-            (cl-tk:tcl-escape (string-downcase (string severity)))
-            (cl-tk:tcl-escape title)
-            (cl-tk:tcl-escape details-code)
+            (cl-tk:tcl-escape (filter-match-line match))
+            (cl-tk:tcl-escape (filter-match-filename match))
+            (filter-match-line-number match)
+            (filter-match-start-position match)
+            (filter-match-end-position match)
             (cl-tk:tcl-escape code-to-jump-to-location))))
 
 
+(defun present-text-filtering-results (results)
+  "Gets results from, say, filter-one-file and present them to tcl"
+  (eval-in-tcl (format nil "::grbr::OpenGrepBrowser"))
+  (let ((serial 0))
+    (dolist (match results)
+      (eval-in-tcl (calc-code-for-filter-match match (incf serial)))
+      )))
+
+
+(defun find-in-clcon-sources (string)
+  "Searches for string, ignores case"
+  (clco::present-text-filtering-results (clco::filter-many-files (clco::clcon-sources) string)))

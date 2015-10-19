@@ -56,7 +56,7 @@ DSPEC is a string and LOCATION a source location. NAME is a string. See also swa
    If mode = :text we will insert the code into text widget. 
    If mode = :eval we will eval the code in the context where $w contains some widget. 
 This widget is required as a parent of tk_messageBox which we show when we unable to locate
-and which is activated after showing message box.
+and which is activated after showing message box. See also write-code-to-pass-to-file-line-char
 "
   (multiple-value-bind (file offset)
       (parse-location-into-file-and-pos loc)
@@ -77,6 +77,18 @@ and which is activated after showing message box.
              "tk_messageBox -parent $w -message {~A} ~% focus $w" message)
             )))
        ))))
+
+
+
+(defun write-code-to-pass-to-file-line-char (stream file line char)
+  "Writes code which would pass to file at line and char. Lines start from 1, chars start from 0. See also write-code-to-pass-to-loc 
+"
+  (check-type line alexandria:positive-integer)
+  (check-type char alexandria:NON-NEGATIVE-INTEGER)
+  (let ((escaped-file (tcl-escape-filename file))
+        (offset (format nil "~A.~A" line char)))
+    (format stream "tkcon::EditFileAtOffset ~A ~A" escaped-file offset)))
+
 
 (defun write-code-to-show-console (stream)
   (format stream "::tkcon::FocusConsole; "))

@@ -4711,6 +4711,7 @@ proc ::tkcon::ReloadSomeIDESources4 {} {
     TkconSourceHere tablelist_util.tcl
     TkconSourceHere search-tablelist.srchtblst.tcl
     TkconSourceHere error-browser.erbr.tcl
+    TkconSourceHere grep-browser.grbr.tcl
     TkconSourceHere buffer-list.buli.tcl
     TkconSourceHere lisp-debugger.ldbg.tcl
     TkconSourceHere tcltextedit-unsorted.tcl

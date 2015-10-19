@@ -21,6 +21,7 @@
                (:file "swank-inspector" :description "inspector backend pieces")
                (:file "stepper-support")
                (:file "swank-compilation-errors")
+               (:file "grep" :description "search in files and displaying data in a panel")
                (:file "text2odu-from-tcl-to-queue" :description "Receive editor events from swank and post them to *text2odu-event-queue*"
                       )
                #+clcon-oduvan (:file "text2odu-test-utils")
