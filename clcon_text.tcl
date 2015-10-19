@@ -287,6 +287,10 @@ namespace eval ::clcon_text {
         if {!$::tkcon::OPT(oduvan-backend) } {
             return
         }
+	if {[::edt::Bi2btext "buf1"] ne $clcon_text} {
+            return
+        }
+        
         # This is a temporary solution. This is a separate option indeed
         set qId [lq $clcon_text]
         switch -exact $type {
