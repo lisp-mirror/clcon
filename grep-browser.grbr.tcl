@@ -18,13 +18,17 @@ namespace eval ::grbr {
     }
 
     
-    proc WidgetParent { w } {
-        set lst [split $w .]
-        set sublist [lrange $lst 0 end-1]
-        puts "sublist = $sublist"
-        return [join $sublist .]
+    # Returns tablelist by main error browser window
+    proc GetTitleListMenuTbl {grbr} {
+        return $grbr.tf.tbl
     }
-    
+
+        
+    proc HeaderOfGrepBrowser {grbr} {
+        return $grbr.header.text 
+    }
+
+
     catch {font create tkconfixed -family Courier -size -20}
     #	    $con configure -font tkconfixed
 
@@ -100,7 +104,8 @@ namespace eval ::grbr {
             after idle [list ::grbr::JumpToLocation [$tbl bodypath] $dataItem]
         }
     }
-    
+
+    # Unused (yet)
     proc EditOtherCompilerMessage {grbr increment ShowSource} {
         set TitleListWindow $grbr
         if {[winfo exists $TitleListWindow]} {
@@ -117,16 +122,10 @@ namespace eval ::grbr {
         }
     }
 
-    # It is unspecified (yet) whether we destroy it. Let's delete them for debugging purposes
-    proc CloseErrorBrowser {grbr} {
-        set TitleListWindow $grbr
-        if {[winfo exists $TitleListWindow]} {
-            wm withdraw $TitleListWindow
-            after idle [list destroy $TitleListWindow]
-        }
-    }
-
-    proc FillHeaderText { grbr clcon_text } {
+    proc FillHeaderText { grbr string } {
+        set text [HeaderOfGrepBrowser $grbr]
+        ::ro_out::D $text 1.0 end
+        ::ro_out::I $text 1.0 $string
     }
 
     # Called from lisp, see clco::present-text-filtering-results
@@ -139,18 +138,24 @@ namespace eval ::grbr {
         
         PrepareGui1 $grbr
 
-        FillHeaderText $grbr [HeaderOfErrorBrowser $grbr]
+        # FillHeaderText $grbr [HeaderOfGrepBrowser $grbr]
 
         set tbl [GetTitleListMenuTbl $grbr]
         
         wcb::callback $tbl before activate ::grbr::DoOnSelect
+
+        return $grbr
+    }
+
+    proc ShowGrepBrowser {grbr} {
         
         ::erbr::DoGoToTop $grbr
+
+        set tbl [GetTitleListMenuTbl $grbr]
         
         focus [$tbl bodypath]
 
         return $grbr
-        
     }
 
     # It is reasonable to sort by severity first, then by number
@@ -197,7 +202,7 @@ namespace eval ::grbr {
     proc TitleListEditMenu {grbr menu} {
         set w $grbr
         set tbl [GetTitleListMenuTbl $w]
-        set text [HeaderOfErrorBrowser $w]
+        set text [HeaderOfGrepBrowser $w]
         set m [menu [::tkcon::MenuButton $menu "2.Edit" edit]]
         $m add command -label "1.Copy" -under 0 -command [list tk_textCopy $tbl] -state disabled
     #     $m add separator
@@ -303,16 +308,6 @@ namespace eval ::grbr {
         TitleListEditMenu $w $menu
 
         return $w    
-    }
-
-    # Returns tablelist by main error browser window
-    proc GetTitleListMenuTbl {grbr} {
-        return $grbr.tf.tbl
-    }
-
-        
-    proc HeaderOfErrorBrowser {grbr} {
-        return $grbr.header.text 
     }
 
 }

@@ -59,7 +59,14 @@ namespace eval ::gui_util {
     proc ClearMenu {m} {
         $m delete 0 end
     }
-  
+
+    # I don't know if someone needs it. Grep it FIXME
+    proc WidgetParent { w } {
+        set lst [split $w .]
+        set sublist [lrange $lst 0 end-1]
+        return [join $sublist .]
+    }
+
 
     # # To be bound on configure event of toplevel window $w as
     # #  bind . <Configure> "gui_util::RememberPositionOnConfigureEvent $w %W %x %y %h %w"

@@ -71,15 +71,25 @@
             (cl-tk:tcl-escape code-to-jump-to-location))))
 
 
-(defun present-text-filtering-results (results)
+(defun present-text-filtering-results (results &key refresh-command)
   "Gets results from, say, filter-one-file and present them to tcl"
   (let* ((grbr (eval-in-tcl (format nil "::grbr::OpenGrepBrowser") :nowait nil))
          (serial 0))
+    (when refresh-command ; it will be used as refresh-command later... maybe... FIXME
+      (eval-in-tcl (format nil "::grbr::FillHeaderText ~A ~A"
+                           grbr
+                           (cl-tk:tcl-escape refresh-command))))
+    (eval-in-tcl (format nil "::grbr::ShowGrepBrowser ~A" grbr) :nowait nil)
     (dolist (match results)
       (eval-in-tcl (calc-code-for-filter-match grbr match (incf serial)))
-      )))
+      )
+    grbr
+    ))
 
 
 (defun find-in-clcon-sources (string)
   "Searches for string, ignores case"
-  (clco::present-text-filtering-results (clco::filter-many-files (clco::clcon-sources) string)))
+  (clco::present-text-filtering-results
+   (clco::filter-many-files (clco::clcon-sources) string)
+   :refresh-command
+   (prin1-to-string  `(clco::filter-many-files (clco::clcon-sources) ,string))))
