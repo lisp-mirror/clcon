@@ -222,6 +222,11 @@ namespace eval ::clcon_text {
     proc ConstructBackendBuffer {clcon_text} {
         variable ::tkcon::OPT
         if $::tkcon::OPT(oduvan-backend) {
+
+	    if {[::edt::Bi2btext "buf1"] ne $clcon_text} {
+                return
+            }
+
             $clcon_text configure -send_to_lisp 1
             MaybeSendToLisp $clcon_text ConstructBackendBuffer {}
         }
@@ -285,9 +290,6 @@ namespace eval ::clcon_text {
     proc MaybeSendToLisp {clcon_text type arglist {far_tcl_continuation_body {}} {UseGlobalPendingText2OduEventCounter 0}} {
         variable ::tkcon::OPT
         if {!$::tkcon::OPT(oduvan-backend) } {
-            return
-        }
-	if {[::edt::Bi2btext "buf1"] ne $clcon_text} {
             return
         }
         
