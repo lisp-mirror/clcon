@@ -53,7 +53,7 @@ namespace eval ::erbr {
     proc WidgetParent { w } {
         set lst [split $w .]
         set sublist [lrange $lst 0 end-1]
-        puts "sublist = $sublist"
+        # puts "sublist = $sublist"
         return [join $sublist .]
     }
     
@@ -300,7 +300,7 @@ namespace eval ::erbr {
         $t RoInsert end "Compilation took $duration s\n"
     }
 
-    # This is a contiuation assigned on reply on initialization request 
+    # This is called from lisp
     proc SwankBrowseErrors1 { EventAsList } {
         # EventAsList is ignored
         variable tv
@@ -510,7 +510,7 @@ namespace eval ::erbr {
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
         set w $PRIV(base).erbrTlv
-        puts $w
+        # puts $w
         if {[winfo exists $w]} {
             ClearTitleList
             return $w
