@@ -74,15 +74,20 @@
 (defun present-text-filtering-results (results &key refresh-command)
   "Gets results from, say, filter-one-file and present them to tcl"
   (let* ((grbr (eval-in-tcl (format nil "::grbr::OpenGrepBrowser") :nowait nil))
-         (serial 0))
+         (serial 0)
+         (print-progress-when 100))
     (when refresh-command ; it will be used as refresh-command later... maybe... FIXME
       (eval-in-tcl (format nil "::grbr::FillHeaderText ~A ~A"
                            grbr
                            (cl-tk:tcl-escape refresh-command))))
-    (eval-in-tcl (format nil "::grbr::ShowGrepBrowser ~A" grbr) :nowait nil)
     (dolist (match results)
       (eval-in-tcl (calc-code-for-filter-match grbr match (incf serial)))
+      (when (= serial print-progress-when)
+        (format t "~%loaded ~D messages into ~A" serial grbr)
+        (setf print-progress-when (* print-progress-when 2))
+        )
       )
+    (eval-in-tcl (format nil "::grbr::ShowGrepBrowser ~A" grbr))
     grbr
     ))
 

@@ -86,7 +86,7 @@ namespace eval ::grbr {
             after idle [list ::tablelist_util::GotoIndex $tbl 0]
         }
 
-        DefaultSortHeaders $tbl
+        # DefaultSortHeaders $tbl
 
         $grbr configure -data $data
         # InsertDataToShowOrBeep $w $EventAsList
@@ -148,11 +148,13 @@ namespace eval ::grbr {
     }
 
     proc ShowGrepBrowser {grbr} {
-        
-        ::erbr::DoGoToTop $grbr
 
         set tbl [GetTitleListMenuTbl $grbr]
+
+        DefaultSortHeaders $tbl
         
+        ::erbr::DoGoToTop $grbr
+       
         focus [$tbl bodypath]
 
         return $grbr
