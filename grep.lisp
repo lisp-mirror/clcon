@@ -41,7 +41,8 @@
   (let ((filelist nil))
     (dolist (mask '("**/*.lisp" "**/*.tcl" "**/*.asd" "**/*.md"))
       (dolist (file (directory (merge-pathnames mask *clcon-source-directory*)))
-        (push file filelist)))
+        (unless (member "xlam" (pathname-directory file) :test 'equalp)
+          (push file filelist))))
     (nreverse filelist)))
 
 (defun filter-many-files (files expr &rest keyargs &key (mode :nocase))
