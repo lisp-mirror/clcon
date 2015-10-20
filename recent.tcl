@@ -34,7 +34,6 @@ namespace eval ::recent {
                                      [lrange $RecentFilesList 0 [expr {$maxnumrecent - 1}]]]
         }
         
-        RedrawRecentMenuForConsole
     }
 
     proc SaveRecentFilesList {fid} {

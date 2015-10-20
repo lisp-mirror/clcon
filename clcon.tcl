@@ -533,8 +533,6 @@ proc ::tkcon::Init {args} {
 	    set PRIV(event) [EvalSlave history nextid]
 	    puts "[expr {$PRIV(event)-1}] events added"
 
-            # We rely upon the fact that Menu exists already.
-            ::recent::RedrawRecentMenuForConsole
 	}
     }
 
@@ -1233,10 +1231,6 @@ proc ::tkcon::InitMenus {w title} {
 	$m add command -label "4.Reload some of IDE sources" -underline 0 \
 	    -command $cmd
 
-        $m add cascade -label "5.Open recent ..." -underline 0 -menu $m.recent
-        
-        
-
 	## Save Menu
 	##
 	set s $m.save
@@ -1255,10 +1249,11 @@ proc ::tkcon::InitMenus {w title} {
 
         ## Recent menu
         set s $m.recent
-        menu $s -disabledforeground $COLOR(disabled)
-        
-    }
+        menu $s -disabledforeground $COLOR(disabled) -postcommand [list ::recent::RecentMenu $m]
+ 	$m add cascade -label "5.Open recent ..." -underline 0 -underline 0 -menu $s
 
+    }
+        
     ## Console Menu
     ##
     foreach m [list [menu $w.console -disabledfore $COLOR(disabled)] \

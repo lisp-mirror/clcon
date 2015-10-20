@@ -45,7 +45,6 @@ namespace eval ::edt {
             SwitchToBuffer $newBi do_nothing
             after idle [list destroy $w]
         }
-        ::recent::RedrawRecentMenuForConsole
     }
 
     # Wrapped for freezed text, for menu only

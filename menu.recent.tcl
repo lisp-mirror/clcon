@@ -1,14 +1,13 @@
 # Drawing of recent menu
 namespace eval ::recent {
-    proc RedrawRecentMenuForConsole {} {                                     
+
+    proc RecentMenu {FileSubMenu} {                                     
         variable RecentFilesList
         variable ::tkcon::PRIV
 
         InitRecentFilesListIfDoesNotExist
 
-        set console [::tkcon::CurrentConsole]
-        set MainMenu $PRIV(menubar)
-        set s $MainMenu.file.recent
+        set s $FileSubMenu.recent
         $s delete 0 end
         set i 1
         foreach filename $RecentFilesList {

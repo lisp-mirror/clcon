@@ -114,8 +114,9 @@ namespace eval ::edt {
         $stepperMenu entryconfigure [::ldbg::StepperMenuTitle] -state $st
     }
     
-    # Empties menu (except menu bar) and fills it again
+    # Empties menu (except menu bar and recent menu) and fills it again
     proc RebuildMenu {} {
+        variable ::tkcon::COLOR
         # set menu [cMenuBar]
         
         ## File Menu
@@ -151,6 +152,16 @@ namespace eval ::edt {
         $m add command -label "4.Reload some of IDE sources" -underline 0 \
 	    -command ::tkcon::ReloadSomeIDESources
 
+        ## Recent menu (clone from clcon.tcl, but we need to delete menu as this
+        ## code is called many times)
+        set s $m.recent
+        if {[winfo exists $s]} {
+            destroy $s
+        }
+        menu $s -disabledforeground $COLOR(disabled) -postcommand [list ::recent::RecentMenu $m]
+ 	$m add cascade -label "5.Open recent ..." -underline 0 -underline 0 -menu $s
+
+        
         
         ## Edit Menu
         ##
