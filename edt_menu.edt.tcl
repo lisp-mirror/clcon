@@ -200,6 +200,11 @@ namespace eval ::edt {
         $m add command -label "Tcl indent new line" -accel <Control-Key-Return> -command $cmd
         bind DoubleMod$w <Control-Key-Return> "$cmd; break"
         
+        $m add separator
+        set cmd [list ::tkcon::TclFindDefinition $btext]
+        $m add command -label "Tcl find source" -accel <Control-Key-F9> -command $cmd
+        bind SingleMod$w <Control-Key-F9> "$cmd; break"
+        
         ## Window Menu
         ##
         set m [cMenuBar .window]
