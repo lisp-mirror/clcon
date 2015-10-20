@@ -198,8 +198,6 @@ namespace eval ::edt {
         set cmd "::edt::e_indent $btext"
         $m add command -label "Tcl indent new line" -accel <Control-Key-Return> -command $cmd
         bind DoubleMod$w <Control-Key-Return> "$cmd; break"
-        bind NoMod$w <F4> "puts WOW; $cmd; break"
-
         
         ## Window Menu
         ##
