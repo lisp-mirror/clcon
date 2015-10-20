@@ -466,7 +466,7 @@ namespace eval ::clcon_text {
     # send_selection : if 1, selection is sent to odu at the beginning of command
     proc CallOduvanchikFunction {clcon_text OduvanchikFunctionNameAndArgs {UserContBody {}} {Options {}}} {
         variable ::tkcon::OPT
-        if {!$::tkcon::OPT(oduvan-backend)} {
+        if {!$::tkcon::OPT(oduvan-backend) || ![$clcon_text cget -send_to_lisp]} {
             error "Unable to call oduvanchik functions with oduvan-backend disabled"
         }
         $clcon_text Freeze

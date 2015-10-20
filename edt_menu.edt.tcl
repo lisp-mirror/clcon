@@ -2,9 +2,9 @@ namespace eval ::edt {
 
     # This is a primitive for commands which behave differently. If there is oduvan backend,
     # script is called at uplevel 1. Otherwise, continue is called at uplevel 1
-    proc CodeToCallBackendOrContinue {script_when_backend} {
+    proc CodeToCallBackendOrContinue {btext script_when_backend} {
         set result \
-       "if {\$::tkcon::OPT(oduvan-backend)} {
+       "if {\$::tkcon::OPT(oduvan-backend) && [$btext cget -send_to_lisp]} {
   $script_when_backend
  } else {
   continue
@@ -24,8 +24,8 @@ namespace eval ::edt {
             [wesppt [list clcon_text::CallOduvanchikFunction $btext "$oduFn nil"] \
                  -add-break 1] 
         if {$(-ContinueIfNoBackend)} {
-            set cmd [CodeToCallBackendOrContinue $ScriptForBackend]
-            set cmdBreak [CodeToCallBackendOrContinue $ScriptForBackendBreak]
+            set cmd [CodeToCallBackendOrContinue $btext $ScriptForBackend]
+            set cmdBreak [CodeToCallBackendOrContinue $btext $ScriptForBackendBreak]
         } else {
             set cmd $ScriptForBackend
             set cmdBreak $ScriptForBackendBreak
