@@ -17,7 +17,7 @@
 namespace eval ::edt {
 
     proc ShowSomeEditor {} {
-        ::tkcon::FocusWindowByName [cTW] [cW]
+        ::tkcon::FocusWindowByName [cTW] [c_text]
         return 
     }
 
