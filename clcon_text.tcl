@@ -246,9 +246,11 @@ namespace eval ::clcon_text {
         variable ::tkcon::OPT
         if $::tkcon::OPT(oduvan-backend) {
 
-	    if {[::edt::Bi2btext "buf1"] ne $clcon_text} {
-                return
-            }
+            # this can be disabled for debugging of the editor.
+            # but it leads to freezing of other buffers!
+	    #if {[::edt::Bi2btext "buf1"] ne $clcon_text} {
+            #    return
+            #}
 
             $clcon_text configure -send_to_lisp 1
             MaybeSendToLisp $clcon_text ConstructBackendBuffer {}
