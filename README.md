@@ -1,7 +1,7 @@
 # README #
 
 ## What's that
-**clcon** is a cross-platform Common Lisp IDE under construction.
+**clcon** is a cross-platform Common Lisp IDE under construction. Current version is 0.2.6 (see tags in repo)
 
 Supported lisp implementation(s):
 
@@ -34,24 +34,23 @@ with the IDE. Take a [demo tour](doc/demo-tour.md) instead.
 Current features are: 
 
 - REPL for Lisp and Tcl with history
-- Debugger 
-- Stepper
-- Multitabbed Editor (currenty have no save confirmation when quitting, beware!)
+- Debugger, Stepper, Inspector from SWANK 
+- Editor (crashes frequently; have no save confirmation when quitting, beware!)
 - Completion for Lisp, Tcl and filenames in REPL
 - Find Source for Lisp and Tcl. Find source for TCL seem to be rather unique feature of clcon
 - Some commands of lisp mode (navigate through forms, auto-indent, have bugs...)
-- Inspector
 - Compilation error browser
+- Find in files 
 
 ## Installation and startup
-For windows, we have [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.2.4.zip). 
+For windows, we have [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.2.6.zip). 
 Anyway, see [doc/INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/INSTALL.md) for installation instructions. 
 
 ## Documentation
 
-[Demo tour](doc/demo-tour.md) - narrow footpath through best views of some features of clcon (a bit outdated)
+[Demo tour](doc/demo-tour.md) - narrow footpath through best views of some features of clcon
 
-[User manual](https://bitbucket.org/budden/clcon/src/default/doc/user-manual.md)
+[User manual](https://bitbucket.org/budden/clcon/src/default/doc/user-manual.md) - a bit outdtated
 
 [Wiki](https://bitbucket.org/budden/clcon/wiki/) - contains [screenshots](https://bitbucket.org/budden/clcon/wiki/Screenshots), but otherwise is not very useful.  
 
@@ -63,12 +62,8 @@ Anyway, see [doc/INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-- fix bugs in lisp mode 
 - paren highlighting
+- make editor reliable
 - use as a GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine)
-- cross-reference navigation
-- better editor functionality
-- thread list with thread debugging
-- grep
-- fix other numerous bugs
-- full-featured menu
+- thread list with thread debugging (if we need it for self-debugging)
+- close all bugs (ha-ha!)
