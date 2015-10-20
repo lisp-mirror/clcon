@@ -3,12 +3,11 @@ namespace eval ::edt {
     # This is a primitive for commands which behave differently. If there is oduvan backend,
     # script is called at uplevel 1. Otherwise, continue is called at uplevel 1
     proc CodeToCallBackendOrContinue {btext script_when_backend} {
-        set result \
-       "if {\$::tkcon::OPT(oduvan-backend) && [$btext cget -send_to_lisp]} {
+        set result [subst -nocommands {if {[$btext UsesLispP]} {
   $script_when_backend
  } else {
   continue
- }"
+ }}]
         return $result
     }
         
@@ -45,7 +44,7 @@ namespace eval ::edt {
         # It is too late hour to start show-mark
         # We have archietectural problems there (rompsite.lisp is too early on the build)
         # set oduCmd "lisp-insert-\)"
-        # set cmd [wesppt [list clcon_text::CallOduvanchikFunction $btext ????]]
+        # set cmd [wesppt [list ::clcon_text::CallOduvanchikFunction $btext ????]]
         # $m add command -label $oduCmd -accel "F11" -command $cmd
         # bind $w <F11> $cmd
 

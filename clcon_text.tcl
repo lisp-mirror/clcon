@@ -319,17 +319,15 @@ namespace eval ::clcon_text {
     # (destroy event in fact)
     proc MaybeSendToLisp {clcon_text type arglist {far_tcl_continuation_body {}} {UseGlobalPendingText2OduEventCounter 0}} {
         variable ::tkcon::OPT
-        if {!$::tkcon::OPT(oduvan-backend) } {
-            return
-        }
         
         # This is a temporary solution. This is a separate option indeed
         set qId [lq $clcon_text]
         switch -exact $type {
             i {
-                if {[$clcon_text cget -private_freezed]
-                    ||
-                    ![$clcon_text cget -send_to_lisp] } {
+                if {![$clcon_text UsesLispP]} {
+                    return
+                }
+                if {[$clcon_text cget -private_freezed]} {
                     return
                 }
                 set index [lindex $arglist 0]
@@ -338,9 +336,10 @@ namespace eval ::clcon_text {
                 set lispCmd "(clco:nti $qId $qIndex $qText)"
             }
             d {
-                if {[$clcon_text cget -private_freezed]
-                    ||
-                    ![$clcon_text cget -send_to_lisp] } {
+                if {![$clcon_text UsesLispP]} {
+                    return
+                }
+                if {[$clcon_text cget -private_freezed]} {
                     return
                 }
                 set b [lindex $arglist 0]
@@ -350,16 +349,22 @@ namespace eval ::clcon_text {
                 set lispCmd "(clco:notify-oduvan-tcl-text-delete $qId $qB $qE)"
             }
             ConstructBackendBuffer {
+                if {![$clcon_text UsesLispP]} {
+                    return
+                }
                 set lispCmd "(clco:notify-oduvan-construct-backend-buffer $qId)"
             }
             DestroyBackendBuffer {
+                # We don't check if current buffer uses lisp, as it can not exist now already. But we at least should check is we have lisp at all.
+                if {$OPT(oduvan-backend)} {
+                    return
+                }
                 set lispCmd "(clco:notify-oduvan-destroy-backend-buffer $qId)"
             }
             CallOduvanchikFunction {
-                if {![$clcon_text cget -send_to_lisp] } {
+                if {![$clcon_text UsesLispP]} {
                     return
                 }
-                
                 set qB [::text2odu::CoerceIndex $clcon_text insert]
                 set FnAndArgs [lindex $arglist 0]
                 set qOptions [::tkcon::QuoteTclListOfStringsForLisp [lindex $arglist 1]] 
@@ -471,7 +476,7 @@ namespace eval ::clcon_text {
     # send_selection : if 1, selection is sent to odu at the beginning of command
     proc CallOduvanchikFunction {clcon_text OduvanchikFunctionNameAndArgs {UserContBody {}} {Options {}}} {
         variable ::tkcon::OPT
-        if {!$::tkcon::OPT(oduvan-backend) || ![$clcon_text cget -send_to_lisp]} {
+        if {![$clcon_text UsesLispP]} {
             error "Unable to call oduvanchik functions with oduvan-backend disabled"
         }
         $clcon_text Freeze
