@@ -40,7 +40,6 @@ proc btext {win args} {
     set ar(-linemap_select_bg) yellow
     set ar(-highlight) 1
     set ar(win) $win
-    set ar(modified) 0
     set ar(commentsAfterId) ""
     set ar(highlightAfterId) ""
     set ar(blinkAfterId) ""
@@ -94,6 +93,7 @@ proc btext {win args} {
     bind $win.t <Configure> [list btext::linemapUpdate $win]
     bind $win.l <ButtonPress-1> [list btext::linemapToggleMark $win %y]
     bind $win.t <KeyRelease-Return> [list btext::linemapUpdate $win]
+
     rename $win __btextJunk$win
     rename $win.t $win._t
 
@@ -105,7 +105,7 @@ proc btext {win args} {
 
     # If the user wants C comments they should call
     # btext::enableComments
-    btext::modified $win 0
+    $win._t edit modified 0
     btext::buildArgParseTable $win
 
     return $win
@@ -325,7 +325,6 @@ proc btext::instanceCmd {self cmd args} {
 		clipboard clear -displayof $self.t
 		clipboard append -displayof $self.t $data
 		$self delete [$self.t index sel.first] [$self.t index sel.last]
-		btext::modified $self 1
 	    }
 	}
 
@@ -360,34 +359,21 @@ proc btext::instanceCmd {self cmd args} {
 	    } else {
 		return -code error "invalid argument(s) sent to $self delete: $args"
 	    }
-	    btext::modified $self 1
 	}
 
 	insert {
 	    eval \$self._t insert $args
-	    btext::modified $self 1
 	    btext::linemapUpdate $self
 	}
 
 	edit {
-	    set subCmd [lindex $args 0]
-	    set argsLength [llength $args]
+	    #set subCmd [lindex $args 0]
+	    #set argsLength [llength $args]
 
-	    btext::getAr $self config ar
+	    # btext::getAr $self config ar
 
-	    if {"modified" == $subCmd} {
-		if {$argsLength == 1} {
-		    return $ar(modified)
-		} elseif {$argsLength == 2} {
-		    set value [lindex $args 1]
-		    set ar(modified) $value
-		} else {
-		    return -code error "invalid arg(s) to $self edit modified: $args"
-		}
-	    } else {
-		#Tk 8.4 has other edit subcommands that I don't want to emulate.
-		return [uplevel 1 [linsert $args 0 $self._t $cmd]]
-	    }
+            #Delegate edit command to _t. 
+            return [uplevel 1 [linsert $args 0 $self._t $cmd]]
 	}
 
 	default {
@@ -595,9 +581,3 @@ if {![catch {
     proc btext::linemapUpdateOffset {args} {}
 }
 
-proc btext::modified {win value} {
-    btext::getAr $win config ar
-    set ar(modified) $value
-    event generate $win <<Modified>>
-    return $value
-}
