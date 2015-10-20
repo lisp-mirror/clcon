@@ -148,6 +148,11 @@ namespace eval ::clcon_text {
         }
         # It looks like we don't need Replace at all
 
+        method UsesLispP {} {
+            variable ::tkcon::OPT
+            return [expr {$OPT(oduvan-backend) && [$self cget -send_to_lisp]}]
+        }
+
         method RememberEvent {script} {
             set q $options(-private_freezed_events_queue)
             putd "444444 Remembering script $script"
