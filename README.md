@@ -1,7 +1,7 @@
 # README #
 
 ## What's that
-**clcon** is a cross-platform Common Lisp IDE under construction.
+**clcon** is a cross-platform Common Lisp IDE under construction. Current version is 0.2.6 (see tags in repo)
 
 Supported lisp implementation(s):
 
