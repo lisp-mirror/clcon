@@ -36,7 +36,7 @@ namespace eval ::edt {
         set w [Bi2W $Bi]
         putd "Saving file if omitted!" 
         RemoveWindowFromLists $Bi
-        UpdateMRUAndBufferList {}
+        # UpdateMRUAndBufferList {}
         set newBi [AnyBufferBi]
         if {$newBi eq {}} {
             # no more buffers - let's kill the editor window
