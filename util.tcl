@@ -82,3 +82,10 @@ proc dump_all_frame_infos {} {
     }
 }
 
+proc BooleanToAsterik {b} {
+    if {$b} {
+        return "*"
+    } else {
+        return ""
+    }
+}        

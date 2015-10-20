@@ -113,11 +113,7 @@ namespace eval ::edt {
         set MRUWinListEntry [lindex [SearchBiInMRUWinList [cBi]] 1]
         set tab_name [dict get $MRUWinListEntry name]
         set btext [Bi2btext $Bi]
-        if {[$btext edit modified]} {
-            set asterik "*"
-        } else {
-            set asterik ""
-        }
+        set asterik [BooleanToAsterik [$btext edit modified]]
         string cat $tab_name $asterik        
     }
 
