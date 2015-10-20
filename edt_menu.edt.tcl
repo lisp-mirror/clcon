@@ -196,7 +196,7 @@ namespace eval ::edt {
 
         $m add separator
 
-        set cmd "::edt::e_indent $btext"
+        set cmd [list ::edt::e_indent $btext]
         $m add command -label "Tcl indent new line" -accel <Control-Key-Return> -command $cmd
         bind DoubleMod$w <Control-Key-Return> "$cmd; break"
         
