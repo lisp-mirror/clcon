@@ -77,8 +77,10 @@ namespace eval ::grbr {
                     ]
         dict set data $RowName $NewItem
 
-        set tbl $TitleListWindow.tf.tbl    
-        set newIndex [$tbl insert end [list $line $LineNumber $filename $serial]]
+        set tbl $TitleListWindow.tf.tbl
+
+        # See also ::edt::PrepareGui1 for columns configuration
+        set newIndex [$tbl insert end [list $serial $line $LineNumber $filename]]
         $tbl rowconfigure $newIndex -name $RowName
 
         # If we inserted first item, highlight it
@@ -163,7 +165,7 @@ namespace eval ::grbr {
     # It is reasonable to sort by severity first, then by number
     # How do we transform severity to number? -sortmode , -sortcommand for column
     proc DefaultSortHeaders {tbl} {
-        $tbl sortbycolumnlist {3} {increasing}
+        $tbl sortbycolumnlist {0} {increasing}
         $tbl see active
     }
     
@@ -268,26 +270,28 @@ namespace eval ::grbr {
 
         # --------------------------------- frames-----------------              
 
-        ::gui_util::frame_clcon_text_and_scrollbars $w.header {-readonly 1 -height 6}
+        ::gui_util::frame_clcon_text_and_scrollbars $w.header {-readonly 1 -height 2}
         
         frame $w.tf
         set tbl $w.tf.tbl
         
-        tablelist::tablelist $tbl -columns {30 "Line" 4 "Line No" 45 "File" 4 "Serial"} -stretch 0 -spacing 10
+        # When you change column order, see also:
+        # ::edt::AppendData , ::edt::DefaultSortHeaders
+        tablelist::tablelist $tbl -columns {4 "№" 40 "Line" 4 "Line No" 25 "File"} -spacing 10
         # $tbl resetsortinfo
+
+        $tbl columnconfigure 0 -sortmode integer
+        $tbl columnconfigure 1 -wrap true
+        $tbl columnconfigure 2 -sortmode integer
+        $tbl columnconfigure 3 -align right
+
+
+        ::tablelist_util::BindReSortingToClickingOnColumnLabel $tbl
 
         $tbl configure \
             -foreground \#000000 \
             -font tkconfixed -borderwidth 1 -highlightthickness 0
         
-
-        $tbl columnconfigure 0 -wrap true
-        $tbl columnconfigure 1 -sortmode integer
-        $tbl columnconfigure 2 -wrap true
-        $tbl columnconfigure 3 -sortmode integer
-
-        ::tablelist_util::BindReSortingToClickingOnColumnLabel $tbl
-
         
         set f1 $w.tf
         scrollbar $f1.sy -orient v -command [list $tbl yview]
