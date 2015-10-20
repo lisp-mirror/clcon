@@ -42,7 +42,7 @@ namespace eval ::fndrpl {
             if {$AreaType=="text"} {
                 set SearchCmd "::fndrpl::FindIt $area"
             } elseif {$AreaType=="tablelist"} {
-                set SearchCmd "::fndrpl::TreeSearchTextOuter $area $EnsurePopulatedCmd"
+                set SearchCmd [list ::fndrpl::TreeSearchTextOuter $area $EnsurePopulatedCmd]
             } else {
                 error "Unknown $AreaType"
             }
