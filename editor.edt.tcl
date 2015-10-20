@@ -98,14 +98,12 @@ namespace eval ::edt {
     }
 
     proc TextModified {Bi} {
-        puts stderr "TextModified $Bi"
         set textt [Bi2_text $Bi]
         set modified [$textt edit modified]
         set w [Bi2W $Bi]
         set notebook [theNotebook]
         set index [$notebook index $w]
-
-        puts stderr "$notebook tab $index -text [CalcTabText $Bi]"
+        ::buli::RefreshData
         $notebook tab $index -text [CalcTabText $Bi]
     }
 

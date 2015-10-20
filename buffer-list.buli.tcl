@@ -16,6 +16,8 @@ namespace eval ::buli {
         set data {}
     }
 
+
+
     # There is a design problem. We mix visual and non-visual
     # activity while we don't know if visual component exists
     # We recreate non-visual data at creation of visual control
@@ -23,8 +25,11 @@ namespace eval ::buli {
     # to be able to change contents of visual component incrementally
     # This was desired for error-browser and this can also be desired
     # for buffer-list. E.g. we would like to remove deleted window
-    # without moving keyboard focus on the list. 
-    proc AppendData {name type path Bi} {
+    # without moving keyboard focus on the list.
+
+    # Bi is a buffer index
+    # Mod is modified flag
+    proc AppendData {name type path Bi mod} {
         variable TitleListWindow
         variable data
 
@@ -33,11 +38,11 @@ namespace eval ::buli {
             return
         }
 
-        set NewItem [dict create name $name type $type path $path Bi $Bi]
+        set NewItem [dict create name $name type $type path $path Bi $Bi $mod mod]
         lappend data $NewItem
 
         set tbl $TitleListWindow.tf.tbl    
-        $tbl insert end [list $name $type $path]
+        $tbl insert end [list $mod $name $type $path]
 
     }
 
@@ -48,7 +53,9 @@ namespace eval ::buli {
             set type [dict get $p type]
             set path [dict get $p path]
             set Bi [dict get $p Bi]
-            AppendData $name $type $path $Bi
+            set modBoolean [[::edt::Bi2btext $Bi] edit modified]
+            set mod [BooleanToAsterik $modBoolean]
+            AppendData $name $type $path $Bi $mod
         }
     }
 
@@ -257,9 +264,8 @@ namespace eval ::buli {
         set tbl $w.tf.tbl
         
         tablelist::tablelist $tbl \
-            -columns {20 "Name" left 3 "Typ" left 30 "Path" left} \
-            -stretch 2 -spacing 10 \
-            -width 35
+            -columns {3 "Mod" 20 "Name" left 3 "Typ" left 30 "Path" left} \
+            -width 40
         $tbl resetsortinfo 
 
         $tbl configure \
@@ -267,8 +273,8 @@ namespace eval ::buli {
             -font tkconfixed -borderwidth 1 -highlightthickness 1 
         
 
-        $tbl columnconfigure 0 -wrap true  
-        $tbl columnconfigure 2 -wrap true
+        $tbl columnconfigure 1 -wrap true  
+        $tbl columnconfigure 3 -wrap true
 
         # ------------------------------ bindings -------------
         MakeBindings $w
