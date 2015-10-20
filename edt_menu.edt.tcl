@@ -70,7 +70,7 @@ namespace eval ::edt {
         
         $m add separator
 
-        OduFnMenuItem $w $m $btext indent-new-line -accel "<Shift-Return>" -bindtag SingleMod$w
+        OduFnMenuItem $w $m $btext indent-new-line -accel "<Shift-Key-Return>" -bindtag SingleMod$w
 
         OduFnMenuItem $w $m $btext indent-form
         
