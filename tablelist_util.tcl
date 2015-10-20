@@ -52,11 +52,7 @@ namespace eval ::tablelist_util {
 
     
     proc BindReSortingToClickingOnColumnLabel {tbl} {
-        for {set i 0} {$i<[$tbl columncount]} {incr i} {
-            set path [$tbl labelpath $i]
-            set cmd "::tablelist_util::SortOrReSort $tbl $i"
-            bind $path <ButtonRelease-1> $cmd
-        }
+        $tbl configure -labelcommand ::tablelist_util::SortOrReSort
     }
 
     proc GotoIndex {tbl index} {
