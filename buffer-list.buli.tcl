@@ -138,7 +138,7 @@ namespace eval ::buli {
         
         DoGoToTop $w
         
-        focus $tbl
+        focus [$tbl bodypath]
         
         return
         
