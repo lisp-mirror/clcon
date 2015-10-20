@@ -123,13 +123,14 @@ namespace eval ::edt {
         ## Note that this is not a menu creation command!
         set Bi [cBi]
         set w [cW]
+        set tw [cTW]
         set btext [c_btext]
         
         set m [cMenuBar .file]
         ::gui_util::ClearMenu $m
 
-        set cmd ::tkcon::OpenForEdit 
-	$m add command -label "Open" -command $cmd -accel "Control-O"
+        set cmd [list ::tkcon::OpenForEdit $tw]
+	$m add command -label "Open" -command $cmd -accel "Control-Key-O"
         bind SingleMod$w <Control-Key-o> "$cmd; break"
         bind SingleMod$w <Control-Key-Cyrillic_shcha> "$cmd; break"
 

@@ -1217,7 +1217,7 @@ proc ::tkcon::InitMenus {w title} {
     foreach m [list [menu $w.file -disabledforeground $COLOR(disabled)] \
                    [menu $w.pop.file -disabledforeground $COLOR(disabled)]] {
         
-        set cmd ::tkcon::OpenForEdit 
+        set cmd [list ::tkcon::OpenForEdit $w]
 	$m add command -label "1.Open for edit" -underline 0 -command $cmd -accel "Control-O"
         bind TkConsoleTextOverrides <Control-Key-o> $cmd
         bind TkConsole <Control-Key-Cyrillic_shcha> $cmd
@@ -2089,26 +2089,21 @@ proc ::tkcon::Load { {fn ""} } {
 
 
 ## ::tkcon::OpenForEdit 
-# ARGS:	fn	- (optional) filename to source in
+# ARGS:	
+# parent - widget parent for dialog 
+# fn - (optional) filename to source in
 # Returns:	selected filename ({} if nothing was selected)
 ## 
-proc ::tkcon::OpenForEdit { {fn ""} } {
+proc ::tkcon::OpenForEdit { parent {fn ""} } {
     set types {
 	{{All Files}	*}
 	{{Lisp Files}	{.lisp .asd}}
 	{{Tcl Files}	{.tcl .tk}}
 	{{Text Files}	{.txt}}
     }
-    # Allow for VFS directories, use Tk dialogs automatically when in
-    # VFS-based areas
-    set check [expr {$fn == "" ? [pwd] : $fn}]
-    if {$::tcl_version >= 8.4 && [lindex [file system $check] 0] == "tclvfs"} {
-	set opencmd [list ::tk::dialog::file:: open]
-    } else {
-	set opencmd [list tk_getOpenFile]
-    }
+    set opencmd [list tk_getOpenFile]
     if {$fn eq "" &&
-	([catch {tk_getOpenFile -filetypes $types \
+	([catch {tk_getOpenFile -parent $parent -filetypes $types \
 		     -title "Source File"} fn] || $fn eq "")
     } { return }
     ::edt::edit -type file -wrap char -- $fn
