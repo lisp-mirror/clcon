@@ -40,20 +40,21 @@ namespace eval ::edt {
         }
     }
 
-    # See also grep for -w editorry
+    # Returns toplevel editor window for a give buffer id. Currenty we
+    # only have a single editor window. See also grep for -w editorry
     proc Bi2TW {Bi} {
         variable ::tkcon::PRIV
         string cat $PRIV(base) .editorry
     }
 
-    # See also grep for -w frammy, 
+    # Returns tab entry (notebook slave window) for a given Bi.
     proc Bi2W {Bi} {
         variable ::tkcon::PRIV
         checkValidBi $Bi
         if {$Bi eq {}} {
             return ""
         } else {
-            return [string cat $PRIV(base) .editorry.frammy. $Bi]
+            return [string cat [theNotebook] "." $Bi]
         }
     }
 
