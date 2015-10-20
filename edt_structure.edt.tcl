@@ -32,7 +32,9 @@ namespace eval ::edt {
     }
 
     proc checkValidBi {Bi} {
-        if {![regexp {^buf[0-9]+} $Bi]} {
+        if {$Bi eq {}} {
+            return
+        } elseif {![regexp {^buf[0-9]+} $Bi]} {
             puts stderr "wriong Bi $Bi"
             idebug on
             idebug break
