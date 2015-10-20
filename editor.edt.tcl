@@ -97,6 +97,29 @@ namespace eval ::edt {
         $w.text mark set insert 1.0
     }
 
+    proc TextModified {Bi} {
+        puts stderr "TextModified $Bi"
+        set textt [Bi2_text $Bi]
+        set modified [$textt edit modified]
+        set w [Bi2W $Bi]
+        set notebook [theNotebook]
+        set index [$notebook index $w]
+
+        puts stderr "$notebook tab $index -text [CalcTabText $Bi]"
+        $notebook tab $index -text [CalcTabText $Bi]
+    }
+
+    proc CalcTabText {Bi} {
+        set MRUWinListEntry [lindex [SearchBiInMRUWinList [cBi]] 1]
+        set tab_name [dict get $MRUWinListEntry name]
+        set btext [Bi2btext $Bi]
+        if {[$btext edit modified]} {
+            set asterik "*"
+        } else {
+            set asterik ""
+        }
+        string cat $tab_name $asterik        
+    }
 
     # Init buffer GUI when it is first created 
     # variable internal_cBi is set already
@@ -107,18 +130,15 @@ namespace eval ::edt {
         variable ::tkcon::COLOR
         variable ::tkcon::OPT
         
-        set MRUWinListEntry [lindex [SearchBiInMRUWinList [cBi]] 1]
-        set tab_name [dict get $MRUWinListEntry name]
-
         set tw [cTW]
         set w [cW]
         set btext [c_btext]
         set textt [c_text]
-        set notebook $tw.frammy
+        set notebook [theNotebook]
 
         frame $w
         ::clcon_text::clcon_text $btext
-        
+
         # $tw.text configure -send_to_lisp 1
         # ::btext::clearHighlightClasses $btext
         
@@ -136,6 +156,8 @@ namespace eval ::edt {
             $btext configure -tabs [list $tabsp left] -tabstyle wordprocessor
         }
 
+        bind $btext <<Modified>> [list ::edt::TextModified [cBi]]
+
         scrollbar $w.sx -orient h -command [list $w.text xview]
         scrollbar $w.sy -orient v -command [list $w.text yview]
 
@@ -145,6 +167,7 @@ namespace eval ::edt {
         grid columnconfigure $w 1 -weight 1
         grid rowconfigure $w 0 -weight 1
 
+        set tab_name [CalcTabText [cBi]]
         $notebook add $w -text $tab_name
     }
 
