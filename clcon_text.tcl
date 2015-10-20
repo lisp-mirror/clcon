@@ -251,7 +251,9 @@ namespace eval ::clcon_text {
         variable ::tkcon::OPT
         if $::tkcon::OPT(oduvan-backend) {
 
-            # this can be disabled for debugging of the editor.
+            # this can be uncommented for debugging of the editor.
+            # only first buffer's command are sent to lisp so that
+            # less mess oduvanchik's state
             # but it leads to freezing of other buffers!
 	    #if {[::edt::Bi2btext "buf1"] ne $clcon_text} {
             #    return

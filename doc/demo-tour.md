@@ -32,7 +32,7 @@ and then press `Control-F3`. Name will expand to `c:/windows` or `/bin`.
 
 Switching between windows
 -----------
-In the editor, press `Control-.` to switch back to console. In the console, press `Control-Shift-e` to switch to editor.
+In the editor, press `Control-.` to switch back to console. In the console, press `Control-Shift-e` to switch to editor. Press `Control-Tab`, `Control-Shift-Tab` to navigate through editor buffers. Press `Control-F12` to see buffer list widget.
 
 Compiling file from editor
 ------------
@@ -51,7 +51,7 @@ You can browse through notes with arrow keys. As you press <space>, source code 
 Once you switched to editor, it is convenient to scroll through messages with Alt-F7/F8. 
 
 Warning! Due to random positioning of windows, some views may be unpleasant to work with, so you might want to 
-resize/reposition them manually. Your feedback and patches to solve this are welcome, see the debugger for a good sample.
+resize/reposition them manually. Your feedback and patches to solve this are welcome. 
 
 Debugger and stepper
 ------
@@ -63,8 +63,8 @@ This would create two functions, `f` and `g`. Run `(f 5)` at the console. Debugg
 
 There is also search in the stack list. Tree without a search is a dense forest! Type `Ctrl-F`, type in `)` and press `F3` or `Return` to continue search.
 
-You can evaluate values in the context of stack frame. Select topmost stack frame in the frame list and choose `Stack/Eval in frame` from debugger menu bar. New window titled "eval in frame"
-will pop up. Note package is prompted at window's title. Type `y` in the window and press `Return`. Console will be activated and result of your evaluation
+You can evaluate values in the context of stack frame. Select topmost stack frame (of function `G`) in the frame list and choose `Stack/Eval in frame` from debugger menu bar. New window titled "eval in frame"
+will pop up. Note package is prompted at window's title. Type `y` in the window and press `Return`. Console will be activated and result of your evaluation 
 will be printed there. 
 
 Also we have "Restarts" menu at menubar. We could call either of them.
@@ -73,7 +73,7 @@ to call default restart, marked by asterik in restarts menu. Let's invoke "conti
 
 Now let's try stepper. 
 
-Warning! To make stepper work correctly, you need to load swank with stepper support disabled. This is true with windows release, but it depends on your initialization file on Linux. Hope to document it later, or see windows file release as an example.
+Warning! To make stepper work correctly, you need to load swank with stepper support disabled. This is true with windows release, but it depends on your initialization file on Linux. Hope to document it later, or see windows file release as an example. Also there are problems in stepper backend when you step out of the frame where you turned stepping mode on. Submit bug to SBCL tracker :) 
 
 Bring up last command with `Control-Up` at the console, and press `Return` to call it again. As debugger occurs, choose `Stack/Switch to stepping mode` from menu bar. Editor window will pop up and current source will be highlighted. Press "F10" (Step next, or "Step over") watch how execution proceeds. Also note that stack and locals are shown in the debugger window. Press "f10" one more time, watch how execution proceeds. Then press "F5" (Continue, or resume to normal execution) to quit stepper mode. 
 
@@ -94,4 +94,12 @@ Commands starting from `..` are interpreted by tcl. E.g. type in ``.. tk_message
 
 Editing files
 ---------
-You can see lisp files are highlighted according to lisp mode, but editing is permanently broken. 
+You can see lisp files are highlighted according to lisp mode, and you can even try to edit them. But editing is permanently broken. Also IDE won't ask you when you are closing modified file. This is done intentially: IDE crashed frequently, so if you dare to edit files in it, you must be always careful and control state of your files. When file is modified, its tab is marked with asterik. Also asterik is shown in the buffer list (invoked by `Control-F12`). 
+
+Find in files
+--------
+This is very new tool, and it is a bit lame, but I have find it useful already.
+Type at the console: 
+`(clco::find-in-clcon-sources "buf1")`
+And you'll see some kind of "grep browser". It can only fine simple strings for now with case ignored. There is no way to call it from the menu. 
+If you want other kinds of search, you are welcome to Common Lisp programming - just jump to `clco::find-in-clcon-sources` and watch how it is done. 
