@@ -140,12 +140,13 @@ namespace eval ::erbr {
 
     proc SeverityToSeverityNumber {severity} {
         switch -exact $severity {
-            "style-warning" {return 0}
-            "warning"       {return 1}
+            "note"          {return 0}
+            "style-warning" {return 1}
+            "warning"       {return 2}
             "read-error"    -
-            "error"         {return 2}
+            "error"         {return 3}
             default {
-                tk_messageBox -message "Unfinished function ::erbr::SeverityToSeverityNumber - $severityWord"
+                tk_messageBox -message "Unfinished function ::erbr::SeverityToSeverityNumber - $severity"
                 {return 2}
             }
         }
@@ -156,9 +157,10 @@ namespace eval ::erbr {
         variable ::tkcon::COLOR
         set SeverityNumber [SeverityToSeverityNumber $severity]
         switch -exact $SeverityNumber {
-            0 { return $COLOR(bg) }
-            1 { return $COLOR(error_browser_serious_bg) }
-            2 { return $COLOR(error_browser_fatal_bg) }
+            0 - 
+            1 { return $COLOR(bg) }
+            2 { return $COLOR(error_browser_serious_bg) }
+            3 { return $COLOR(error_browser_fatal_bg) }
             default { error "unknown severity number" }
         }
     }
