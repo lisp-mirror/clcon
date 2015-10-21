@@ -115,6 +115,34 @@
     result))
 
 
+(defun recompute-line-tags-starting-from-line-background (start-line)
+  (iter (for line initially start-line then (line-next line))
+        (while line)
+        (oi::recompute-line-tag line)
+        ;;(until (eq line end-line)) ; это наше отличие
+        ))
+  
+(defmethod oi::recompute-tags-up-to :around (end-line background)
+  "We always recompute everything to the end of file. end-line is required to know buffer only"
+  (cond
+    ((null background)
+     (call-next-method))
+    (t
+     (let* ((level (oi::buffer-tag-line-number (line-buffer end-line)))
+            (start-line
+             (iter (for line initially end-line then prev)
+                   (for prev = (line-previous line))
+                   (let ((validp (< (oi::line-number line) level)))
+                     (finding line such-that (or validp (null prev)))))))
+       (unless (line-previous start-line)
+         (let ((tag (oi::make-tag :syntax-info (oi::empty-syntax-info))))
+           (setf (oi::%line-tag start-line) tag)
+           (setf (oi::tag-syntax-info tag) (oi::recompute-syntax-marks start-line tag)))
+         (setf start-line (line-next start-line)))
+       ;; Это только для начальной отладки! Потом выделять случай, когда что-то реально поменялось, и переделать в сообщение
+       (recompute-line-tags-starting-from-line-background start-line)
+       ))))
+
 
 (defun cl-boolean-to-tcl (x)
   "Returns 0 or 1 in numeric form"
