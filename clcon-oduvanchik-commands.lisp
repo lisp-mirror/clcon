@@ -22,33 +22,16 @@
      )
     ))
 
-(defun encode-marks-for-line (line stream &key line-number)
+(defun encode-marks-for-line (line exact-line-number stream)
   "{linenumber {charpos0 font0} {charpos1 font1} ...} 
   If we know line-number, we can pass it"
-  (let* ((marks (oi::line-marks line))
-         (any-mark (first marks))
-         (exact-line-number line-number)
-         (have-something nil)
-         )
-    (unless any-mark
-      (return-from encode-marks-for-line nil))
-    (unless exact-line-number
-      (setf exact-line-number
-            (+ (nth 1 (oi::mark-position any-mark)) 1))
-      (assert (= exact-line-number
-                 (oi::tag-line-number (oi::%line-tag line)))))
+  (let* ((marks (oi::line-marks line)))
+    (format stream "{~D " exact-line-number)
     (dolist (m (sort marks '< :key 'oi::mark-charpos))
       (typecase m
         (oi:font-mark
-         (cond
-           (have-something)
-           (t
-            (setf have-something t)
-            (format stream "{~D " exact-line-number)
-            ))            
          (format stream "{~D ~D} " (oi:mark-charpos m) (oi::font-mark-font m)))))
-    (when have-something 
-      (format stream "} "))
+    (format stream "} ")
     ))
 
 (defun numbered-line-of-buffer-by-clcon (clcon_text number)
