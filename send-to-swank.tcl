@@ -159,7 +159,7 @@ proc ::tkcon::SendEventToSwank {form continuation {MsgFmtKind 1} {ThreadDesignat
       }
     }
 
-    putd "About to send to SWANK: $cmd"
+    # putd "217901 About to send to SWANK: $cmd"
 
     
     set code [catch {puts -nonewline $sock $cmd ; flush $sock} result]

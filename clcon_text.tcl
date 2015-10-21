@@ -155,7 +155,7 @@ namespace eval ::clcon_text {
 
         method RememberEvent {script} {
             set q $options(-private_freezed_events_queue)
-            putd "444444 Remembering script $script"
+            # putd "444444 Remembering script $script"
             lappend q $script
             $self configure -private_freezed_events_queue $q
             #putd "[llength $q] events remembered]" 
@@ -227,7 +227,7 @@ namespace eval ::clcon_text {
                         set q [lrange $q 1 end]
                         $self configure -private_freezed_events_queue $q
                         if {$script ne {}} {
-                            putd "444444 Unfreeze: about to eval $script"
+                            # putd "444444 Unfreeze: about to eval $script"
                             catch {eval $script} code
                             if {$code ne {}} { putd "Error when unfreezing, will try to proceed: $code" }
                             # Check-the-world
@@ -269,9 +269,9 @@ namespace eval ::clcon_text {
             # only first buffer's command are sent to lisp so that
             # less mess oduvanchik's state
             # but it leads to freezing of other buffers!
-	    #if {[::edt::Bi2btext "buf1"] ne $clcon_text} {
-            #    return
-            #}
+	    if {[::edt::Bi2btext "buf1"] ne $clcon_text} {
+                return
+            }
 
             $clcon_text configure -send_to_lisp 1
             MaybeSendToLisp $clcon_text ConstructBackendBuffer {}
@@ -441,8 +441,8 @@ namespace eval ::clcon_text {
             {"if {[<<<<destination>>>> cget -private_freezed]} {
    <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>>}
  } else {
-   putd 444444
-   putd {<<<<OldEventBody>>>>}
+   # putd 444444
+   # putd {<<<<     OldEventBody      >>>>}
    <<<<OldEventBody>>>>
  }<<<<MaybeBreak>>>>"} 0]
         if {$(-add-break)} {
