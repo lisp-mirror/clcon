@@ -13,12 +13,10 @@
   (end-position 1) ; reserved
   )
 
-(defun filter-one-file (infile expr &key (mode :nocase))
-  "Mode can be :exact, :nocase, :regexp. Returns list of matches. Match is a list of three values: string, its number, "
+(defun filter-one-file-or-err (infile display-filename expr mode)
   (assert (eq mode :nocase) () "Only :nocase mode is supported")
   (with-open-file (in infile :direction :input)
     (do* ((result nil result)
-          (filename (namestring infile) filename)
           (line (read-line in nil nil) (read-line in nil nil))
           (line-number 1 (+ line-number 1))
           (position nil nil))
@@ -27,14 +25,31 @@
       (setf position (search expr line :test 'char-equal))    
       (when position
         (push (make-filter-match
-               :filename filename
+               :filename display-filename
                :line-number line-number
                :line line
                :start-position nil
-               ; when more than one match, we will have two matches,
-               ; loop complicates. Skip this for now.
+               ;; when more than one match, we will have two matches,
+               ;; loop complicates. Skip this for now.
                ) result)))))
 
+(defun filter-one-file (infile expr &key (mode :nocase))
+  "Mode can be :exact, :nocase, :regexp. Returns list of matches. Match is a list filter-match structures"
+  (let ((display-filename (namestring infile)))
+    (multiple-value-bind (matches error)
+        (ignore-errors
+          (filter-one-file-or-err infile display-filename expr mode))
+      (cond
+        (error
+         (list (make-filter-match
+                :filename display-filename
+                :line-number 1
+                :line (format nil "Error processing file: ~A" error)
+                :start-position nil)))
+        (t
+         matches))
+      )))
+  
 
 (defun clcon-sources ()
   "Returns an approximate list of clcon source files"
