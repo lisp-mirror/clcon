@@ -123,7 +123,8 @@
            (setf (oi::%line-tag start-line) tag)
            (setf (oi::tag-syntax-info tag) (oi::recompute-syntax-marks start-line tag)))
          (setf start-line (line-next start-line)))
-       (recompute-line-tags-starting-from-line-background start-line)
+       (when start-line
+         (recompute-line-tags-starting-from-line-background start-line))
        ))))
 
 
