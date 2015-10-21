@@ -22,10 +22,10 @@
      )
     ))
 
-(defun encode-marks-for-line (line exact-line-number stream)
+(defun encode-marks-for-line (syntax-info exact-line-number stream)
   "{linenumber {charpos0 font0} {charpos1 font1} ...} 
   If we know line-number, we can pass it"
-  (let* ((marks (oi::line-marks line)))
+  (let* ((marks (oi::sy-font-marks syntax-info)))
     (format stream "{~D " exact-line-number)
     (dolist (m (sort marks '< :key 'oi::mark-charpos))
       (typecase m
@@ -89,7 +89,7 @@
               (let* ((line-number (oi::tag-line-number (oi::%line-tag line)))
                      (encoded-marks
                       (with-output-to-string (ou)
-                        (encode-marks-for-line line line-number ou)))
+                        (encode-marks-for-line result line-number ou)))
                      (change-id (buffer-change-id buffer)))
                 (clco::notify-highlight-single-line 
                  clcon_text encoded-marks line-number change-id buffer)
@@ -188,3 +188,19 @@
     (do ((ll l (line-next ll)))
         ((null ll) count)
       (incf count (length (oi::line-marks ll))))))
+
+(defun check-all-lines-are-disjoint ()
+  (let* ((b (current-buffer))
+         (all-line-chars nil)
+         (m (buffer-start-mark b))
+         (l (mark-line m))
+         )
+    (do ((ll l (line-next ll)))
+        ((null ll)
+         nil
+         )
+      (push (oi::line-chars ll) all-line-chars))
+    (unless
+        (= (length all-line-chars)
+           (length (remove-duplicates all-line-chars)))
+      (print "Some line-chars coincide"))))
