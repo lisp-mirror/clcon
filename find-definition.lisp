@@ -101,7 +101,7 @@ and which is activated after showing message box. See also write-code-to-pass-to
          (l (length dspecs-and-locations)))
     (with-output-to-string (ou)
       (case l
-        (0 (print-just-line ou "No definitions found"))
+        (0 (print-just-line ou (format nil "No definitions found for ~A" text)))
         (t
          (when (> l 1)
            (write-code-to-show-console ou))
