@@ -72,13 +72,13 @@
        
     
 
-(defun dump-all-marks (clcon_text stream-designator)
-  (do ((s (odu::numbered-line-of-buffer-by-clcon clcon_text 1)
-          (oi::line-next s)
-          ))
-      ((null s) t)
-    (encode-marks-for-line s stream-designator)
-    ))
+;;(defun dump-all-marks (clcon_text stream-designator)
+;;  (do ((s (odu::numbered-line-of-buffer-by-clcon clcon_text 1)
+;;          (oi::line-next s)
+;;          ))
+;;      ((null s) t)
+;;    (encode-marks-for-line s stream-designator)
+;;    ))
 
 
 (defun buffer-change-id (buffer)
