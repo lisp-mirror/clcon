@@ -471,7 +471,7 @@ namespace eval ::clcon_text {
         }
     }
 
-    # UserContBody is a body of procedure to be called with two parameters: clcon_text and EventAsList. Beware UserContBody is called after unfreezing!
+    # UserContBody is a body of procedure to be called with two parameters: clcon_text and EventAsList. If supplied, it must call Unfreeze. 
     # OduvanchikFunctionNameAndArgs represents function from :oduvanchik home-package and its arguments, in a readable form. All packages to symbols must be specified. All string must be quoted with ::tkcon::QuoteTclStringForLisp. Subforms are not evaluated. Consider it as aquote list without outermost '()
     # Elements of list are passed to funcall. 
     # Options is a dict of options. Current known options are:
@@ -483,7 +483,7 @@ namespace eval ::clcon_text {
         }
         $clcon_text Freeze
         if {$UserContBody ne {}} {
-            set ContBody [subst -nocommand {$clcon_text Unfreeze; apply {{clcon_text EventAsList} $UserContBody} $clcon_text \$EventAsList}]
+            set ContBody [subst -nocommand {apply {{clcon_text EventAsList} $UserContBody} $clcon_text \$EventAsList}]
         } else {
             set ContBody [subst -nocommand {$clcon_text Unfreeze}]
         }

@@ -95,9 +95,11 @@ namespace eval ::edt {
             set code [::mprs::Unleash [lindex $l2 1]]
             set proc [subst -nocommand {{w} {$code}}]
             # tk_messageBox -message $proc
-            apply $proc [::tkcon::CurrentConsole] 
+            apply $proc [::tkcon::CurrentConsole]
+            $clcon_text Unfreeze
         } else {
             tk_messageBox -parent $clcon_text -message "FindSource command aborted"
+            $clcon_text Unfreeze
         }
           
     }
