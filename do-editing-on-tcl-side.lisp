@@ -83,7 +83,6 @@
   (line-buffer (mark-line mark)))
 
 (defmethod insert-string-with-clcon_text (mark string start end)
-  "When oi::*do-editing-on-tcl-side*, does all processing by itself. If processes request, returns t. Otherwise returns nil"
   (assert *do-editing-on-tcl-side*)
   (assert (= start 0))
   (assert (= end (length string)))
