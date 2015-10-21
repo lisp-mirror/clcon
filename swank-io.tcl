@@ -460,12 +460,15 @@ proc ::tkcon::SetupSwankConnection {channel console} {
 
 proc ::tkcon::DisconnectFromSwank {} {
     variable PRIV
+    variable ::mprs::ContinuationsDict 
     set name $::swcnn::CurrentSwankConnection
     if {$name eq {}} {
         error "::tkcon::DisconnectFromSwank: disconnected already"
     }
     set ::swcnn::CurrentSwankConnection {}
+    set ContinuationsDict [dict create]
     ::swcnn::TerminateConnection $name
+    ::edt::OduvanchikDisconnected
     Prompt
 }             
 
