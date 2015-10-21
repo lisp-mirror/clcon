@@ -95,7 +95,7 @@
                  clcon_text encoded-marks line-number change-id buffer)
                 )
               )))))
-    result))
+    (values result recomputed)))
 
 
 (defun recompute-line-tags-starting-from-line-background (start-line)
