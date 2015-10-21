@@ -102,7 +102,6 @@
   (iter (for line initially start-line then (line-next line))
         (while line)
         (oi::recompute-line-tag line)
-        ;;(until (eq line end-line)) ; это наше отличие
         ))
   
 (defmethod oi::recompute-tags-up-to :around (end-line background)
@@ -122,7 +121,6 @@
            (setf (oi::%line-tag start-line) tag)
            (setf (oi::tag-syntax-info tag) (oi::recompute-syntax-marks start-line tag)))
          (setf start-line (line-next start-line)))
-       ;; Это только для начальной отладки! Потом выделять случай, когда что-то реально поменялось, и переделать в сообщение
        (recompute-line-tags-starting-from-line-background start-line)
        ))))
 

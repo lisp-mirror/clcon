@@ -1,5 +1,5 @@
 # sending text commands to oduvanchik
-# See also text2odu.lisp, clcon_text.tcl
+# See also text2odu-from-tcl-to-queue.lisp , clcon_text.tcl
 
 namespace eval ::text2odu {
 
