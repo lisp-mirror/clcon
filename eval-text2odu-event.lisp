@@ -231,9 +231,14 @@
        (clco::call-oduvanchik-function-with-clcon_text
         (eval-call-oduvanchik-function-with-clcon_text e))
        ))))
-     
+
+(defun assert-we-are-in-oduvanchik-thread ()
+  (assert (string= 
+           (bt:thread-name (bt:current-thread))
+           "Oduvanchik")))
 
 (defun eval-pending-text2odu-events (&key (hang t))
+  (assert-we-are-in-oduvanchik-thread)
   (loop
      (let ((e (clco-oduvanchik-key-bindings::text2odu-dispatcher-to-editor-queue-pop :hang hang)))
        (cond
