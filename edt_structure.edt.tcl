@@ -326,6 +326,16 @@ namespace eval ::edt {
         return [cW]
     }
 
+    # Is called when we determine that oduvanchik disconnected
+    proc OduvanchikDisconnected {} {
+        variable EditorMRUWinList
+        foreach p $EditorMRUWinList {
+            set Bi [dict get $p "Bi"]
+            set btext [Bi2btext $Bi]
+            catch { ::clcon_text::OduvanchikDisconnected_clcon_text $btext } 
+        }            
+    }
+
     
     InitEditorWindowLists
 
