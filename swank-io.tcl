@@ -379,13 +379,14 @@ proc ::tkcon::SwankReadMessageFromStream {stream} {
 
 ## from swank-protocol::read-message-string
 proc ::tkcon::SwankReadMessageString {} {
+    variable ::swcnn::CurrentSwankConnection
     variable PRIV
 
-    if {$::swcnn::CurrentSwankConnection eq {}} {
+    if {$CurrentSwankConnection eq {}} {
         error "Attempt to read from closed connection"
     }
 
-    upvar \#0 $::swcnn::CurrentSwankConnection con
+    upvar \#0 $CurrentSwankConnection con
 
     
     set channel $con(sock)

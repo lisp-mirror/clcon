@@ -1,17 +1,20 @@
 ## Swank connection object
 
 namespace eval ::swcnn {
-    variable SwankConnectionCounter 
-    if {![info exists SwankConnectionCounter]} {
-        set SwankConnectionCounter 0
-    }
+    defvar SwankConnectionCounter 0
 
     # name of connection
-    variable CurrentSwankConnection 
-    if {![info exists CurrentSwankConnection]} {
-        set CurrentSwankConnection {}
-    }
+    defvar CurrentSwankConnection {}
 
+    proc SwankConnectedP {} {
+        variable CurrentSwankConnection
+        if {$CurrentSwankConnection eq {}} {
+            return 0
+        } else {
+            return 1
+        }
+    }
+    
     proc GenSwankConnectionCounter {} {
         variable SwankConnectionCounter
         
