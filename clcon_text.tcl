@@ -180,6 +180,9 @@ namespace eval ::clcon_text {
         
         method Unfreeze {} {
             #putd "Entering Unfreeze"
+            if {!$options(-send_to_lisp)} {
+                return
+            }
             set pfl -private_freeze_level
             switch -exact $options($pfl) {
                 0 { putd "Unfreeze: error - must be freezed" }
@@ -197,6 +200,9 @@ namespace eval ::clcon_text {
 
         method ContinueUnfreeze {} {
             #putd "Entering ContinueUnfreeze"
+            if {!$options(-send_to_lisp)} {
+                return
+            }
             set pfl -private_freeze_level
             set current_freezed_state $options(-private_freezed)
             if {$options($pfl)>1} {
@@ -224,6 +230,10 @@ namespace eval ::clcon_text {
                             putd "444444 Unfreeze: about to eval $script"
                             catch {eval $script} code
                             if {$code ne {}} { putd "Error when unfreezing, will try to proceed: $code" }
+                            # Check-the-world
+                            if {!$options(-send_to_lisp)} {
+                                return
+                            }
                         }
                         #putd "Now will shedule ContinueUnfreeze"
                         after 50 event generate $win <<ContinueUnfreeze>>
@@ -501,6 +511,19 @@ namespace eval ::clcon_text {
     #     return {}
     # }
 
+    # Oduvanchik is disconnected. Special care must be taken in the
+    # case we have unfreezing processing on stack.
+    proc OduvanchikDisconnected_clcon_text {clcon_text} {
+        $clcon_text configure                          \
+            -send_to_lisp 0                            \
+            -private_freezed 0                         \
+            -private_freeze_level 0                    \
+            -private_freezed_events_queue [list]       \
+            -private_pending_sent_modifications 0      \
+            -private_pending_far_tcl_continuations 0
+    }
+
+    
     # InitOneBindingOfFreezableText <Key-Return>
     InitBindingsOfFreezableText
 }
