@@ -259,7 +259,11 @@ namespace eval ::clcon_text {
     
     proc ConstructBackendBuffer {clcon_text} {
         variable ::tkcon::OPT
-        if $::tkcon::OPT(oduvan-backend) {
+
+        # If we want oduvan-backend, but there is no connection,
+        # We won't try to communicate to lisp.
+        # If later we connect to swank, the buffer will remain lame. 
+        if {$::tkcon::OPT(oduvan-backend) && [::swcnn::SwankConnectedP]} {
 
             # this can be uncommented for debugging of the editor.
             # only first buffer's command are sent to lisp so that
@@ -489,7 +493,7 @@ namespace eval ::clcon_text {
     proc CallOduvanchikFunction {clcon_text OduvanchikFunctionNameAndArgs {UserContBody {}} {Options {}}} {
         variable ::tkcon::OPT
         if {![$clcon_text UsesLispP]} {
-            error "Unable to call oduvanchik functions with oduvan-backend disabled"
+            error "Unable to call oduvanchik functions with oduvan-backend disabled (for this buffer)"
         }
         $clcon_text Freeze
         if {$UserContBody ne {}} {
