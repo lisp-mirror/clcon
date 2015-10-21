@@ -69,7 +69,7 @@
   )
 
 (defun notify-highlight-single-line (clcon_text-pathname encoded-marks line-no change-id buffer)
-  "See also eval-highlight-single-line"
+  "See also clco::eval-highlight-single-line"
   (assert (equal clcon_text-pathname (oi::buffer-to-clcon_text buffer)))
   (post-highlight-event
    (make-highlight-event

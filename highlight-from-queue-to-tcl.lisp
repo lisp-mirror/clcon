@@ -19,6 +19,7 @@
 
 
 (defun eval-highlight-single-line (e)
+  "See also clco::notify-highlight-single-line"
   (let* ((cmd (format nil "::edt::ApplyHighlightToLine ~A ~A"
                       (highlight-event-clcon_text-pathname e)
                       (--> e string))
