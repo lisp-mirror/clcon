@@ -46,7 +46,6 @@
      (delete-region oduvanchik-internals::*internal-temp-region*)
      t)))
 
-
 (defun eval-before-tcl-text-insert (e)
   "See clco::nti"  
   (etypecase e
@@ -208,8 +207,20 @@
         ;; known functions are indent-new-line-command and new-line-command
         (swank::eval-for-emacs `(call-oduvanchik-fn-internal ',fn-funcall-list ',options ',clcon_text ',buffer) :common-lisp-user cont)
         
-        nil
+        nil ; real return is done via continuations machinery
         ))))
+
+(defun eval-order-call-oduvanchik-from-itself (e)
+  "See clco::order-call-oduvanchik-from-itself"
+  (let* ((fn-funcall-list (clco::text2odu-event-fn-and-args e))
+         (fn (car fn-funcall-list)))
+    (assert (and
+             (eq (symbol-package fn) (find-package :oduvanchik)) ; security limitation
+             (fboundp fn)) () "Symbol ~S funbound or have home-package different from :oduvanchik" fn)
+    (apply #'funcall fn-funcall-list))
+  nil ; nowhere to return
+  )
+
 
 ; for single chars, use (oduvanchik-ext:char-key-event #\x)
 (defun eval-text2odu-event (e)
@@ -233,6 +244,8 @@
         )
        (clco::call-oduvanchik-function-with-clcon_text
         (eval-call-oduvanchik-function-with-clcon_text e))
+       (clco::call-oduvanchik-from-itself
+        (eval-order-call-oduvanchik-from-itself e))
        ))))
 
 (defun assert-we-are-in-oduvanchik-thread ()

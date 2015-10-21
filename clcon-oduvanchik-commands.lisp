@@ -99,10 +99,12 @@
 
 
 (defun recompute-line-tags-starting-from-line-background (start-line)
-  (iter (for line initially start-line then (line-next line))
-        (while line)
-        (oi::recompute-line-tag line)
-        ))
+  (assert-we-are-in-oduvanchik-thread)
+  (oi::recompute-line-tag start-line)
+  (let ((next (oi::line-next start-line)))
+    (when next
+      (clco::order-call-oduvanchik-from-itself
+       (list 'recompute-line-tags-starting-from-line-background next)))))
   
 (defmethod oi::recompute-tags-up-to :around (end-line background)
   "We always recompute everything to the end of file. end-line is required to know buffer only"

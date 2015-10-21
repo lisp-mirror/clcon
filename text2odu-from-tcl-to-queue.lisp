@@ -46,6 +46,10 @@
     ;; sync insertion points, bind *oduvanchik-backend* to t so that all
     ;; editions are sent synchronously to tcl instead of local processing in oduvanchik
     call-oduvanchik-function-with-clcon_text ; particular case of eval-oduvanchik-command just for one command
+
+    ;; this event originates from oduvanchik itself, but we want it was processed as it come from the outside, so we have no internal oduvanchik's functions on the stack. Data is
+    ;; contained in fn-and-args field.
+    call-oduvanchik-from-itself
     ))
 
 (defstruct row-col
@@ -154,6 +158,16 @@
     :kind 'destroy-backend-buffer
     :clcon_text-pathname clcon_text-pathname
     :swank-connection swank::*emacs-connection*
+    )))
+
+
+(defun order-call-oduvanchik-from-itself (fn-and-args)
+  "See oduvanchik::eval-order-call-oduvanchik-from-itself"
+  (post-oduvan-event
+   (make-text2odu-event
+    :kind 'call-oduvanchik-from-itself
+    ; copy it just in case it is stack-allocated
+    :fn-and-args (copy-list fn-and-args) 
     )))
 
 
