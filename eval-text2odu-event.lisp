@@ -1,5 +1,6 @@
 ;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
 ;; evaluation of text2odu events. Takes place in editor thread.
+;; see doc/text2odu.md
 (in-package :oduvanchik)
 
 
@@ -47,6 +48,7 @@
 
 
 (defun eval-before-tcl-text-insert (e)
+  "See clco::nti"  
   (etypecase e
     (clcon-server::text2odu-event
      (let* ((clcon_text (clcon-server::text2odu-event-clcon_text-pathname e))
@@ -61,6 +63,7 @@
   )
 
 (defun eval-before-tcl-text-delete (e)
+  "See clco::notify-oduvan-tcl-text-delete"
   (etypecase e
     (clcon-server::text2odu-event
      (let* ((ebeg (clcon-server::text2odu-event-beg e))

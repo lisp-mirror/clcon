@@ -64,9 +64,9 @@ FIXME правильно ли, что мы устанавливаем insert в 
 
 
 ```
-clcon_text.tcl -> swank-io.tcl -> text2odu-from-tcl-to-queue.lisp(*text2odu-event-queue*)->
+../clcon_text.tcl -> ../swank-io.tcl -> ../text2odu-from-tcl-to-queue.lisp (*text2odu-event-queue*)->
 
-text2odu-dispatch-to-oduvan.lisp(тред диспетчера в функции clco::text2odu-dispatcher-thread-function
+../text2odu-dispatch-to-oduvan.lisp (тред диспетчера в функции clco::text2odu-dispatcher-thread-function
              перекладывает события в очередь *text2odu-dispatcher-to-editor-queue*
              и подсовывает событие нажатия клавиши F8 или другой кнопки в очередь входных событий одуванчика - clco::podsunutq-event
              )
