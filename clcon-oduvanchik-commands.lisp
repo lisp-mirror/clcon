@@ -14,6 +14,7 @@
 (defcommand "Sync Cursor" (p)
     "Debug-time command to sync cursor. There were no need to make it a command"
     "Does nothing but printing current cursor position. The rely upon the fact that clco::call-oduvanchik-function-with-clcon_text syncs cursor of backend buffer with that of clcon_text"
+  (oduvan-invisible-maybe-highlight-open-parens) ; just experiment... 
   (multiple-value-bind (row col)
       (oi::mark-row-and-col (current-point))
     (clco:eval-in-tcl
@@ -22,15 +23,61 @@
      )
     ))
 
+
+(defun oduvan-invisible-kill-open-paren-font-marks ()
+  "Rework of kill-open-paren-font-marks"
+  (when *open-paren-font-marks*
+    (let* ((start (region-start *open-paren-font-marks*))
+           (end (region-end *open-paren-font-marks*))
+           (lines (mapcar #'mark-line (list start end)))
+           (economy-lines (remove-duplicates lines)))
+      (delete-font-mark start)
+      (delete-font-mark end)
+      (setf *open-paren-font-marks* nil)
+      (dolist (line economy-lines)
+        (oi::maybe-send-line-highlight-to-clcon line)))))      
+
+
+(defun oduvan-invisible-maybe-highlight-open-parens ()
+  "Rework of odu::maybe-highlight-open-parens. Works in the current buffer"
+  (when (value highlight-open-parens)
+    (multiple-value-bind (start end)
+        (funcall (value open-paren-finder-function)
+                 (current-point))
+      (cond
+        ((and start end)
+         (oduvan-invisible-kill-open-paren-font-marks)
+         (set-open-paren-font-marks start end)
+         (let* ((lines (mapcar #'mark-line (list start end)))
+                (economy-lines (remove-duplicates lines)))
+           (dolist (line economy-lines)
+             (oi::maybe-send-line-highlight-to-clcon line))))
+        (t
+         (oduvan-invisible-kill-open-paren-font-marks)
+         )))))
+
+
+(defun line-effective-marks (line)
+  "Marks of the line plus marks of odu::*open-paren-font-marks*. We assume we have fresh %line-tag"
+  (let* ((tag (oi::%line-tag line))
+         (syntax-info (oi::tag-syntax-info tag))
+         (marks ; this worked (oi::sy-font-marks syntax-info)
+          (oi::line-marks line) ; this ceased to work before. 
+           )
+         (sorted-marks (sort marks '< :key 'oi::mark-charpos)))
+    (declare (ignorable syntax-info))
+    sorted-marks
+    ))
+
 (defun encode-marks-for-line (line stream)
   "{linenumber {charpos0 font0} {charpos1 font1} ...} 
   If we know line-number, we can pass it. We believe that line-tag is fresh - for now it it true for all calls"
   (let* ((tag (oi::%line-tag line))
-       (syntax-info (oi::tag-syntax-info tag))
+       ;(syntax-info (oi::tag-syntax-info tag))
        (exact-line-number (oi::tag-line-number tag))
-       (marks (oi::sy-font-marks syntax-info)))
+       (sorted-marks (line-effective-marks line)))
     (format stream "{~D " exact-line-number)
-    (dolist (m (sort marks '< :key 'oi::mark-charpos))
+    (dolist (m sorted-marks)
       (typecase m
         (oi:font-mark
          (format stream "{~D ~D} " (oi:mark-charpos m) (oi::font-mark-font m)))))
@@ -76,8 +123,9 @@
 
 
 (defmethod oi::maybe-send-line-highlight-to-clcon :around (line)
-  "We assume that %line-tag was calculated just now, so it is fresh and ready for use. 
-Next method is dummy, we don't call it"
+  "If we have highlight enabled in features, send it to clcon. 
+   We assume that %line-tag is fresh and ready for use. 
+   next-method is dummy, we don't call it"
   #-oduvan-enable-highlight
   (declare (ignore line))
   #+oduvan-enable-highlight
