@@ -71,30 +71,35 @@
     "
     (oi::buffer-modified-tick buffer))
 
+(defun maybe-send-line-highlight-to-clcon (line tag)
+  #-oduvan-enable-highlight
+  (declare (ignore line tag))
+  #+oduvan-enable-highlight
+  (let* ((buffer (line-buffer line)))
+    (when (bufferp buffer)
+      (let* ((clcon_text (oi::buffer-to-clcon_text buffer))
+             (connection (and clcon_text
+                              ;; if not, this is not clcon_text backend buffer
+                              (oduvanchik-interface:variable-value
+                               'odu::swank-connection ;"Swank Connection"
+                               :buffer buffer))
+               ))
+        (when (and clcon_text connection)
+          (let* ((line-number (oi::tag-line-number (oi::%line-tag line)))
+                 (encoded-marks
+                  (with-output-to-string (ou)
+                    (encode-marks-for-line result line-number ou)))
+                 (change-id (buffer-change-id buffer)))
+            (clco::notify-highlight-single-line 
+             clcon_text encoded-marks line-number change-id buffer)
+            )
+          )))))
+
 (defmethod oi::recompute-syntax-marks :around (line tag)
   (multiple-value-bind (result recomputed)
       (call-next-method)
     (when recomputed
-      #+oduvan-enable-highlight
-      (let* ((buffer (line-buffer line)))
-        (when (bufferp buffer)
-          (let* ((clcon_text (oi::buffer-to-clcon_text buffer))
-                 (connection (and clcon_text
-                                        ; if not, this is not clcon_text backend buffer
-                                  (oduvanchik-interface:variable-value
-                                   'odu::swank-connection ;"Swank Connection"
-                                   :buffer buffer))
-                   ))
-            (when (and clcon_text connection)
-              (let* ((line-number (oi::tag-line-number (oi::%line-tag line)))
-                     (encoded-marks
-                      (with-output-to-string (ou)
-                        (encode-marks-for-line result line-number ou)))
-                     (change-id (buffer-change-id buffer)))
-                (clco::notify-highlight-single-line 
-                 clcon_text encoded-marks line-number change-id buffer)
-                )
-              )))))
+      (maybe-send-line-highlight-to-clcon line tag))
     (values result recomputed)))
 
 
