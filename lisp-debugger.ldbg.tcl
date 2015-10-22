@@ -12,7 +12,7 @@ namespace eval ::ldbg {
     variable Restarts
 
     # we try to keep this var 1 when debugger is active and 0 when it is inactive
-    variable InTheDebugger 1
+    variable InTheDebugger 0
     # stepper mode is 1 when we are in stepper
     variable StepperMode 0
     
