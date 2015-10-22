@@ -436,7 +436,7 @@ namespace eval ::ldbg {
             # In a stepper mode, show source immediately
             CellCmd 0 RowDblClick
         } else {
-            focus $tbl
+            focus [$tbl bodypath]
         }
         
         return

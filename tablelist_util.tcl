@@ -12,11 +12,7 @@ namespace eval ::tablelist_util {
     }
 
     proc TreeSetTo {tbl index} {
-        $tbl selection clear 0 end
-        $tbl selection set $index $index
-        $tbl selection anchor $index
-        $tbl activate $index
-        $tbl see $index
+        GotoIndex $tbl $index
     }
 
 
