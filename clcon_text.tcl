@@ -269,9 +269,9 @@ namespace eval ::clcon_text {
             # only first buffer's command are sent to lisp so that
             # less mess oduvanchik's state
             # but it leads to freezing of other buffers!
-	    if {[::edt::Bi2btext "buf1"] ne $clcon_text} {
-                return
-            }
+	    #if {[::edt::Bi2btext "buf1"] ne $clcon_text} {
+            #    return
+            #}
 
             $clcon_text configure -send_to_lisp 1
             MaybeSendToLisp $clcon_text ConstructBackendBuffer {}
