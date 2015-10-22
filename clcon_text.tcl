@@ -95,6 +95,7 @@ namespace eval ::clcon_text {
             set w [$self RealText]
             set CurrentBindTags [bindtags $w]
             set NewBindTags [SubstituteSingleValueInListVarKeyEq CurrentBindTags Text FreezableText]
+            # set NewBindTags2 [lappend $NewBindTags TextTrackCursor]
             bindtags $win $NewBindTags
             bindtags $w $NewBindTags
             bind $win <<ContinueUnfreeze>> "$self Unfreeze"
@@ -134,7 +135,7 @@ namespace eval ::clcon_text {
             set result [$hull replace {*}$args]
             return $result
         }
-
+        
         # NSL stands for "not send to lisp". Especially for oduvanchik commands which
         # do text editings, see do-editing-on-tcl-side.lisp
         method RoInsertNSL {args} {
@@ -146,12 +147,12 @@ namespace eval ::clcon_text {
             $hull delete {*}$args
         }
         # It looks like we don't need Replace at all
-
+        
         method UsesLispP {} {
             variable ::tkcon::OPT
             return [expr {$OPT(oduvan-backend) && [$self cget -send_to_lisp]}]
         }
-
+        
         method RememberEvent {script} {
             set q $options(-private_freezed_events_queue)
             # putd "444444 Remembering script $script"
@@ -338,6 +339,17 @@ namespace eval ::clcon_text {
         # This is a temporary solution. This is a separate option indeed
         set qId [lq $clcon_text]
         switch -exact $type {
+            n { 
+                if {![$clcon_text UsesLispP]} {
+                    return
+                }
+                # When unfreezing, we send it. Or I'm brain-damaged.
+                if {[$clcon_text cget -private_freezed] == 1} {
+                    return
+                }
+                set qIndex [::text2odu::CoerceIndex $clcon_text insert]
+                set lispCmd "(clco:ncm $qId $qIndex)"
+            }
             i {
                 if {![$clcon_text UsesLispP]} {
                     return
@@ -434,25 +446,33 @@ namespace eval ::clcon_text {
     # it is protected with namespace prefix.
     # If you need continue, add another named arg.
     proc WrapEventScriptForFreezedText {script args} {
-        named_args $args {-destination "%W" -add-break 0}
+        named_args $args {-destination "%W" -add-break 0 -note-cursor-motion 1}
         CheckIfScriptDoesNotContainBreakContinueOrReturn $script 
         set Template [lindex \
             {"if {[<<<<destination>>>> cget -private_freezed]} {
-   <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>>}
+   <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>><<<<NoteCursorMotion>>>>}
  } else {
    # putd 444444
    # putd {<<<<     OldEventBody      >>>>}
-   <<<<OldEventBody>>>>
- }<<<<MaybeBreak>>>>"} 0]
+   <<<<OldEventBody>>>><<<<NoteCursorMotion>>>>
+ }"} 0]
+        if {$(-note-cursor-motion)} {
+            set NoteCursorMotion  "
+ ::clcon_text::tncm %W"
+        } else {
+            set NoteCursorMotion ""
+        }        
         if {$(-add-break)} {
             set MaybeBreak " 
  break"
         } else {
             set MaybeBreak ""
         }
-        set t1 [regsub -all <<<<OldEventBody>>>> $Template $script]
+        set t0 [regsub -all <<<<NoteCursorMotion>>>> $Template $NoteCursorMotion]
+        set t1 [regsub -all <<<<OldEventBody>>>> $t0 $script]
         set t2 [regsub -all <<<<destination>>>> $t1 $(-destination)]
         set t3 [regsub -all <<<<MaybeBreak>>>> $t2 $MaybeBreak]
+        puts stderr "WrapEventScriptForFreezedText234324: $t3"
         return $t3
     }
 
@@ -475,6 +495,7 @@ namespace eval ::clcon_text {
         }
         return
     }
+
 
     proc SubstituteSingleValueInListVarKeyEq {listVariable old new} {
         upvar 1 $listVariable var
@@ -502,6 +523,12 @@ namespace eval ::clcon_text {
         }
         showVarPutd ContBody
         MaybeSendToLisp $clcon_text CallOduvanchikFunction [list $OduvanchikFunctionNameAndArgs $Options] $ContBody
+    }
+
+
+    proc tncm {clcon_text_dot_t} {
+        set clcon_text [::edt::text2btext $clcon_text_dot_t]
+        MaybeSendToLisp $clcon_text n {}
     }
 
     # # To be called from oi::delete-region

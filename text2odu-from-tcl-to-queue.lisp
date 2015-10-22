@@ -109,7 +109,7 @@
   )
 
 (defun notify-oduvan-construct-backend-buffer (clcon_text-pathname)
-  "Called from tcl when text is created, from arbitrary thread. See also oduvanchik::eval-construct-backend-buffer"
+  "Called from tcl when text is created, from arbitrary thread. See also oduvanchik::eval-construct-backend-buffer; ::clcon_text::MaybeSendToLisp"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'construct-backend-buffer
@@ -118,7 +118,7 @@
     )))
 
 (defun ncm (clcon_text-pathname pos)
-  "notify-oduvan-cursor-moved. See oduvanchik::eval-notify-oduvan-cursor-moved"
+  "notify-oduvan-cursor-moved. See oduvanchik::eval-notify-oduvan-cursor-moved, ::clcon_text::MaybeSendToLisp"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'cursor-moved
@@ -128,7 +128,7 @@
     )))
 
 (defun nti  (clcon_text-pathname index string)
-  "notify-oduvan-tcl-text-insert . Called from RoInsert. See oduvanchik::eval-before-tcl-text-insert"
+  "notify-oduvan-tcl-text-insert . Called from RoInsert. See oduvanchik::eval-before-tcl-text-insert, ::clcon_text::MaybeSendToLisp"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'before-tcl-text-insert
@@ -139,7 +139,7 @@
     )))
 
 (defun call-oduvanchik-function-with-clcon_text (clcon_text-pathname insert-index far_tcl_cont_id oduvanchik-function-name-and-args options)
-  "Send call-oduvanchik-function-with-clcon_text event to oduvanchik. See oduvanchik::eval-call-oduvanchik-function-with-clcon_text"
+  "Send call-oduvanchik-function-with-clcon_text event to oduvanchik. See oduvanchik::eval-call-oduvanchik-function-with-clcon_text, ::clcon_text::MaybeSendToLisp"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'call-oduvanchik-function-with-clcon_text
@@ -152,7 +152,7 @@
     )))
 
 (defun notify-oduvan-tcl-text-delete (clcon_text-pathname beg end)
-  "Called from RoDelete before really deleting text"
+  "Called from RoDelete before really deleting text, see ::clcon_text::MaybeSendToLisp"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'before-tcl-text-delete
@@ -164,7 +164,7 @@
 
 
 (defun notify-oduvan-destroy-backend-buffer (clcon_text-pathname)
-  "Called from RoInsert"
+  "Called from RoInsert. See also ::clcon_text::MaybeSendToLisp"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'destroy-backend-buffer
@@ -174,7 +174,7 @@
 
 
 (defun order-call-oduvanchik-from-itself (fn-and-args)
-  "See oduvanchik::eval-order-call-oduvanchik-from-itself"
+  "See oduvanchik::eval-order-call-oduvanchik-from-itself. Called from lisp only"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'call-oduvanchik-from-itself
