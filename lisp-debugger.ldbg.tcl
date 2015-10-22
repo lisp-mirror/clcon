@@ -660,7 +660,24 @@ namespace eval ::ldbg {
         # We keep window so that it could recall its size and position.
         wm withdraw $MainWindow
     }
-    
+
+# Example of successful return from frame:
+# (:emacs-rex
+#  (swank:sldb-return-from-frame 8 "nil")
+#  "COMMON-LISP-USER" 10 23)
+# (:return
+#  (:abort "nil")
+#  23)
+# (:debug-return 10 1 nil)
+
+# Example of unsuccessful one:
+#    (:emacs-rex
+# (swank:sldb-return-from-frame 0 "3")
+# "COMMON-LISP-USER" 1 8)
+#(:return
+# (:ok "(\"Cannot return from frame: #<sb-di::compiled-frame sb-kernel::integer-/-integer, interrupted>\")")
+# 8)
+
     proc ReturnFromFrame {RowName} {
         variable MainWindow
         set FrameNo [RowNameToFrameNo $RowName]
@@ -676,10 +693,30 @@ namespace eval ::ldbg {
         set qCode [::tkcon::QuoteLispObjToString $code]
         ::tkcon::EvalInSwankAsync \
             "(swank:sldb-return-from-frame $FrameNo $qCode)" \
-            {} $thread
-        ::ldbg::CloseDebuggerWindow $MainWindow
+            {::ldbg::ReturnFromFrameC1 $EventAsList} $thread
     }
 
+    proc ReturnFromFrameC1 {EventAsList} {
+        variable MainWindow
+        set EventHead [lindex $EventAsList 0]
+        if { $EventHead ne {:return} } {
+            puts stderr "Something wrong: in SWANK reply we expected :return, but get $EventHead"
+        }
+        set SwankReply [::mprs::Unleash [lindex $EventAsList 1]]
+        set HeadSwankReply [lindex $SwankReply 0]
+        switch -exact $HeadSwankReply {
+            ":ok" { 
+                set message [::mprs::Unleash [lindex $SwankReply 1]]
+                puts stderr $message
+                ::tkcon::FocusConsole
+            }
+            ":abort" {
+                ::ldbg::CloseDebuggerWindow $MainWindow
+            }
+        }
+    }
+
+    
 #(:emacs-rex
 #  (swank:frame-package-name 0)
 #  "COMMON-LISP-USER" 11 24)
