@@ -22,10 +22,13 @@
      )
     ))
 
-(defun encode-marks-for-line (syntax-info exact-line-number stream)
+(defun encode-marks-for-line (line stream)
   "{linenumber {charpos0 font0} {charpos1 font1} ...} 
-  If we know line-number, we can pass it"
-  (let* ((marks (oi::sy-font-marks syntax-info)))
+  If we know line-number, we can pass it. We believe that line-tag is fresh - for now it it true for all calls"
+  (let* ((tag (oi::%line-tag line))
+       (syntax-info (oi::tag-syntax-info tag))
+       (exact-line-number (oi::tag-line-number tag))
+       (marks (oi::sy-font-marks syntax-info)))
     (format stream "{~D " exact-line-number)
     (dolist (m (sort marks '< :key 'oi::mark-charpos))
       (typecase m
@@ -71,6 +74,7 @@
     "
     (oi::buffer-modified-tick buffer))
 
+
 (defmethod oi::maybe-send-line-highlight-to-clcon :around (line)
   "We assume that %line-tag was calculated just now, so it is fresh and ready for use. 
 Next method is dummy, we don't call it"
@@ -82,6 +86,7 @@ Next method is dummy, we don't call it"
     (t 
      (let* ((buffer (line-buffer line))
             (tag (oi::%line-tag line))
+            (line-number (oi::tag-line-number tag))
             (sy (oi::tag-syntax-info tag)))
        (assert sy)
        (when (bufferp buffer)
@@ -93,14 +98,13 @@ Next method is dummy, we don't call it"
                                   :buffer buffer))
                   ))
            (when (and clcon_text connection)
-             (let* ((line-number (oi::tag-line-number tag))
-                    (encoded-marks
+             (let* ((encoded-marks
                      (with-output-to-string (ou)
-                       (encode-marks-for-line sy line-number ou)))
+                       (encode-marks-for-line line ou)))
                     (change-id (buffer-change-id buffer)))
                (clco::notify-highlight-single-line 
                 clcon_text encoded-marks line-number change-id buffer)
-            )
+               )
              )))))))
 
 (defun recompute-line-tags-starting-from-line-background (start-line)
