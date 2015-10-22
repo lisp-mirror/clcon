@@ -50,6 +50,8 @@
     ;; this event originates from oduvanchik itself, but we want it was processed as it come from the outside, so we have no internal oduvanchik's functions on the stack. Data is
     ;; contained in fn-and-args field.
     call-oduvanchik-from-itself
+    ;; special message when cursor moved
+    cursor-moved 
     ))
 
 (defstruct row-col
@@ -112,6 +114,16 @@
    (make-text2odu-event
     :kind 'construct-backend-buffer
     :clcon_text-pathname clcon_text-pathname
+    :swank-connection swank::*emacs-connection*
+    )))
+
+(defun ncm (clcon_text-pathname pos)
+  "notify-oduvan-cursor-moved. See oduvanchik::eval-notify-oduvan-cursor-moved"
+  (post-oduvan-event
+   (make-text2odu-event
+    :kind 'cursor-moved
+    :clcon_text-pathname clcon_text-pathname
+    :beg (parse-row-col pos)
     :swank-connection swank::*emacs-connection*
     )))
 

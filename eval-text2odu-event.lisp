@@ -46,6 +46,19 @@
      (delete-region oduvanchik-internals::*internal-temp-region*)
      t)))
 
+(defun eval-notify-oduvan-cursor-moved (e)
+  "Cursor moved. See clco::ncm"
+  (etypecase e
+    (clcon-server::text2odu-event
+     (let* ((clcon_text (clcon-server::text2odu-event-clcon_text-pathname e))
+            (buffer (oi::clcon_text-to-buffer clcon_text)))
+       (assert buffer)
+       (use-buffer buffer 
+         (with-mark-in-row-col (cursor-point (clcon-server::text2odu-event-beg e))
+           (move-mark (current-point) cursor-point)
+           )))))
+  nil)
+
 (defun eval-before-tcl-text-insert (e)
   "See clco::nti"  
   (etypecase e
@@ -228,14 +241,16 @@
   (etypecase e
     (clcon-server::text2odu-event
      (ecase (clco::text2odu-event-kind e)
-       (clco::construct-backend-buffer
-        (eval-construct-backend-buffer e))
+       (clco::cursor-moved
+        (eval-notify-oduvan-cursor-moved e))
        (clco::before-tcl-text-insert
         (eval-before-tcl-text-insert e))
        (clco::before-tcl-text-delete
         (eval-before-tcl-text-delete e)
         ; (warn "ignoring before-tcl-text-delete event")
         )
+       (clco::construct-backend-buffer
+        (eval-construct-backend-buffer e))
        (clco::destroy-backend-buffer
         (eval-destroy-backend-buffer e)
         )
