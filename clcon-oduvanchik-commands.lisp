@@ -71,37 +71,37 @@
     "
     (oi::buffer-modified-tick buffer))
 
-(defun maybe-send-line-highlight-to-clcon (line tag)
+(defmethod oi::maybe-send-line-highlight-to-clcon :around (line)
+  "We assume that %line-tag was calculated just now, so it is fresh and ready for use. 
+Next method is dummy, we don't call it"
   #-oduvan-enable-highlight
-  (declare (ignore line tag))
+  (declare (ignore line))
   #+oduvan-enable-highlight
-  (let* ((buffer (line-buffer line)))
-    (when (bufferp buffer)
-      (let* ((clcon_text (oi::buffer-to-clcon_text buffer))
-             (connection (and clcon_text
-                              ;; if not, this is not clcon_text backend buffer
-                              (oduvanchik-interface:variable-value
-                               'odu::swank-connection ;"Swank Connection"
-                               :buffer buffer))
-               ))
-        (when (and clcon_text connection)
-          (let* ((line-number (oi::tag-line-number (oi::%line-tag line)))
-                 (encoded-marks
-                  (with-output-to-string (ou)
-                    (encode-marks-for-line result line-number ou)))
-                 (change-id (buffer-change-id buffer)))
-            (clco::notify-highlight-single-line 
-             clcon_text encoded-marks line-number change-id buffer)
+  (cond
+    ((null line))
+    (t 
+     (let* ((buffer (line-buffer line))
+            (tag (oi::%line-tag line))
+            (sy (oi::tag-syntax-info tag)))
+       (assert sy)
+       (when (bufferp buffer)
+         (let* ((clcon_text (oi::buffer-to-clcon_text buffer))
+                (connection (and clcon_text
+                                 ;; if not, this is not clcon_text backend buffer
+                                 (oduvanchik-interface:variable-value
+                                  'odu::swank-connection ;"Swank Connection"
+                                  :buffer buffer))
+                  ))
+           (when (and clcon_text connection)
+             (let* ((line-number (oi::tag-line-number tag))
+                    (encoded-marks
+                     (with-output-to-string (ou)
+                       (encode-marks-for-line sy line-number ou)))
+                    (change-id (buffer-change-id buffer)))
+               (clco::notify-highlight-single-line 
+                clcon_text encoded-marks line-number change-id buffer)
             )
-          )))))
-
-(defmethod oi::recompute-syntax-marks :around (line tag)
-  (multiple-value-bind (result recomputed)
-      (call-next-method)
-    (when recomputed
-      (maybe-send-line-highlight-to-clcon line tag))
-    (values result recomputed)))
-
+             )))))))
 
 (defun recompute-line-tags-starting-from-line-background (start-line)
   (assert-we-are-in-oduvanchik-thread)
@@ -126,7 +126,9 @@
        (unless (line-previous start-line)
          (let ((tag (oi::make-tag :syntax-info (oi::empty-syntax-info))))
            (setf (oi::%line-tag start-line) tag)
-           (setf (oi::tag-syntax-info tag) (oi::recompute-syntax-marks start-line tag)))
+           (setf (oi::tag-syntax-info tag) (oi::recompute-syntax-marks start-line tag))
+           ; we know for sure that recalculation was done as tag was created just now
+           (oi::maybe-send-line-highlight-to-clcon start-line))
          (setf start-line (line-next start-line)))
        (when start-line
          (recompute-line-tags-starting-from-line-background start-line))
