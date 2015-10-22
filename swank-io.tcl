@@ -210,7 +210,7 @@ proc ::mprs::EvalInTclSync {EventAsList} {
     set ThreadId [Unleash [lindex $EventAsList 1]]
     set Tag [Unleash [lindex $EventAsList 2]]
     set Code [Unleash [lindex $EventAsList 3]]
-    putd "Entered EvalInTclSync with $Tag, $Code"
+    putd "567989 Entered EvalInTclSync with $Tag, $Code"
     set Result [eval $Code]
     # set errorCode [catch {eval $Code} Result]
     # if {$errorCode} {
@@ -222,7 +222,7 @@ proc ::mprs::EvalInTclSync {EventAsList} {
     #showVar EvalInTclValueForm
     #puts stderr "Returning from EvalInTclSync"
     ::tkcon::SendEventToSwank $EvalInTclValueForm {} 3 $ThreadId $Tag
-    putd "Returning from EvalInTclSync with $Tag"
+    putd "567989 Returning from EvalInTclSync with $Tag"
     return     
 }
 
