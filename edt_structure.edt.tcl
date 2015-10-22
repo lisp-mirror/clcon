@@ -78,6 +78,12 @@ namespace eval ::edt {
         checkValidBi $Bi
         return [string cat [Bi2W $Bi] ".text.t"]
     }
+
+    # This can be required when doing bindings on text itself
+    proc text2btext {btext_dot_t} {
+        ::mprs::AssertEq [string range $btext_dot_t end-6 end] ".text.t"
+        return [string range $btext_dot_t 0 end-2]
+    }
     
     
     # current editing widget (e.g. frame, but now - just window)
