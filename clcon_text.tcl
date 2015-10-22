@@ -526,8 +526,9 @@ namespace eval ::clcon_text {
     }
 
 
-    proc tncm {clcon_text_dot_t} {
-        set clcon_text [::edt::text2btext $clcon_text_dot_t]
+    proc tncm {btext_or_btext_dot_t} {
+        set x $btext_or_btext_dot_t
+        set clcon_text [::edt::CoerceTextToItsBText $x]
         MaybeSendToLisp $clcon_text n {}
     }
 

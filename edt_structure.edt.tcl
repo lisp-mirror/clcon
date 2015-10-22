@@ -80,9 +80,17 @@ namespace eval ::edt {
     }
 
     # This can be required when doing bindings on text itself
-    proc text2btext {btext_dot_t} {
-        ::mprs::AssertEq [string range $btext_dot_t end-6 end] ".text.t"
-        return [string range $btext_dot_t 0 end-2]
+    proc CoerceTextToItsBText {btext_or_btext_dot_t} {
+        set x $btext_or_btext_dot_t
+        if {[string range $x end-6 end] eq ".text.t"} {
+            return [string range $x 0 end-2]
+        } elseif {[string range $x end-4 end] eq ".text"} {
+            return $x
+        } else {
+            puts stderr "Unexpected btext_or_btext_dot_t = $x"
+            idebug on
+            idebug break
+        }
     }
     
     

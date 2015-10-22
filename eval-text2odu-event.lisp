@@ -56,6 +56,8 @@
        (use-buffer buffer 
          (with-mark-in-row-col (cursor-point (clcon-server::text2odu-event-beg e))
            (move-mark (current-point) cursor-point)
+           ;; this is what it all what done for
+           (oduvan-invisible-maybe-highlight-open-parens)
            )))))
   nil)
 
