@@ -46,7 +46,17 @@ oi::line-tag -> ... -> oi::recompute-syntax-marks -> clco::notify-highlight-sing
 ------------
 odu::maybe-highlight-open-parens - a redisplay hook that matches parens by highlighting the corresponding open-paren after a close-paren is typed
 
-вопрос в том, вызывается ли он при хождении по скобкам? 
+вопрос в том, вызывается ли он при хождении по скобкам?
+Ответ: вызывается, но работает только для закрывающей скобки. С открывающей - извините.
+Пока пусть будет так.
+
+
+В результате вызывается odu::set-open-paren-font-marks, к-рая устанавливает
+две фонтовые марки. Это прекрасно. Но что делать с процессом покраски?
+Видимо, они должны как-то суммироваться с результатом раскраски, ведь иначе раскраска затрёт их.
+
+Пока попробуем поместить это прямо в odu::encode-marks-for-line . 
+
 
 See also
 ========
