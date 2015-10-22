@@ -1,6 +1,8 @@
 ## Debugger
 # TkconSourceHere search-tablelist.tcl
 
+# Reloading the sources will crash current debugging session
+
 namespace eval ::ldbg {
 
     # Initial event which caused entering into a debugger as lisdt
@@ -10,15 +12,17 @@ namespace eval ::ldbg {
     variable Restarts
 
     # we try to keep this var 1 when debugger is active and 0 when it is inactive
-    defvar InTheDebugger 1
+    variable InTheDebugger 1
     # stepper mode is 1 when we are in stepper
-    defvar StepperMode 0
+    variable StepperMode 0
     
     # We delete MainWindow when reloading source so that it will be refreshed
     # This is appropriate for some tools only. E.g. rebuilding editor is not
     # a good idea.
-    variable MainWindow {}
-
+    variable MainWindow 
+    if {[info exists MainWindow] && [winfo exists $MainWindow]} {
+        catch { destroy $MainWindow }
+    }
     
     variable StepperMenuPathname 
 
