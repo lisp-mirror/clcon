@@ -42,6 +42,11 @@ oi::line-tag -> ... -> oi::recompute-syntax-marks -> clco::notify-highlight-sing
 - принудительный запуск - когда мы должны дождаться результата. Например, из package-at-point. 
 
 
+Подсветка скобок
+------------
+odu::maybe-highlight-open-parens - a redisplay hook that matches parens by highlighting the corresponding open-paren after a close-paren is typed
+
+вопрос в том, вызывается ли он при хождении по скобкам? 
 
 See also
 ========
