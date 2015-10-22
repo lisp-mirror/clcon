@@ -909,7 +909,6 @@ namespace eval ::ldbg {
     # binds it to each of bindtags
     proc StepperMenuItem {m bindtags name label accel} {
         variable MainWindow
-        set w $MainWindow
         set cmd [list ::ldbg::InvokeStepperRestart $name]
         set cmdBreak "$cmd; break"
         $m add command -label $name -command $cmd -accel $accel
