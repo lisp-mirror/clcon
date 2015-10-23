@@ -67,6 +67,18 @@ namespace eval ::gui_util {
         return [join $sublist .]
     }
 
+    # Returns list of lists three elements: bindtag event script
+    proc ListAllWindowBindingds { w } {
+        set result {}
+        foreach bindtag [bindtags $w] {
+            foreach binding [bind $bindtag] {
+                lappend result \
+                    [list $bindtag $binding \
+                         [bind $bindtag $binding]]
+            }
+        }
+        return $result
+    }
 
     # # To be bound on configure event of toplevel window $w as
     # #  bind . <Configure> "gui_util::RememberPositionOnConfigureEvent $w %W %x %y %h %w"
