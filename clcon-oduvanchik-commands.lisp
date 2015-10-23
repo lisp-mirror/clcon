@@ -166,10 +166,14 @@
   "We always recompute everything to the end of file. end-line is required to know buffer only"
   (oi::check-something-ok)
   (let* ((buffer (line-buffer end-line))
+         (dummy1 (assert buffer))
+         (buffer-end (oi::buffer-end-mark buffer))
+         (dummy2 (assert buffer-end))
+         (real-end-line (mark-line buffer-end))
          (new-highlight-wave-id (reset-background-highlight-process buffer))
          (level (oi::buffer-tag-line-number buffer))
          (start-line
-          (iter (for line initially end-line then prev)
+          (iter (for line initially real-end-line then prev)
                 (for prev = (line-previous line))
                 (let ((validp (< (oi::line-number line) level)))
                   (finding line such-that (or validp (null prev)))))))
