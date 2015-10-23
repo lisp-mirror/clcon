@@ -455,10 +455,13 @@ namespace eval ::clcon_text {
             {"if {[<<<<destination>>>> cget -private_freezed]} {
    <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>><<<<NoteCursorMotion>>>>}
  } else {
-   # putd 444444
-   # putd {<<<<     OldEventBody      >>>>}
    <<<<OldEventBody>>>><<<<NoteCursorMotion>>>>
  }"} 0]
+
+   # Inser this into script     
+   # putd 444444
+   # putd {<<<<     OldEventBody      >>>>}
+        
         if {$(-note-cursor-motion)} {
             set NoteCursorMotion  "
  ::clcon_text::tncm %W"
