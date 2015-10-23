@@ -60,6 +60,10 @@ namespace eval ::edt {
         }
     }
 
+    proc Bi2WStatusBar {Bi} {
+        return [string cat [Bi2W $Bi] .sb]
+    }
+
     proc W2Bi {w} {
         if {[winfo parent $w] ne [theNotebook]} {
             error "$w must have been a name of window in a notebook"
