@@ -244,9 +244,9 @@ proc btext::buildArgParseTable win {
 proc btext::instanceCmd {self cmd args} {
 
     # We don't need to disable it in the release as it acts on logging only
-    if {[::edt::Bi2btext "buf1"] eq $self} {
-        putd "INVOKED_BTEXT_INSTANCE_CMD $cmd $args"
-        }
+    #if {[::edt::Bi2btext "buf1"] eq $self} {
+    #    putd "INVOKED_BTEXT_INSTANCE_CMD $cmd $args"
+    #    }
 
     #slightly different than the RE used in btext::comments
     set commentRE {\"|\\|'|/|\*}
