@@ -174,6 +174,8 @@ namespace eval ::edt {
 
         set tab_name [CalcTabText [cBi]]
         $notebook add $w -text $tab_name
+
+        ::clcon_text::tncm $btext
     }
 
     
