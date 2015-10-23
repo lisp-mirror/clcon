@@ -483,6 +483,17 @@ namespace eval ::clcon_text {
         return $t3
     }
 
+    # Try to arrange things so that correct and minimal set of cursor position
+    # changes were noted. 
+    proc DoesEventModifyCursorPos {ev} {
+        # In tk_samples/original-tkcon.tcl, special bindtag is used for that
+        # We found that for keyboard we will not achieve that bindtag. But
+        # if our keyboard shortcuts call oduvanchik functions, we anyway note
+        # cursor position change on unfreeze.
+        # Maybe using DoesEventModifyCursorPos is a better approach, but
+        # we have other problems now and can not afford resources to implement it.
+        # FIXME
+    }
 
     proc WrapFreezableHandlerScript {ev} {
         set script [bind Text $ev]
