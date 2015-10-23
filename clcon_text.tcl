@@ -244,6 +244,7 @@ namespace eval ::clcon_text {
                         # Event queue empty, state is 2. just check that level is 1 and exit
                         ::mprs::AssertEq 1 $options($pfl)
                         $self configure -private_freezed 0 $pfl [expr {$options($pfl) - 1}]
+                        after idle [list ::clcon_text::tncm $self]
                     }
                 }
             }
@@ -346,8 +347,8 @@ namespace eval ::clcon_text {
                 if {![$clcon_text UsesLispP]} {
                     return
                 }
-                # When unfreezing, we send it. Or I'm brain-damaged.
-                if {[$clcon_text cget -private_freezed] == 1} {
+                # When unfreezing, we DO NOT send it. ContinueUnfreeze would send it for us
+                if {[$clcon_text cget -private_freezed]} {
                     return
                 }
                 set qIndex [::text2odu::CoerceIndex $clcon_text insert]
@@ -453,7 +454,7 @@ namespace eval ::clcon_text {
         CheckIfScriptDoesNotContainBreakContinueOrReturn $script 
         set Template [lindex \
             {"if {[<<<<destination>>>> cget -private_freezed]} {
-   <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>><<<<NoteCursorMotion>>>>}
+   <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>>}
  } else {
    <<<<OldEventBody>>>><<<<NoteCursorMotion>>>>
  }<<<<MaybeBreak>>>>"} 0]
@@ -464,7 +465,7 @@ namespace eval ::clcon_text {
         
         if {$(-note-cursor-motion)} {
             set NoteCursorMotion  "
- ::clcon_text::tncm %W"
+ after idle [list ::clcon_text::tncm %W]"
         } else {
             set NoteCursorMotion ""
         }        
@@ -531,10 +532,21 @@ namespace eval ::clcon_text {
         MaybeSendToLisp $clcon_text CallOduvanchikFunction [list $OduvanchikFunctionNameAndArgs $Options] $ContBody
     }
 
-
+    # Send cursor position to oduvanchik. This is for display purposes only, e.g. for
+    # highlighting open parens. Normaly this function is programmed at after idle event.
+    # When clcon_text is freezed, event is ignored. When unfreezing, it is send from
+    # the unfreeze 2. 
     proc tncm {btext_or_btext_dot_t} {
         set x $btext_or_btext_dot_t
+        # before idle came, widget could be destroyed.
+        putd "Entered tncm"
         set clcon_text [::edt::CoerceTextToItsBText $x]
+        if {![winfo exists $clcon_text]} {
+            putd "Entered tncm:oops $clcon_text"
+            return
+        }
+        global $clcon_text.CursorPos
+        set $clcon_text.CursorPos [$clcon_text index insert]
         MaybeSendToLisp $clcon_text n {}
     }
 
