@@ -59,9 +59,9 @@
 
 
 (defun line-effective-marks (line)
-  "Marks of the line plus marks of odu::*open-paren-font-marks*. We assume we have fresh %line-tag"
+  "Marks of the line plus marks of odu::*open-paren-font-marks*"
   (oi::check-something-ok)
-  (let* ((tag (oi::%line-tag line))
+  (let* ((tag (line-tag-no-recalc line))
          (syntax-info (oi::tag-syntax-info tag))
          (marks ; this worked (oi::sy-font-marks syntax-info)
           (oi::line-marks line) ; this ceased to work before. 
@@ -74,9 +74,9 @@
 
 (defun encode-marks-for-line (line stream)
   "{linenumber {charpos0 font0} {charpos1 font1} ...} 
-  If we know line-number, we can pass it. We believe that line-tag is fresh - for now it it true for all calls"
+  If we know line-number, we can pass it. line-tag must be ok."
   (oi::check-something-ok)
-  (let* ((tag (oi::%line-tag line))
+  (let* ((tag (line-tag-no-recalc line))
        ;(syntax-info (oi::tag-syntax-info tag))
        (exact-line-number (oi::tag-line-number tag))
        (sorted-marks (line-effective-marks line)))
@@ -128,9 +128,7 @@
 
 
 (defmethod oi::maybe-send-line-highlight-to-clcon :around (line)
-  "If we have highlight enabled in features, send it to clcon. 
-   We assume that %line-tag is fresh and ready for use. 
-   next-method is dummy, we don't call it"
+  "If we have highlight enabled in features, send it to clcon"
   #-oduvan-enable-highlight
   (declare (ignore line))
   #+oduvan-enable-highlight
@@ -138,7 +136,7 @@
     ((null line))
     (t 
      (let* ((buffer (line-buffer line))
-            (tag (oi::%line-tag line))
+            (tag (oi:line-tag-no-recalc line))
             (line-number (oi::tag-line-number tag))
             (sy (oi::tag-syntax-info tag)))
        (assert sy)
@@ -164,7 +162,7 @@
   "We always recompute everything to the end of file. end-line is required to know buffer only"
   (oi::check-something-ok)
   (let* ((buffer (line-buffer end-line))
-         (highlight-wave-id (incf (oi::buffer-highlight-wave-id buffer)))
+         (new-highlight-wave-id (reset-background-highlight-process buffer))
          (level (oi::buffer-tag-line-number buffer))
          (start-line
           (iter (for line initially end-line then prev)
@@ -173,7 +171,8 @@
                   (finding line such-that (or validp (null prev)))))))
     (oi::check-something-ok)
     (clco::order-call-oduvanchik-from-itself
-     (list 'recompute-line-tags-starting-from-line-background-1 start-line highlight-wave-id))
+     (list 'recompute-line-tags-starting-from-line-background-1
+           start-line new-highlight-wave-id))
     ))
 
 (defun recompute-line-tags-starting-from-line-background-1 (start-line highlight-wave-id)
