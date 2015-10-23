@@ -41,6 +41,7 @@ Current features are:
 - Some commands of lisp mode (navigate through forms, auto-indent, have bugs...)
 - Compilation error browser
 - Find in files 
+- Matching paren highlight (in trunk)
 
 ## Installation and startup
 For windows, we have [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.2.6.zip). 
@@ -62,8 +63,8 @@ Anyway, see [doc/INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-- paren highlighting
-- make editor reliable
+- cross-reference info display
 - use as a GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine)
+- make editor reliable
 - thread list with thread debugging (if we need it for self-debugging)
 - close all bugs (ha-ha!)
