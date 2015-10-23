@@ -3,23 +3,6 @@
 
 # Applications of swank-io.tcl to tasks of our IDE
 
-## ::tkcon::LispFindDefinitionInner
-# Similar to ::tkcon::ExpandLispSymbol
-proc ::tkcon::LispFindDefinitionInner str {
-    variable PRIV
-
-    # require at least a single character, otherwise continue
-    if {$str eq ""} {return -code continue}
-    
-    # string quoting is a bullshit here!
-    set Quoted [QuoteLispObjToString $str]
-    set LispCmd "(cl:progn (clcon-server:server-lookup-definition $Quoted))"
-   
-    ::tkcon::EvalInSwankAsync $LispCmd {::tkcon::LispFindDefinitionInnerContinuation $EventAsList} {:find-existing}
-    
-}
-
-
 proc ::tkcon::LispFindDefinitionInnerContinuation {SwankReplyAsList} {
     variable PRIV
     set head [::mprs::Unleash [lindex $SwankReplyAsList 0]]
@@ -171,6 +154,7 @@ proc ::tkcon::EditFileAtLine {filename line} {
 # See also: ::edt::FindSourceCommand
 ## 
 proc ::tkcon::LispFindDefinition {w} {
+    variable PRIV
     set exp [::tkcon::BeginningOfLispSymbolRegexp]
 
     if {[$w compare insert >= limit]} {
@@ -184,12 +168,25 @@ proc ::tkcon::LispFindDefinition {w} {
     set tmp2 [$w search -regexp $exp $tmp]
     if {[string compare {} $tmp2]} {append tmp2 +1c} else {set tmp2 {insert lineend}}
     set str [$w get $tmp $tmp2]
-    LispFindDefinitionInner $str
+
+    if {$str eq ""} {
+        set con $PRIV(console)
+        WritePassiveText $con "No symbol at cursor" output
+        $con see insert
+        return
+    }
+    
+    # string quoting is a bullshit here!
+    set Quoted [QuoteLispObjToString $str]
+    set LispCmd "(cl:progn (clcon-server:server-lookup-definition $Quoted))"
+   
+    ::tkcon::EvalInSwankAsync $LispCmd {::tkcon::LispFindDefinitionInnerContinuation $EventAsList} {:find-existing}
+    
 }
 
 
 
-## ::tkcon::LispFindDefinition - clone of ::tkcon::Expand - 
+## ::tkcon::TclFindDefinition - clone of ::tkcon::Expand - 
 # ARGS:	w	- text widget in which to expand str
 # See also: ::edt::FindSourceCommand
 ## 
@@ -200,7 +197,6 @@ proc ::tkcon::TclFindDefinition {w} {
     } else {
         ::record_definition::EditProcedure $str
     }
-    # LispFindDefinitionInner $str
 }
 
 
