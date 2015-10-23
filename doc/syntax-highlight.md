@@ -60,6 +60,8 @@ odu::maybe-highlight-open-parens - a redisplay hook that matches parens by highl
 2. при перекраске скобок соответствующие строки сразу отправляются в clcon, не через
 очередь событий одуванчика.
 
+Для подсветки скобок нужно 
+
 See also
 ========
 text2odu.md
