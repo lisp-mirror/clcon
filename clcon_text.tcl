@@ -456,7 +456,7 @@ namespace eval ::clcon_text {
    <<<<destination>>>> RememberEvent {<<<<OldEventBody>>>><<<<NoteCursorMotion>>>>}
  } else {
    <<<<OldEventBody>>>><<<<NoteCursorMotion>>>>
- }"} 0]
+ }<<<<MaybeBreak>>>>"} 0]
 
    # Inser this into script     
    # putd 444444
