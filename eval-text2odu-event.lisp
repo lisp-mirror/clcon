@@ -15,11 +15,13 @@
 
 (defun set-mark-to-row-and-col (mark row col)
   "Row and col a given in clcon_text 's coordinate system"
+  (check-something-ok mark)
   (let* ((line (mark-line mark))
          (buffer (line-buffer line)))
     (move-mark mark (buffer-start-mark buffer))
     (line-offset mark (- row 1) col)
     (check-mark-is-at-row-and-col mark row col)
+    (check-something-ok mark)
     nil
     ))
 
@@ -30,6 +32,7 @@
   (alexandria:once-only (row-col)
     `(with-mark ((,name (buffer-start-mark (current-buffer)) :right-inserting))
        (set-mark-to-row-and-col ,name (clco::row-col-row ,row-col) (clco::row-col-col ,row-col))
+       (check-something-ok ,name)
        ,@body)))
 
 (defun delete-characters-between-marks (beg end)
@@ -58,6 +61,7 @@
            (move-mark (current-point) cursor-point)
            ;; this is what it all what done for
            (oduvan-invisible-maybe-highlight-open-parens)
+           (check-something-ok cursor-point)
            )))))
   nil)
 
@@ -69,10 +73,10 @@
             (buffer (oi::clcon_text-to-buffer clcon_text)))
        (assert buffer)
        (use-buffer buffer 
-         (odu::check-display-start-ok)
+         (odu::check-something-ok)
          (with-mark-in-row-col (beg (clcon-server::text2odu-event-beg e))
-           (insert-string beg (clcon-server::text2odu-event-string e)))
-         (odu::check-display-start-ok)))))
+           (insert-string beg (clcon-server::text2odu-event-string e))
+           (odu::check-something-ok beg))))))
   nil
   )
 
@@ -93,7 +97,9 @@
                 (delete-characters-between-marks beg end)))
              (t
               (delete-characters beg 1)
-              )))))))
+              ))
+           (check-something-ok beg)
+           )))))
   t)
 
 (defun find-buffer-by-name (buffer-name)
@@ -146,6 +152,7 @@
         (p (buffer-point buffer)))
     (assert clcon_text () "~S This is not a clcon_text backend buffer" buffer)
     (oi::send-mark-to-clcon_text clcon_text p :remote-name "insert")
+    (odu::check-something-ok p)
     ))
 
 (defun nop (&rest args) (declare (ignore args)))
@@ -153,6 +160,7 @@
 (defun call-oduvanchik-fn-internal (fn-funcall-list options clcon_text buffer)
   "Called from eval-call-oduvanchik-function-with-clcon_text via eval-for-emacs"
   (declare (ignorable clcon_text))
+  (odu::check-something-ok)
   (let (result)      
     (let* ((oduvanchik-internals::*do-editing-on-tcl-side* t))
       (cond
@@ -161,6 +169,7 @@
       (setf result (apply 'funcall fn-funcall-list))
       )
     (odu::send-buffer-point-to-clcon_text buffer)
+    (odu::check-something-ok)
     result
     ))
 
@@ -221,7 +230,7 @@
         ;; (oi::sync-mark-from-clcon_text clcon_text (current-point) "insert")
         ;; known functions are indent-new-line-command and new-line-command
         (swank::eval-for-emacs `(call-oduvanchik-fn-internal ',fn-funcall-list ',options ',clcon_text ',buffer) :common-lisp-user cont)
-        
+        (check-something-ok)
         nil ; real return is done via continuations machinery
         ))))
 
@@ -229,10 +238,12 @@
   "See clco::order-call-oduvanchik-from-itself"
   (let* ((fn-funcall-list (clco::text2odu-event-fn-and-args e))
          (fn (car fn-funcall-list)))
+    (check-something-ok)
     (assert (and
              (eq (symbol-package fn) (find-package :oduvanchik)) ; security limitation
              (fboundp fn)) () "Symbol ~S funbound or have home-package different from :oduvanchik" fn)
     (apply #'funcall fn-funcall-list))
+    (check-something-ok)
   nil ; nowhere to return
   )
 
@@ -240,6 +251,7 @@
 ; for single chars, use (oduvanchik-ext:char-key-event #\x)
 (defun eval-text2odu-event (e)
   "This code is executed inside a command. Transform text2odu events to oduvanchik function calls"
+  (check-something-ok)
   (etypecase e
     (clcon-server::text2odu-event
      (ecase (clco::text2odu-event-kind e)
@@ -263,7 +275,9 @@
         (eval-call-oduvanchik-function-with-clcon_text e))
        (clco::call-oduvanchik-from-itself
         (eval-order-call-oduvanchik-from-itself e))
-       ))))
+       )))
+  (check-something-ok)
+  )
 
 (defun assert-we-are-in-oduvanchik-thread ()
   (assert (string= 
@@ -283,7 +297,9 @@
 (oduvanchik::defcommand "evaltext2oduevent" (p)
     "Get and eval single clcon event"
     "Get and eval single clcon event"
+  (check-something-ok)
   (eval-pending-text2odu-events :hang p)
+  (check-something-ok)
   ;(oduvanchik.x11::kick-oduvanchik)
   )
 
