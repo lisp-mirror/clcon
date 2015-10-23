@@ -40,6 +40,7 @@
 
 (defun oduvan-invisible-maybe-highlight-open-parens ()
   "Rework of odu::maybe-highlight-open-parens. Works in the current buffer"
+  (check-something-ok)
   (when (value highlight-open-parens)
     (multiple-value-bind (start end)
         (funcall (value open-paren-finder-function)
@@ -59,6 +60,7 @@
 
 (defun line-effective-marks (line)
   "Marks of the line plus marks of odu::*open-paren-font-marks*. We assume we have fresh %line-tag"
+  (oi::check-something-ok)
   (let* ((tag (oi::%line-tag line))
          (syntax-info (oi::tag-syntax-info tag))
          (marks ; this worked (oi::sy-font-marks syntax-info)
@@ -66,12 +68,14 @@
            )
          (sorted-marks (sort marks '< :key 'oi::mark-charpos)))
     (declare (ignorable syntax-info))
+    (oi::check-something-ok)
     sorted-marks
     ))
 
 (defun encode-marks-for-line (line stream)
   "{linenumber {charpos0 font0} {charpos1 font1} ...} 
   If we know line-number, we can pass it. We believe that line-tag is fresh - for now it it true for all calls"
+  (oi::check-something-ok)
   (let* ((tag (oi::%line-tag line))
        ;(syntax-info (oi::tag-syntax-info tag))
        (exact-line-number (oi::tag-line-number tag))
@@ -82,6 +86,7 @@
         (oi:font-mark
          (format stream "{~D ~D} " (oi:mark-charpos m) (oi::font-mark-font m)))))
     (format stream "} ")
+    (oi::check-something-ok)
     ))
 
 (defun numbered-line-of-buffer-by-clcon (clcon_text number)
@@ -155,18 +160,12 @@
                )
              )))))))
 
-(defun recompute-line-tags-starting-from-line-background (start-line)
-  (assert-we-are-in-oduvanchik-thread)
-  (oi::recompute-line-tag start-line)
-  (let ((next (oi::line-next start-line)))
-    (when next
-      (clco::order-call-oduvanchik-from-itself
-       (list 'recompute-line-tags-starting-from-line-background next)))))
-  
 (defmethod oi::recompute-tags-up-to :around (end-line background)
   "We always recompute everything to the end of file. end-line is required to know buffer only"
+  (oi::check-something-ok)
   (cond
     ((null background)
+     (oi::check-something-ok)
      (call-next-method))
     (t
      (let* ((level (oi::buffer-tag-line-number (line-buffer end-line)))
@@ -175,17 +174,38 @@
                    (for prev = (line-previous line))
                    (let ((validp (< (oi::line-number line) level)))
                      (finding line such-that (or validp (null prev)))))))
-       (unless (line-previous start-line)
-         (let ((tag (oi::make-tag :syntax-info (oi::empty-syntax-info))))
-           (setf (oi::%line-tag start-line) tag)
-           (setf (oi::tag-syntax-info tag) (oi::recompute-syntax-marks start-line tag))
-           ; we know for sure that recalculation was done as tag was created just now
-           (oi::maybe-send-line-highlight-to-clcon start-line))
-         (setf start-line (line-next start-line)))
-       (when start-line
-         (recompute-line-tags-starting-from-line-background start-line))
+       (oi::check-something-ok)
+       (clco::order-call-oduvanchik-from-itself
+        (list 'recompute-line-tags-starting-from-line-background-1 start-line))
        ))))
 
+(defun recompute-line-tags-starting-from-line-background-1 (start-line)
+  (assert-we-are-in-oduvanchik-thread)
+  (oi::check-something-ok)
+  (unless (line-previous start-line)
+    (let ((tag (oi::make-tag :syntax-info (oi::empty-syntax-info))))
+      (setf (oi::%line-tag start-line) tag)
+      (setf (oi::tag-syntax-info tag) (oi::recompute-syntax-marks start-line tag))
+                                        ; we know for sure that recalculation was done as tag was created just now
+      (oi::check-something-ok)
+      (oi::maybe-send-line-highlight-to-clcon start-line)
+      (oi::check-something-ok)
+      )
+    (setf start-line (line-next start-line)))
+  (when start-line
+    (clco::order-call-oduvanchik-from-itself
+       (list 'recompute-line-tags-starting-from-line-background-2 start-line))
+    ))
+
+(defun recompute-line-tags-starting-from-line-background-2 (start-line)
+  (assert-we-are-in-oduvanchik-thread)
+  (oi::check-something-ok)
+  (oi::recompute-line-tag start-line)
+  (oi::check-something-ok)
+  (let ((next (oi::line-next start-line)))
+    (when next
+      (clco::order-call-oduvanchik-from-itself
+       (list 'recompute-line-tags-starting-from-line-background-2 next)))))
 
 (defun cl-boolean-to-tcl (x)
   "Returns 0 or 1 in numeric form"
@@ -224,7 +244,6 @@
 ; (slot-value (slot-value (slot-value (slot-value (oi::clcon_text-to-buffer ".__edit1.text") 'oi::%region) 'oi::start) 'oi::line) 'oi::marks)
 
 ; (clco:eval-in-tcl (with-output-to-string (ou) (format ou "::edt::ApplyHighlightToLine .__edit1.text ") (odu::encode-marks-for-line (odu::numbered-line-of-buffer-by-clcon ".__edit1.text" 3) ou)))
-
 
 (defun check-display-start-mark-ok (window)
   (let* ((mark (window-display-start window)))
