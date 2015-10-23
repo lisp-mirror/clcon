@@ -100,9 +100,12 @@ namespace eval ::clcon_text {
             bindtags $w $NewBindTags
             bind $win <<ContinueUnfreeze>> "$self Unfreeze"
             ::edt::CreateHighlightTags $self
+            global $self.CursorPos
+            set $self.CursorPos {}
         }
         destructor {
             $options(-opened_file) destroy
+            unset $self.CursorPos
             DestroyBackendBuffer $win
         }
 

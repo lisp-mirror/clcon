@@ -123,15 +123,23 @@ namespace eval ::edt {
         variable ::tkcon::PRIV
         variable ::tkcon::COLOR
         variable ::tkcon::OPT
-        
+
+        set Bi [cBi]
         set tw [cTW]
         set w [cW]
+        set WStatusBar [Bi2WStatusBar $Bi]
         set btext [c_btext]
         set textt [c_text]
         set notebook [theNotebook]
 
         frame $w
         ::clcon_text::clcon_text $btext
+
+
+        frame $WStatusBar
+        label $WStatusBar.cursor -relief sunken -borderwidth 1 -anchor e -width 6 \
+	    -textvariable $btext.CursorPos
+        grid $WStatusBar.cursor -sticky news         
 
         # $tw.text configure -send_to_lisp 1
         # ::btext::clearHighlightClasses $btext
@@ -150,15 +158,18 @@ namespace eval ::edt {
             $btext configure -tabs [list $tabsp left] -tabstyle wordprocessor
         }
 
-        bind $btext <<Modified>> [list ::edt::TextModified [cBi]]
+        bind $btext <<Modified>> [list ::edt::TextModified $Bi]
 
         scrollbar $w.sx -orient h -command [list $w.text xview]
         scrollbar $w.sy -orient v -command [list $w.text yview]
 
-        grid $btext - $w.sy -sticky news
-        grid $w.sx - -sticky ew
+        grid $btext -row 0 -column 0 -sticky nsew
+        grid $w.sy -row 0 -column 1 -sticky ns
+        grid $w.sx -row 1 -column 0 -sticky ew
+        grid $WStatusBar -row 2 -column 0 -columnspan 2 -sticky ew
+        
         grid columnconfigure $w 0 -weight 1
-        grid columnconfigure $w 1 -weight 1
+        # grid columnconfigure $w 1 -weight 1
         grid rowconfigure $w 0 -weight 1
 
         set tab_name [CalcTabText [cBi]]
