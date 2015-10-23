@@ -472,7 +472,7 @@ namespace eval ::clcon_text {
         set t1 [regsub -all <<<<OldEventBody>>>> $t0 $script]
         set t2 [regsub -all <<<<destination>>>> $t1 $(-destination)]
         set t3 [regsub -all <<<<MaybeBreak>>>> $t2 $MaybeBreak]
-        puts stderr "WrapEventScriptForFreezedText234324: $t3"
+        # puts stderr "WrapEventScriptForFreezedText234324: $t3"
         return $t3
     }
 
