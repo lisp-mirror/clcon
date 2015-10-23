@@ -105,6 +105,7 @@ namespace eval ::clcon_text {
         }
         destructor {
             $options(-opened_file) destroy
+            global $self.CursorPos
             unset $self.CursorPos
             DestroyBackendBuffer $win
         }
