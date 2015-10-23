@@ -4,3 +4,4 @@ syntax: glob
 alt/*
 xlam/*
 tk_samples/*
+mypipe
