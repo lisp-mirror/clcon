@@ -39,7 +39,9 @@
 
 
 (defun oduvan-invisible-maybe-highlight-open-parens ()
-  "Rework of odu::maybe-highlight-open-parens. Works in the current buffer"
+  "Rework of odu::maybe-highlight-open-parens. Works in the current buffer. 
+ It looks like working with parens is independent of buffer highlighting. So we don't
+ bother ourselves with redrawing"
   (check-something-ok)
   (when (value highlight-open-parens)
     (multiple-value-bind (start end)
@@ -171,42 +173,28 @@
                   (finding line such-that (or validp (null prev)))))))
     (oi::check-something-ok)
     (clco::order-call-oduvanchik-from-itself
-     (list 'recompute-line-tags-starting-from-line-background-1
-           start-line new-highlight-wave-id))
+     (list 'recompute-line-tags-starting-from-line-background
+           buffer start-line new-highlight-wave-id))
     ))
 
-(defun recompute-line-tags-starting-from-line-background-1 (start-line highlight-wave-id)
+(defun recompute-line-tags-starting-from-line-background (buffer start-line highlight-wave-id)
   (assert-we-are-in-oduvanchik-thread)
-  (let ((buffer (line-buffer start-line)))
-    (unless (= highlight-wave-id (oi::buffer-highlight-wave-id buffer))
-      (return-from recompute-line-tags-starting-from-line-background-1 nil))
-    (oi::check-something-ok)
-    (unless (line-previous start-line)
-      (let ((tag (oi::make-tag :syntax-info (oi::empty-syntax-info))))
-        (setf (oi::%line-tag start-line) tag)
-        (setf (oi::tag-syntax-info tag) (oi::recompute-syntax-marks start-line tag))
-        ;; we know for sure that recalculation was done as tag was created just now
-        (setf (oi::buffer-tag-line-number buffer) (1+ (oi::line-number start-line)))
-        (oi::maybe-send-line-highlight-to-clcon start-line)
-        )
-      (setf start-line (line-next start-line)))
-    (when start-line
-      (clco::order-call-oduvanchik-from-itself
-       (list 'recompute-line-tags-starting-from-line-background-2 start-line highlight-wave-id))
-      )))
-
-(defun recompute-line-tags-starting-from-line-background-2 (start-line highlight-wave-id)
-  (assert-we-are-in-oduvanchik-thread)
-  (let ((buffer (line-buffer start-line)))
-    (unless (= highlight-wave-id (oi::buffer-highlight-wave-id buffer))
-      (return-from recompute-line-tags-starting-from-line-background-2 nil)))
-  (oi::check-something-ok)
-  (oi::recompute-line-tag start-line)
-  (oi::check-something-ok)
-  (let ((next (oi::line-next start-line)))
-    (when next
-      (clco::order-call-oduvanchik-from-itself
-       (list 'recompute-line-tags-starting-from-line-background-2 next highlight-wave-id)))))
+  (let ((check-the-buffer (line-buffer start-line)))
+    (cond
+      ((not (= highlight-wave-id (oi::buffer-highlight-wave-id buffer)))
+       ;; We're obsolete. Die.
+       (return-from recompute-line-tags-starting-from-line-background nil))
+      ((not (equal buffer check-the-buffer))
+       (error "Again we are trying to paint deleted line..."))
+      (t 
+       (oi::check-something-ok)
+       (when start-line
+         (oi::recompute-line-tag start-line)
+         (let ((next (oi::line-next start-line)))
+           (when next
+             (clco::order-call-oduvanchik-from-itself
+              (list 'recompute-line-tags-starting-from-line-background
+                    buffer next highlight-wave-id)))))))))
 
 (defun cl-boolean-to-tcl (x)
   "Returns 0 or 1 in numeric form"
