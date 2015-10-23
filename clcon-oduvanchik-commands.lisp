@@ -66,7 +66,6 @@
          (marks ; this worked (oi::sy-font-marks syntax-info)
           (oi::line-marks line) ; this ceased to work before. 
            )
-         (oi::check-something-ok)
          (sorted-marks (sort (copy-list marks) '< :key 'oi::mark-charpos)))
     (declare (ignorable syntax-info))
     (oi::check-something-ok)
@@ -164,7 +163,9 @@
 (defmethod oi::recompute-tags-up-to (end-line (background (eql t)))
   "We always recompute everything to the end of file. end-line is required to know buffer only"
   (oi::check-something-ok)
-  (let* ((level (oi::buffer-tag-line-number (line-buffer end-line)))
+  (let* ((buffer (line-buffer end-line))
+         (highlight-wave-id (incf (oi::buffer-highlight-wave-id buffer)))
+         (level (oi::buffer-tag-line-number buffer))
          (start-line
           (iter (for line initially end-line then prev)
                 (for prev = (line-previous line))
@@ -172,11 +173,14 @@
                   (finding line such-that (or validp (null prev)))))))
     (oi::check-something-ok)
     (clco::order-call-oduvanchik-from-itself
-     (list 'recompute-line-tags-starting-from-line-background-1 start-line))
+     (list 'recompute-line-tags-starting-from-line-background-1 start-line highlight-wave-id))
     ))
 
-(defun recompute-line-tags-starting-from-line-background-1 (start-line)
+(defun recompute-line-tags-starting-from-line-background-1 (start-line highlight-wave-id)
   (assert-we-are-in-oduvanchik-thread)
+  (let ((buffer (line-buffer start-line)))
+    (unless (= highlight-wave-id (oi::buffer-highlight-wave-id buffer))
+      (return-from recompute-line-tags-starting-from-line-background-1 nil)))
   (oi::check-something-ok)
   (unless (line-previous start-line)
     (let ((tag (oi::make-tag :syntax-info (oi::empty-syntax-info))))
@@ -190,18 +194,21 @@
     (setf start-line (line-next start-line)))
   (when start-line
     (clco::order-call-oduvanchik-from-itself
-       (list 'recompute-line-tags-starting-from-line-background-2 start-line))
+       (list 'recompute-line-tags-starting-from-line-background-2 start-line highlight-wave-id))
     ))
 
-(defun recompute-line-tags-starting-from-line-background-2 (start-line)
+(defun recompute-line-tags-starting-from-line-background-2 (start-line highlight-wave-id)
   (assert-we-are-in-oduvanchik-thread)
+  (let ((buffer (line-buffer start-line)))
+    (unless (= highlight-wave-id (oi::buffer-highlight-wave-id buffer))
+      (return-from recompute-line-tags-starting-from-line-background-2 nil)))
   (oi::check-something-ok)
   (oi::recompute-line-tag start-line)
   (oi::check-something-ok)
   (let ((next (oi::line-next start-line)))
     (when next
       (clco::order-call-oduvanchik-from-itself
-       (list 'recompute-line-tags-starting-from-line-background-2 next)))))
+       (list 'recompute-line-tags-starting-from-line-background-2 next highlight-wave-id)))))
 
 (defun cl-boolean-to-tcl (x)
   "Returns 0 or 1 in numeric form"
