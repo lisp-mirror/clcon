@@ -3,7 +3,8 @@
 ## Copyright (c) Denis Budyak 2015
 
 proc ::tkcon::BeginningOfLispSymbolRegexp {} {
-    return "\[^\\\\\]\[\[ \t\n\r\\\(\",@\\'\]"
+     # ; return "\[^\\\\\]\[\[ \t\n\r(\",@\\'\]"
+     return {[^\\][[:space:]$(),@'""]}
 }
 
 ## ::tkcon::Expand - 

@@ -174,13 +174,13 @@ proc ::tkcon::LispFindDefinition {w} {
     set exp [::tkcon::BeginningOfLispSymbolRegexp]
 
     if {[$w compare insert >= limit]} {
-        set SearchStartPos limit
+        set SearchStartPos {limit -1c}
     } else {
-        set SearchStartPos {insert linestart}
+        set SearchStartPos {insert linestart -1c}
     }
     
     set tmp [$w search -backwards -regexp $exp insert-1c $SearchStartPos]
-    if {[string compare {} $tmp]} {append tmp +2c} else {set tmp $SearchStartPos}
+    if {[string compare {} $tmp]} {append tmp +2c} else {set tmp "$SearchStartPos +1c"}
     set tmp2 [$w search -regexp $exp $tmp]
     if {[string compare {} $tmp2]} {append tmp2 +1c} else {set tmp2 {insert lineend}}
     set str [$w get $tmp $tmp2]
