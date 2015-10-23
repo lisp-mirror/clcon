@@ -161,24 +161,19 @@
                )
              )))))))
 
-(defmethod oi::recompute-tags-up-to :around (end-line background)
+(defmethod oi::recompute-tags-up-to (end-line (background (eql t)))
   "We always recompute everything to the end of file. end-line is required to know buffer only"
   (oi::check-something-ok)
-  (cond
-    ((null background)
-     (oi::check-something-ok)
-     (call-next-method))
-    (t
-     (let* ((level (oi::buffer-tag-line-number (line-buffer end-line)))
-            (start-line
-             (iter (for line initially end-line then prev)
-                   (for prev = (line-previous line))
-                   (let ((validp (< (oi::line-number line) level)))
-                     (finding line such-that (or validp (null prev)))))))
-       (oi::check-something-ok)
-       (clco::order-call-oduvanchik-from-itself
-        (list 'recompute-line-tags-starting-from-line-background-1 start-line))
-       ))))
+  (let* ((level (oi::buffer-tag-line-number (line-buffer end-line)))
+         (start-line
+          (iter (for line initially end-line then prev)
+                (for prev = (line-previous line))
+                (let ((validp (< (oi::line-number line) level)))
+                  (finding line such-that (or validp (null prev)))))))
+    (oi::check-something-ok)
+    (clco::order-call-oduvanchik-from-itself
+     (list 'recompute-line-tags-starting-from-line-background-1 start-line))
+    ))
 
 (defun recompute-line-tags-starting-from-line-background-1 (start-line)
   (assert-we-are-in-oduvanchik-thread)
