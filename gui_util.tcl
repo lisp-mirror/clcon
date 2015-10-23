@@ -80,6 +80,20 @@ namespace eval ::gui_util {
         return $result
     }
 
+    # Adds putd (entry) to each binding
+    # Example:  ::gui_util::InstrumentAllBindingsWithPutd [::edt::c_btext]
+    # ::gui_util::InstrumentAllBindingsWithPutd [::edt::c_text] 454570000
+    # 
+    proc InstrumentAllBindingsWithPutd { w {InitialNumber 454560000}} {
+        foreach entry [ListAllWindowBindingds $w] {
+            foreach { bindtag event script } $entry {}
+            set script [string cat "putd InstrumentAllBindingsWithPutd/[incr InitialNumber];" $script]
+            bind $bindtag $event $script
+        }
+        return $InitialNumber
+    }
+
+    
     # # To be bound on configure event of toplevel window $w as
     # #  bind . <Configure> "gui_util::RememberPositionOnConfigureEvent $w %W %x %y %h %w"
     # # so that it records window position and size into a variable
