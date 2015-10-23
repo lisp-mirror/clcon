@@ -30,12 +30,13 @@
     (let* ((start (region-start *open-paren-font-marks*))
            (end (region-end *open-paren-font-marks*))
            (lines (mapcar #'mark-line (list start end)))
-           (economy-lines (remove-duplicates lines)))
+           (economy-lines (remove nil (remove-duplicates lines))))
       (delete-font-mark start)
       (delete-font-mark end)
       (setf *open-paren-font-marks* nil)
-      (dolist (line economy-lines)
-        (oi::maybe-send-line-highlight-to-clcon line)))))      
+      (when (every 'oi::line-tag-valid-p economy-lines)
+        (dolist (line economy-lines)
+          (oi::maybe-send-line-highlight-to-clcon line))))))
 
 
 (defun oduvan-invisible-maybe-highlight-open-parens ()
@@ -52,9 +53,10 @@
          (oduvan-invisible-kill-open-paren-font-marks)
          (set-open-paren-font-marks start end)
          (let* ((lines (mapcar #'mark-line (list start end)))
-                (economy-lines (remove-duplicates lines)))
-           (dolist (line economy-lines)
-             (oi::maybe-send-line-highlight-to-clcon line))))
+                (economy-lines (remove nil (remove-duplicates lines))))
+           (when (every 'oi::line-tag-valid-p economy-lines)
+             (dolist (line economy-lines)
+               (oi::maybe-send-line-highlight-to-clcon line)))))
         (t
          (oduvan-invisible-kill-open-paren-font-marks)
          )))))
@@ -171,6 +173,7 @@
                 (for prev = (line-previous line))
                 (let ((validp (< (oi::line-number line) level)))
                   (finding line such-that (or validp (null prev)))))))
+    (declare (ignore dummy1 dummy2))
     (oi::check-something-ok)
     (clco::order-call-oduvanchik-from-itself
      (list 'recompute-line-tags-starting-from-line-background
