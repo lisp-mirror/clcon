@@ -180,22 +180,21 @@
   (assert-we-are-in-oduvanchik-thread)
   (let ((buffer (line-buffer start-line)))
     (unless (= highlight-wave-id (oi::buffer-highlight-wave-id buffer))
-      (return-from recompute-line-tags-starting-from-line-background-1 nil)))
-  (oi::check-something-ok)
-  (unless (line-previous start-line)
-    (let ((tag (oi::make-tag :syntax-info (oi::empty-syntax-info))))
-      (setf (oi::%line-tag start-line) tag)
-      (setf (oi::tag-syntax-info tag) (oi::recompute-syntax-marks start-line tag))
-                                        ; we know for sure that recalculation was done as tag was created just now
-      (oi::check-something-ok)
-      (oi::maybe-send-line-highlight-to-clcon start-line)
-      (oi::check-something-ok)
-      )
-    (setf start-line (line-next start-line)))
-  (when start-line
-    (clco::order-call-oduvanchik-from-itself
+      (return-from recompute-line-tags-starting-from-line-background-1 nil))
+    (oi::check-something-ok)
+    (unless (line-previous start-line)
+      (let ((tag (oi::make-tag :syntax-info (oi::empty-syntax-info))))
+        (setf (oi::%line-tag start-line) tag)
+        (setf (oi::tag-syntax-info tag) (oi::recompute-syntax-marks start-line tag))
+        ;; we know for sure that recalculation was done as tag was created just now
+        (setf (oi::buffer-tag-line-number buffer) (1+ (oi::line-number start-line)))
+        (oi::maybe-send-line-highlight-to-clcon start-line)
+        )
+      (setf start-line (line-next start-line)))
+    (when start-line
+      (clco::order-call-oduvanchik-from-itself
        (list 'recompute-line-tags-starting-from-line-background-2 start-line highlight-wave-id))
-    ))
+      )))
 
 (defun recompute-line-tags-starting-from-line-background-2 (start-line highlight-wave-id)
   (assert-we-are-in-oduvanchik-thread)
