@@ -66,7 +66,8 @@
          (marks ; this worked (oi::sy-font-marks syntax-info)
           (oi::line-marks line) ; this ceased to work before. 
            )
-         (sorted-marks (sort marks '< :key 'oi::mark-charpos)))
+         (oi::check-something-ok)
+         (sorted-marks (sort (copy-list marks) '< :key 'oi::mark-charpos)))
     (declare (ignorable syntax-info))
     (oi::check-something-ok)
     sorted-marks
