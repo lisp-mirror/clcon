@@ -338,8 +338,9 @@ proc ::tkcon::GetTclNameAtInsert {w} {
 proc ::tkcon::TclListAllDefinedThingsInNamespace {namespace} {
     set procs [info procs ${namespace}::*]
     set vars [info vars ${namespace}::*]
+    set commands [info commands ${namespace}::*]
     set children [namespace children ${namespace}]
-    set result [concat $procs $vars $children]
+    set result [concat $procs $vars $commands $children]
     foreach child $children {
         set result [concat $result [TclListAllDefinedThingsInNamespace $child]]
     }
@@ -356,6 +357,6 @@ proc ::tkcon::TclApropos {str} {
             lappend result $x
         }
     }
-    return [lsort $result]
+    return [lsort -unique ${result}]
 }
 
