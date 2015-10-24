@@ -23,35 +23,29 @@ Code is completely platform-independent and should run on other platforms too. A
 - Simple, one-click installable CL environment for beginners
 
 ## Current state
-IDE slowly moves to maturity. The most problematic part is oduvanchik editor backend
-which has some "floating" crashes. Also some necessary things for serious development
-are still missing, e.g. working in other package than cl-user is hard now. 
+I begun switching to devopment of clcon in clcon itself. Some features are still missing when
+compared to EMACS, I'm adding them as far as their absense becomes intolerable. 
 
-It is likely that you fall into trouble at any place. 
-So if you want to take a look at clcon, do not try to just "play around" 
-with the IDE. Take a [demo tour](doc/demo-tour.md) instead.
+If you want to try using clcon, prepare to problems - this is still prototype quality. 
+So first of all take a [demo tour](doc/demo-tour.md).
 
-Current features are: 
-
+## Current features
 - REPL for Lisp and Tcl with history
+- Completion, find source, apropos for Lisp and TCl in REPL
+- Find in files (prototype)
 - Debugger, Stepper, Inspector from SWANK 
-- Editor (crashes frequently; have no save confirmation when quitting, beware!)
-- Completion for Lisp, Tcl and filenames in REPL
-- Find Source for Lisp and Tcl. Find source for TCL seem to be rather unique feature of clcon
-- Some commands of lisp mode (navigate through forms, auto-indent, have bugs...)
+- Editor with lisp syntax and paren highlight
+- Some parts of lisp mode: auto-indent, navigate through forms
 - Compilation error browser
-- Find in files 
-- Matching paren highlight (in trunk)
 
 ## Installation and startup
 For windows, we have [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.2.6.zip). 
 Anyway, see [doc/INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/INSTALL.md) for installation instructions. 
 
 ## Documentation
-
 [Demo tour](doc/demo-tour.md) - narrow footpath through best views of some features of clcon
 
-[User manual](https://bitbucket.org/budden/clcon/src/default/doc/user-manual.md) - a bit outdtated
+[User manual](https://bitbucket.org/budden/clcon/src/default/doc/user-manual.md)
 
 [Wiki](https://bitbucket.org/budden/clcon/wiki/) - contains [screenshots](https://bitbucket.org/budden/clcon/wiki/Screenshots), but otherwise is not very useful.  
 
@@ -63,8 +57,8 @@ Anyway, see [doc/INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-- cross-reference info display
+- minimal "list definitions in file" tool
+- print "who calls" info
+- package-awareness of IDE
 - use as a GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine)
-- make editor reliable
-- thread list with thread debugging (if we need it for self-debugging)
 - close all bugs (ha-ha!)
