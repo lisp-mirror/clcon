@@ -26,14 +26,12 @@ Use Control-Alt-u to complete tcl name. Be sure to type in a space after ".."
 
 Find source command
 -------------------
-Currently finding a source can't properly extract symbol. So to see how it work just type
-defun 
-or, say, 
-print-object 
-on the fresh lisp prompt and press Alt-. 
+Find source command works best in console. Common-lisp package is assumed. Type 
+`defun` or, say, `print-object` on the fresh lisp prompt and press Alt-. 
 If there is a single source, you just go to source. 
 If there are many, they are printed at console and you can click on either on them with mouse (no way to do that
-with keyboard now, sorry for that, this is a bug)
+with keyboard now).
+Find source for tcl accepts fully-qualified identifier. Invoke it with Control-F9. 
 
 Find in files
 -------------

@@ -14,17 +14,19 @@ Note! You can not yet enter multi-line commands. As you press returns, input is 
 
 After you pressed return, you see that printing occurs with intervals. This experiment shows that we have async I/O.
 
-Completion and find definition
+Completion, find definition, apropos 
 -------------
 Completion and find definition works best in the console. Keyboard accelerators are shown in "Edit" menu.
 
 ### Lisp
 At the console, type in `clco:serv` and press `Tab`. Name will expand to `clco:server-lookup-definition`. 
 Now press `Alt-.` Editor window will pop up and source of function you typed will be seen.
+Use `.apr -lookup-` to list all symbols containing "-lookup-" substring in their name. 
 
 ### Tcl
 Return to the console with `Control-.` . Type a space and then `snit::Ca`. Then press `Control-Alt-u` . Name will expand to 
 `::snit::Capitalize`. Press `Control-F9` and jump to a source of tcl proc. We only now support procs, not variables. 
+Use `.tapr cap` to list all tcl procs, commands and vars containing substring `cap` in their name.
 
 ### File name
 Return to the console with `Control-.`. Type a space and then some partial file name in Unix style, e.g. `c:/win` under Windows or `/bi` under Unix
