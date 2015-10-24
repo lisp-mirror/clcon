@@ -25,35 +25,6 @@ proc ::tkcon::LispFindDefinitionInnerContinuation {SwankReplyAsList} {
     return
 }
 
-
-# Similar to ::tkcon::ExpandLispSymbol
-# FIXME - we need call compilation asynchronously, handle other results,
-# print code context (from lisp)
-# handle query to load failed compilation
-proc ::tkcon::CompileLispFileTmp filename {
-    variable PRIV
-
-    set Quoted [QuoteLispObjToString $filename]
-    set LispCmd "(clcon-server::compile-file-for-tcl $Quoted nil)"
-   
-    set SwankReply [::tkcon::EvalInSwankSync $LispCmd]
-    
-    putd "EvalInSwankSync returned $SwankReply"
-    putd "car swankreply = [::mprs::Car $SwankReply]"
-  
-    if {[::mprs::Car $SwankReply] eq ":ok"} {
-        # what about code injection? FIXME safety
-        set TclCode "set w $PRIV(console); [::mprs::Unleash [::mprs::Cadr $SwankReply]]"
-        putd "I will now eval code $TclCode"
-        eval $TclCode
-        $PRIV(console) see end
-    } else {
-        putd "ListDefinitions: I don't know what is [::mprs::Car $SwankReply]"
-    }
-}
-
-
-
 ## ::tkcon::ExpandLispSymbol
 # - expand a lisp symbol based on $str
 # ARGS:	str	- partial proc name to expand
@@ -149,8 +120,8 @@ proc ::tkcon::EditFileAtLine {filename line} {
     EditFileAtOffset $filename [string cat $line ".0"]
 }
 
-## ::tkcon::LispFindDefinition - clone of ::tkcon::Expand - 
-# ARGS:	w	- text widget in which to expand str
+## ::tkcon::LispFindDefinition - 
+# ARGS:	w	- console text widget in which to find a symbol
 # See also: ::edt::FindSourceCommand
 ## 
 proc ::tkcon::LispFindDefinition {w} {
