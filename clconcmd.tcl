@@ -17,10 +17,6 @@ namespace eval clconcmd {
         tkcon main TkconSourceHere $filename
     }
 
-    proc bufferlist {} {
-        tkcon main ::buli::BufferListBox 
-    }
-
     proc history {} {
         tkcon main history
     }
@@ -28,10 +24,6 @@ namespace eval clconcmd {
     # Run oduvanchik command (with 
     proc o {commandNameWoPrefix} {
         ::edt::oImplementation $commandNameWoPrefix
-    }
-
-    proc erbr {} {
-        tkcon main ::erbr::SwankBrowseErrors1 {'defun}
     }
 
     # Swank inspect star
