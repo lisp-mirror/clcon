@@ -253,7 +253,16 @@ proc ::tkcon::ExpandVariable {str {findUniqueMatch 1}} {
         }
 	## Space transformation avoided for array names.
     } else {
-	set match [EvalAttached [list info vars $str*]]
+	set match1 [EvalAttached [list info vars $str*]]
+        set ns [EvalAttached \
+		"namespace children \[namespace current\] [list $str*]"]
+        if {[llength $ns]==1} {
+            set match2 [EvalAttached [list info vars ${ns}::*]]
+        } else {
+            set match2 $ns
+        }
+        set match [concat $match1 $match2]
+
         if {$findUniqueMatch} {
             if {[llength $match] > 1} {
                 regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
