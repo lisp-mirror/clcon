@@ -20,7 +20,10 @@ namespace eval ::autotests {
         ::tkcon::Prompt
         $con insert end $partial_namespace
         event generate $con <<TkCon_ExpandTcl>>
-        after [TimeUnits 0.1] [list ::autotests::regression70continuation]
+        # Here we can afford it, as unfinished activity leads to failure of the test.
+        # In general case, I don't know how to ensure that clear and prompt commands are
+        # fully completed
+        after [TimeUnits 0.1] [list after idle [list ::autotests::regression70continuation]]
     }
 
     proc regression70continuation {} {
