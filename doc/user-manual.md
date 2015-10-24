@@ -57,15 +57,20 @@ Place dot (.) in the first position of the command to invoke named IDE command. 
 
 ```.insp*``` call inspector to inspect ```*``` (result of previous REPL evaluation)
 
-```.tcsoh filename.tcl``` loads tcl file from directory where clcon.tcl script is located into main IDE tcl interpeter 
-
-```.bufferlist``` shows editor's buffer list. Or just press `Ctrl-F12` (in most of the windows)
+```.tcsoh filename.tcl``` loads tcl file from directory where clcon.tcl script is located into main IDE tcl interpeter. Also note we
+have file/Reload some of IDE sources which reloads all sources excluding clcon.tcl, record_definition.tcl and named_args.tcl. 
 
 ```.history``` shows command history
 
 ```.NNN``` where NNN is a decimal number re-runs command from history with that number
 
 ```.o``` run oduvanchik command in visible editor buffer. Command must be written with dashes and without '-command' suffix, e.g. ```.o indent-new-line```
+
+```.fics string``` finds a string in clcon sources (case insensitive)
+
+```.apr string``` invokes lisp apropos (case insensitive)
+
+```.tapr string``` invokes tcl apropos (case insensitive)
 
 ```.help``` lists available IDE commands (no real help, sorry :) )
 
@@ -172,7 +177,7 @@ Read issues
 
 Thread list and debugging
 ------------------
-У нас нет ГУЯ для отладки потоков. Но можно напечатать
-список потоков в консоль с помощью ```(swank:list-threads)```,
-а затем вызвать отладку треда по номеру в списке (не по id-у треда) ```(swank:debug-nth-thread <N>)``` . Номер в списке начинается с нуля (заголовок не считаем).
+We have no GUI to debug threads. But we can get list of threads with 
+`(swank:list-threads)`, and then debug thread by its number in a list (not by thread id)
+with `(swank:debug-nth-thread <N>)` . Numbers are zero-based (not counting header). 
  

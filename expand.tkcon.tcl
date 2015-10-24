@@ -327,3 +327,35 @@ proc ::tkcon::GetTclNameAtInsert {w} {
     showVarPutd result
     return $result
 }
+
+#proc ::tkcon::TclListAllToplevelThings {} {
+#    set procs [info procs *]
+#    set vars [info vars *]
+#    set result [concat $procs $vars]
+#    return $result
+#}
+
+proc ::tkcon::TclListAllDefinedThingsInNamespace {namespace} {
+    set procs [info procs ${namespace}::*]
+    set vars [info vars ${namespace}::*]
+    set children [namespace children ${namespace}]
+    set result [concat $procs $vars $children]
+    foreach child $children {
+        set result [concat $result [TclListAllDefinedThingsInNamespace $child]]
+    }
+    return $result
+}
+
+proc ::tkcon::TclApropos {str} {
+    # set e1 [TclListAllToplevelThings]
+    # set AllNames [concat $e1 $e2]
+    set AllNames [TclListAllDefinedThingsInNamespace "::"]
+    set result [list]
+    foreach x $AllNames {
+        if {[string match -nocase *${str}* $x]} {
+            lappend result $x
+        }
+    }
+    return [lsort $result]
+}
+

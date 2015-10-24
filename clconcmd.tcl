@@ -34,12 +34,36 @@ namespace eval clconcmd {
         tkcon main ::erbr::SwankBrowseErrors1 {'defun}
     }
 
+    # Swank inspect star
     proc insp* {} {
         tkcon main ::insp::SwankInspect "*"
     }
 
     proc ed {filename} {
         ::edt::edit -type file -wrap char -- $filename
+    }
+
+    # Tcl apropos
+    proc tapr {str} {
+        foreach x [::tkcon::TclApropos ${str}] {
+            puts ${x}
+        }
+    }
+
+    # Lisp apropos 
+    proc apr {str} {
+        set qStr [::tkcon::QuoteLispObjToString $str]
+        set form "(cl:apropos $qStr)" 
+        ::tkcon::FocusConsole
+        ::tkcon::SendEventToSwank $form {puts ""} 1 {:find-existing}
+    }
+
+    # Find in clcon sources 
+    proc fics {str} {
+        set qStr [::tkcon::QuoteLispObjToString $str]
+        set form "(clco::find-in-clcon-sources $qStr)" 
+        ::tkcon::FocusConsole
+        ::tkcon::SendEventToSwank $form {puts ""} 1 {:find-existing}
     }
 }
     
