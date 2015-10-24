@@ -35,6 +35,12 @@ If there is a single source, you just go to source.
 If there are many, they are printed at console and you can click on either on them with mouse (no way to do that
 with keyboard now, sorry for that, this is a bug)
 
+Find in files
+-------------
+Can be called from lisp only or as an IDE command. 
+See IDE command `.fics` or try `(clco::find-in-clcon-sources "Prompt")`
+See source of that lisp function to learn how to write your own file search functions.
+
 Connecting/disconnecting to/from SWANK
 --------------------------------------
 Use two items on Console menubar item
@@ -181,3 +187,8 @@ We have no GUI to debug threads. But we can get list of threads with
 `(swank:list-threads)`, and then debug thread by its number in a list (not by thread id)
 with `(swank:debug-nth-thread <N>)` . Numbers are zero-based (not counting header). 
  
+Syntax highlighting
+------------------
+Code highlighting is now rather humble. All files are painted as lisp regardless of extension.
+Also we have basic paren highlighting - when you stand after closing paren, editor highlights
+appropriate opening paren. 
