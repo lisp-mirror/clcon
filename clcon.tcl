@@ -295,7 +295,6 @@ proc ::tkcon::Init {args} {
 	find,case	0
 	find,reg	0
 	errorInfo	{}
-	protocol	exit
 	showOnStartup	1
 	slaveprocs	{
 	    alias clear dir dump echo idebug lremove
@@ -751,7 +750,7 @@ proc ::tkcon::InitUI {title} {
     if {$root eq "."} { set w {} } else { set w [toplevel $root] }
     if {!$PRIV(WWW)} {
 	wm withdraw $root
-	wm protocol $root WM_DELETE_WINDOW $PRIV(protocol)
+	wm protocol $root WM_DELETE_WINDOW ::tkcon::Destroy
     }
     set PRIV(base) $w
 
@@ -883,6 +882,10 @@ proc ::tkcon::InitTab {w} {
 
     # text console
     set con $w.tab[incr PRIV(uid)]
+
+    # budden. I'm not quite sure...
+    # wm protocol $con WM_DELETE_WINDOW [list wm destroy $PRIV(root)]
+
     # ctext -linemap 0 , clcon_text
     text $con -wrap char -foreground $COLOR(stdin) \
 	-insertbackground $COLOR(cursor) -borderwidth 1 -highlightthickness 0
@@ -2250,6 +2253,17 @@ proc ::tkcon::MainInit {} {
 	}
     }
 
+    proc ::tkcon::CheckIfEditorAllowsToExitAndSayToUser {} {
+        variable PRIV
+        if {[::edt::EditorHaveModifiedWindowsP]} {
+            tk_messageBox -parent $PRIV(console) -title "Quit clcon" -message "You have unsaved files" 
+            ::edt::ShowSomeEditor
+            return 0
+        } else {
+            return 1
+        }
+    }
+    
     ## ::tkcon::Destroy - destroy console window
     ## This proc should only be called by the main interpreter.  If it is
     ## called from there, it will ask before exiting tkcon.  All others
@@ -2258,8 +2272,13 @@ proc ::tkcon::MainInit {} {
     proc ::tkcon::Destroy {{slave {}}} {
 	variable PRIV
 
+        if {![::tkcon::CheckIfEditorAllowsToExitAndSayToUser]} {
+            return
+        }
+        
 	# Just close on the last one
 	if {[llength $PRIV(interps)] == 1} { exit }
+        
 	if {"" == $slave} {
 	    ## Main interpreter close request
 	    if {[tk_messageBox -parent $PRIV(root) -title "Quit tkcon?" \

@@ -30,11 +30,49 @@ namespace eval ::edt {
             return [dict get $p "Bi"]
         }
     }
-    
+
+    # Returns 1 if we must continue closing, 0 if we must keep buffer
+    proc SaveDontSaveOrCancel {Bi} {
+        set w [Bi2W $Bi]
+        set clcon_text [Bi2btext $Bi]
+        set textt [Bi2_text $Bi]
+        set modified [$clcon_text edit modified]
+        set MRUWinListEntry [lindex [SearchBiInMRUWinList $Bi] 1]
+        set tab_name [dict get $MRUWinListEntry name]
+        if {$modified} {
+            if {[FileLessBufferP $clcon_text]} {
+                set word "buffer"
+            } else {
+                set word "file"
+            }
+            set word2 [string toupper $word 0]
+            set UserReplyToSaveRequest [YesNoCancel "Closing $word" "$word2 $tab_name not saved. Save?" $textt]
+            switch -exact $UserReplyToSaveRequest {
+                "yes" {
+                    Save $clcon_text
+                    return 1
+                }
+                "no" {
+                # nothing to do
+                    return 1
+                }
+                "cancel" {
+                    return 0
+                }
+                default {
+                    error "logic error"
+                }
+            }
+        } else {
+            return 1
+        }
+    }
+        
     # close file (without saving for now)  
     proc EditCloseFile {Bi} {
-        set w [Bi2W $Bi]
-        putd "Saving file if omitted!" 
+        if {![SaveDontSaveOrCancel $Bi]} {
+            return
+        }
         RemoveWindowFromLists $Bi
         # UpdateMRUAndBufferList {}
         set newBi [AnyBufferBi]
@@ -43,6 +81,7 @@ namespace eval ::edt {
             after idle [list destroy [cTW]]
         } else {
             SwitchToBuffer $newBi do_nothing
+            set w [Bi2W $Bi]
             after idle [list destroy $w]
         }
     }
@@ -106,6 +145,19 @@ namespace eval ::edt {
         ::buli::RefreshData
         $notebook tab $index -text [CalcTabText $Bi]
     }
+
+    proc EditorHaveModifiedWindowsP {} {
+        variable ContentKeyToBufIdDict
+        dict for {key Bi} $ContentKeyToBufIdDict {
+	    set textt [Bi2_text $Bi]
+            set modified [$textt edit modified]
+            if {$modified} {
+                return 1
+            }
+        }
+        return 0
+    }
+
 
     proc CalcTabText {Bi} {
         set MRUWinListEntry [lindex [SearchBiInMRUWinList [cBi]] 1]
