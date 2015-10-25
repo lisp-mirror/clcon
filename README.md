@@ -1,8 +1,13 @@
 # README #
 
 ## What's that
-**clcon** is a cross-platform Common Lisp IDE under construction. Current version is 0.2.6 (see tags in repo)
+**clcon** is a cross-platform Common Lisp IDE under construction. Current version is 0.2.6 (see tags in repo).
 
+## Note about versions
+If your're reading this document online, this document describes trunk version. 
+Description of file release is under c:/clcon/quicklisp/local-projects/clcon/readme.md when release is installed.
+
+## Platform support
 Supported lisp implementation(s):
 
 - SBCL
@@ -43,7 +48,7 @@ For windows, we have [File release](https://bitbucket.org/budden/clcon/downloads
 Anyway, see [doc/INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/INSTALL.md) for installation instructions. 
 
 ## Documentation
-[Demo tour](doc/demo-tour.md) - narrow footpath through best views of some features of clcon
+[Demo tour (trunk version)](doc/demo-tour.md) - narrow footpath through best views of some features of clcon.
 
 [User manual](https://bitbucket.org/budden/clcon/src/default/doc/user-manual.md)
 
