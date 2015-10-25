@@ -2988,23 +2988,6 @@ proc tkcon {cmd args} {
 	    ## Modify a var in the master environment using lappend
 	    return [uplevel \#0 lappend $args]
 	}
-	sh* - dei* {
-	    ## 'show|deiconify' - deiconifies the console.
-	    if {![info exists PRIV(root)]} {
-		# We are likely in some embedded console configuration.
-		# Make default setup reflect that.
-		set PRIV(showOnStartup) 0
-		set PRIV(protocol) {tkcon hide}
-		set PRIV(root) .tkcon
-		set OPT(exec) ""
-	    }
-	    if {![winfo exists $PRIV(root)]} {
-		eval [linsert $args 0 ::tkcon::Init]
-	    }
-	    # this may throw an error if toplevel is embedded
-	    catch {wm deiconify $PRIV(root); raise $PRIV(root)}
-	    focus -force $PRIV(console)
-	}
 	ti* {
 	    ## 'title' ?title? - gets/sets the console's title
 	    if {[llength $args]} {
