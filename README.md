@@ -45,7 +45,9 @@ So first of all take a [demo tour](doc/demo-tour.md).
 
 ## Installation and startup
 For windows, we have [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.2.6.zip). 
-Anyway, see [doc/INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/INSTALL.md) for installation instructions. 
+Note: online documentation describes current repository trunk. Documentation for the file release version (including readme file) is inside the release archive itself, at clcon/quicklisp/local-projects/clcon subdirectory of archive. See doc/INSTALL.md for installation instructions.
+
+For the trunk, see [INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/INSTALL.md).
 
 ## Documentation
 [Demo tour (trunk version)](doc/demo-tour.md) - narrow footpath through best views of some features of clcon.
