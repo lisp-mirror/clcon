@@ -85,7 +85,8 @@ namespace eval ::edt {
         $m add separator
 
         OduFnMenuItem $w $m $btext forward-form \
-            -accel <Control-Key-Right> -bindtag SingleMod$w -ContinueIfNoBackend 1
+            -ContinueIfNoBackend 1
+            # -accel <Control-Key-Right> -bindtag SingleMod$w 
         
         OduFnMenuItem $w $m $btext backward-form
         OduFnMenuItem $w $m $btext forward-list
