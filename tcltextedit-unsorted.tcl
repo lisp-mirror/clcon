@@ -106,6 +106,7 @@ proc YesNoCancel {title message parent} {
     set ou [string cat $parent .ou]
     catch {destroy $ou}
     toplevel $ou
+    wm withdraw $ou
     wm title $ou $title
     set YesNoCancelReply "cancel"
     frame $ou.f
@@ -127,6 +128,8 @@ proc YesNoCancel {title message parent} {
     bind $ou <Escape> "set YesNoCancelReply cancel"
     #label $ou.img -image warn
     pack $ou.f
+    wm deiconify $ou
+    raise $ou
     focus $ou.f.yes
     wm protocol $ou WM_DELETE_WINDOW "set YesNoCancelReply cancel"
 
