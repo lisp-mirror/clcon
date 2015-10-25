@@ -1,4 +1,4 @@
-Clcon demo tour
+Clcon demo tour - online version is for trunc, file release version is in the release
 ===============
 
 Clcon is a building site. Excavators buzz. Pits, traps, naked electric wires wait you there.
