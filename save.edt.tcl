@@ -16,19 +16,16 @@ namespace eval ::edt {
     }
 
 
-    proc UntitledBufferP {clcon_text} {
+    proc FileLessBufferP {clcon_text} {
         set opened_file [$clcon_text cget -opened_file]
         expr {[$opened_file cget -filename]=={}}
-    }
-
-    proc DoSave {clcon_text FileName} {
     }
 
     # Returns 1 if file was saved. Can modify clcon_text data.
     proc Save {clcon_text} {
         set opened_file [$clcon_text cget -opened_file]
         set FileName [$opened_file cget -filename]
-        if {[UntitledBufferP $clcon_text]} {
+        if {[FileLessBufferP $clcon_text]} {
             set UntitledBuffer 1
             set FileName [FILESaveRequest {}]
             if {$FileName eq {}} {
