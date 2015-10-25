@@ -296,3 +296,6 @@ sldb-break-with-default-debugger
   (setf (slot-value c 'swank::trace-output) *initial-standard-output*))
 (push 'redirect-trace-output-to-inferior-lisp swank::*new-connection-hook*)
 
+
+(format *trace-output* "~%insert-string b ~A" (oi::mark-row-and-col mark))
+deal-with-highlight-after-insert-command
