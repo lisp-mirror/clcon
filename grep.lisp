@@ -54,7 +54,7 @@
 (defun clcon-sources ()
   "Returns an approximate list of clcon source files"
   (let ((filelist nil))
-    (dolist (mask '("**/*.lisp" "**/*.tcl" "**/*.asd" "**/*.md"))
+    (dolist (mask '("**/*.lisp" "**/*.tcl" "**/*.asd" "**/*.md" "../oduvanchik/**/*.lisp" "../oduvanchik/*.asd"))
       (dolist (file (directory (merge-pathnames mask *clcon-source-directory*)))
         (unless
             (or (member "xlam" (pathname-directory file) :test 'equalp)
