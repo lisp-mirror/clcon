@@ -341,13 +341,13 @@ proc ::tkcon::GetTclNameAtInsert {text} {
     set exp_beg "\[^\\\\\]\[\[ \t\n\r\\\{\"$\]" 
 
     if {[IsItConsole $w] && [IsInsertAfterTheConsolePrompt $w]} {
-        set searchStartPos [$w index limit]
+        set searchStartPos "[$w index limit] -1c"
     } else {
         set searchStartPos 1.0
     }    
         
     set i_b [$w search -backwards -regexp $exp_beg insert-1c $searchStartPos]
-    if {$i_b ne {}} {append i_b +2c} else {set i_b $searchStartPos}
+    if {$i_b ne {}} {append i_b +2c} else {set i_b "$searchStartPos +1c"}
     set exp_end "\[^\\\\\]\[\\\[\\\] \t\n\r\\\{\}\"$\]"
     set i_e [$w search -forwards -regexp $exp_end insert end]
     if {$i_e ne {}} {append i_e +1c} else {set i_e end-1c}
