@@ -105,3 +105,11 @@ Type at the console:
 `(clco::find-in-clcon-sources "buf1")`
 And you'll see some kind of "grep browser". It can only fine simple strings for now with case ignored. There is no way to call it from the menu. 
 If you want other kinds of search, you are welcome to Common Lisp programming - just jump to `clco::find-in-clcon-sources` and watch how it is done. 
+
+List declarations in current file
+---------
+Press `f12` in the editor buffer, or choose "Show current file declarations" from the Edit menu of Editor. 
+Press `Space` to open declaration location. Or press `Return` to close declaration list and jump to location. 
+Code to extract declarations is extremely simple - no warranty. Also note that declarations are extracted from
+ the file, not from the buffer. So if file is open in the editor and modified, locations will be inexact. 
+Also widget's design is not that perfect. At least I used it dozen of times and found it can be useful sometimes. 

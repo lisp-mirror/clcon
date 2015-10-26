@@ -64,7 +64,7 @@ For the trunk, see [INSTALL.md](https://bitbucket.org/budden/clcon/src/default/d
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-- print "who calls" info
 - package-awareness of IDE
 - use as a GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine)
 - close all bugs (ha-ha!)
+- print "who calls" info 
