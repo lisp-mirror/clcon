@@ -2116,7 +2116,9 @@ proc ::tkcon::OpenForEdit { parent {fn ""} } {
 ## This does not eval in a slave because it's not necessary
 # ARGS:	w	- console text widget
 # 	fn	- (optional) filename to save to
-## 
+#       type    - type of content to save
+#       opt     - at least for a type eq "widget", a widget
+##
 proc ::tkcon::Save { {fn ""} {type ""} {opt ""} {mode w} } {
     variable PRIV
 
@@ -2129,22 +2131,22 @@ proc ::tkcon::Save { {fn ""} {type ""} {opt ""} {mode w} } {
 	if {$type == 5 || $type == -1} return
 	set type $s($type)
     }
-    # Allow for VFS directories, use Tk dialogs automatically when in
-    # VFS-based areas
-    set check [expr {$opt == "" ? [pwd] : $opt}]
-    if {$::tcl_version >= 8.4 && [lindex [file system $check] 0] == "tclvfs"} {
-	set savecmd [list ::tk::dialog::file:: save]
+    set savecmd [list tk_getSaveFile]
+    if {$type eq "widget"} {
+        set parent $opt
     } else {
-	set savecmd [list tk_getSaveFile]
+        set parent $PRIV(console)
     }
     if {$fn eq ""} {
 	set types {
+	    {{Lisp Files}       {.lisp .asd}}
 	    {{Tcl Files}	{.tcl .tk}}
 	    {{Text Files}	{.txt}}
 	    {{All Files}	*}
 	}
-	if {[catch {eval $savecmd [list -defaultextension .tcl \
-				       -filetypes $types \
+	if {[catch {eval $savecmd [list -defaultextension .tcl   \
+				       -filetypes $types         \
+				       -parent $parent           \
 				       -title "Save $type"]} fn]
 	     || $fn eq ""} return
     }
