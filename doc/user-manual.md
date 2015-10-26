@@ -67,7 +67,7 @@ Place dot (.) in the first position of the command to invoke named IDE command. 
 ```.tcsoh filename.tcl``` loads tcl file from directory where clcon.tcl script is located into main IDE tcl interpeter. Also note we
 have file/Reload some of IDE sources which reloads all sources excluding clcon.tcl, record_definition.tcl and named_args.tcl. 
 
-```.history``` shows command history
+```.hist``` shows command history. It accepts an optional string argument. If supplies, it is treated as glob pattern to filter history event. Asteriks are added at the left and right sides of pattern prior to filtering.
 
 ```.NNN``` where NNN is a decimal number re-runs command from history with that number
 
@@ -92,8 +92,8 @@ Place two dots (..) to pass arbitrary tcl command to tcl interpreter. E.g. this 
 Opening files for editing
 -------------------------
 Use "File" menu, Control-o keyboard shortcut or
-.ed IDE command: 
-```.ed <filename>```
+.edit IDE command: 
+```.edit <filename>```
 Press Ctrl-F3 to complete filename (at least it will work undex *nix).
 
 Saving files 

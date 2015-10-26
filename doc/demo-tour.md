@@ -43,8 +43,8 @@ Compiling file from editor
 At the console, open test/error-browser-sample-file.lisp file for editing.
 There are at least two ways to do that: via file open dialog (Control-O)
 or via console ed command:
-``.ed /s2/clcon/test/error-browser-sample-file.lisp`` or 
-``.ed c:/clcon/quicklisp/local-projects/clcon/test/error-browser-sample-file.lisp``
+``.edit /s2/clcon/test/error-browser-sample-file.lisp`` or 
+``.edit c:/clcon/quicklisp/local-projects/clcon/test/error-browser-sample-file.lisp``
 for Windows file release. While typing in filename, use Control-F3 for completion.
 
 File will open in the editor. From the menu, choose `Lisp/Compile and load`. Two new windows will pop up: list of compiler notes 
@@ -83,10 +83,8 @@ Bring up last command with `Control-Up` at the console, and press `Return` to ca
 
 IDE commands. 
 ---------------------
-We have some kind of IDE command language. IDE commands start with `.`
+We like menus, but console-based ideology is nice too. So we have some kind of IDE command language. IDE commands start with `.`
 Type `.help` to see list of those.
-
-One of useful commands is `.history`. It shows history of last commands you entered. You can invoke several last commands via history menu. 
 
 Standalone inspector
 ----------

@@ -91,7 +91,7 @@ namespace eval ::edt {
         } elseif {[string range $x end-4 end] eq ".text"} {
             return $x
         } else {
-            puts stderr "Unexpected btext_or_btext_dot_t = $x"
+            puts stderr "Unexpected btext_or_btext_dot_t = $x. If you were using WrapEventScriptForFreezedText, try -destination"
             idebug on
             idebug break
         }
