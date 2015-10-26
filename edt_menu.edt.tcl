@@ -72,7 +72,9 @@ namespace eval ::edt {
         OduFnMenuItem $w $m $btext indent-new-line -accel "<Shift-Key-Return>" -bindtag SingleMod$w
 
         OduFnMenuItem $w $m $btext indent-form
-        
+
+        OduFnMenuItem $w $m $btext indent -accel "<Tab>" -bindtag NoMod$w
+
         set cmd [wesppt [list clcon_text::CallOduvanchikFunction $btext "odu::indent-region-command nil" {} {send_selection 1}]]
         
         $m add command -label "Indent Region" -command $cmd 
