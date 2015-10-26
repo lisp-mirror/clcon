@@ -60,13 +60,15 @@ namespace eval ::srchtblst {
         return $increment
     }
 
+    # Returns command, including search string, as a list
     proc SearchStateTableListCmdWithCaseOption {} {
         variable ::fndrpl::SearchState
         set findcase [dict get $SearchState -findcase]
+        set searchStringQ [dict get $SearchState -searchStringQ]
         if {$findcase eq "1"} {
-            set result "regexp"
+            set result [list string match [string cat "*" $searchStringQ "*"]]
         } elseif {$findcase eq "0"} {
-            set result "regexp -nocase"
+            set result [list string match -nocase [string cat "*" $searchStringQ "*"]]
         } else {
             error "wrong findcase $findcase"
         }
@@ -96,9 +98,13 @@ namespace eval ::srchtblst {
                 apply $lambda $tbl -1
             }            
             set CmdWithCaseOption [SearchStateTableListCmdWithCaseOption]
-            set celltext [$tbl get $CurName]
-            set cmd [string cat $CmdWithCaseOption " " [list $searchString [lindex $celltext 0]]]
+            # set celltext [$tbl get $CurName]
+            # We separate cells with tabs to decrease possibility of occasional finding of the entire search string
+            # We could describe it is a search feature though.
+            set celltext [list [join [$tbl rowcget $CurName -text] \t]]
+            set cmd [concat $CmdWithCaseOption $celltext]
             putd "about to test row at $CurName = [$tbl index $CurName]"
+            showVarPutd cmd
             if {[eval $cmd]} {
                 # found 
                 ::tablelist_util::TreeSetTo $tbl $CurName
