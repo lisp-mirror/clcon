@@ -7,6 +7,19 @@ proc ::tkcon::BeginningOfLispSymbolRegexp {} {
      return {[^\\][[:space:]$(),@'""]}
 }
 
+# for clcon, pass [$clcon_text RealText] here. For editor, pass [::edt::Bi2_text]
+proc ::tkcon::IsItConsole {text} {
+    variable PRIV
+    ::mprs::AssertEq [winfo class $text] Text
+    expr { $text eq $PRIV(console) }
+}
+    
+# We assume we are at the console, see ::tkcon::IsItConsole
+proc ::tkcon::IsInsertAfterTheConsolePrompt {text} {
+    $text comp insert >= limit
+}
+
+
 ## ::tkcon::Expand - 
 # ARGS:	w	- text widget in which to expand str
 # 	type	- type of expansion (path / proc / variable)
@@ -322,18 +335,23 @@ proc ::tkcon::ExpandBestMatch {l {e {}}} {
     }
 }
 
-
 # Returns name at which insert stands
-proc ::tkcon::GetTclNameAtInsert {w} {
+proc ::tkcon::GetTclNameAtInsert {text} {
+    set w $text
     set exp_beg "\[^\\\\\]\[\[ \t\n\r\\\{\"$\]" 
-    set i_b [$w search -backwards -regexp $exp_beg insert-1c 1.0]
-    if {$i_b ne {}} {append i_b +2c} else {set i_b 1.0}
+
+    if {[IsItConsole $w] && [IsInsertAfterTheConsolePrompt $w]} {
+        set searchStartPos [$w index limit]
+    } else {
+        set searchStartPos 1.0
+    }    
+        
+    set i_b [$w search -backwards -regexp $exp_beg insert-1c $searchStartPos]
+    if {$i_b ne {}} {append i_b +2c} else {set i_b $searchStartPos}
     set exp_end "\[^\\\\\]\[\\\[\\\] \t\n\r\\\{\}\"$\]"
     set i_e [$w search -forwards -regexp $exp_end insert end]
-    showVarPutd i_e
     if {$i_e ne {}} {append i_e +1c} else {set i_e end-1c}
     set result [$w get $i_b $i_e]
-    showVarPutd result
     return $result
 }
 
