@@ -61,7 +61,7 @@ bind Text <KeyPress> {
 # FIXME some options might be buffer-related, not text-related.
 namespace eval ::clcon_text {
 
-    snit::type opened_file {
+    ::snit::type opened_file {
         option -filename {}
         option -filemtime {}
     }
