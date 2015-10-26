@@ -139,6 +139,9 @@ namespace eval ::tkcon {
 proc putd {arg1} {
     variable ::tkcon::OPT
 
+    if { ![info exists ::tkcon::OPT] } {
+        error "it is too early to use putd. Try 'puts stderr'"
+    }
     if { $::tkcon::OPT(putd-enabled) } {
         global putdChannel
         global putdChannelOpen 
@@ -3006,6 +3009,18 @@ proc tkcon {cmd args} {
 	lappend {
 	    ## Modify a var in the master environment using lappend
 	    return [uplevel \#0 lappend $args]
+	}
+	show - deiconify {
+	    ## 'show|deiconify' - deiconifies the console.
+	    if {![info exists PRIV(root)]} {
+	        error "tkcon embedded functionality removed. If you need embedded configuration, patch clcon"
+	    }
+	    if {![winfo exists $PRIV(root)]} {
+		eval [linsert $args 0 ::tkcon::Init]
+	    }
+	    # this may throw an error if toplevel is embedded
+	    catch {wm deiconify $PRIV(root); raise $PRIV(root)}
+	    focus -force $PRIV(console)
 	}
 	ti* {
 	    ## 'title' ?title? - gets/sets the console's title
