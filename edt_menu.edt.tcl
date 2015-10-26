@@ -212,7 +212,7 @@ namespace eval ::edt {
         bind DoubleMod$w <Control-Key-Return> "$cmd; break"
         
         $m add separator
-        set cmd [list ::tkcon::TclFindDefinition $btext]
+        set cmd [list ::tkcon::TclFindDefinition [$btext RealText]]
         $m add command -label "Tcl find source" -accel <Control-Key-F9> -command $cmd
         bind SingleMod$w <Control-Key-F9> "$cmd; break"
         
