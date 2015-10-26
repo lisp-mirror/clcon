@@ -223,10 +223,10 @@ namespace eval ::edt {
         set m [cMenuBar .window]
         ::gui_util::ClearMenu $m
         
-        set cmd [list ::clconcmd::bufferlist]
+        set cmd ::buli::BufferListBox
 	$m add command -label "Buffer list" -underline 0 -accel "Control-F12" \
             -command $cmd
-        bind SingleMod$w <Control-Key-F12> $cmd
+        bind SingleMod$w <Control-Key-F12> [concat $cmd ";" break]
         #
         set cmd [list ::tkcon::FocusConsole]
 	$m add command -label "Console" -underline 0 -accel "Control-." \

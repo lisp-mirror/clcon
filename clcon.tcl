@@ -1422,7 +1422,7 @@ proc ::tkcon::InitMenus {w title} {
     ## Window Menu
     ##
     foreach m [list [menu $w.window] [menu $w.pop.window]] {
-        set cmd [list ::clconcmd::bufferlist]
+        set cmd [list ::buli::BufferListBox]
 	$m add command -label "Buffer list" -underline 0 -accel "Control-F12" \
             -command $cmd
         bind $PRIV(root) <Control-Key-F12> $cmd

@@ -517,7 +517,7 @@ namespace eval ::ldbg {
         ## Window Menu
         ##
         set m [menu [::tkcon::MenuButton $menu "7.Window" window]]
-        set cmd [list ::clconcmd::bufferlist]
+        set cmd ::buli::BufferListBox
 	$m add command -label "Buffer list" -accel "Control-F12" \
             -command $cmd 
         #bind $w <Control-Key-F12> $cmd
