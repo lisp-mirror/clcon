@@ -423,7 +423,7 @@ namespace eval ::clcon_text {
             ::clcon_text::IncrPendingSentNotifications \
                 -1 $clcon_text $UseGlobalPendingText2OduEventCounter
         }]
-        putd "MaybeSendToLisp: about to send $lispCmd with cont $continuation"
+        # putd "632017 MaybeSendToLisp: about to send $lispCmd with cont $continuation"
         ::tkcon::EvalInSwankAsync $lispCmd $continuation {:find-existing}
     }
 
@@ -551,7 +551,6 @@ namespace eval ::clcon_text {
     proc tncm {btext_or_btext_dot_t} {
         set x $btext_or_btext_dot_t
         # before idle came, widget could be destroyed.
-        putd "Entered tncm"
         set clcon_text [::edt::CoerceTextToItsBText $x]
         if {![winfo exists $clcon_text]} {
             putd "Entered tncm:oops $clcon_text"
