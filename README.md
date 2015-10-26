@@ -37,11 +37,11 @@ So first of all take a [demo tour](doc/demo-tour.md).
 ## Current features
 - REPL for Lisp and Tcl with history
 - Completion, find source, apropos for Lisp and TCl in REPL
-- Find in files (prototype)
+- Find in files
 - Debugger, Stepper, Inspector from SWANK 
-- Editor with lisp syntax and paren highlight
-- Some parts of lisp mode: auto-indent, navigate through forms
-- Compilation error browser
+- Editor with lisp syntax highlight, autoindent, lisp forms navigation
+- Compile lisp from IDE, compilation error browser with "jump to source"
+- List definitions in a file for Lisp and Tcl (very primitive version)
 
 ## Installation and startup
 For windows, we have [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.2.6.zip). 
@@ -64,7 +64,6 @@ For the trunk, see [INSTALL.md](https://bitbucket.org/budden/clcon/src/default/d
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-- minimal "list definitions in file" tool
 - print "who calls" info
 - package-awareness of IDE
 - use as a GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine)
