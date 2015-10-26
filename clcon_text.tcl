@@ -465,7 +465,7 @@ namespace eval ::clcon_text {
         
         if {$(-note-cursor-motion)} {
             set NoteCursorMotion  "
- after idle [list ::clcon_text::tncm %W]"
+ after idle [list ::clcon_text::tncm <<<<destination>>>>]"
         } else {
             set NoteCursorMotion ""
         }        
