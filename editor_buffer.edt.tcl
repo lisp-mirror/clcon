@@ -183,6 +183,7 @@ namespace eval ::edt {
     }
 
     # Removes old editor bindtags and set new ones
+    # New bindtags are DoubleMod$suffix, SingleMod$suffix, NoMod$suffix
     proc SetEditorBindtags {path suffix} {
         set s $suffix
         set result [list DoubleMod$s SingleMod$s NoMod$s]

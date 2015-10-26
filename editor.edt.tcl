@@ -158,6 +158,26 @@ namespace eval ::edt {
         return 0
     }
 
+    # w is a result of  bi2W - this is in correspondence with tag names
+    proc FixParentsKeyBindings {w} {
+
+        # Fix ttk::notebook's bindings which would otherwise be shadowed by btext's bindings
+        # There is a nice idea to borrow event handlers just from parents. 
+        # But parent's handlers include %W and we have different %W
+
+        bind SingleMod$w <Control-Key-Tab> [list ::ttk::notebook::TLCycleTab %W 1]
+        bind SingleMod$w <Control-Key-ISO_Left_Tab> [list ::ttk::notebook::TLCycleTab %W -1]
+
+        bind DoubleMod$w <Control-Shift-Key-Tab> [list ::ttk::notebook::TLCycleTab %W -1]
+        bind DoubleMod$w <Control-Shift-Key-ISO_Left_Tab> [list ::ttk::notebook::TLCycleTab %W -1]
+
+        # Disabling Shift-Key-Tab as it removes cursor from text widget. 
+        bind SingleMod$w <Shift-Key-ISO_Left_Tab> [list break]
+        bind SingleMod$w <Shift-Key-Tab> [list break]
+
+        # Just <Tab> is defined as indent at ::edt::MakeLispModeMenu
+    }
+        
 
     proc CalcTabText {Bi} {
         set MRUWinListEntry [lindex [SearchBiInMRUWinList [cBi]] 1]
@@ -263,6 +283,8 @@ namespace eval ::edt {
         foreach path [list $tw $w $btext $textt] {
             SetEditorBindtags $path $w
         }
+
+        FixParentsKeyBindings $w
 
         RebuildMenu
 
