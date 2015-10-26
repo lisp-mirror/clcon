@@ -192,6 +192,14 @@ namespace eval ::edt {
         $m add command -label "Replace" -under 0 -command $cmd -accel "Control-h"
         bind SingleMod$w <Control-Key-h> "$cmd; break"
         bind SingleMod$w <Control-Key-Cyrillic_er> "$cmd; break"
+
+        $m add separator
+        # this command works for both lisp and tcl so we put it at edit menu
+        set cmd [list ::edt::FindCurrentFileDeclarations $btext]
+        $m add command -label "Show Current File declarations (no save!)" \
+            -command $cmd -accel "F12"
+        bind NoMod$w <F12> [concat $cmd ";" break]
+
         
         ## Lisp mode Menu
         ##

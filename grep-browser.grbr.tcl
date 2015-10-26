@@ -44,12 +44,16 @@ namespace eval ::grbr {
 
     # Jump to current source location if it is possible.
     # Otherwise, issue a warning and stay in the message list
-    proc JumpToCurrentLocation {grbr} {
+    proc JumpToCurrentLocation {grbr args} {
+        named_args $args {-close 0}
         set data [$grbr cget -data]
         set tbl [GetTitleListMenuTbl $grbr]
         set rowName [$tbl rowcget active -name]
         set dataItem [dict get $data $rowName]
         JumpToLocation [$tbl bodypath] $dataItem
+        if {$(-close)} {
+            after idle [list destroy $grbr]
+        }
     }
     
 
@@ -128,6 +132,9 @@ namespace eval ::grbr {
         set text [HeaderOfGrepBrowser $grbr]
         ::ro_out::D $text 1.0 end
         ::ro_out::I $text 1.0 $string
+        set TitleShort [string range $string 0 50]
+        set TitleShortNoSpaces [regsub -line -all \n $TitleShort " "]
+        wm title $grbr $TitleShortNoSpaces
     }
 
     # Called from lisp, see clco::present-text-filtering-results
@@ -218,10 +225,16 @@ namespace eval ::grbr {
 
         $m add separator
 
-        set cmd [list ::grbr::JumpToCurrentLocation $grbr]
-        $m add command -label "Jump to current source location" -accel "<space>" -command $cmd
+        set cmd [list ::grbr::JumpToCurrentLocation $grbr -close 0]
+        $m add command -label "Show source" -accel "<Space>" -command $cmd
         foreach tag [list [$tbl bodytag] $text] {
             bind $tag <space> $cmd
+        }
+
+        set cmd [list ::grbr::JumpToCurrentLocation $grbr -close 1]
+        $m add command -label "Goto source and close browser" -accel "<Return>" -command $cmd
+        foreach tag [list [$tbl bodytag] $text] {
+            bind $tag <Return> [concat $cmd ";" break]
         }
         
         AddNextAndPreviousMatchCommands $m [list [$tbl bodytag] $text] 0

@@ -76,6 +76,17 @@ namespace eval ::edt {
         ::tkcon::SendEventToSwank $form {} 1 {:find-existing}
     }
 
+    # Note we do not save file and 
+    proc FindCurrentFileDeclarations {clcon_text} {
+        set opened_file [$clcon_text cget -opened_file]
+        set FileName [$opened_file cget -filename]
+        set qFileName [::tkcon::QuoteLispObjToString $FileName]
+        set form "(clco::find-current-file-declarations $qFileName)"
+        ::tkcon::SendEventToSwank $form {} 1 {:find-existing}
+    }
+
+
+
     proc EncodeTypeForBufferList {type} {
         switch -exact $type {
             file {return "f"}

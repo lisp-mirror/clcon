@@ -13,25 +13,80 @@
   (end-position 1) ; reserved
   )
 
+(defun file-type-to-language (file-type)
+  (let ((c-file-type (string-downcase file-type)))
+    (alexandria:switch (c-file-type :test 'string=)
+                       ("tcl" :tcl)
+                       ("lisp" :lisp)
+                       ("asd" :lisp)
+                       (t :lisp))))
+
+
+(defun lisp-definition-filter (expr line)
+  "Extremely simple: toplevel is the form which starts from #\( at the beginning of line"
+  (declare (ignore expr))
+  (and (> (length line) 0)
+       (char= (elt line 0) #\())
+  )
+
+(defun tcl-definition-filter (expr line)
+  "Form that starts from the non-comment at the beginning of line, or which starts from the words proc, ::snit or namespace"
+  (declare (ignore expr))
+  (cond
+   ((= (length line) 0)
+    nil)
+   (t
+    (let* ((first-char (elt line 0))
+           (trimmed (string-left-trim cl-ppcre::+whitespace-char-string+ line))
+           (trimmed-len (length trimmed))
+           (trimmed-first-char (and (> trimmed-len 0) (elt trimmed 0))))
+      (cond
+       ((null trimmed-first-char)
+        nil)
+       ((member trimmed-first-char '(#\# #\}) :test 'char=)
+        nil)
+       ((not (find first-char cl-ppcre::+whitespace-char-string+))
+        t)
+       (t
+        (dolist (keyword '("proc" "namespace" "::snit::widget" "::snit::type" "::snit::widgetadaptor" "::snit::macro"))
+          (multiple-value-bind (found suffix)
+                               (alexandria:starts-with-subseq
+                                keyword trimmed :test 'char= :return-suffix t)
+            (when (and found)
+              (or (string= suffix "")
+                  (find (elt suffix 0) cl-ppcre::+whitespace-char-string+))
+              (return-from tcl-definition-filter t))))))))))
+
 (defun filter-one-file-or-err (infile display-filename expr mode)
-  (assert (eq mode :nocase) () "Only :nocase mode is supported")
-  (with-open-file (in infile :direction :input)
-    (do* ((result nil result)
-          (line (read-line in nil nil) (read-line in nil nil))
-          (line-number 1 (+ line-number 1))
-          (position nil nil))
-         ((null line)
-          (nreverse result))
-      (setf position (search expr line :test 'char-equal))    
-      (when position
-        (push (make-filter-match
-               :filename display-filename
-               :line-number line-number
-               :line line
-               :start-position nil
-               ;; when more than one match, we will have two matches,
-               ;; loop complicates. Skip this for now.
-               ) result)))))
+  "Mode can be a string or a function of two arguments, expr and match. If mode is a function
+   it must return position of the match when match is found or null when it is not found"
+  (let ((filter 
+         (etypecase mode
+           (symbol 
+            (assert (eq mode :nocase) () "Only :nocase mode is supported")
+            (lambda (expr line)
+              (search expr line :test 'char-equal)))
+           (function
+            mode
+            ; believe everything is ok
+            ))))
+    (with-open-file (in infile :direction :input)
+      (do* ((result nil result)
+            (line (read-line in nil nil) (read-line in nil nil))
+            (line-number 1 (+ line-number 1))
+            (position nil nil))
+           ((null line)
+            (nreverse result))
+        (setf position (funcall filter expr line))
+        (when position
+          (push (make-filter-match
+                 :filename display-filename
+                 :line-number line-number
+                 :line line
+                 :start-position nil
+                 ;; when more than one match, we will have two matches,
+                 ;; loop complicates. Skip this for now.
+                 ) result))))))
 
 (defun filter-one-file (infile expr &key (mode :nocase))
   "Mode can be :exact, :nocase, :regexp. Returns list of matches. Match is a list filter-match structures"
@@ -89,15 +144,16 @@
             (cl-tk:tcl-escape code-to-jump-to-location))))
 
 
-(defun present-text-filtering-results (results &key refresh-command)
+(defun present-text-filtering-results (results &key refresh-command title)
   "Gets results from, say, filter-one-file and present them to tcl"
+  (declare (ignore refresh-command)) ; reserved
   (let* ((grbr (eval-in-tcl (format nil "::grbr::OpenGrepBrowser") :nowait nil))
          (serial 0)
          (print-progress-when 100))
-    (when refresh-command ; it will be used as refresh-command later... maybe... FIXME
+    (when title ; it will be used as refresh-command later... maybe... FIXME
       (eval-in-tcl (format nil "::grbr::FillHeaderText ~A ~A"
                            grbr
-                           (cl-tk:tcl-escape refresh-command))))
+                           (cl-tk:tcl-escape title))))
     (dolist (match results)
       (eval-in-tcl (calc-code-for-filter-match grbr match (incf serial)))
       (when (= serial print-progress-when)
@@ -114,5 +170,23 @@
   "Searches for string, ignores case"
   (clco::present-text-filtering-results
    (clco::filter-many-files (clco::clcon-sources) string)
-   :refresh-command
-   (prin1-to-string  `(clco::filter-many-files (clco::clcon-sources) ,string))))
+   :title
+   (format nil "Find in Tcl Sources: ~A" string)))
+
+
+(defun find-current-file-declarations (infile)
+  "Very basic definition navigation facility. For lisp, returns list of toplevel forms. For tcl, returns toplevel procs and procs packed in the namespace"
+  (clco::present-text-filtering-results
+   (let* ((file-type (pathname-type infile))
+          (language (file-type-to-language file-type))
+          (filter
+           (ecase language
+             (:lisp
+              #'lisp-definition-filter)
+             (:tcl
+              #'tcl-definition-filter))))
+     (filter-one-file-or-err infile infile nil filter)
+     )
+   :title
+   (format nil "Declarations of ~%~A" infile)
+   ))
