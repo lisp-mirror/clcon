@@ -299,3 +299,13 @@ sldb-break-with-default-debugger
 
 (format *trace-output* "~%insert-string b ~A" (oi::mark-row-and-col mark))
 deal-with-highlight-after-insert-command
+
+
+Заготовка для просмотровщика перекрёстных ссылок. Сейчас рано её делать, т.к.
+виджеты списков не очень совершенны
+tcl-ные процедуры для основы:
+proc CompileAndLoadTheFile {clcon_text} {
+proc FindSourceCommand {text} {
+Виджет для основы: error-browser.erbr.tcl
+Функция лиспа для основы: clco::compile-file-for-tcl
+
