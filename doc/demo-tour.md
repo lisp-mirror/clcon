@@ -92,7 +92,7 @@ Eval something, say `'defun`, at the console. And then type in `.insp*` (this is
 
 Invoking tcl
 --------
-Commands starting from `..` are interpreted by tcl. E.g. type in ``.. tk_messageBox -message "Wow!"`` to try. There is also a way to invoke tcl from lisp. Type in `(clcon-server:eval-in-tcl "tk_messageBox -message WOW")` at the console and you'll see message box, which was invoked from the lisp side. 
+When you enter line starting from `.. `, at the IDE prompt, the line will be treated as tcl command. E.g. type in ``.. tk_messageBox -message "Wow!"`` to try. There is also a way to invoke tcl from lisp. Type in `(clcon-server:eval-in-tcl "tk_messageBox -message WOW")` at the console and you'll see message box, which was invoked from the lisp side. 
 
 Editing files
 ---------

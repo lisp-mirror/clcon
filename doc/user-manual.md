@@ -83,10 +83,10 @@ have file/Reload some of IDE sources which reloads all sources excluding clcon.t
 
 Tcl escapes
 -----------
-Place two dots (..) to pass arbitrary tcl command to tcl interpreter. E.g. this will display a message box. Use Control-Alt-U to complete tcl symbol. To use completion at first identifier at your command, type in on more space after two dots .
+Place two dots and a space (`.. `) directly at the IDE prompt to pass arbitrary tcl command to tcl interpreter. Use Control-Alt-U to complete tcl names. E.g. this will display tk's message box. 
 
 ```
-..tk_messageBox -title "clcon" -message "Wow, it works!" -parent $::tkcon::PRIV(console)
+.. tk_messageBox -title "clcon" -message "Wow, it works!" -parent $::tkcon::PRIV(console)
 ```
 
 Opening files for editing
