@@ -68,7 +68,7 @@ namespace eval ::gui_util {
     }
 
     # Returns list of lists three elements: bindtag event script
-    proc ListAllWindowBindingds { w } {
+    proc ListAllWindowBindings { w } {
         set result {}
         foreach bindtag [bindtags $w] {
             foreach binding [bind $bindtag] {
@@ -83,9 +83,10 @@ namespace eval ::gui_util {
     # Adds putd (entry) to each binding
     # Example:  ::gui_util::InstrumentAllBindingsWithPutd [::edt::c_btext]
     # ::gui_util::InstrumentAllBindingsWithPutd [::edt::c_text] 454570000
-    # 
+    # As binding fires, you have string like InstrumentAllBindingsWithPutd/454560029 in your putd log.
+    # Then call .. ::gui_util::ListAllWindowsBindings [::edt::c_btext] and find number there with console Find box. 
     proc InstrumentAllBindingsWithPutd { w {InitialNumber 454560000}} {
-        foreach entry [ListAllWindowBindingds $w] {
+        foreach entry [ListAllWindowBindings $w] {
             foreach { bindtag event script } $entry {}
             set script [string cat "putd InstrumentAllBindingsWithPutd/[incr InitialNumber];" $script]
             bind $bindtag $event $script
