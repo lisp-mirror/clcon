@@ -52,7 +52,7 @@ namespace eval ::edt {
         $m add command -label "0.Compile and load" -underline 0 -command $cmd -accel "F7"
         bind NoMod$w <F7> $cmd
 
-        ::erbr::AddNextAndPreviousCompilerMessagesCommands $m $btext 1
+        ::erbr::AddNextAndPreviousCompilerMessagesCommands $m SingleMod$w 1
 
         $m add separator
 

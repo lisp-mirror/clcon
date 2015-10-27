@@ -403,8 +403,8 @@ namespace eval ::erbr {
         $m add command -label "Goto next compiler message" -command $cmdForward -accel "Alt-F8"
         foreach tag $tagListForKeys {
             # puts stderr $tag
-            bind $tag <Alt-Key-F7> $cmdBack
-            bind $tag <Alt-Key-F8> $cmdForward
+            bind $tag <Alt-Key-F7> [concat $cmdBack ";" break]
+            bind $tag <Alt-Key-F8> [concat $cmdForward ";" break]
         }
     }
     
