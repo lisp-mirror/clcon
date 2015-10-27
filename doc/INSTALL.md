@@ -3,24 +3,22 @@ Clcon installation and startup
 
 Warning
 -------
-Clcon is at early alpha stage. It is more working prototype than ready to use software. So install it to:
-- Take your impression of it's look and feel (use [Demo Tour](demo-tour.md)) and send me your positive feedback :) 
-- Decide if you want to participate in the development
+Clcon is alpha stage. Before trying to use, please take a [Demo Tour](demo-tour.md)). You'll see that some
+features sometimes work. After that, you can try to use clcon, but it is likely you'll have a trouble. 
 
-Especially dangerous idea is to use it as a file editor. It can crash at any moment. No file save enquiry is issued when closing. 
-So it is easy to lose your work. I really use clcon for some activity, but it is still far from being complete IDE. 
+I use clcon to develop itself, but editing files is rather dangerous. Editor can crash at any moment. 
+So it is easy to lose your work. 
 
 Windows: installing file release
 ----------
 - Download file release from [Downloads page](https://bitbucket.org/budden/clcon/downloads)
 - Unpack it to c:\clcon
-- Download and install [ActiveTCL](http://www.activestate.com/activetcl). Be sure to create .tcl file association (it is done by default)
 - Start c:\clcon\bin\clcon-server-and-client.cmd - this will load and run the IDE. When running for the first time, building will take a while. Subsequent loads are faster
 - To see what clcon can do, take a [Demo Tour](demo-tour.md)
 - If all is ok, you have clcon with SBCL (use Alt-. to find sources of SBCL objects) and quicklisp (use ql:quickload to load libraries)
 - Repositories of clcon components (clcon, oduvanchik, budden-tools) are at c:\clcon\quicklisp\local-projects - feel free to send patches :)
 
-Alternative way: loading sources and building (Linux & Windows)
+Alternative way: loading sources and building (Linux)
 -----------
 
 ### Load and install dependencies
@@ -70,20 +68,13 @@ To load server-side code to lisp, use
 ; If :oduvan-invisible set, we can build and start on MS Windows
 ; If :oduvan-invisible is not set, we can run only on Linux, but
 ; we also see normal Oduvanchik's GUI
-; I usually develop with :oduvan-invisible disabled
 (pushnew :oduvan-invisible *features*)
 
 ; May be needed sometimes for the debugging. 
 ; (pushnew :oduvan-use-sleep-in-dispatch *features*)
 
-; For debugging editor with client-server communcation enabled for
-; only single buffer. 
-; (pushnew :use-oduvan-for-first-clcon_text-pathname-only *features*)
-; if you are using trunk, you can also grep "buf1" in *.tcl to disable some debugging code in the editor.
-
-
-; uncomment next line to see highlight (oduvanchik would hangs up soon)
-; (pushnew :oduvan-enable-highlight *features*) 
+; comment next line if code highlight causes problems 
+(pushnew :oduvan-enable-highlight *features*) 
 
 ;; Setting paths and loading
 (pushnew #P"path/to/clcon-server-source/" asdf:*central-registry* :test 'equalp)
@@ -93,16 +84,11 @@ To load server-side code to lisp, use
 (swank:create-server :port 4009 :dont-close t)
 ```
 
-After that, start IDE:
+As you have sbcl running, do
 
-Unix:
 ```
 wish clcon.tcl
 ```
-
-Windows: double click clcon.tcl
-
-It should start up the IDE and connect automatically to swank. 
 Then type in expression like 
 
 ```
