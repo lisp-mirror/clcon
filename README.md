@@ -1,7 +1,7 @@
 # README #
 
 ## What's that
-**clcon** is a cross-platform Common Lisp IDE under construction. Current version is 0.2.6 (see tags in repo).
+**clcon** is a cross-platform Common Lisp IDE under construction. Current release is 0.3.0 (see tags in repo).
 
 ## Note about versions
 If your're reading this document online, this document describes trunk version. 
@@ -12,27 +12,31 @@ Supported lisp implementation(s):
 
 - SBCL
 
+Supported tcl version(s):
+
+- tcl 8.6.3, 8.6.4
+
 Supported platforms: 
 
 - Debian 8 (32 bit) at x86 processor
+- Debian Mint Rafaela (64 bit) with the help of tombert's tcltk, see http://wiki.tcl.tk/668
 - Windows 7 (32 bit)
 - as of 2015-09-11, reported by pcchange90 to run on windows 7(64 bit) and sbcl(x86,not amd64)
-
-Code is completely platform-independent and should run on other platforms too. Also it might run on other lisp implmentations, though I don't remember. Give it a try :) 
 
 ## Screenshots
 [See here](https://bitbucket.org/budden/clcon/wiki/Screenshots)
 
 ## Project goals
 - GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine)
-- Simple, one-click installable CL environment for beginners
+- Just an alternative to EMACS/SLIME with permissive license.
 
 ## Current state
-I begun switching to devopment of clcon in clcon itself. Some features are still missing when
-compared to EMACS, I'm adding them as far as their absense becomes intolerable. 
+Clcon is now used for self development and shows itself rather robust in careful hands of its creator. Crashes or necessity to use EMACS are infrequent.
 
-If you want to try using clcon, prepare to problems - this is still prototype quality. 
-So first of all take a [demo tour](doc/demo-tour.md).
+Clcon have most of essential features required for efficient CL development. 
+But some of them are still missing. 
+
+If you want to try using clcon, first of all take a [demo tour](doc/demo-tour.md).
 
 ## Current features
 - REPL for Lisp and Tcl with history
@@ -44,15 +48,15 @@ So first of all take a [demo tour](doc/demo-tour.md).
 - List definitions in a file for Lisp and Tcl (very primitive version)
 
 ## Installation and startup
-For windows, we have [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.2.6.zip). 
-Note: online documentation describes current repository trunk. Documentation for the file release version (including readme file) is inside the release archive itself, at clcon/quicklisp/local-projects/clcon subdirectory of archive. See doc/INSTALL.md for installation instructions.
+For windows, we have [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.3.0.zip). 
+Documentation related to release are in the file itself. 
 
-For the trunk, see [INSTALL.md](https://bitbucket.org/budden/clcon/src/default/doc/INSTALL.md).
+For Linux, see [doc/INSTALL.md](doc/INSTALL.md).
 
 ## Documentation
-[Demo tour (trunk version)](doc/demo-tour.md) - narrow footpath through best views of some features of clcon.
+[Demo tour (trunk version)](doc/demo-tour.md) - a footpath through best views of some features of clcon.
 
-[User manual](https://bitbucket.org/budden/clcon/src/default/doc/user-manual.md)
+[User manual](doc/user-manual.md) 
 
 [Wiki](https://bitbucket.org/budden/clcon/wiki/) - contains [screenshots](https://bitbucket.org/budden/clcon/wiki/Screenshots), but otherwise is not very useful.  
 
@@ -64,7 +68,7 @@ For the trunk, see [INSTALL.md](https://bitbucket.org/budden/clcon/src/default/d
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-- package-awareness of IDE
+- package-awareness of IDE (status bar, prompt, find source)
 - use as a GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine)
 - close all bugs (ha-ha!)
-- print "who calls" info 
+- print "who calls" info
