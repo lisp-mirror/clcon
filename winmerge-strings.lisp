@@ -8,7 +8,7 @@
 
 (defun call-bat (bat args &key (wait t))
   (apply #'sb-ext:run-program
-         "c:/clcon/util/CallBatFromGuiDetached.exe"
+         "c:/clcon/bin/util/CallBatFromGuiDetached.exe"
          (cons bat args)
          (dispatch-keyargs-simple wait)
          ))

@@ -125,5 +125,5 @@
 
 ;; start frontend. CallBatFromGuiDetached.exe is used to bypass problems
 ;; with run-program
-(uiop/run-program:run-program "c:\\clcon\\util\\CallBatFromGuiDetached.exe c:\\clcon\\bin\\clcon-client.cmd") 
+(uiop/run-program:run-program "c:\\clcon\\bin\\util\\CallBatFromGuiDetached.exe c:\\clcon\\bin\\clcon-client.cmd") 
 
