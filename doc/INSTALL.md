@@ -51,6 +51,9 @@ hg clone -u 0.2.6 https://bitbucket.org/budden/clcon
 (ql:quickload :split-sequence)
 (ql:quickload :swank) ; don't need it if you have SLIME already
 (ql:quickload :cl-tk)
+(ql:quickload :named-readtables)
+(ql:quickload :command-line-arguments)
+(ql:quickload :cl-utilities)
 ```
 
 To load server-side code to lisp, use
