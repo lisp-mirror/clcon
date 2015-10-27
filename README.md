@@ -31,7 +31,7 @@ Supported platforms:
 - Just an alternative to EMACS/SLIME with permissive license.
 
 ## Current state
-Clcon is now used for self development and shows itself rather robust in careful hands of its creator. Crashes or necessity to use EMACS are infrequent.
+Clcon is at "alpha" stage. It is currently used for self development and shows itself rather robust in careful hands of its creator. Crashes or necessity to use EMACS are infrequent.
 
 Clcon have most of essential features required for efficient CL development. 
 But some of them are still missing. 
