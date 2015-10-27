@@ -79,7 +79,7 @@ Now let's try stepper.
 
 Warning! To make stepper work correctly, you need to load swank with stepper support disabled. This is true with windows release, but it depends on your initialization file on Linux. Hope to document it later, or see windows file release as an example. Also there are problems in stepper backend when you step out of the frame where you turned stepping mode on. Submit bug to SBCL tracker :) 
 
-Bring up last command with `Control-Up` at the console, and press `Return` to call it again. As debugger occurs, choose `Stack/Switch to stepping mode` from menu bar. Editor window will pop up and current source will be highlighted. Press "F10" (Step next, or "Step over") watch how execution proceeds. Also note that stack and locals are shown in the debugger window. Press "f10" one more time, watch how execution proceeds. Then press "F5" (Continue, or resume to normal execution) to quit stepper mode. 
+With `Control-Up` at the console, bring up last command `(f 5)` to the prompt, and press `Return` to call it again. As debugger occurs, choose `Stack/Switch to stepping mode` from menu bar. Editor window will pop up and current source will be highlighted. Press "F10" (Step next, or "Step over") watch how execution proceeds. Also note that stack and locals are shown in the debugger window. Press "f10" one more time, watch how execution proceeds. Then press "F5" (Continue, or resume to normal execution) to quit stepper mode. 
 
 IDE commands. 
 ---------------------
@@ -96,20 +96,29 @@ When you enter line starting from `.. `, at the IDE prompt, the line will be tre
 
 Editing files
 ---------
-You can see lisp files are highlighted according to lisp mode, and you can even try to edit them. But editing is permanently broken. Also IDE won't ask you when you are closing modified file. This is done intentially: IDE crashed frequently, so if you dare to edit files in it, you must be always careful and control state of your files. When file is modified, its tab is marked with asterik. Also asterik is shown in the buffer list (invoked by `Control-F12`). 
+All files are now highlighted according to lisp mode, and you can even edit them! Beware that editor is extremely complex inside and it can still contain uncovered bugs - be sure to save your files frequently. `Save as` command works too, but it does not reopen newly created file, you have to open it manually. 
+
+When the file is modified, its tab is marked with asterik. Also asterik is shown in the buffer list (invoked by `Control-F12`). 
+
+Interesting commands while editing lisp are "indent" (`Tab` key) and "indent new line"  (`Shift-Return`). Also you can note highlight of opening paren when you stay at closing one. Also we have "Lisp" menu with several lisp mode commands (not currently bound to menus, but should work). Find source for now assumes common-lisp-user package, so it is of limited use. 
+
+Also we have rather lame tcl indentation. Tcl find source ignores current namespace, so it is of limited use. 
 
 Find in files
 --------
 This is very new tool, and it is a bit lame, but I have find it useful already.
 Type at the console: 
-`(clco::find-in-clcon-sources "buf1")`
-And you'll see some kind of "grep browser". It can only fine simple strings for now with case ignored. There is no way to call it from the menu. 
+`.fics buf1`
+(Here "fics" is an abbreviation for "find-in-clcon-sources")
+And you'll see some kind of "grep browser". Press <space> or <return> to jump to a source. Difference is that <return> closes grep browser while <space> does not. It can only fine simple strings for now with case ignored. Note this command is processed by tcl interpreter, so use tcl's quoting rules. The most simple way to get more or less predictible results when some funny characters are present is to wrap your search string into `{}`. 
+
 If you want other kinds of search, you are welcome to Common Lisp programming - just jump to `clco::find-in-clcon-sources` and watch how it is done. 
 
 List declarations in current file
 ---------
 Press `f12` in the editor buffer, or choose "Show current file declarations" from the Edit menu of Editor. 
-Press `Space` to open declaration location. Or press `Return` to close declaration list and jump to location. 
-Code to extract declarations is extremely simple - no warranty. Also note that declarations are extracted from
+Again, press `Space` or `Return` to go to source. `Return` closes declaration list. 
+
+Code to extract declarations says tcl from lisp, but is extremely simple - no warranty. Also note that declarations are extracted from
  the file, not from the buffer. So if file is open in the editor and modified, locations will be inexact. 
 Also widget's design is not that perfect. At least I used it dozen of times and found it can be useful sometimes. 
