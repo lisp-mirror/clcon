@@ -23,9 +23,9 @@ Linux:
 
 ### Prerequisites
 - [SBCL](http://www.sbcl.org/platform-table.html) >= 1.2.7. Check your sbcl version with `(lisp-implementation-version)`
-- tcl/tk >= 8.6.2. To check your tcl tk version start wish from the console and type in in the console: `info patchlevel`. If your distribution have earlier version, try Tombert's tcltk, see http://wiki.tcl.tk/668, or something else.
+- [tcl/tk](http://tcl.tk) >= 8.6.2. To check your tcl tk version start wish from the console and type in in the console: `info patchlevel`. If your distribution have earlier version, try Tombert's tcltk, see http://wiki.tcl.tk/668, or something else.
 - [quicklisp](https://www.quicklisp.org/beta/) set up at your SBCL
-- [slime] must be known to your quicklisp, but not loaded in your initialization files (e.g. your ~/.sbclrc)
+- [slime](https://common-lisp.net/project/slime/) must be known to your quicklisp (do `(ql:quickload :slime)` once), but not loaded in your initialization files (e.g. your ~/.sbclrc)
 - fresh version of [budden-tools](https://bitbucket.org/budden/budden-tools). Put it under local-projects directory of quicklisp, e.g. (for Linux)
 - setting of `sb-impl::*default-external-format*` to `:utf-8` in your initialization file. 
 - hg (Mercurial) `sudo apt-get install mercurial`
