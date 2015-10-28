@@ -353,6 +353,7 @@ namespace eval ::edt {
         if {[dict get $opts -offset] ne {}} {
             $btext mark set insert [dict get $opts -offset]
             $btext see insert
+            ::clcon_text::tncm $btext
         }
 
         return $btext
