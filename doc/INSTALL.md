@@ -29,19 +29,19 @@ Linux:
 ### Prerequisites
 [SBCL](http://www.sbcl.org/platform-table.html) >= 1.2.7. Check your sbcl version with `(lisp-implementation-version)`
 
-[tcl/tk](http://tcl.tk) >= 8.6.2. To check your tcl tk version start `wish` from the console and type in in the console: `info patchlevel`. If your distribution have earlier version, try Tombert's tcltk, see http://wiki.tcl.tk/668, or something else.
+[Tcl/tk](http://tcl.tk) >= 8.6.2. To check your tcl tk version start `wish` from the console and type in in the console: `info patchlevel`. If your distribution have earlier version, try Tombert's tcltk, see http://wiki.tcl.tk/668, or something else.
 
-[quicklisp](https://www.quicklisp.org/beta/) set up at your SBCL
+[Quicklisp](https://www.quicklisp.org/beta/) set up at your SBCL
 
-[slime](https://common-lisp.net/project/slime/) must be known to your quicklisp (do `(ql:quickload :slime)` once), but not loaded in your initialization files (e.g. your ~/.sbclrc)
+[Slime](https://common-lisp.net/project/slime/) must be known to your quicklisp (do `(ql:quickload :slime)` once), but not loaded in your initialization files (e.g. your ~/.sbclrc)
 
-find where your quicklisp's local-projects are located. Simplest way to do it is to start sbcl and type in: `ql:*local-project-directories*`. It will print list of local projects directories, choose any of these. Usually it is `~/quicklisp/local-projects`.
+Find where your quicklisp's local-projects are located. Simplest way to do it is to start sbcl and type in: `ql:*local-project-directories*`. It will print list of local projects directories, choose any of these. Usually it is `~/quicklisp/local-projects`.
 
-setting of `sb-impl::*default-external-format*` to `:utf-8` in your initialization file, e.g. 
+Make sure `sb-impl::*default-external-format*` is `:utf-8`. E.g., add the following to your ~/.sbclrc 
 
     (setf sb-impl::*default-external-format* to :utf-8)
 
-hg (Mercurial) 
+Mercurial (aka hg)
 
     sudo apt-get install mercurial
 
@@ -52,7 +52,7 @@ Fresh version of [budden-tools](https://bitbucket.org/budden/budden-tools). Put 
 
 ### Installation
 
-Choose good version of clcon. You can load trunk, but it is better to load latest tagged "release", e.g. 0.3.0. Note that online documentation usually describes trunk. To be sure that it matches software functionality, read not the online documentation, but documentation you have installed. 
+Choose good version of clcon. You can try trunk, but it is better to load latest tagged "release", e.g. 0.3.0. Note that online documentation usually describes trunk. To be sure that it matches software functionality, read not the online documentation, but documentation you have installed. 
 
 Decide where you will locate clcon. You can put it just to local-projects directory, but you can also put it to a more convenient place and make a symlink to its directory at the local-projects dir with `ln -s`. The same goes to oduvanchik. 
 
@@ -63,16 +63,16 @@ Download chosen releases of oduvanchik and clcon to chosen directory, e.g.
     hg clone -u 0.3.0 https://bitbucket.org/budden/clcon
 
 
-### Build and start server: 
+### Build and start server
 
     sbcl --load ~/quicklisp/local-projects/clcon/load-clcon-server-linux.lisp
 
 If all is ok, you will see 
 
-   ;; Swank started at port: 4009.
-   ;; Swank started at port: 4005.
-   Waiting for oduvanchik to start.
-   *
+    ;; Swank started at port: 4009.
+    ;; Swank started at port: 4005.
+    Waiting for oduvanchik to start.
+    *
 
 ### Start client
    
