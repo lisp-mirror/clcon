@@ -51,6 +51,10 @@ namespace eval ::edt {
         after idle [list ::edt::DoApplyHighlightToLine $clcon_text $s]
     }
 
+    proc CurrentPackageChange {clcon_text data} {
+        showVar data
+    }
+
     proc DoApplyHighlightToLine {clcon_text s} {
         # text could disappear
         catch {

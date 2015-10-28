@@ -43,6 +43,7 @@
   '(member
     highlight-single-line
     cancel-highlighting
+    package-change ; we entered into a place where we have another package in the same buffer, or we obtained or lost information of it
     shutdown-highlight-dispatcher ; called at the exit
     ))
 
@@ -80,6 +81,25 @@
     :end-line-no line-no
     :swank-connection (oi::variable-value 'odu::swank-connection :buffer buffer)
     )))
+
+
+(defun encode-last-buffer-name-sent-to-tcl-type (x)
+  "Encodes value of oi::last-buffer-name-sent-to-tcl-type to be sent to lisp"
+  (etypecase x
+    ((eql :unknown) "{0}")
+    (string (format nil "{1 ~A}" (cl-tk:tcl-escape x)))))
+
+(defun notify-package-change (clcon_text-pathname package-name-or-info buffer)
+  "See also odu::send-package-to-clcon"
+  (let ((package-info
+         (encode-last-buffer-name-sent-to-tcl-type package-name-or-info)))
+    (post-highlight-event
+     (make-highlight-event
+      :kind 'package-change
+      :clcon_text-pathname clcon_text-pathname
+      :string package-info
+      :swank-connection (oi::variable-value 'odu::swank-connection :buffer buffer)
+      ))))
 
 
 (defun shutdown-highlight-dispatcher ()

@@ -61,6 +61,7 @@
            (move-mark (current-point) cursor-point)
            ;; this is what it all what done for
            (oduvan-invisible-maybe-highlight-open-parens)
+           (maybe-send-package-to-tcl clcon_text)
            (check-something-ok cursor-point)
            )))))
   nil)

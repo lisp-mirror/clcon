@@ -28,6 +28,18 @@
       ;; we should carefully synchronize them indeed
       (clco:eval-in-tcl cmd :nowait nil))))
 
+
+(defun eval-package-change (e)
+  "See also clco::notify-package-change"
+  (let* ((cmd (format nil "::edt::CurrentPackageChange ~A ~A"
+                      (highlight-event-clcon_text-pathname e)
+                      (--> e string))
+           ))
+    (swank::with-connection ((--> e swank-connection))
+      ;; we should carefully synchronize them indeed
+      (clco:eval-in-tcl cmd :nowait nil))))
+
+
 (defun highlight-dispatcher-thread-function ()
   (loop
      (let ((e (pop-highlight-event-queue)))
@@ -38,7 +50,10 @@
             (return-from highlight-dispatcher-thread-function nil))
            (highlight-single-line
             (eval-highlight-single-line e)
-            ))))))
+            )
+           (package-change
+            (eval-package-change e))
+   )))))
 
 
 (defun start-highlight-dispatcher ()

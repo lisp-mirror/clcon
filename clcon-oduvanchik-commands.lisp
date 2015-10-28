@@ -39,6 +39,25 @@
           (oi::maybe-send-line-highlight-to-clcon line))))))
 
 
+(defun maybe-send-package-to-tcl (clcon_text)
+  "Send package at current-point if it is known. We assume and do not check that clcon_text corresponds to current buffer. Returns t if package was sent"
+  (let* ((p (current-point))
+         (line (mark-line p))
+         (buffer (line-buffer line))
+         (package (odu::package-at-point-if-known))
+         (last-package (oi::buffer-last-buffer-name-sent-to-tcl buffer))
+         )
+    (cond
+     ((equalp package last-package)
+      ; do nothing
+      nil
+      )
+     (t
+      (send-package-to-clcon clcon_text package buffer)
+      (setf (oi::buffer-last-buffer-name-sent-to-tcl buffer) package)
+      t
+      ))))
+
 (defun oduvan-invisible-maybe-highlight-open-parens ()
   "Rework of odu::maybe-highlight-open-parens. Works in the current buffer. 
  It looks like working with parens is independent of buffer highlighting. So we don't
@@ -161,6 +180,14 @@
                 clcon_text encoded-marks line-number change-id buffer)
                )
              )))))))
+
+(defun send-package-to-clcon (clcon_text package buffer)
+  "Posts event of package change to a highlight events queue"
+  #-oduvan-enable-highlight
+  (declare (ignore clcon_text package buffer))
+  #+oduvan-enable-highlight
+  (clco::notify-package-change clcon_text package buffer)
+  )
 
 (defmethod oi::recompute-tags-up-to (end-line (background (eql t)))
   "We always recompute everything to the end of file. end-line is required to know buffer only"

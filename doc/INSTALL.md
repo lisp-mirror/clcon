@@ -74,6 +74,8 @@ To load server-side code to lisp, use
 ; (pushnew :oduvan-use-sleep-in-dispatch *features*)
 
 ; comment next line if code highlight causes problems 
+; you will also lose package detection functionality in a lisp mode, 
+; package common-lisp-user will be always assumed in the editor
 (pushnew :oduvan-enable-highlight *features*) 
 
 ;; Setting paths and loading
