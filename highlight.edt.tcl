@@ -52,7 +52,12 @@ namespace eval ::edt {
     }
 
     proc CurrentPackageChange {clcon_text data} {
-        showVar data
+        global $clcon_text.StatusBarInfo
+        if {[lindex $data 0]} {
+            set $clcon_text.StatusBarInfo(package) [lindex $data 1]
+        } else {
+            set $clcon_text.StatusBarInfo(package) {CL-USER}
+        }
     }
 
     proc DoApplyHighlightToLine {clcon_text s} {

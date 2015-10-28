@@ -7,7 +7,7 @@
     "Find source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
     ""
   (let* ((s (symbol-string-at-point))
-         (code (clco::server-lookup-definition s)))
+         (code (clco::server-lookup-definition s (odu::package-at-point))))
     code))
 
 

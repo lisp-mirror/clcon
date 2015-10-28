@@ -100,13 +100,14 @@ namespace eval ::clcon_text {
             bindtags $w $NewBindTags
             bind $win <<ContinueUnfreeze>> "$self Unfreeze"
             ::edt::CreateHighlightTags $self
-            global $self.CursorPos
-            set $self.CursorPos {}
+            global $self.StatusBarInfo
+            set $self.StatusBarInfo(CursorPos) {}
+            set $self.StatusBarInfo(Package) {CL-USER}
         }
         destructor {
             $options(-opened_file) destroy
-            global $self.CursorPos
-            unset $self.CursorPos
+            global $self.StatusBarInfo
+            array unset $self.StatusBarInfo
             DestroyBackendBuffer $win
         }
 
@@ -140,7 +141,7 @@ namespace eval ::clcon_text {
             return $result
         }
         
-        # NSL stands for "not send to lisp". Especially for oduvanchik commands which
+        # NSL stands for "not send to lisp". Specially for oduvanchik commands which
         # do text editings, see do-editing-on-tcl-side.lisp
         method RoInsertNSL {args} {
             putd "RoInsertNSL $args"
@@ -343,7 +344,8 @@ namespace eval ::clcon_text {
         # This is a temporary solution. This is a separate option indeed
         set qId [lq $clcon_text]
         switch -exact $type {
-            n { 
+            n {
+                # see ::clcon_text::tncm
                 if {![$clcon_text UsesLispP]} {
                     return
                 }
@@ -556,8 +558,8 @@ namespace eval ::clcon_text {
             putd "Entered tncm:oops $clcon_text"
             return
         }
-        global $clcon_text.CursorPos
-        set $clcon_text.CursorPos [$clcon_text index insert]
+        global $clcon_text.StatusBarInfo
+        set $clcon_text.StatusBarInfo(CursorPos) [$clcon_text index insert]
         MaybeSendToLisp $clcon_text n {}
     }
 
