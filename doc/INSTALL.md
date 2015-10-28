@@ -3,7 +3,7 @@ Clcon <TRUNK> installation and startup
 
 Warning
 -------
-Clcon is alpha quality software. Before trying to use, please take a [Demo Tour](demo-tour.md)). 
+Clcon is alpha quality software. Before trying to use, please take a [Demo Tour](demo-tour.md). 
 You'll see that some features indeed work at some cases. 
 
 I use clcon to develop itself, but editing files is rather dangerous. Editor can hang up at any moment. 
