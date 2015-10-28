@@ -1,18 +1,38 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; SERVER STARTing Script START
+;;; Clcon server startup script 
 (in-package :cl-user)
 
+;;;;;;;;;;;;;;;;; Preliminary checks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(assert (eq sb-impl::*default-external-format* :utf-8) ()
+  "Clcon server unable to load: we need (eq sb-impl::*default-external-format* :utf-8)")
+
+(assert (find-package :ql) ()
+  "Clcon server unable to load: we need QUICKLISP")
+
+(assert (find-package :asdf) ()
+  "Clcon server unable to load: we need ASDF")
+
+;;;;;;;;;;;;;;;;;; Starting SWANK ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (when (find-package :swank)
-  (error "Unable to load: swank is loaded already. Your plan:
+  (error "Clcon server unable to load: swank is loaded already. Your plan:
  1. remove swank initialization from initialization files
  2. remove swank's fasls which are normally at ~/.slime/fasl 
  3. retry"))
 
 ;; Disable stepping in SWANK 
 (proclaim '(optimize (debug 3) (compilation-speed 3)))
-(asdf:oos 'asdf:load-op 'swank)
 
-;; trying to send all tracing to a single stream
+;; Load SWANK
+
+(load (merge-pathnames "swank-loader.lisp" (ql:where-is-system :swank)))
+; (setq swank-loader::*fasl-directory* "c:/clcon/fasl-cache/swank/")
+(swank-loader:init)
+(swank:swank-require '(swank-asdf swank-repl swank-fancy-inspector)) 
+
+
+;;;;;;;;;;;;;;;;;; Trying to send all tracing to SBCL console ;;;;;;;;;;;;
+
+;; It is useful for debugging clcon
 (defvar *initial-standard-output* *standard-output*)
 
 (defun redirect-trace-output-to-inferior-lisp (c)
@@ -20,17 +40,18 @@
 
 (push 'redirect-trace-output-to-inferior-lisp swank::*new-connection-hook*)
 
-;; loading dependencies
+;;;;;;;;;;;;;;;;;; Loading dependencies ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (ql:quickload :alexandria)
 (ql:quickload :split-sequence)
-(ql:quickload :swank) ; don't need it if you have SLIME already
 (ql:quickload :cl-tk)
 ;; Patch to correct absent libraries:
 (ql:quickload "named-readtables")
 (ql:quickload "command-line-arguments") 
 (ql:quickload "cl-utilities")
  
-;; Set some features. 
+;;;;;;;;;;;;;;;;;; Set features  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; If you change any feature, clear your fasl cache and restart server
 ;; Cache is normally in ~/.cache/common-lisp 
  
@@ -54,29 +75,26 @@
  
 ; comment next line if code highlight causes problems
 (pushnew :oduvan-enable-highlight *features*)
- 
-;; Setting paths and loading
-;(pushnew #P"path/to/clcon-server-source/" asdf:*central-registry* :test 'equalp)
 
-#| (let ((clcondir (merge-pathnames
-                 (make-pathname
-                  :directory
-                  '(:relative "clcon/"))
-                 ql:*quicklisp-home*))
-      (oduvandir (merge-pathnames
-                  (make-pathname  
-                   :directory
-                   '(:relative ".quicklisp/local-projects/oduvanchik/"))
-                  (user-homedir-pathname)))
-      )
-  (pushnew clcondir asdf:*central-registry* :test 'equalp)
-  (pushnew oduvandir asdf:*central-registry* :test 'equalp)
-  ) |#
 
-;in windows you can write like this:
-;(pushnew #P"C:/xxx/xxx/clcon/" asdf:*central-registry* :test 'equalp)
- 
+;;;;;;;;;;;;;;;;;; Loading server ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 (asdf:load-system :clcon-server)
+
+
+;;;;;;;;;;;;;;;;;; Starting editor backend ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(clco:start-oduvanchik)
+
+
+;;;;;;;;;;;;;;;;;; Starting server ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; This is clcon server
 (swank:create-server :port 4009 :dont-close t)
+
+;; Auxilary server to connect to from EMACS
+(swank:create-server :port 4005 :dont-close t)
  
-;;; end of script 
