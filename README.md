@@ -54,8 +54,8 @@ Documentation related to release are in the file itself.
 For Linux, see [doc/INSTALL.md](doc/INSTALL.md).
 
 ## Documentation
-Warning! All documentation describes trunk version. If you download the release, 
-documentation is inside the release. Do not read online documentation then!
+**Warning!** All documentation describes trunk version. If you download the release, 
+documentation is inside the release. **Do not read online documentation** then!
 
 [Demo tour (trunk version)](doc/demo-tour.md) - a footpath through best views of some features of clcon.
 
