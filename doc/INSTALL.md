@@ -51,31 +51,33 @@ Fresh version of [budden-tools](https://bitbucket.org/budden/budden-tools). Put 
     hg clone https://bitbucket.org/budden/budden-tools
 
 ### Installation
-- choose good version of clcon. You can load trunk, but it is better to load latest tagged "release", e.g. 0.3.0. Note that online documentation usually describes trunk. To be sure that it matches software functionality, read not the online documentation, but documentation you have installed. 
-- decide where you will locate clcon. You can put it just to local-projects directory, but you can also put it to a more convenient place and make a symlink to its directory at the local-projects dir with `ln -s`. The same goes to oduvanchik. 
-- download chosen releases of oduvanchik and clcon to chosen directory, e.g.
-    ```
+
+Choose good version of clcon. You can load trunk, but it is better to load latest tagged "release", e.g. 0.3.0. Note that online documentation usually describes trunk. To be sure that it matches software functionality, read not the online documentation, but documentation you have installed. 
+
+Decide where you will locate clcon. You can put it just to local-projects directory, but you can also put it to a more convenient place and make a symlink to its directory at the local-projects dir with `ln -s`. The same goes to oduvanchik. 
+
+Download chosen releases of oduvanchik and clcon to chosen directory, e.g.
+
     cd ~/quicklisp/local-projects
     hg clone -u 0.3.0 https://bitbucket.org/budden/oduvanchik
     hg clone -u 0.3.0 https://bitbucket.org/budden/clcon
-    ```
 
 
-### Attempt to build and start server: 
-    `
+### Build and start server: 
+
     sbcl --load ~/quicklisp/local-projects/clcon/load-clcon-server-linux.lisp
-    `
-    If all is ok, you will see 
-   `
+
+If all is ok, you will see 
+
    ;; Swank started at port: 4009.
    ;; Swank started at port: 4005.
    Waiting for oduvanchik to start.
    *
-   `
 
 ### Start client
    
-   `~/quicklisp/local-projects/clcon/clcon.tcl`
+    ~/quicklisp/local-projects/clcon/clcon.tcl
     
 ### Demo tour
+
 To see what clcon can do, take a [Demo Tour](demo-tour.md)
