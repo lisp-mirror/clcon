@@ -21,7 +21,9 @@ Completion and find definition works best in the console. Keyboard accelerators 
 ### Lisp
 At the console, enter `.apr -lookup-` to list all symbols containing "-lookup-" substring in their name. 
 At the console, type in `clco:serv` and press `Tab`. Name will expand to `clco:server-lookup-definition`. 
-Now press `Alt-.` Editor window will pop up and source of function you typed will be seen.
+Now press `Alt-.` Editor window will pop up and source of function you typed will be seen. You can press Alt-. at
+any lisp definition in the editor and jump to its source. If there are more then one definition, list of "hyperlinks"
+will show up at the console. Click on either of them with mouse to open an appropriate source.
 
 
 ### Tcl
