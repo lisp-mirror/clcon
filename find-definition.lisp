@@ -102,7 +102,7 @@ and which is activated after showing message box. See also write-code-to-pass-to
   (format stream "::tkcon::FocusConsole; "))
   
 
-(defun server-lookup-definition (text package-name)
+(defun server-lookup-definition (text &optional (package-name (package-name *package*)))
   "text is a name of a lisp object which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
   (let* ((dspecs-and-locations
           (swank-find-definitions-for-clcon text package-name))

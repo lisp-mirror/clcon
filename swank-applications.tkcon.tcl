@@ -151,7 +151,7 @@ proc ::tkcon::LispFindDefinition {w} {
     set Quoted [QuoteLispObjToString $str]
     set LispCmd "(cl:progn (clcon-server:server-lookup-definition $Quoted))"
    
-    ::tkcon::EvalInSwankAsync $LispCmd {::tkcon::LispFindDefinitionInnerContinuation $EventAsList} {:find-existing}
+    ::tkcon::EvalInSwankAsync $LispCmd {::tkcon::LispFindDefinitionInnerContinuation $EventAsList} {:repl-thread}
     
 }
 
