@@ -56,7 +56,7 @@ namespace eval ::edt {
         if {[lindex $data 0]} {
             set $clcon_text.StatusBarInfo(package) [lindex $data 1]
         } else {
-            set $clcon_text.StatusBarInfo(package) {??}
+            set $clcon_text.StatusBarInfo(package) {CL-USER}
         }
     }
 
