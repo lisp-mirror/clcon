@@ -218,9 +218,15 @@ namespace eval ::edt {
 
 
         frame $WStatusBar
+
+        label $WStatusBar.packageTitle -text "PKG"
+        label $WStatusBar.package -relief sunken -borderwidth 1 -anchor w -width 34 -textvariable $btext.StatusBarInfo(package)
         label $WStatusBar.cursor -relief sunken -borderwidth 1 -anchor e -width 6 \
 	    -textvariable $btext.StatusBarInfo(CursorPos)
-        grid $WStatusBar.cursor -sticky news         
+
+        grid $WStatusBar.packageTitle -row 0 -column 0 -sticky nws
+        grid $WStatusBar.package -row 0 -column 1 
+        grid $WStatusBar.cursor -row 0 -column 2 -sticky nes         
 
         # $tw.text configure -send_to_lisp 1
         # ::btext::clearHighlightClasses $btext
@@ -353,8 +359,9 @@ namespace eval ::edt {
         if {[dict get $opts -offset] ne {}} {
             $btext mark set insert [dict get $opts -offset]
             $btext see insert
-            ::clcon_text::tncm $btext
         }
+
+        ::clcon_text::tncm $btext
 
         return $btext
     }

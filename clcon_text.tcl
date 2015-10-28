@@ -102,6 +102,7 @@ namespace eval ::clcon_text {
             ::edt::CreateHighlightTags $self
             global $self.StatusBarInfo
             set $self.StatusBarInfo(CursorPos) {}
+            set $self.StatusBarInfo(Package) {??}
         }
         destructor {
             $options(-opened_file) destroy
