@@ -11,31 +11,41 @@ So it is easy to lose your work.
 
 Windows: installing file release
 ----------
-- Download file release from [Downloads page](https://bitbucket.org/budden/clcon/downloads)
-- Unpack it to c:\clcon
-- Start c:\clcon\bin\clcon-server-and-client.cmd - this will load and run the IDE. When running for the first time, building will take a while. Subsequent loads are faster
-- To see what clcon can do, take a [Demo Tour](demo-tour.md)
-- If all is ok, you have clcon with SBCL (use Alt-. to find sources of SBCL objects) and quicklisp (use ql:quickload to load libraries)
-- Repositories of clcon components (clcon, oduvanchik, budden-tools) are at c:\clcon\quicklisp\local-projects - feel free to send patches :)
+Download file release from [Downloads page](https://bitbucket.org/budden/clcon/downloads)
+
+Unpack it to c:\clcon
+
+Start c:\clcon\bin\clcon-server-and-client.cmd - this will load and run the IDE. When running for the first time, building will take a while. Subsequent loads are faster
+
+To see what clcon can do, take a [Demo Tour](demo-tour.md)
+
+If all is ok, you have clcon with SBCL (use Alt-. to find sources of SBCL objects) and quicklisp (use ql:quickload to load libraries)
+
+Repositories of clcon components (clcon, oduvanchik, budden-tools) are at c:\clcon\quicklisp\local-projects - feel free to send patches :)
 
 Linux: 
 -----------
 
 ### Prerequisites
-- [SBCL](http://www.sbcl.org/platform-table.html) >= 1.2.7. Check your sbcl version with `(lisp-implementation-version)`
-- [tcl/tk](http://tcl.tk) >= 8.6.2. To check your tcl tk version start `wish` from the console and type in in the console: `info patchlevel`. If your distribution have earlier version, try Tombert's tcltk, see http://wiki.tcl.tk/668, or something else.
-- [quicklisp](https://www.quicklisp.org/beta/) set up at your SBCL
-- [slime](https://common-lisp.net/project/slime/) must be known to your quicklisp (do `(ql:quickload :slime)` once), but not loaded in your initialization files (e.g. your ~/.sbclrc)
-- find where your quicklisp's local-projects are located. Simplest way to do it is to start sbcl and type in: `ql:*local-project-directories*`. It will print list of local projects directories, choose any of these. Usually it is `~/quicklisp/local-projects`.
-- setting of `sb-impl::*default-external-format*` to `:utf-8` in your initialization file, e.g. 
+[SBCL](http://www.sbcl.org/platform-table.html) >= 1.2.7. Check your sbcl version with `(lisp-implementation-version)`
 
-    ```(setf sb-impl::*default-external-format* to :utf-8)```
+[tcl/tk](http://tcl.tk) >= 8.6.2. To check your tcl tk version start `wish` from the console and type in in the console: `info patchlevel`. If your distribution have earlier version, try Tombert's tcltk, see http://wiki.tcl.tk/668, or something else.
 
-- hg (Mercurial) 
+[quicklisp](https://www.quicklisp.org/beta/) set up at your SBCL
+
+[slime](https://common-lisp.net/project/slime/) must be known to your quicklisp (do `(ql:quickload :slime)` once), but not loaded in your initialization files (e.g. your ~/.sbclrc)
+
+find where your quicklisp's local-projects are located. Simplest way to do it is to start sbcl and type in: `ql:*local-project-directories*`. It will print list of local projects directories, choose any of these. Usually it is `~/quicklisp/local-projects`.
+
+setting of `sb-impl::*default-external-format*` to `:utf-8` in your initialization file, e.g. 
+
+    (setf sb-impl::*default-external-format* to :utf-8)
+
+hg (Mercurial) 
 
     sudo apt-get install mercurial
 
-- fresh version of [budden-tools](https://bitbucket.org/budden/budden-tools). Put it under local-projects directory of quicklisp, e.g. (for Linux)
+Fresh version of [budden-tools](https://bitbucket.org/budden/budden-tools). Put it under local-projects directory of quicklisp, e.g. (for Linux)
 
     cd ~/quicklisp/local-projects
     hg clone https://bitbucket.org/budden/budden-tools
