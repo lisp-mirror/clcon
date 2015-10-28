@@ -33,14 +33,12 @@ Linux:
 
 - hg (Mercurial) 
 
-    ```sudo apt-get install mercurial```
+    sudo apt-get install mercurial
 
 - fresh version of [budden-tools](https://bitbucket.org/budden/budden-tools). Put it under local-projects directory of quicklisp, e.g. (for Linux)
 
-    ```
     cd ~/quicklisp/local-projects
     hg clone https://bitbucket.org/budden/budden-tools
-    ```  
 
 ### Installation
 - choose good version of clcon. You can load trunk, but it is better to load latest tagged "release", e.g. 0.3.0. Note that online documentation usually describes trunk. To be sure that it matches software functionality, read not the online documentation, but documentation you have installed. 
