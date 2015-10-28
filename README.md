@@ -16,12 +16,12 @@ Supported tcl version(s):
 
 - tcl 8.6.3, 8.6.4
 
-Supported platforms: 
+Platforms where testing is 
 
-- Debian 8 (32 bit) at x86 processor
-- Debian Mint Rafaela (64 bit) with the help of tombert's tcltk, see http://wiki.tcl.tk/668
-- Windows 7 (32 bit)
-- as of 2015-09-11, reported by pcchange90 to run on windows 7(64 bit) and sbcl(x86,not amd64)
+- Debian 8 (32 bit) at x86 processor - tested regularly
+- Debian 17.2 (64 bit) with the help of tombert's tcltk, see http://wiki.tcl.tk/668, tested occasionally
+- Windows 7 (32 bit) - tested regularly
+- Windows 7 (64 bit), SBCL x86 - tested occasionally
 
 ## Screenshots
 [See here](https://bitbucket.org/budden/clcon/wiki/Screenshots)
