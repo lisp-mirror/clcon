@@ -219,7 +219,7 @@ namespace eval ::edt {
 
         frame $WStatusBar
         label $WStatusBar.cursor -relief sunken -borderwidth 1 -anchor e -width 6 \
-	    -textvariable $btext.CursorPos
+	    -textvariable $btext.StatusBarInfo(CursorPos)
         grid $WStatusBar.cursor -sticky news         
 
         # $tw.text configure -send_to_lisp 1

@@ -100,13 +100,13 @@ namespace eval ::clcon_text {
             bindtags $w $NewBindTags
             bind $win <<ContinueUnfreeze>> "$self Unfreeze"
             ::edt::CreateHighlightTags $self
-            global $self.CursorPos
-            set $self.CursorPos {}
+            global $self.StatusBarInfo
+            set $self.StatusBarInfo(CursorPos) {}
         }
         destructor {
             $options(-opened_file) destroy
-            global $self.CursorPos
-            unset $self.CursorPos
+            global $self.StatusBarInfo
+            array unset $self.StatusBarInfo
             DestroyBackendBuffer $win
         }
 
@@ -557,8 +557,8 @@ namespace eval ::clcon_text {
             putd "Entered tncm:oops $clcon_text"
             return
         }
-        global $clcon_text.CursorPos
-        set $clcon_text.CursorPos [$clcon_text index insert]
+        global $clcon_text.StatusBarInfo
+        set $clcon_text.StatusBarInfo(CursorPos) [$clcon_text index insert]
         MaybeSendToLisp $clcon_text n {}
     }
 
