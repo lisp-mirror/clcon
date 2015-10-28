@@ -40,7 +40,7 @@ If you want to try using clcon, first of all take a [demo tour](doc/demo-tour.md
 
 ## Current features
 - REPL for Lisp and Tcl with history
-- Completion, find source, apropos for Lisp and TCl in REPL
+- Completion, find source, apropos for Lisp and TCl (completion only works in REPL)
 - Find in files
 - Debugger, Stepper, Inspector from SWANK 
 - Editor with lisp syntax highlight, autoindent, lisp forms navigation
@@ -54,9 +54,12 @@ Documentation related to release are in the file itself.
 For Linux, see [doc/INSTALL.md](doc/INSTALL.md).
 
 ## Documentation
+Warning! All documentation describes trunk version. If you download the release, 
+documentation is inside the release. Do not read online documentation then!
+
 [Demo tour (trunk version)](doc/demo-tour.md) - a footpath through best views of some features of clcon.
 
-[User manual](doc/user-manual.md) 
+[User manual (trunc version)](doc/user-manual.md) 
 
 [Wiki](https://bitbucket.org/budden/clcon/wiki/) - contains [screenshots](https://bitbucket.org/budden/clcon/wiki/Screenshots), but otherwise is not very useful.  
 
@@ -68,7 +71,7 @@ For Linux, see [doc/INSTALL.md](doc/INSTALL.md).
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-- package-awareness of IDE (status bar, prompt, find source)
+- package-awareness of IDE (prompt, find source in REPL)
 - use as a GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine)
 - close all bugs (ha-ha!)
 - print "who calls" info
