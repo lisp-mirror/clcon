@@ -140,7 +140,7 @@ namespace eval ::clcon_text {
             return $result
         }
         
-        # NSL stands for "not send to lisp". Especially for oduvanchik commands which
+        # NSL stands for "not send to lisp". Specially for oduvanchik commands which
         # do text editings, see do-editing-on-tcl-side.lisp
         method RoInsertNSL {args} {
             putd "RoInsertNSL $args"
@@ -343,7 +343,8 @@ namespace eval ::clcon_text {
         # This is a temporary solution. This is a separate option indeed
         set qId [lq $clcon_text]
         switch -exact $type {
-            n { 
+            n {
+                # see ::clcon_text::tncm
                 if {![$clcon_text UsesLispP]} {
                     return
                 }
