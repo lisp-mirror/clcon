@@ -16,8 +16,8 @@
 (when (find-package :swank)
   (error "Clcon server unable to load: swank is loaded already. Your plan:
  1. remove swank initialization from initialization files
- 2. remove swank's fasls which are normally at ~/.slime/fasl 
- 3. retry"))
+ 2. remove swank's fasls which are normally at ~A
+ 3. retry" "~/.slime/fasl"))
 
 ;; Disable stepping in SWANK 
 (proclaim '(optimize (debug 3) (compilation-speed 3)))
