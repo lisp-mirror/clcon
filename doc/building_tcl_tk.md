@@ -1,9 +1,17 @@
 
 BUILDING tcl/tk 8.4.6:
 
+copies lib*.a to *.lib (don't know if it will fail)
+
 http://wiki.tcl.tk/14828
 
+c:\mingw\msys\1.0\msys.bat
+
 export PATH=$PATH:/c/MinGW/bin
+
+cd d:/tcktk8.6.4/tcl8.6.4/win
+
+configure --prefix=/c/tcl
 
 building tk: 
 
