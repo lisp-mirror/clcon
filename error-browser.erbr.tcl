@@ -142,6 +142,7 @@ namespace eval ::erbr {
         switch -exact $severity {
             "note"          {return 0}
             "style-warning" {return 1}
+            "redefinition"  - 
             "warning"       {return 2}
             "read-error"    -
             "error"         {return 3}
