@@ -283,7 +283,7 @@ sldb-break-with-default-debugger
 
 Трассирвока tcl
 ----------------
-..proc trace_report {args} { puts stderr $args }
+..proc trace_report {args} { putd "trace_report: $args"; dump_all_stack_putd }
 ..trace add execution ::edt::Bi2W leave trace_report
 
 

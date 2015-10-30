@@ -73,12 +73,12 @@ proc tr {x} {
 }
 
 
-proc dump_all_frame_infos {} {
-    for {set x 0} {$x<100} {incr x} { 
-        catch { set frame$x [ info frame $x ] }
-        if {[info exists frame$x]} {
-            showVar frame$x
-        }
+proc dump_all_stack_putd {{prefix "  stack:"}} {
+    set i 0
+    while { $i < [ info frame ] } {
+        set inf [info frame $i]
+        putd "$prefix$inf"
+        incr i
     }
 }
 
