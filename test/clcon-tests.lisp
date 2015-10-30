@@ -11,14 +11,14 @@
 
 
 
-(def-trivial-test::! odu-file-path-namestring.1 
+#+windows (def-trivial-test::! odu-file-path-namestring.1 
                      (string=
                       (DIRED::ODU-FILE-PATH-NAMESTRING "c:\\Program Files\\Steel Bank Common Lisp\\1.2.16\\sbcl.exe")
                       "c:/Program Files/Steel Bank Common Lisp/1.2.16/"
                       )
   t)
 
-(def-trivial-test::! odu-file-path-namestring.2
+#+windows (def-trivial-test::! odu-file-path-namestring.2
                      (string=
                       (DIRED::ODU-FILE-PATH-NAMESTRING "c:/Program Files/Steel Bank Common Lisp/1.2.16/sbcl.exe")
                       "c:/Program Files/Steel Bank Common Lisp/1.2.16/"
