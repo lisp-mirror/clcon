@@ -281,10 +281,6 @@ namespace eval ::edt {
         
         SetupEditorWindowWhenSwitchingToIt
 
-        wm deiconify $tw
-
-        focus [c_text]
-       
         UpdateMRUAndBufferList [cBi]
     }
 

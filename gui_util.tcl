@@ -118,9 +118,13 @@ namespace eval ::gui_util {
     proc FocusWindowByName {window {widget {}}} {
         if {$window eq {}} {
             bell
-        }
+            return
+        } 
         set code [catch {
-            wm deiconify $window
+            set state_now [wm state $window]
+            if {[lsearch {iconic withdrawn} $state_now] >= 0} {
+                wm deiconify $window
+            }
             raise $window
             if {$widget ne {}} {
                 focus $widget
@@ -132,5 +136,5 @@ namespace eval ::gui_util {
             bell
         }
         return 
-    }
+    } 
 }
