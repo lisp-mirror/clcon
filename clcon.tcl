@@ -1028,7 +1028,7 @@ proc ::tkcon::FocusConsole {} {
     variable PRIV
     set w $PRIV(root)
     set txt $PRIV(console)
-    FocusWindowByName $w $txt
+    ::gui_util::FocusWindowByName $w $txt
 }
 
 
