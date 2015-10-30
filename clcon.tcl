@@ -1015,25 +1015,6 @@ proc ::tkcon::GotoTab {con} {
 }
 
 
-proc ::tkcon::FocusWindowByName {window {widget {}}} {
-    if {$window eq {}} {
-        bell
-    }
-    set code [catch {
-        wm deiconify $window
-        raise $window
-        if {$widget ne {}} {
-            focus $widget
-        } else {
-            focus $window
-        }
-    }]
-    if {$code} {
-        bell
-    }
-    return 
-}
-    
 # Returns text widget of current console. It is suitable e.g.
 # for calling write-code-to-pass-to-loc with the pattern
 # apply {$w ...} [::tkcon::CurrentConsole]

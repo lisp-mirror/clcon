@@ -235,7 +235,7 @@ namespace eval ::edt {
         switch -exact $action {
             "" -
             focus {
-                ::tkcon::FocusWindowByName $tw [c_text]
+                ::gui_util::FocusWindowByName $tw [c_text]
             }
             deiconify {
                 wm deiconify $tw

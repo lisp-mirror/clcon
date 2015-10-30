@@ -114,4 +114,23 @@ namespace eval ::gui_util {
     # proc NoteWidgetsChanged {widget suffix_list proc_body} {
     # }
     # See example in FindBox
+
+    proc FocusWindowByName {window {widget {}}} {
+        if {$window eq {}} {
+            bell
+        }
+        set code [catch {
+            wm deiconify $window
+            raise $window
+            if {$widget ne {}} {
+                focus $widget
+            } else {
+                focus $window
+            }
+        }]
+        if {$code} {
+            bell
+        }
+        return 
+    }
 }
