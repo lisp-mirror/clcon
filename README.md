@@ -71,7 +71,6 @@ documentation is inside the release. **Do not read online documentation** then!
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-- package-awareness of IDE (prompt, find source in REPL)
 - use as a GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine)
 - lisp completion in the editor
 - close at least 3 bugs per week
