@@ -537,22 +537,4 @@ proc ::tkcon::OuterNewSwank {} {
     ::swcnn::MakeSwankConnection $OPT(swank-ip) $OPT(swank-port)
 }
 
-## ::tkcon::NewSwank - called to create a socket to connect to
-# Results:	It will create a socket, and attach if requested
-# FIXME logic does not follow logic from tkcon.
-# Study relations between consoles and interpretes in tkon and fix thie sequence.
-##
-#proc ::tkcon::NewSwank {host port} {
-#    variable PRIV
-#    if {[catch {
-#	set sock [socket $host $port]
-#        fconfigure $sock -encoding utf-8
-#    } err]} {
-#	tk_messageBox -title "Socket Connection Error" \
-#		-message "Unable to connect to \"$host:$port\":\n$err" \
-#		-icon error -type ok
-#    } else {
-#	AttachSwank $sock
-#    }
-#}
 
