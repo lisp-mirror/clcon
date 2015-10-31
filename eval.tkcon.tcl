@@ -409,8 +409,7 @@ namespace eval ::tkcon {
             set debugging 0
         }
         if {$::swcnn::CurrentSwankConnection ne {} && !$debugging } {
-            $w insert end [EvalSlave history nextid] prompt
-            $w insert end " CL-UsER>" prompt
+            $w insert end [join [list [EvalSlave history nextid] " " $PRIV(CurrentPackageDisplayName) ">"] ""] prompt
         } else {
             if {!$OPT(showstatusbar)} {
                 if {$PRIV(appname) ne ""} {
@@ -446,5 +445,13 @@ namespace eval ::tkcon {
         if {!$OPT(showstatusbar)} {
             Prompt $pre $post $prompt
         }
+    }
+
+    # new-package event received from slime
+    # second elt is package name, third is package nickname
+    proc ChangeCurrentPackage {EventAsList} {
+        variable PRIV
+        set PRIV(CurrentPackageName) [::mprs::Unleash [lindex $EventAsList 1]]
+        set PRIV(CurrentPackageDisplayName) [::mprs::Unleash [lindex $EventAsList 2]]
     }
 }

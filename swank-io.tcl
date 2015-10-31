@@ -232,6 +232,7 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
     # we don't need to Unleash keywords
     set Head [Unleash [lindex $EventAsList 0]]
     if { $Head eq ":write-string" } {
+        # There is also a third element in the list, e.g. :repl-result
         puts -nonewline [Unleash [lindex $EventAsList 1]]
         ::tkcon::SheduleCheckSWANKEventQueue
     } elseif { $Head eq ":eval-no-wait" } {
@@ -247,6 +248,8 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
         ::ldbg::DebugReturn $EventAsList $ContinuationId
     } elseif { $Head eq ":indentation-update" } {
         putd "Impolitely ignore :indentation-update"
+    } elseif { $Head eq ":new-package" } {
+        ::tkcon::ChangeCurrentPackage $EventAsList       
     } elseif { $Head eq ":ping" } {
         ::swcnn::Pong $EventAsList
     } elseif { [ContinuationExistsP $ContinuationId ] == 1 && [lsearch -exact [list ":return"] $Head] >= 0 } {

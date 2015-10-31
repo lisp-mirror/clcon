@@ -311,6 +311,8 @@ proc ::tkcon::Init {args} {
 	tabs		{}
 
         SwankThread      {}
+        CurrentPackageName "COMMON-LISP-USER"
+        CurrentPackageDisplayName "CL-USER"
     } {
 	if {![info exists PRIV($key)]} { set PRIV($key) $default }
     }
