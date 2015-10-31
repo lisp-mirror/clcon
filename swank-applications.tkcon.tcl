@@ -137,7 +137,8 @@ proc ::tkcon::LispFindDefinition {w} {
     
     # string quoting is a bullshit here!
     set Quoted [QuoteLispObjToString $str]
-    set LispCmd "(cl:progn (clcon-server:server-lookup-definition $Quoted))"
+    set Package [QuoteLispObjToString $PRIV(CurrentPackageName)]
+    set LispCmd "(cl:progn (clcon-server:server-lookup-definition $Quoted $Package))"
    
     ::tkcon::EvalInSwankAsync $LispCmd {::tkcon::LispFindDefinitionInnerContinuation $EventAsList} {:repl-thread}
     
