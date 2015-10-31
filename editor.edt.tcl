@@ -345,7 +345,7 @@ namespace eval ::edt {
 
         
         # Find old edit window if there is one
-        set Bi [FindOrMakeEditorWindow $word $opts $tail]
+        lassign [FindOrMakeEditorWindow $word $opts $tail] Bi word
         set w [Bi2W $Bi]
         set tw [Bi2TW $Bi]
         set btext [Bi2btext $Bi]

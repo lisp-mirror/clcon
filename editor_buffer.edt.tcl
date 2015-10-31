@@ -1,12 +1,22 @@
 ## editor - part which is independent on window management.
 
 namespace eval ::edt {
+    proc CanonicalizeFileName {name} {
+        global tcl_platform
+        if {$tcl_platform(platform) == "windows"} {
+            regsub -all {(\\)} $name {/} name
+            return [string tolower $name]
+        } else {
+            return string
+        }
+    }
 
     # This function increases ReuseCounter for non-reusable parameter sets
     # Take care to call it once for every parameter set.
     proc CanonicalizeEditArgs {word opts} {
         set type [dict get $opts -type]
         if {$type eq "file"} {
+            set word [CanonicalizeFileName $word]
             return [list $word -type $type]
         } elseif {$type eq "error"} {
             return [list tcl_error -type $type -no [GenReuseCounter]]

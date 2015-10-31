@@ -296,11 +296,12 @@ namespace eval ::edt {
     # Word is filename,procname, etc.
     # Opts are options from edit command
     # Tail is as returned from EditorParseArgs 
-    # Sets internal_cBi and returns it
+    # Sets internal_cBi and returns a list of Bi and canonicalized word    # 
     proc FindOrMakeEditorWindow {word opts tail} {
         variable ContentKeyToBufIdDict
         variable internal_cBi
         set key [CanonicalizeEditArgs $word $opts]
+        set word [lindex $key 0]
         if { [dict exists $ContentKeyToBufIdDict $key] } {
 
             set Bi [dict get $ContentKeyToBufIdDict $key]
@@ -328,7 +329,7 @@ namespace eval ::edt {
             LoadContentsAndUpdateRecent $w $word $opts $tail
         }
 
-        return $internal_cBi
+        return [list $internal_cBi $word]
     }
 
     proc CurrentlyVisibleBi {} {
