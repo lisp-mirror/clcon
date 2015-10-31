@@ -27,13 +27,15 @@ proc ::tkcon::LispFindDefinitionInnerContinuation {SwankReplyAsList} {
 
 ## ::tkcon::ExpandLispSymbol
 # - expand a lisp symbol in the console based on $str
-# ARGS:	str	- partial proc name to expand
-# Used to Call:	        ::tkcon::ExpandBestMatch
-# Used to Return:	list containing longest unique match followed by all the
-#		possible further matches
+# ARGS:	w     - widget (passed to continuation)
+#       str   - partial lisp symbol name to expand
+#       tmp   - index in text widget (passed to continuation)
+# Return:     - -code 12120374 to make caller return rather soon (see caller)
+# Shedules:   ExpandLispSymbolC1 after returning from swank
 ##
-# we hid ExpandLispSymbol for a while as we use expandsymbol as entrypoint to find-definition
-proc ::tkcon::ExpandLispSymbol str {
+# we hide ExpandLispSymbol for a while as we use expandsymbol as entrypoint to find-definition
+## 
+proc ::tkcon::ExpandLispSymbol {w str tmp} {
     variable OPT
     variable PRIV
     
@@ -44,35 +46,30 @@ proc ::tkcon::ExpandLispSymbol str {
     set Quoted [QuoteLispObjToString $str]
     set PackageName [QuoteLispObjToString $PRIV(CurrentPackageDisplayName)]
     set LispCmd "(swank:simple-completions $Quoted '$PackageName)"
-   
-    set SwankReply [::tkcon::EvalInSwankSync $LispCmd]
+    set OnReply [join [list [list ::tkcon::ExpandLispSymbolC1 $w $str $tmp] "\$EventAsList"]]
+    EvalInSwankAsync $LispCmd $OnReply :find-existing
+    return -code 12120374 ""
+}
 
 #(:return
 # (:ok
 #  (("defcas" "defclass" "defconstant" "defconstant-uneql" "defconstant-uneql-name" "defconstant-uneql-new-value" "defconstant-uneql-old-value" "defgeneric" "defglobal" "defimplementation" "define-alien-routine" "define-alien-type" "define-alien-variable" "define-cas-expander" "define-compiler-macro" "define-condition" "define-hash-table-test" "define-load-time-global" "define-method-combination" "define-modify-macro" ...)
 #   "def"))
-
     
-    if {[::mprs::Car $SwankReply] eq ":ok"} {
-        set ExpansionsAndBestMatch [::mprs::Cadr $SwankReply]
-    } else {
-        putd "ExpandLispSymbol: I don't know what is [::mprs::Car $SwankReply]"
-        return -code error ""
-    }
+proc ::tkcon::ExpandLispSymbolC1 {w str tmp EventAsList} {
+    set ExpansionsAndBestMatch [::mprs::ParseReturnOk $EventAsList]
 
-    if {[::mprs::Null [::mprs::Car $ExpansionsAndBestMatch]]} {
-        return -code break ""
+    # showVar ExpansionsAndBestMatch
+
+    if {[::mprs::Null [lindex $ExpansionsAndBestMatch 0]]} {
+        return
     }
     
-    set match [::mprs::UnleashListOfAtoms [::mprs::Car $ExpansionsAndBestMatch]]
+    set match [::mprs::UnleashListOfAtoms [lindex $ExpansionsAndBestMatch 0]]
 
-    if {[llength $match] > 1} {
-	regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
-	set match [linsert $match 0 $str]
-    } else {
-	regsub -all {([^\\]) } $match {\1\\ } match
-    }
-    return -code [expr {$match eq "" ? "continue" : "break"}] $match
+    set match [ExpandMatchMagic $str $match]
+
+    ::tkcon::ExpandC1 $w $str $tmp $match
 }
 
 
