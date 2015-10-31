@@ -77,6 +77,11 @@ proc ::tkcon::Expand {w {type ""}} {
             # break - acceptable return
             # continue - acceptable 
         }
+        12120374 {
+            # this is a special case of returning from ::tkcon::ExpandLispSymbol
+            # which is async. So it is too early to do something else. 
+            return
+        }
         0 -
         1 - 
         2 -
@@ -86,6 +91,10 @@ proc ::tkcon::Expand {w {type ""}} {
             return 0
         }
     }
+    ExpandC1 $w $str $tmp $res
+}
+
+proc ::tkcon::ExpandC1 {w str tmp res} {
     set len [llength $res]
     if {$len} {
 	$w delete $tmp insert
