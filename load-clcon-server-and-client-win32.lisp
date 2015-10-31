@@ -10,8 +10,8 @@
 
 ;; example of local projects. Do we need it? 
 ;;(ql:quickload :quickproject)
-;;(quickproject:make-project "c:/clcon/quicklisp/local-projects/budden-tools" :depends-on '(:alexandria :cl-fad :split-sequence :cl-utilities :named-readtables :cl-ppcre :swank :closer-mop))
-;;(quickproject:make-project "c:/clcon/quicklisp/local-projects/oduvanchik"  :depends-on '(:alexandria :trivial-gray-streams :iterate :babel :cl-ppcre :named-readtables :budden-tools :split-sequence))
+;;(quickproject:make-project "c:/clcon/lp/budden-tools" :depends-on '(:alexandria :cl-fad :split-sequence :cl-utilities :named-readtables :cl-ppcre :swank :closer-mop))
+;;(quickproject:make-project "c:/clcon/lp/oduvanchik"  :depends-on '(:alexandria :trivial-gray-streams :iterate :babel :cl-ppcre :named-readtables :budden-tools :split-sequence))
 ;; 
 
 ;; piece from my init.lisp
@@ -78,7 +78,7 @@
 
 ; from budden-tools
 (asdf:load-system :decorate-function) 
-(load (compile-file (at-clcon-root "quicklisp/local-projects/budden-tools/asdf-3.1.4-tools.lisp")))
+(load (compile-file (at-clcon-root "lp/budden-tools/asdf-3.1.4-tools.lisp")))
 
 (asdf:load-system :iterate-keywords)
 (asdf:load-system :alexandria)
@@ -86,7 +86,7 @@
 (asdf:load-system :budden-tools)
 
 (budden-tools:def-toplevel-progn "load winmerge-strings" ()
-  (load (at-clcon-root "quicklisp/local-projects/clcon/winmerge-strings.lisp")))
+  (load (at-clcon-root "lp/clcon/winmerge-strings.lisp")))
 
 (BUDDEN-TOOLS:def-toplevel-progn "load :see-packages system" ()
   (asdf:load-system :see-packages) 
