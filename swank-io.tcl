@@ -342,7 +342,7 @@ proc ::tkcon::TempSwankChannelReadable {sock} {
     set Event [SwankReadMessageString]
 
     # just for debugging 
-    # putd "217901 message from socket: $Event"
+    putd "217901 message from socket: $Event"
 
     if { [string index $Event 0] eq "(" } {
         puts stderr "Skipping lisp-formed event $Event"
@@ -428,8 +428,9 @@ proc ::tkcon::SetupSwankConnection {channel console} {
 
     # this is not from lime!
     ::tkcon::SwankNoteTclConnection 
-    # We must read reply. Putd is for debugging only.
-    putd [SwankReadMessage]
+    # We must read reply
+    set reply [SwankReadMessage]
+    putd $reply
 
 
   #(swank-protocol:request-connection-info connection)
@@ -459,8 +460,8 @@ proc ::tkcon::SetupSwankConnection {channel console} {
     #SwankRequestSwankRequire1 "swank-presentations"
     SwankRequestSwankRequire1 "swank-repl"
 
-    # putd is for debugging here
-    putd [SwankReadMessage]
+    set reply [SwankReadMessage]
+    putd $reply
 
     # Start it up
     # disabled at emacs SwankRequestInitPresentations

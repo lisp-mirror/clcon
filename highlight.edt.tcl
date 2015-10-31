@@ -51,6 +51,8 @@ namespace eval ::edt {
         after idle [list ::edt::DoApplyHighlightToLine $clcon_text $s]
     }
 
+    # Display change of current package in a status bar
+    # see also ::tkcon::ChangeCurrentPackageA
     proc CurrentPackageChange {clcon_text data} {
         global $clcon_text.StatusBarInfo
         if {[lindex $data 0]} {

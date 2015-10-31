@@ -448,7 +448,7 @@ namespace eval ::tkcon {
     }
 
     # Parses return from swank-repl:create-repl
-    # See also ChangeCurrentPackageB
+    # See also ChangeCurrentPackageB, ::edt::CurrentPackageChange
     proc ChangeCurrentPackageA {EventAsList} {
         variable PRIV
         set x [::mprs::ParseReturnOk $EventAsList]
@@ -457,7 +457,7 @@ namespace eval ::tkcon {
     }
        
 
-    # See also ChangeCurrentPackageA
+    # See also ChangeCurrentPackageA, ::edt::CurrentPackageChange
     # new-package event received from slime
     # second elt is package name, third is package nickname
     proc ChangeCurrentPackageB {EventAsList} {
