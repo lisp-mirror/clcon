@@ -319,3 +319,8 @@ MakeSwankConnection ->
      (swank-io.tcl)proc ::tkcon::SwankRequestCreateRepl = на продолжении - SwankReplReady
      и затем читает ответ и продолжение вызывается
         (на продолжении) SwankReplReady PRIV(SwankReplReady) := 1
+
+
+(:emacs-rex
+ (swank:operate-on-system-for-emacs "ltk" 'load-op)
+ "COMMON-LISP-USER" t 29)

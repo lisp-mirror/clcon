@@ -59,3 +59,16 @@
     ))
 
 
+(defun load-system-for-tcl (system-name &rest options)
+  "Backend for ::edt::CompileAndLoadTheFile . Rather untraditional c-s dialog. We normally do such things in tcl. It can be sometimes more convenient to edit though as we're in Lisp"
+  (let* ((compilation-result (apply #'swank:operate-on-system-for-emacs system-name 'asdf:load-op options))
+         (success (swank::compilation-result-successp compilation-result))
+         (notes (swank::compilation-result-notes compilation-result))
+         (serial 0)
+         )
+    (when (or notes (not success))
+      (eval-in-tcl (format nil "::erbr::SwankBrowseErrors1 ~A" (CLCO::CONVERT-OBJECT-TO-TCL compilation-result)))
+      (dolist (note notes)
+        (eval-in-tcl (calc-details-code note (incf serial)))
+        ))
+    ))
