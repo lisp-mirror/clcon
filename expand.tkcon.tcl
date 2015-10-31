@@ -19,6 +19,18 @@ proc ::tkcon::IsInsertAfterTheConsolePrompt {text} {
     $text comp insert >= limit
 }
 
+# It looks like that it finds best match and prepares
+# what we will insert into insertion point and what we will print above it
+proc ::tkcon::ExpandMatchMagic {str match} {
+    if {[llength $match] > 1} {
+        regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
+        set match [linsert $match 0 $str]
+    } else {
+        regsub -all {([^\\]) } $match {\1\\ } match
+    }
+    return $match
+}
+
 
 ## ::tkcon::Expand - 
 # ARGS:	w	- text widget in which to expand str
@@ -46,7 +58,7 @@ proc ::tkcon::Expand {w {type ""}} {
     # We can ignore return codes when we are looking for specific kind of completion
     showVarPutd type
     switch -glob $type {
-        li* { set code [catch {ExpandLispSymbol $str} res] }
+        li* { set code [catch {ExpandLispSymbol $w $str $tmp} res] }
 	pa* { set code [catch {ExpandPathname $str} res] }
 	pr* { set code [catch {ExpandProcname $str} res] }
 	v*  { set code [catch {ExpandVariable $str} res] }
@@ -60,12 +72,7 @@ proc ::tkcon::Expand {w {type ""}} {
                 showVarPutd matchN
                 set match [concat $match $matchN]
 	    }
-            if {[llength $match] > 1} {
-                regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
-                set match [linsert $match 0 $str]
-            } else {
-                regsub -all {([^\\]) } $match {\1\\ } match
-            }
+            set match [ExpandMatchMagic $str $match]
             set res $match
             # this is only for a check just below
             set code 3 
@@ -202,12 +209,7 @@ proc ::tkcon::ExpandProcname {str {findUniqueMatch 1}} {
     putd "Match in ExpandProcName"
     showVarPutd match
     if {$findUniqueMatch} {
-        if {[llength $match] > 1} {
-            regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
-            set match [linsert $match 0 $str]
-        } else {
-            regsub -all {([^\\]) } $match {\1\\ } match
-        }
+        set match [ExpandMatchMagic $str $match]
     }
     return $match
 }
@@ -303,12 +305,7 @@ proc ::tkcon::ExpandVariable {str {findUniqueMatch 1}} {
         set match [concat $match1 $match2]
 
         if {$findUniqueMatch} {
-            if {[llength $match] > 1} {
-                regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
-                set match [linsert $match 0 $str]
-            } else {
-                regsub -all {([^\\]) } $match {\1\\ } match
-            }
+            set Match [ExpandMatchMagic $str $match]
         }
     }
     return $match
