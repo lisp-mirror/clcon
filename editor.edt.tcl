@@ -374,5 +374,12 @@ namespace eval ::edt {
         set wcmd [clcon_text::WrapEventScriptForFreezedText $cmd -destination $txt]
         eval $wcmd
     }   
+
+    proc ProcessEdRequest {EventAsList} {
+        set FileNameSpec [::mprs::Unleash [lindex $EventAsList 1]]
+        puts stderr $FileNameSpec
+        ::mprs::AssertEq [::mprs::Unleash [lindex $FileNameSpec 0]] {:filename}
+        edit -type file [::mprs::Unleash [lindex $FileNameSpec 1]]
+    }
 }
 
