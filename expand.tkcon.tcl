@@ -41,9 +41,9 @@ proc ::tkcon::Expand {w {type ""}} {
     set tmp [$w search -backwards -regexp $exp insert-1c limit-1c]
     if {[string compare {} $tmp]} {append tmp +2c} else {set tmp limit}
     set str [$w get $tmp insert]
-    # Expand procs can return "break" to indicate not to try further
-    # matches, otherwise "continue" says "I got nothing, continue on"
-    # We can ignore return codes from the specific expand type checks
+    # Expand procs can return "break" to indicate not to try other ways of compleation
+    # or "continue" says "I got nothing, continue on to other kinds of completion"
+    # We can ignore return codes when we are looking for specific kind of completion
     showVarPutd type
     switch -glob $type {
         li* { set code [catch {ExpandLispSymbol $str} res] }
@@ -67,7 +67,24 @@ proc ::tkcon::Expand {w {type ""}} {
                 regsub -all {([^\\]) } $match {\1\\ } match
             }
             set res $match
+            # this is only for a check just below
+            set code 3 
 	}
+    }
+    switch -exact $code {
+        3 -
+        4 {
+            # break - acceptable return
+            # continue - acceptable 
+        }
+        0 -
+        1 - 
+        2 -
+        default {
+            # expand must not return ok,error,return
+            puts stderr "Error in completion, code = $code"
+            return 0
+        }
     }
     set len [llength $res]
     if {$len} {
