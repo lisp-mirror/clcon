@@ -26,7 +26,7 @@ proc ::tkcon::LispFindDefinitionInnerContinuation {SwankReplyAsList} {
 }
 
 ## ::tkcon::ExpandLispSymbol
-# - expand a lisp symbol based on $str
+# - expand a lisp symbol in the console based on $str
 # ARGS:	str	- partial proc name to expand
 # Used to Call:	        ::tkcon::ExpandBestMatch
 # Used to Return:	list containing longest unique match followed by all the
@@ -40,20 +40,18 @@ proc ::tkcon::ExpandLispSymbol str {
     # require at least a single character, otherwise continue
     if {$str eq ""} {return -code continue}
     
-    # set LispCmd {(subseq (format nil "~{ ~A~}" (first (swank:simple-completions "a" "COMMON-LISP-USER"))) 1)}
-
     # string quoting is a bullshit here!
     set Quoted [QuoteLispObjToString $str]
-    if { $OPT(putd-enabled) == 1 } {
-        set LispCmd "(cl:progn (swank:simple-completions $Quoted '\"COMMON-LISP-USER\"))"
-    } else {
-        set LispCmd "(swank:simple-completions $Quoted '\"COMMON-LISP-USER\")"
-    }
+    set PackageName [QuoteLispObjToString $PRIV(CurrentPackageDisplayName)]
+    showVarPutd PackageName
+    set LispCmd "(swank:simple-completions $Quoted '$PackageName)"
+    showVarPutd LispCmd
    
     #testProc $LispCmd 1
     ##putd "Ok"
     ##tr [alias]
     set SwankReply [::tkcon::EvalInSwankSync $LispCmd]
+    showVarPutd SwankReply
     
 #(:return
 # (:ok
@@ -65,7 +63,7 @@ proc ::tkcon::ExpandLispSymbol str {
         set ExpansionsAndBestMatch [::mprs::Cadr $SwankReply]
     } else {
         putd "ExpandLispSymbol: I don't know what is [::mprs::Car $SwankReply]"
-        return
+        return -code error ""
     }
 
     if {[::mprs::Null [::mprs::Car $ExpansionsAndBestMatch]]} {
