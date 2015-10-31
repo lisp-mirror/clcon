@@ -112,6 +112,7 @@ proc ::tkcon::ExpandC1 {w str tmp res} {
 	if {$len > 1} {
 	    if {$::tkcon::OPT(showmultiple) && \
 		    ![string compare [lindex $res 0] $str]} {
+                WritePassiveText $w [format "Completions of %s:" $str] output
 		puts stdout [lsort [lreplace $res 0 0]]
 	    }
 	}
