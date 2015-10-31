@@ -43,16 +43,10 @@ proc ::tkcon::ExpandLispSymbol str {
     # string quoting is a bullshit here!
     set Quoted [QuoteLispObjToString $str]
     set PackageName [QuoteLispObjToString $PRIV(CurrentPackageDisplayName)]
-    showVarPutd PackageName
     set LispCmd "(swank:simple-completions $Quoted '$PackageName)"
-    showVarPutd LispCmd
    
-    #testProc $LispCmd 1
-    ##putd "Ok"
-    ##tr [alias]
     set SwankReply [::tkcon::EvalInSwankSync $LispCmd]
-    showVarPutd SwankReply
-    
+
 #(:return
 # (:ok
 #  (("defcas" "defclass" "defconstant" "defconstant-uneql" "defconstant-uneql-name" "defconstant-uneql-new-value" "defconstant-uneql-old-value" "defgeneric" "defglobal" "defimplementation" "define-alien-routine" "define-alien-type" "define-alien-variable" "define-cas-expander" "define-compiler-macro" "define-condition" "define-hash-table-test" "define-load-time-global" "define-method-combination" "define-modify-macro" ...)
@@ -71,7 +65,6 @@ proc ::tkcon::ExpandLispSymbol str {
     }
     
     set match [::mprs::UnleashListOfAtoms [::mprs::Car $ExpansionsAndBestMatch]]
-    # set MatchesList 
 
     if {[llength $match] > 1} {
 	regsub -all {([^\\]) } [ExpandBestMatch $match $str] {\1\\ } str
