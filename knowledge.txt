@@ -309,3 +309,13 @@ proc FindSourceCommand {text} {
 Виджет для основы: error-browser.erbr.tcl
 Функция лиспа для основы: clco::compile-file-for-tcl
 
+
+====================================================
+
+MakeSwankConnection ->
+(swank-io.tcl) ::tkcon::AttachSwank -> 
+  PRIV(SwankReplReady) := 0   
+  (swank-io.tcl) ::tkcon::SetupSwankConnection -> 
+     (swank-io.tcl)proc ::tkcon::SwankRequestCreateRepl = на продолжении - SwankReplReady
+     и затем читает ответ и продолжение вызывается
+        (на продолжении) SwankReplReady PRIV(SwankReplReady) := 1

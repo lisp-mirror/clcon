@@ -311,6 +311,7 @@ proc ::tkcon::Init {args} {
 	tabs		{}
 
         SwankThread      {}
+        SwankReplReady   0  
         CurrentPackageName "COMMON-LISP-USER"
         CurrentPackageDisplayName "CL-USER"
     } {

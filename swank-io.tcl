@@ -121,10 +121,19 @@ proc ::tkcon::SwankNoteTclConnection {} {
     ::tkcon::SwankEmacsRex "(clco:note-this-is-tcl-connection)"
 }
 
+proc ::tkcon::ReadThatSwankReplReady {} {
+    variable PRIV
+    set Event [SwankReadMessage]
+    set EventAsList [::mprs::Unleash $Event] 
+    showVar EventAsList
+    ::tkcon::ChangeCurrentPackageA $EventAsList
+    set PRIV(SwankThread) 1
+    set PRIV(SwankReplReady) 1
+}
+
 proc ::tkcon::SwankRequestCreateRepl {} {
     variable PRIV
     ::tkcon::SwankEmacsRex {(swank-repl:create-repl nil :coding-system "utf-8-unix")}
-    set PRIV(SwankThread) 1
 }
 
 # must be called when SWANKIsInSyncMode and when SWANKSyncContinuation is set
@@ -249,7 +258,7 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
     } elseif { $Head eq ":indentation-update" } {
         putd "Impolitely ignore :indentation-update"
     } elseif { $Head eq ":new-package" } {
-        ::tkcon::ChangeCurrentPackage $EventAsList       
+        ::tkcon::ChangeCurrentPackageB $EventAsList       
     } elseif { $Head eq ":ping" } {
         ::swcnn::Pong $EventAsList
     } elseif { [ContinuationExistsP $ContinuationId ] == 1 && [lsearch -exact [list ":return"] $Head] >= 0 } {
@@ -416,7 +425,10 @@ proc ::tkcon::SetupSwankConnection {channel console} {
     bind $console <<CheckSWANKEventQueue>> ::mprs::ProcessEventsFromQueueIfAppropriate
 
     # this is not from lime!
-    SwankNoteTclConnection 
+    ::tkcon::SwankNoteTclConnection 
+    # We must read reply. Putd is for debugging only.
+    putd [SwankReadMessage]
+
 
   #(swank-protocol:request-connection-info connection)
   #;; Read the connection information message
@@ -451,11 +463,9 @@ proc ::tkcon::SetupSwankConnection {channel console} {
     # Start it up
     # disabled at emacs SwankRequestInitPresentations
 
-    SwankRequestCreateRepl
-
-    # Wait for startup
-    # putd is for debugging here
-    putd [SwankReadMessage]
+    ::tkcon::SwankRequestCreateRepl
+    # Wait for startup. We read message here and set some variables from it.
+    ::tkcon::ReadThatSwankReplReady 
 
     #;; Read all the other messages, dumping them
     #(swank-protocol:read-all-messages connection))
@@ -486,6 +496,9 @@ proc ::tkcon::AttachSwank {name} {
     variable OPT
     variable ATTACH
     variable $name
+
+    set PRIV(SwankReplReady) 0
+
     upvar \#0 $name con
     set sock $con(sock)
     puts stderr "WARNING! tkcon allows for several consoles, but do not try to have more than one SWANK attachment simultanously" 
@@ -511,7 +524,7 @@ proc ::tkcon::AttachSwank {name} {
         fconfigure $sock -buffering full -blocking 0
     
         # It is important we initialize connection before binding fileevent
-        SetupSwankConnection $sock $PRIV(console)
+        ::tkcon::SetupSwankConnection $sock $PRIV(console)
 
         # The file event will just putd whatever data is found
         # into the interpreter
@@ -525,6 +538,8 @@ proc ::tkcon::AttachSwank {name} {
     } else {
         myerror "Unexpected state $con(state)"
     }
+
+    ::mprs::AssertEq $PRIV(SwankReplReady) 1
 
     Prompt
     
