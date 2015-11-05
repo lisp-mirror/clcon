@@ -101,7 +101,7 @@ namespace eval ::swcnn {
                 -icon error -type ok
         } else {
             set CurrentSwankConnection $name
-            ::tkcon::AttachSwank $name
+            ::tkcon::AttachSwank $name {}
         }
     }
 

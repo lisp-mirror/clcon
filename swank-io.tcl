@@ -493,10 +493,12 @@ proc ::tkcon::DisconnectFromSwank {} {
 
 
 ## ::tkcon::AttachSwank - called to setup SWANK connection
-# ARGS:	name	- swank connection name  
+# ARGS:	
+#  name         - swank connection name  
+#  continuation - a parameterless body to call after connection
 # Results:	::tkcon::EvalAttached is recreated to send commands to socket
 ##
-proc ::tkcon::AttachSwank {name} {
+proc ::tkcon::AttachSwank {name continuation} {
     variable PRIV
     variable OPT
     variable ATTACH
@@ -535,23 +537,30 @@ proc ::tkcon::AttachSwank {name} {
         # into the interpreter
         fileevent $sock readable [list ::tkcon::SwankChannelReadable $sock]
 
-        set con(state) "initialized"
+        set con(state) "AttachSwank : initialized"
     } elseif { $con(state) eq "initialized" } {
         # do nothing
-        putd "Initialized already"
+        puts stderr "Initialized already"
         # We can't reach this point as we call AttachSwank only from OuterNewSwank
     } else {
         myerror "Unexpected state $con(state)"
     }
 
-    ::mprs::AssertEq $PRIV(SwankReplReady) 1
-
-    WritePassiveText $PRIV(console) "Connected to swank" output
     
-    Prompt
-    
-    return {}
+    ::tkcon::AttachSwankTail $continuation
 }
+
+
+proc ::tkcon::AttachSwankTail {continuation} {
+    variable PRIV
+    variable ATTACH
+    ::mprs::AssertEq $PRIV(SwankReplReady) 1
+    WritePassiveText $PRIV(console) "Connected to swank" output
+    Prompt
+    eval $continuation
+}
+
+
 
 proc ::tkcon::OuterNewSwank {} {
     # ::tkcon::NewSwank 127.0.0.1 4009
