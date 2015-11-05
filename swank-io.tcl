@@ -508,7 +508,7 @@ proc ::tkcon::AttachSwank {name} {
 
     if {[llength [info level 0]] == 1} {
 	# no args were specified, return the attach info instead
-	return [AttachId]
+	error "Something wrong in AttachSwank"
     }
     set PRIV(displayWin) .
     global tcl_version
@@ -548,7 +548,7 @@ proc ::tkcon::AttachSwank {name} {
     
     Prompt
     
-    return [AttachId]
+    return {}
 }
 
 proc ::tkcon::OuterNewSwank {} {
