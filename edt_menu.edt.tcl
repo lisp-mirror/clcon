@@ -132,7 +132,9 @@ namespace eval ::edt {
         set m [cMenuBar .file]
         ::gui_util::ClearMenu $m
 
-        set cmd [list ::tkcon::OpenForEdit $tw]
+        set initialdir ""
+        catch { ::clcon_text::PathToAFile $btext } initialdir
+        set cmd [list ::tkcon::OpenForEdit $tw "" $initialdir]
 	$m add command -label "Open" -command $cmd -accel "Control-Key-O"
         bind SingleMod$w <Control-Key-o> "$cmd; break"
         bind SingleMod$w <Control-Key-Cyrillic_shcha> "$cmd; break"

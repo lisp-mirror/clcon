@@ -1204,7 +1204,7 @@ proc ::tkcon::InitMenus {w title} {
     foreach m [list [menu $w.file -disabledforeground $COLOR(disabled)] \
                    [menu $w.pop.file -disabledforeground $COLOR(disabled)]] {
         
-        set cmd [list ::tkcon::OpenForEdit $w]
+        set cmd [list ::tkcon::OpenForEdit $w "" ""]
 	$m add command -label "1.Open for edit" -underline 0 -command $cmd -accel "Control-O"
         bind TkConsoleTextOverrides <Control-Key-o> $cmd
         bind TkConsole <Control-Key-Cyrillic_shcha> $cmd
@@ -2075,20 +2075,24 @@ proc ::tkcon::Load { {fn ""} } {
 ## ::tkcon::OpenForEdit 
 # ARGS:	
 # parent - widget parent for dialog 
-# fn - (optional) filename to source in
+# fn - filename to source in, "" means no filename
+# initialdir - for tk_getOpenFile, "" means we will not supply it.
 # Returns:	selected filename ({} if nothing was selected)
 ## 
-proc ::tkcon::OpenForEdit { parent {fn ""} } {
+proc ::tkcon::OpenForEdit { parent fn initialdir } {
     set types {
 	{{All Files}	*}
 	{{Lisp Files}	{.lisp .asd}}
 	{{Tcl Files}	{.tcl .tk}}
 	{{Text Files}	{.txt}}
     }
-    set opencmd [list tk_getOpenFile]
+    set opencmd [list tk_getOpenFile -parent $parent -filetypes $types \
+		     -title "Source File"]
+    if {$initialdir ne ""} {
+        lappend opencmd "-initialdir" $initialdir
+    }
     if {$fn eq "" &&
-	([catch {tk_getOpenFile -parent $parent -filetypes $types \
-		     -title "Source File"} fn] || $fn eq "")
+	([catch { eval $opencmd } fn] || $fn eq "")
     } { return }
     ::edt::edit -type file -wrap char -- $fn
     return $fn

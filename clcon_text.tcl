@@ -585,6 +585,15 @@ namespace eval ::clcon_text {
             -private_pending_far_tcl_continuations 0
     }
 
+
+    # returns path to a file, if there is one. Otherwise throws an error which you should process
+    proc PathToAFile {clcon_text} {
+        set opened_file [$clcon_text cget -opened_file]
+        set filename [$opened_file cget -filename]
+        return [file dirname $filename]
+    }
+    
+
     
     # InitOneBindingOfFreezableText <Key-Return>
     InitBindingsOfFreezableText
