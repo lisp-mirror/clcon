@@ -588,7 +588,6 @@ proc ::tkcon::Init {args} {
 	[expr {$OPT(maxlinelen)?$OPT(maxlinelen):{unlimited}}]"
 
     Prompt "$title console display active (Tcl$::tcl_patchLevel / Tk$::tk_patchLevel)\n"
-    OuterNewSwank
 }
 
 ## ::tkcon::InitSlave - inits the slave by placing key procs and aliases in it
@@ -4723,3 +4722,5 @@ proc ::tkcon::ReloadSomeIDESources {} {
 }
 
 package provide tkcon $::tkcon::VERSION
+
+::tkcon::OuterNewSwank
