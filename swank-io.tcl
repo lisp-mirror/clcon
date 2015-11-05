@@ -117,8 +117,9 @@ proc ::tkcon::SwankRequestInitPresentations {} {
     ::tkcon::SwankEmacsRex "(swank:init-presentations)"
 }
 
-proc ::tkcon::SwankNoteTclConnection {} {
+proc ::tkcon::SwankNoteTclConnection {continuation} {
     ::tkcon::SwankEmacsRex "(clco:note-this-is-tcl-connection)"
+    eval $continuation
 }
 
 proc ::tkcon::ReadThatSwankReplReady {} {
@@ -423,13 +424,17 @@ proc ::tkcon::SwankReadMessage {} {
 
 ## Modelled after defmethod lime::connect :after
 ## some parts are not implemented yet
-proc ::tkcon::SetupSwankConnection {channel console} {
+proc ::tkcon::SetupSwankConnection {channel console continuation} {
 
     # this is tcl/tk specific
     bind $console <<CheckSWANKEventQueue>> ::mprs::ProcessEventsFromQueueIfAppropriate
 
     # this is not from lime!
-    ::tkcon::SwankNoteTclConnection 
+    ::tkcon::SwankNoteTclConnection [list ::tkcon::SSC2 $continuation]
+}
+
+
+proc ::tkcon::SSC2 {continuation} {
     # We must read reply
     set reply [SwankReadMessage]
     putd $reply
@@ -475,6 +480,9 @@ proc ::tkcon::SetupSwankConnection {channel console} {
     #;; Read all the other messages, dumping them
     #(swank-protocol:read-all-messages connection))
     #
+    set con(state) "AttachSwank : initialized"
+
+    eval $continuation
 }
 
 proc ::tkcon::DisconnectFromSwank {} {
