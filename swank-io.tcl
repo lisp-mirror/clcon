@@ -333,9 +333,9 @@ proc ::tkcon::SheduleCheckSWANKEventQueue {} {
 }
 
 
-## Temporary procedure to handle input from SWANK
+## Procedure to handle input from SWANK
 ## does not have counterparts in swank-protocol!!
-proc ::tkcon::TempSwankChannelReadable {sock} {
+proc ::tkcon::SwankChannelReadable {sock} {
     variable SWANKEventQueue
     variable SWANKIsInSyncMode
 
@@ -531,7 +531,7 @@ proc ::tkcon::AttachSwank {name} {
 
         # The file event will just putd whatever data is found
         # into the interpreter
-        fileevent $sock readable [list ::tkcon::TempSwankChannelReadable $sock]
+        fileevent $sock readable [list ::tkcon::SwankChannelReadable $sock]
 
         set con(state) "initialized"
     } elseif { $con(state) eq "initialized" } {
