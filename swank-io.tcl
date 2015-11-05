@@ -521,7 +521,7 @@ proc ::tkcon::AttachSwank {name continuation} {
 
     upvar \#0 $name con
     set sock $con(sock)
-    puts stderr "WARNING! tkcon allows for several consoles, but do not try to have more than one SWANK attachment simultanously" 
+    # puts stderr "WARNING! tkcon allows for several consoles, but do not try to have more than one SWANK attachment simultanously" 
 
     if {[llength [info level 0]] == 1} {
 	# no args were specified, return the attach info instead
