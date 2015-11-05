@@ -107,8 +107,9 @@ proc ::mprs::DeleteSyncEventsFromTheQueue {} {
 
 
 ## swank-protocol::request-swank-require
-proc ::tkcon::SwankRequestSwankRequire1 {requirement} {
+proc ::tkcon::SwankRequestSwankRequire1 {requirement continuation} {
     ::tkcon::SwankEmacsRex "(swank:swank-require '$requirement)"
+    eval $continuation
 }
 
 ## swank-protocol::request-init-presentations
@@ -122,19 +123,22 @@ proc ::tkcon::SwankNoteTclConnection {continuation} {
     eval $continuation
 }
 
-proc ::tkcon::ReadThatSwankReplReady {} {
+proc ::tkcon::ReadThatSwankReplReady {continuation} {
     variable PRIV
     set Event [SwankReadMessage]
     set EventAsList [::mprs::Unleash $Event] 
     showVar EventAsList
-    ::tkcon::ChangeCurrentPackageA $EventAsList
+    ::tkcon::ChangeCurrentPackageA $EventAsList 
     set PRIV(SwankThread) 1
     set PRIV(SwankReplReady) 1
+    eval $continuation
 }
 
-proc ::tkcon::SwankRequestCreateRepl {} {
+
+proc ::tkcon::SwankRequestCreateRepl {continuation} {
     variable PRIV
     ::tkcon::SwankEmacsRex {(swank-repl:create-repl nil :coding-system "utf-8-unix")}
+    eval $continuation
 }
 
 # must be called when SWANKIsInSyncMode and when SWANKSyncContinuation is set
@@ -465,18 +469,26 @@ proc ::tkcon::SSC2 {continuation} {
   #        (getf data :version)))
     #;; Require some Swank modules
     #SwankRequestSwankRequire1 "swank-presentations"
-    SwankRequestSwankRequire1 "swank-repl"
+  ::tkcon::SwankRequestSwankRequire1 "swank-repl" [list ::tkcon::SSC3 $continuation]
+}
 
+
+proc ::tkcon::SSC3 {continuation} {
     set reply [SwankReadMessage]
     putd $reply
 
     # Start it up
     # disabled at emacs SwankRequestInitPresentations
 
-    ::tkcon::SwankRequestCreateRepl
-    # Wait for startup. We read message here and set some variables from it.
-    ::tkcon::ReadThatSwankReplReady 
+    ::tkcon::SwankRequestCreateRepl [list ::tkcon::SSC4 $continuation]
+}
 
+proc ::tkcon::SSC4 {continuation} {
+    # Wait for startup. We read message here and set some variables from it.
+    ::tkcon::ReadThatSwankReplReady [list ::tkcon::SSC5 $continuation]
+}
+
+proc ::tkcon::SSC5 {continuation} {
     #;; Read all the other messages, dumping them
     #(swank-protocol:read-all-messages connection))
     #
