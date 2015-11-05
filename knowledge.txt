@@ -1,4 +1,4 @@
-; -*- Coding: utf-8 ; mode : lisp ; -*-
+﻿; -*- Coding: utf-8 ; mode : lisp ; -*-
 (in-package :swank)
 
 
@@ -324,3 +324,15 @@ MakeSwankConnection ->
 (:emacs-rex
  (swank:operate-on-system-for-emacs "ltk" 'load-op)
  "COMMON-LISP-USER" t 29)
+
+
+
+======================================================
+(editor:defcommand "Paste Filename" (p) "Pastes and unixized filename from clipboard" "Pastes and unixized filename from clipboard"  
+  (declare (ignore p))
+  #+ignore (editor:backward-kill-form-command p)
+  (insert-string (current-point) 
+                 (format nil "~S" 
+                         (substitute 
+                          #\/ #\\ 
+                          (string-trim +whitespace+ (CAPI-WIN32-LIB::GET-CLIPBOARD-TEXT))))))
