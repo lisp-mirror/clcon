@@ -108,37 +108,31 @@ proc ::mprs::DeleteSyncEventsFromTheQueue {} {
 
 ## swank-protocol::request-swank-require
 proc ::tkcon::SwankRequestSwankRequire1 {requirement continuation} {
-    ::tkcon::SwankEmacsRex "(swank:swank-require '$requirement)"
-    eval $continuation
+    ::tkcon::SSCSend "(swank:swank-require '$requirement)" $continuation
 }
 
 ## swank-protocol::request-init-presentations
 proc ::tkcon::SwankRequestInitPresentations {} {
     myerror "presentations are disabled in EMACS setup"
-    ::tkcon::SwankEmacsRex "(swank:init-presentations)"
+    ::tkcon::SSCSend "(swank:init-presentations)" {}
 }
 
 proc ::tkcon::SwankNoteTclConnection {continuation} {
-    ::tkcon::SwankEmacsRex "(clco:note-this-is-tcl-connection)"
-    eval $continuation
+    ::tkcon::SSCSend "(clco:note-this-is-tcl-connection)" $continuation
 }
 
-proc ::tkcon::ReadThatSwankReplReady {continuation} {
+proc ::tkcon::SwankReplReady {EventAsList} {
     variable PRIV
-    set Event [SwankReadMessage]
-    set EventAsList [::mprs::Unleash $Event] 
-    showVar EventAsList
     ::tkcon::ChangeCurrentPackageA $EventAsList 
     set PRIV(SwankThread) 1
     set PRIV(SwankReplReady) 1
-    eval $continuation
 }
 
 
 proc ::tkcon::SwankRequestCreateRepl {continuation} {
     variable PRIV
-    ::tkcon::SwankEmacsRex {(swank-repl:create-repl nil :coding-system "utf-8-unix")}
-    eval $continuation
+    ::tkcon::SSCSend {(swank-repl:create-repl nil :coding-system "utf-8-unix")} \
+        $continuation
 }
 
 # must be called when SWANKIsInSyncMode and when SWANKSyncContinuation is set
@@ -434,15 +428,13 @@ proc ::tkcon::SetupSwankConnection {channel console continuation} {
     bind $console <<CheckSWANKEventQueue>> ::mprs::ProcessEventsFromQueueIfAppropriate
 
     # this is not from lime!
-    ::tkcon::SwankNoteTclConnection [list ::tkcon::SSC2 $continuation]
+    ::tkcon::SwankNoteTclConnection "::tkcon::SSC2 \$EventAsList [list $continuation]"
 }
 
 
-proc ::tkcon::SSC2 {continuation} {
-    # We must read reply
-    set reply [SwankReadMessage]
-    putd $reply
-
+proc ::tkcon::SSC2 {EventAsList continuation} {
+    # We have nothing to do with this reply
+    putd EventAsList
 
   #(swank-protocol:request-connection-info connection)
   #;; Read the connection information message
@@ -469,23 +461,24 @@ proc ::tkcon::SSC2 {continuation} {
   #        (getf data :version)))
     #;; Require some Swank modules
     #SwankRequestSwankRequire1 "swank-presentations"
-  ::tkcon::SwankRequestSwankRequire1 "swank-repl" [list ::tkcon::SSC3 $continuation]
+  ::tkcon::SwankRequestSwankRequire1 "swank-repl" "::tkcon::SSC3 \$EventAsList [list $continuation]"
 }
 
 
-proc ::tkcon::SSC3 {continuation} {
-    set reply [SwankReadMessage]
-    putd $reply
+proc ::tkcon::SSC3 {EventAsList continuation} {
+    # nothing to do with the reply
+    putd $EventAsList
 
     # Start it up
     # disabled at emacs SwankRequestInitPresentations
 
-    ::tkcon::SwankRequestCreateRepl [list ::tkcon::SSC4 $continuation]
+    ::tkcon::SwankRequestCreateRepl "::tkcon::SSC4 \$EventAsList [list $continuation]"
 }
 
-proc ::tkcon::SSC4 {continuation} {
+proc ::tkcon::SSC4 {EventAsList continuation} {
     # Wait for startup. We read message here and set some variables from it.
-    ::tkcon::ReadThatSwankReplReady [list ::tkcon::SSC5 $continuation]
+    ::tkcon::SwankReplReady $EventAsList 
+    ::tkcon::SSC5 $continuation
 }
 
 proc ::tkcon::SSC5 {continuation} {
@@ -550,13 +543,10 @@ proc ::tkcon::AttachSwank {name continuation} {
     if { $con(state) eq "socket_only" } {
         fconfigure $sock -buffering full -blocking 0
     
-        # It is important we initialize connection before binding fileevent
-        ::tkcon::SetupSwankConnection $sock $PRIV(console) [list ::tkcon::AttachSwankTail $continuation]
-
-        # The file event will just putd whatever data is found
-        # into the interpreter
         fileevent $sock readable [list ::tkcon::SwankChannelReadable $sock]
         
+        ::tkcon::SetupSwankConnection $sock $PRIV(console) [list ::tkcon::AttachSwankTail $continuation]
+
         return
 
     } elseif { $con(state) eq "initialized" } {

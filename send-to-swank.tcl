@@ -176,6 +176,7 @@ proc ::tkcon::SendEventToSwank {form continuation {MsgFmtKind 1} {ThreadDesignat
 
 
 ## ::tkcon::EmacsRex - from swank-protocol::emacs-rex
+## CURRENTLY UNUSED
 ##  Docstring from emacs-rex:
 ##  (R)emote (E)xecute S-e(X)p.
 ##
@@ -183,6 +184,12 @@ proc ::tkcon::SendEventToSwank {form continuation {MsgFmtKind 1} {ThreadDesignat
 ##  be read with read-response.
 ##  MsgFmtKind must be 1 if form is (swank-repl:listener-eval ...) or 0 otherwise
 proc ::tkcon::SwankEmacsRex {form {MsgFmtKind 0}} {
-    SendEventToSwank $form {} $MsgFmtKind
+    ::tkcon::SendEventToSwank $form {} $MsgFmtKind
 }
 
+
+## SwankSetupConnectionSend - special wrapper to use when sending 
+## events from SwankSetupConnection 
+proc ::tkcon::SSCSend {form continuation} {
+    ::tkcon::SendEventToSwank $form $continuation 0
+}
