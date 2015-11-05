@@ -551,13 +551,14 @@ proc ::tkcon::AttachSwank {name continuation} {
         fconfigure $sock -buffering full -blocking 0
     
         # It is important we initialize connection before binding fileevent
-        ::tkcon::SetupSwankConnection $sock $PRIV(console) {}
+        ::tkcon::SetupSwankConnection $sock $PRIV(console) [list ::tkcon::AttachSwankTail $continuation]
 
         # The file event will just putd whatever data is found
         # into the interpreter
         fileevent $sock readable [list ::tkcon::SwankChannelReadable $sock]
+        
+        return
 
-        set con(state) "AttachSwank : initialized"
     } elseif { $con(state) eq "initialized" } {
         # do nothing
         puts stderr "Initialized already"
