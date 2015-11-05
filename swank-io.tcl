@@ -255,11 +255,11 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
     } elseif { $Head eq ":debug-return" } {
         ::ldbg::DebugReturn $EventAsList $ContinuationId
     } elseif { $Head eq ":indentation-update" } {
-        putd "Impolitely ignore :indentation-update"
+        putd "::mprs::ProcessAsyncEvent: impolitely ignoring :indentation-update"
     } elseif { $Head eq ":new-package" } {
         ::tkcon::ChangeCurrentPackageB $EventAsList       
     } elseif { $Head eq ":new-features" } {
-        puts "Ignoring new features event: $EventAsList"
+        puts "::mprs::ProcessAsyncEvent: ignoring new features event: $EventAsList"
     } elseif { $Head eq ":ed" } {
         ::edt::ProcessEdRequest $EventAsList
     } elseif { $Head eq ":ping" } {
@@ -271,7 +271,7 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
         # putd "About to RunContinuation for $ContinuationId"
         RunContinuation $ContinuationId $EventAsList
     } else {
-        puts stderr "ProcessAsyncEvent: skipping async event from lisp: $EventAsList" 
+        puts stderr "::mprs::ProcessAsyncEvent: skipping async event from lisp: $EventAsList" 
         ::tkcon::SheduleCheckSWANKEventQueue
     }
     return {}
