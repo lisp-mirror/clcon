@@ -539,7 +539,7 @@ proc ::tkcon::AttachSwank {name continuation} {
         fconfigure $sock -buffering full -blocking 0
     
         # It is important we initialize connection before binding fileevent
-        ::tkcon::SetupSwankConnection $sock $PRIV(console)
+        ::tkcon::SetupSwankConnection $sock $PRIV(console) {}
 
         # The file event will just putd whatever data is found
         # into the interpreter
