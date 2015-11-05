@@ -544,6 +544,8 @@ proc ::tkcon::AttachSwank {name} {
 
     ::mprs::AssertEq $PRIV(SwankReplReady) 1
 
+    WritePassiveText $PRIV(console) "Connected to swank" output
+    
     Prompt
     
     return [AttachId]
@@ -552,6 +554,8 @@ proc ::tkcon::AttachSwank {name} {
 proc ::tkcon::OuterNewSwank {} {
     # ::tkcon::NewSwank 127.0.0.1 4009
     variable OPT
+    variable PRIV
+    WritePassiveText $PRIV(console) "Connecting to swank..." output
     ::swcnn::MakeSwankConnection $OPT(swank-ip) $OPT(swank-port)
 }
 
