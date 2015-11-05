@@ -19,6 +19,7 @@
            #:start-oduvanchik ; start oduvanchik in another thread
            #:restart-with-name-exists-p
            #:invoke-sldb-restart-by-name
+           #:load-system-for-tcl ; can be removed at some point
            )
   )
 
