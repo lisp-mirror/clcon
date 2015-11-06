@@ -20,6 +20,8 @@
            #:restart-with-name-exists-p
            #:invoke-sldb-restart-by-name
            #:load-system-for-tcl ; can be removed at some point
+           #:find-string-in-files ; can be removed
+           #:files-by-glob-list   ; can be removed
            )
   )
 

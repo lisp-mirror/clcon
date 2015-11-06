@@ -117,6 +117,16 @@
           (push file filelist))))
     (nreverse filelist)))
 
+
+(defun files-by-glob-list (&rest glob-list)
+  "For each glob in list, return all matching files"
+  (let ((filelist nil))
+    (dolist (mask glob-list)
+      (dolist (file (directory mask))
+        (pushnew file filelist :test 'equal)))
+    (nreverse filelist)))
+
+
 (defun filter-many-files (files expr &rest keyargs &key (mode :nocase))
   "Filters list of files and appends all results"
   (declare (ignore mode)) ; it is used as part of keyargs
@@ -173,6 +183,17 @@
    :title
    (format nil "Find in Tcl Sources: ~A" string)))
 
+(defun find-string-in-files (string file-list &key regexp case-sensitive secondary-string)
+  "For each string in file-list, calls directory. Then searches string in all of the files. See also clco:files-by-glob-list. Example is in the source"
+; (clco:FIND-STRING-IN-FILES "f4" (clco:FILES-BY-GLOB-LIST "c:/clcon/lp/**/*.lisp"))
+  (when
+      (or regexp case-sensitive secondary-string)
+    (error "keyargs are not implemented"))
+  (clco::present-text-filtering-results
+   (clco::filter-many-files file-list string)
+   :title
+   (format nil "Find in ~A files: ~A" (length file-list) string))
+  )
 
 (defun find-current-file-declarations (infile)
   "Very basic definition navigation facility. For lisp, returns list of toplevel forms. For tcl, returns toplevel procs and procs packed in the namespace"

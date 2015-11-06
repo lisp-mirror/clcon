@@ -36,11 +36,20 @@ Find source for tcl accepts fully-qualified identifier. Invoke it with Control-F
 Find in files
 -------------
 Can be called from lisp only or as an IDE command. 
-See IDE command `.fics` or try `(clco::find-in-clcon-sources "Prompt")`
-Example of searching for either of two strings:
+See IDE command `.fics`. There are also Lisp functions for the search:
+
+### Example of searching for either of two strings:
 `(clco::present-text-filtering-results (union (clco::filter-many-files (clco::clcon-sources) "wesppt") (clco::filter-many-files (clco::clcon-sources) "WrapEventScriptForFreezedText") :test 'equalp))`
 This is rather lame, as lines are not sorted appropriately when merging two sets. 
 See source of that lisp function to learn how to write your own file search functions. 
+
+### Example of searching string in files specified by globs
+
+`(clco:FIND-STRING-IN-FILES "f4"
+   (clco:FILES-BY-GLOB-LIST
+    "c:/clcon/lp/**/*.lisp"
+    "c:/clcon/lp/**/*.asd"))`
+
 
 Connecting/disconnecting to/from SWANK
 --------------------------------------
