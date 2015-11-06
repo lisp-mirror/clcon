@@ -853,7 +853,7 @@ namespace eval ::ldbg {
         ::ldbg::CloseDebuggerWindow $MainWindow
     }
 
-    
+    # Currently unused. Has counterpart in slime. Seem to be useless.
     proc Abort {w} {
         variable DebugEvent
         variable Restarts
@@ -866,6 +866,21 @@ namespace eval ::ldbg {
         ::ldbg::CloseDebuggerWindow $MainWindow
     }
     
+
+
+    proc ThrowToTopLevel {w} {
+        variable DebugEvent
+        variable Restarts
+        variable MainWindow
+        set thread [GetDebuggerThreadId]
+        set level [GetDebuggerLevel]
+        ::tkcon::EvalInSwankAsync \
+            "(swank:throw-to-toplevel)" \
+            {} $thread
+        ::ldbg::CloseDebuggerWindow $MainWindow
+    }
+    
+
     
     ## ::tkcon::HistoryMenu - dynamically build the menu for attached interpreters
     ##
@@ -1041,7 +1056,7 @@ namespace eval ::ldbg {
 
         # ------------------------------ bindings -------------
         MakeBindings $w
-        wm protocol $w WM_DELETE_WINDOW "::ldbg::Abort $w"
+        wm protocol $w WM_DELETE_WINDOW "::ldbg::ThrowToTopLevel $w"
         
         # -------------------------- layout -------------------
         
