@@ -352,6 +352,9 @@ namespace eval ::ldbg {
             ReturnFromFrame {
                 ReturnFromFrame $RowName
             }
+            RestartFrame {
+                RestartFrame $RowName
+            }
             EvalInFrame {
                 EvalInFrame $RowName
             }
@@ -845,15 +848,13 @@ namespace eval ::ldbg {
         ::ldbg::CloseDebuggerWindow $MainWindow
     }
 
-
-    proc RestartFrame {} {
-        variable DebugEvent
-        variable Restarts
+    proc RestartFrame {RowName} {
+        error "FIXME: RestartFrame is not implemented properly"
         variable MainWindow
+        set FrameNo [RowNameToFrameNo $RowName]
         set thread [GetDebuggerThreadId]
-        set level [GetDebuggerLevel]
         ::tkcon::EvalInSwankAsync \
-            "(swank:restart-frame $level)" \
+            "(swank:restart-frame $FrameNo)" \
             {} $thread
         ::ldbg::CloseDebuggerWindow $MainWindow
     }
