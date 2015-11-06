@@ -7,3 +7,4 @@ tk_samples/*
 mypipe
 swank-text-log.log
 \#*\#
+defun-to-file/*
