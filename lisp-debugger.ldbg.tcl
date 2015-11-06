@@ -322,6 +322,22 @@ namespace eval ::ldbg {
         } 
     }            
     
+    # Just as if user typed asdf::e in topmost frame. See also EditCurrentAsdfSystem
+    proc EditCurrentAsdfFile {} {
+        set thread [GetDebuggerThreadId]
+        ::tkcon::EvalInSwankAsync \
+            "(swank::pprint-eval-string-in-frame \"asdf::e\" 0 \"ASDF\")" \
+            {::ldbg::EvalInFrameC2 $EventAsList} $thread
+    }
+
+    # Just as if user typed asdf::ep in topmost frame. See also EditCurrentAsdfFile
+    proc EditCurrentAsdfSystem {} {
+        set thread [GetDebuggerThreadId]
+        ::tkcon::EvalInSwankAsync \
+            "(swank::pprint-eval-string-in-frame \"asdf::ep\" 0 \"ASDF\")" \
+            {::ldbg::EvalInFrameC2 $EventAsList} $thread
+    }
+
     proc CellCmd {row action} {
         variable MainWindow
         set tbl [GetFramesTablelist $MainWindow]
@@ -461,8 +477,21 @@ namespace eval ::ldbg {
         CellCmd $active $Cmd
     }
 
+    proc MakeMainWindowFileMenu {w menu} {
+        set m [menu [::tkcon::MenuButton $menu "1.File" file]]
+        set cmd "::ldbg::EditCurrentAsdfFile" 
+        $m add command -label "1. Edit current asdf file if defined" -underline 0 -command $cmd
+
+        set cmd "::ldbg::EditCurrentAsdfSystem" 
+        $m add command -label "2. Edit current asdf system if defined" -underline 0 -command $cmd
+
+        set cmd "::ldbg::ThrowToTopLevel $w"
+        $m add command -label "3. Close debugger and throw to top level" -underline 0 -command $cmd
+    }
+        
+
     proc MakeMainWindowStackMenu {w menu} {
-        set m [menu [::tkcon::MenuButton $menu "1.Stack" stack]]
+        set m [menu [::tkcon::MenuButton $menu "2.Stack" stack]]
         set tbl [GetFramesTablelist $w ]
 
         # FIXME redo all that strings to lists as with EnableStepping
@@ -475,18 +504,21 @@ namespace eval ::ldbg {
         set cmd "::ldbg::CellCmdForActiveCell $tbl ReturnFromFrame"
         $m add command -label "2.Return from frame" -underline 0 -command $cmd
 
+        set cmd "::ldbg::CellCmdForActiveCell $tbl RestartFrame"
+        $m add command -label "3.Restart frame" -underline 0 -command $cmd
+
         set cmd "::ldbg::CellCmdForActiveCell $tbl EvalInFrame"
-        $m add command -label "3.Eval in frame" -underline 0 -command $cmd
+        $m add command -label "4.Eval in frame" -underline 0 -command $cmd
 
         set cmd "::ldbg::CellCmdForActiveCell $tbl EvalInFramePrettyPrint"
-        $m add command -label "4.Eval in frame (pretty print)" -underline 0 -command $cmd
+        $m add command -label "5.Eval in frame (pretty print)" -underline 0 -command $cmd
 
         set cmd [list ::ldbg::CellCmdForActiveCell $tbl EnableStepping]
-        $m add command -label "5.Switch to stepping mode" -underline 0 -command $cmd        
+        $m add command -label "6.Switch to stepping mode" -underline 0 -command $cmd        
     }
     
     proc MakeMainWindowEditMenu {w menu} {
-        set m [menu [::tkcon::MenuButton $menu "2.Edit" edit]]
+        set m [menu [::tkcon::MenuButton $menu "3.Edit" edit]]
         set tbl [GetFramesTablelist $w ]
         set bodytag [$tbl bodytag]
         set cmd "::tablelist_util::CopyCurrentCell $tbl"
@@ -742,7 +774,6 @@ namespace eval ::ldbg {
         EvalInFrameInner $RowName 1
     }
 
-    
     proc EvalInFrameInner {RowName PrettyPrint} {
         set FrameNo [RowNameToFrameNo $RowName]
         ::tkcon::EvalInSwankAsync                                 \
@@ -810,6 +841,19 @@ namespace eval ::ldbg {
         set level [GetDebuggerLevel]
         ::tkcon::EvalInSwankAsync \
             "(swank:invoke-nth-restart-for-emacs $level $i)" \
+            {} $thread
+        ::ldbg::CloseDebuggerWindow $MainWindow
+    }
+
+
+    proc RestartFrame {} {
+        variable DebugEvent
+        variable Restarts
+        variable MainWindow
+        set thread [GetDebuggerThreadId]
+        set level [GetDebuggerLevel]
+        ::tkcon::EvalInSwankAsync \
+            "(swank:restart-frame $level)" \
             {} $thread
         ::ldbg::CloseDebuggerWindow $MainWindow
     }
@@ -1046,6 +1090,7 @@ namespace eval ::ldbg {
         # Menu items created later as they refer to window contents
         
         # TitleListFileMenu $w $menu
+        MakeMainWindowFileMenu $w $menu
         MakeMainWindowStackMenu $w $menu
         MakeMainWindowEditMenu $w $menu
         MakeMainWindowWindowMenu $w $menu
