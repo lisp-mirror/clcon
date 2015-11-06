@@ -22,13 +22,13 @@ Completion and find definition works best in the console. Keyboard accelerators 
 At the console, enter `.apr -lookup-` to list all symbols containing "-lookup-" substring in their name. 
 At the console, type in `clco:serv` and press `Tab`. Name will expand to `clco:server-lookup-definition`. 
 Now press `Alt-.` Editor window will pop up and source of function you typed will be seen. You can press Alt-. at
-any lisp definition in the editor and jump to its source. If there are more then one definition, list of "hyperlinks"
+any lisp definition in the editor and jump to its source. If there are more then one definition (e.g. for FORMAT function), list of "hyperlinks"
 will show up at the console. Click on either of them with mouse to open an appropriate source.
 
 
 ### Tcl
 Return to the console with `Control-.`.
-At the console, enter `.tapr cap` to list all tcl procs, commands and vars containing substring `cap` in their name.
+At the console, enter `.tapr cap` to list all tcl procs, commands and vars containing substring `cap` in their name. Position a keyboard cursor at any of them and press Control-F9 to go to its source. 
 Return to the console with `Control-.` . Type a space and then `snit::Ca`. Then press `Control-Alt-u` . Name will expand to 
 `::snit::Capitalize`. Press `Control-F9` and jump to a source of tcl proc. We only now support procs, not variables. 
 
@@ -46,7 +46,7 @@ At the console, open test/error-browser-sample-file.lisp file for editing.
 There are at least two ways to do that: via file open dialog (Control-O)
 or via console ed command:
 ``.edit /s2/clcon/test/error-browser-sample-file.lisp`` or 
-``.edit c:/clcon/quicklisp/local-projects/clcon/test/error-browser-sample-file.lisp``
+``.edit c:/clcon/lp/clcon/test/error-browser-sample-file.lisp``
 for Windows file release. While typing in filename, use Control-F3 for completion.
 
 File will open in the editor. From the menu, choose `Lisp/Compile and load`. Two new windows will pop up: list of compiler notes 
@@ -114,7 +114,7 @@ Type at the console:
 (Here "fics" is an abbreviation for "find-in-clcon-sources")
 And you'll see some kind of "grep browser". Press <space> or <return> to jump to a source. Difference is that <return> closes grep browser while <space> does not. It can only fine simple strings for now with case ignored. Note this command is processed by tcl interpreter, so use tcl's quoting rules. The most simple way to get more or less predictible results when some funny characters are present is to wrap your search string into `{}`. 
 
-If you want other kinds of search, you are welcome to Common Lisp programming - just jump to `clco::find-in-clcon-sources` and watch how it is done. 
+More searching examples are in the [user manual](user-manual.md).
 
 List declarations in current file
 ---------

@@ -92,7 +92,7 @@ namespace eval ::clconcmd {
 namespace eval ::tkcon {
     # when modifying this line, make sure that the auto-upgrade check
     # for version still works.
-    variable VERSION "0.3.0"
+    variable VERSION "0.3.1"
     # The OPT variable is an array containing most of the optional
     # info to configure.  COLOR has the color data.
     variable OPT
