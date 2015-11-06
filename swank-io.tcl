@@ -174,10 +174,9 @@ proc ::mprs::ParseReturnOk { EventAsList } {
         set result [::mprs::Unleash [lindex $SwankReply 1]]
         return $result
     } else {
-        error "I don't know what is $HeadSwankReply while parsing swank reply $Event"
+        error "I don't know what is $HeadSwankReply while parsing swank reply $EventAsList"
     }
 }
-
 
 proc ::mprs::MaybeProcessSyncEventFromQueue {} {
     variable ::tkcon::SWANKIsInSyncMode
