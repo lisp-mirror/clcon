@@ -21,9 +21,9 @@ To see what clcon can do, take a [Demo Tour](demo-tour.md)
 
 If all is ok, you have clcon with SBCL (use Alt-. to find sources of SBCL objects) and quicklisp (use ql:quickload to load libraries)
 
-Repositories of clcon components (clcon, oduvanchik, budden-tools) are at c:\clcon\quicklisp\local-projects - feel free to send patches :)
+Repositories of clcon components (clcon, oduvanchik, budden-tools) are at c:\clcon\lp - feel free to send patches :)
 
-Linux: 
+Linux: DIDN'T TEST LAST VERSION OF THIS INSTRUCTIONS!
 -----------
 
 ### Prerequisites
@@ -33,7 +33,9 @@ Linux:
 
 [Quicklisp](https://www.quicklisp.org/beta/) set up at your SBCL
 
-[Slime](https://common-lisp.net/project/slime/) must be known to your quicklisp (do `(ql:quickload :slime)` once), but not loaded in your initialization files (e.g. your ~/.sbclrc)
+SLIME must not be loaded in your initialization files (e.g. your ~/.sbclrc)
+
+Beware we will install incompatible SLIME version during this setup!
 
 Find where your quicklisp's local-projects are located. Simplest way to do it is to start sbcl and type in: `ql:*local-project-directories*`. It will print list of local projects directories, choose any of these. Usually it is `~/quicklisp/local-projects`.
 
@@ -45,22 +47,32 @@ Mercurial (aka hg)
 
     sudo apt-get install mercurial
 
+Git
+   
+    sudo apt-get install git
+
 Fresh version of [budden-tools](https://bitbucket.org/budden/budden-tools). Put it under local-projects directory of quicklisp, e.g. (for Linux)
 
     cd ~/quicklisp/local-projects
     hg clone https://bitbucket.org/budden/budden-tools
+    
+My modified versions of SLIME and named-readtables    
+    
+    cd ~/quicklisp/local-projects
+    git clone https://github.com/budden/slime 
+    git clone https://github.com/budden/named-readtables
 
 ### Installation
 
-Choose good version of clcon. You can try trunk, but it is better to load latest tagged "release", e.g. 0.3.0. Note that online documentation usually describes trunk. To be sure that it matches software functionality, read not the online documentation, but documentation you have installed. 
+Choose good version of clcon. You can try trunk, but it is better to load latest tagged "release", 0.3.1. Note that online documentation usually describes trunk. To be sure that it matches software functionality, read not the online documentation, but documentation you have installed. 
 
 Decide where you will locate clcon. You can put it just to local-projects directory, but you can also put it to a more convenient place and make a symlink to its directory at the local-projects dir with `ln -s`. The same goes to oduvanchik. 
 
 Download chosen releases of oduvanchik and clcon to chosen directory, e.g.
 
     cd ~/quicklisp/local-projects
-    hg clone -u 0.3.0 https://bitbucket.org/budden/oduvanchik
-    hg clone -u 0.3.0 https://bitbucket.org/budden/clcon
+    hg clone -u 0.3.1 https://bitbucket.org/budden/oduvanchik
+    hg clone -u 0.3.1 https://bitbucket.org/budden/clcon
 
 
 ### Build and start server
