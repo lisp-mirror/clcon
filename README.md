@@ -28,7 +28,7 @@ Platforms where testing is
 
 ## Project goals
 - GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine) (achieved already)
-- Alternative to EMACS
+- 1.0 release with all bugs fixed
 
 ## Current state
 Clcon is at "alpha" stage. It is currently used for self development and shows itself rather robust in careful hands of its creator. Crashes or necessity to use EMACS are infrequent.
@@ -72,6 +72,5 @@ documentation is inside the release. **Do not read online documentation** then!
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-- close at least 3 bugs per week
+- close at least 2 bugs per week
 - implement lisp completion in the editor
-- print "who calls" info
