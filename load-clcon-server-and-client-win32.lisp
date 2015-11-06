@@ -8,6 +8,20 @@
 (eval-when (:compile-toplevel)
   (error "Your must not compile ~S, just load it as a source" *compile-file-truename*))
 
+
+;;;;;;;;;;;;;;;;;; Trying to send all tracing to SBCL console ;;;;;;;;;;;;
+
+;; It is useful for debugging 
+(defvar *initial-standard-output* *standard-output*)
+
+(defun redirect-trace-output-to-inferior-lisp (c)
+  (setf (slot-value c 'swank::trace-output) *initial-standard-output*))
+
+(push 'redirect-trace-output-to-inferior-lisp swank::*new-connection-hook*)
+
+
+;;;;;;;;;;;;;;;;;; End of trying to send all tracing to SBCL console ;;;;;;;;;;;;
+
 ;; example of local projects. Do we need it? 
 ;;(ql:quickload :quickproject)
 ;;(quickproject:make-project "c:/clcon/lp/budden-tools" :depends-on '(:alexandria :cl-fad :split-sequence :cl-utilities :named-readtables :cl-ppcre :swank :closer-mop))
