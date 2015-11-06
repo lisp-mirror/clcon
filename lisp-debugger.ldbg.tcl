@@ -886,14 +886,14 @@ namespace eval ::ldbg {
             set Short [::mprs::Unleash [lindex $Restart 0]]
             set Long [::mprs::Unleash [lindex $Restart 1]]
             if {$i < 10} {
-                set underlined 0
+                set underlined "-underline 0"
             } else {
-                set underlined {}
+                set underlined ""
             }
-            $m add command \
-                -label "$i: \[$Short\] $Long" \
+            $m add command                     \
+                -label "$i: \[$Short\] $Long"  \
                 -command "::ldbg::InvokeRestart $i" \
-                -underline $underlined
+                {*}$underlined
             incr i
         }
     }
