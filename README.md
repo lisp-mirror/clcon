@@ -5,7 +5,7 @@
 
 ## Note about versions
 If your're reading this document online, this document describes trunk version. 
-Description of file release is under c:/clcon/quicklisp/local-projects/clcon/readme.md when release is installed.
+Description of file release is under c:/clcon/lp/clcon/readme.md when release is installed.
 
 ## Platform support
 Supported lisp implementation(s):
