@@ -1,7 +1,7 @@
 # README #
 
 ## What's that
-**clcon** is a cross-platform Common Lisp IDE under construction. Current release is 0.3.0 (see tags in repo).
+**clcon** is a cross-platform Common Lisp IDE under construction. Current release is 0.3.1 (see tags in repo).
 
 ## Note about versions
 If your're reading this document online, this document describes trunk version. 
@@ -27,8 +27,8 @@ Platforms where testing is
 [See here](https://bitbucket.org/budden/clcon/wiki/Screenshots)
 
 ## Project goals
-- GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine)
-- Just an alternative to EMACS/SLIME with permissive license.
+- GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine) (achieved already)
+- Alternative to EMACS
 
 ## Current state
 Clcon is at "alpha" stage. It is currently used for self development and shows itself rather robust in careful hands of its creator. Crashes or necessity to use EMACS are infrequent.
@@ -48,8 +48,9 @@ If you want to try using clcon, first of all take a [demo tour](doc/demo-tour.md
 - List definitions in a file for Lisp and Tcl (very primitive version)
 
 ## Installation and startup
-For windows, we have [File release](https://bitbucket.org/budden/clcon/downloads/clcon-0.3.0.zip). 
-Documentation related to release are in the file itself. 
+For windows, we used to have a file release. Now you can download 
+[cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine/downloads/cl-stirling-engine-at-clcon-0.3.1.zip) which
+contains clcon 0.3.1 . Documentation related to release is in the file itself. 
 
 For Linux, see [doc/INSTALL.md](doc/INSTALL.md).
 
@@ -71,7 +72,6 @@ documentation is inside the release. **Do not read online documentation** then!
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-- use as a GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine)
-- lisp completion in the editor
 - close at least 3 bugs per week
+- implement lisp completion in the editor
 - print "who calls" info
