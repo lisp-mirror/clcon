@@ -159,8 +159,6 @@ namespace eval ::edt {
         $m add command -label "Close" -accel "Control-w" -command $CloseFile
         bind SingleMod$w <Control-Key-w> $CloseFile
         
-        set dismiss [wesppt [list ::edt::HideEditorWindow [cTW]]]
-        $m add command -label "Hide editor window" -underline 0 -command $dismiss
         $m add command -label "4.Reload some of IDE sources" -underline 0 \
 	    -command ::tkcon::ReloadSomeIDESources
 
