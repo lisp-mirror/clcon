@@ -45,10 +45,7 @@ See source of that lisp function to learn how to write your own file search func
 
 ### Example of searching string in files specified by globs
 
-`(clco:FIND-STRING-IN-FILES "f4"
-   (clco:FILES-BY-GLOB-LIST
-    "c:/clcon/lp/**/*.lisp"
-    "c:/clcon/lp/**/*.asd"))`
+`(clco:FIND-STRING-IN-FILES "f4" (clco:FILES-BY-GLOB-LIST "c:/clcon/lp/**/*.lisp" "c:/clcon/lp/**/*.asd"))`
 
 
 Connecting/disconnecting to/from SWANK
