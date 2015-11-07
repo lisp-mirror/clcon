@@ -72,12 +72,13 @@ namespace eval ::edt {
     }
                
 
-
+    # returns clcon_text (of class btext)
     proc Bi2btext {Bi} {
         checkValidBi $Bi
         return [string cat [Bi2W $Bi] ".text"]
     }
 
+    # returns text embedded into clcon_text
     proc Bi2_text {Bi} {
         checkValidBi $Bi
         return [string cat [Bi2W $Bi] ".text.t"]
@@ -114,6 +115,7 @@ namespace eval ::edt {
         string cat [cTW] .frammy
     }
 
+    # returns current clcon_text == btext
     proc c_btext {} {
         variable internal_cBi
         return [Bi2btext $internal_cBi]
