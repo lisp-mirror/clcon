@@ -142,8 +142,6 @@
    #-oduvan-invisible :oduvanchik.clx
    ))
 
-)
-
 ;;;;;;;;;;;;;;;;;; Loading server ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (asdf:load-system :clcon-server)
