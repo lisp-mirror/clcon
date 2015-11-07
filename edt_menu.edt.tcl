@@ -10,6 +10,10 @@ namespace eval ::edt {
  }}]
         return $result
     }
+
+    proc EditNewFile {} {
+        ::edt::edit -type newfile -- ""
+    }
         
     # If ContinueIfNoBackend, binding would check precense of oduvan-backend,
     # and if it is absend, would call continue so that other bindings would work.
@@ -132,6 +136,9 @@ namespace eval ::edt {
         set m [cMenuBar .file]
         ::gui_util::ClearMenu $m
 
+        set cmd ::edt::EditNewFile 
+        $m add command -label "1.New" -command $cmd
+
         set initialdir ""
         catch { ::clcon_text::PathToAFile $btext } initialdir
         set cmd [list ::tkcon::OpenForEdit $tw "" $initialdir]
@@ -139,13 +146,13 @@ namespace eval ::edt {
         bind SingleMod$w <Control-Key-o> "$cmd; break"
         bind SingleMod$w <Control-Key-Cyrillic_shcha> "$cmd; break"
 
-        set cmd [wesppt [list ::edt::Save $w.text]]
+        set cmd [wesppt [list ::edt::Save $Bi $w.text]]
         $m add command -label "Save" -command $cmd -accel "Control-S"
         bind SingleMod$w <Control-Key-s> $cmd
         bind SingleMod$w <Control-Key-Cyrillic_yeru> $cmd
         
         $m add command -label "Save As..."  -underline 0 \
-            -command [wesppt [list ::tkcon::Save {} widget $btext]]
+            -command [wesppt [list ::edt::SaveAs $Bi $w.text]]
         $m add separator
 
         set CloseFile [wesppt [list ::edt::EditCloseFile $Bi]]

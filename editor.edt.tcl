@@ -93,7 +93,8 @@ namespace eval ::edt {
     }
 
     proc LoadContentsAndUpdateRecent {w word opts tail} {
-        switch -glob -- [dict get $opts -type] {
+        set type [dict get $opts -type]
+        switch -glob -- $type {
             proc*	{
                 $w.text insert 1.0 \
                     [::tkcon::EvalOther {} slave dump proc [list $word]]
@@ -104,9 +105,10 @@ namespace eval ::edt {
                     [::tkcon::EvalOther {} slave dump var [list $word]]
                 after idle [list ::tkcon::Highlight $w.text tcl]
             }
+            newfile - 
             file	{
 
-                if {$word ne {}} {
+                if {$type eq "file"} {
                     set filemtime [file mtime $word]
                 } else {
                     set filemtime {}
@@ -116,12 +118,14 @@ namespace eval ::edt {
                 
                 ::clcon_text::ConstructBackendBuffer $w.text
                 
-                $w.text insert 1.0 [::edt::ReadFileIntoString $word 0]
+                if {$type eq "file"} {
+                    $w.text insert 1.0 [::edt::ReadFileIntoString $word 0]
                 
-                after idle [list ::tkcon::Highlight $w.text \
+                    after idle [list ::tkcon::Highlight $w.text \
                                 [string trimleft [file extension $word] .]]
-
-                ::recent::AddRecent $word
+  
+                    ::recent::AddRecent $word
+                }    
             }
             error*	{
                 $w.text insert 1.0 [join $tail \n]
@@ -339,10 +343,6 @@ namespace eval ::edt {
         set ParsedArgs [EditorParseArgs $args]
 
         foreach {word opts tail} $ParsedArgs break
-        
-        # In the future, tw will stand for window, w - for frame
-        # Now they coincide
-
         
         # Find old edit window if there is one
         lassign [FindOrMakeEditorWindow $word $opts $tail] Bi word

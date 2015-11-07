@@ -156,7 +156,7 @@ namespace eval ::edt {
     # This function can be useful for some other tools, e.g. recent files menu
     proc IsFileBeingEdited {filename} {
         variable ContentKeyToBufIdDict
-        set key [list $filename -type file]
+        set key [list [CanonicalizeFileName $filename] -type file]
         dict exists $ContentKeyToBufIdDict $key
     }
 

@@ -18,6 +18,9 @@ namespace eval ::edt {
         if {$type eq "file"} {
             set word [CanonicalizeFileName $word]
             return [list $word -type $type]
+        } elseif {$type eq "newfile"} {
+            set word "untitled [::edt::GenReuseCounter]"
+            return [list $word -type $type]
         } elseif {$type eq "error"} {
             return [list tcl_error -type $type -no [GenReuseCounter]]
         } else {

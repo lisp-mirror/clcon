@@ -1204,16 +1204,17 @@ proc ::tkcon::InitMenus {w title} {
     foreach m [list [menu $w.file -disabledforeground $COLOR(disabled)] \
                    [menu $w.pop.file -disabledforeground $COLOR(disabled)]] {
         
-        set cmd [list ::tkcon::OpenForEdit $w "" ""]
-	$m add command -label "1.Open for edit" -underline 0 -command $cmd -accel "Control-O"
-        bind TkConsoleTextOverrides <Control-Key-o> $cmd
-        bind TkConsole <Control-Key-Cyrillic_shcha> $cmd
-        
-	$m add command -label "Load Tcl File" -command ::tkcon::Load
-	$m add cascade -label "2.Save console output..."  -underline 0 -menu $m.save
+        set cmd ::edt::EditNewFile
+        $m add command -label "1.Edit new file" -underline 0 -command $cmd
 
-	$m add separator
-	$m add command -label "3.Quit" -command exit
+        set cmd [list ::tkcon::OpenForEdit $w "" ""]
+	$m add command -label "Open for edit" -command $cmd -accel "Control-O"
+        bind TkConsoleTextOverrides <Control-Key-o> "$cmd; break"
+        bind TkConsole <Control-Key-Cyrillic_shcha> "$cmd; break"
+        
+	$m add command -label "2.Load Tcl File" -underline 0 -command ::tkcon::Load
+	$m add cascade -label "3.Save console output..."  -underline 0 -menu $m.save
+
 	$m add separator
 
         set cmd ::tkcon::ReloadSomeIDESources
@@ -1241,6 +1242,8 @@ proc ::tkcon::InitMenus {w title} {
         menu $s -disabledforeground $COLOR(disabled) -postcommand [list ::recent::RecentMenu $m]
  	$m add cascade -label "5.Open recent ..." -underline 0 -underline 0 -menu $s
 
+	$m add separator
+	$m add command -label "6.Quit" -command exit
     }
         
     ## Console Menu
@@ -2071,6 +2074,9 @@ proc ::tkcon::Load { {fn ""} } {
     EvalAttached [list source $fn]
 }
 
+proc ::tkcon::DoOpenFileForEdit {fn} {
+    ::edt::edit -type file -wrap char -- $fn
+    }
 
 ## ::tkcon::OpenForEdit 
 # ARGS:	
@@ -2092,9 +2098,10 @@ proc ::tkcon::OpenForEdit { parent fn initialdir } {
         lappend opencmd "-initialdir" $initialdir
     }
     if {$fn eq "" &&
-	([catch { eval $opencmd } fn] || $fn eq "")
-    } { return }
-    ::edt::edit -type file -wrap char -- $fn
+	([catch { eval $opencmd } fn] || $fn eq "")} { 
+       return 
+    }
+    DoOpenFileForEdit $fn
     return $fn
 }
 
