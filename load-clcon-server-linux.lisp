@@ -29,6 +29,8 @@
 (swank-loader:init)
 (swank:swank-require '(swank-asdf swank-repl swank-fancy-inspector)) 
 
+;; Enable stepping everywhere
+(proclaim '(optimize (debug 3) (compilation-speed 0) (speed 0) (space 0) (safety 3)))
 
 ;;;;;;;;;;;;;;;;;; Trying to send all tracing to SBCL console ;;;;;;;;;;;;
 
@@ -76,6 +78,29 @@
 ; comment next line if code highlight causes problems
 (pushnew :oduvan-enable-highlight *features*)
 
+
+;;;;;;;;;;;;;;;;;; Carefully loading buddens-readtable ;;;;;;;;;;;;;;;;;
+
+(asdf:load-system :budden-tools)
+
+(BUDDEN-TOOLS:def-toplevel-progn "load :see-packages system" ()
+  (asdf:load-system :see-packages) 
+  (asdf:load-system :russian-budden-tools)
+  )
+
+(defun tune-russian-letters-for-buddens-readtable-a ()
+  (assert (null (named-readtables:find-readtable :buddens-readtable-a)))
+  (setf budden-tools::*def-symbol-reamacro-additional-name-starting-characters*
+        (append budden-tools::*def-symbol-reamacro-additional-name-starting-characters*
+                russian-budden-tools::*cyrillic-characters*)))
+
+(tune-russian-letters-for-buddens-readtable-a)
+
+(BUDDEN-TOOLS:def-toplevel-progn "load some systems" ()
+  (asdf:load-system :perga) 
+  (asdf:load-system :buddens-readtable)
+  (asdf:load-system :editor-budden-tools)   
+  )
 
 ;;;;;;;;;;;;;;;;;; Loading server ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

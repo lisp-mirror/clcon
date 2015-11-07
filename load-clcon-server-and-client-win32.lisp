@@ -31,8 +31,8 @@
 ;; piece from my init.lisp
 (defparameter *clcon-root* #+win32 (pathname "c:/clcon/") #+unix (pathname "/s2/sw/"))
 
-(proclaim '(optimize (debug 3) (speed 1) (compilation-speed 0) (space 0)))
-(declaim (optimize (debug 3) (speed 1) (compilation-speed 0) (space 0)))
+;; Enable stepping everywhere else (this code is duplicated in .sbclrc)
+(proclaim '(optimize (debug 3) (compilation-speed 0) (speed 0) (space 0) (safety 3)))
 
 (asdf:load-system :uiop) ;; loading uiop is simple
 (map () 'load ;; loading asdf/defsystem is tricky
@@ -97,6 +97,13 @@
 (asdf:load-system :iterate-keywords)
 (asdf:load-system :alexandria)
 (asdf:load-system :cl-fad)
+
+
+;;;;;;;;;;;;;;;;;; Carefully loading buddens-readtable ;;;;;;;;;;;;;;;;;
+;; we need it for editor-budden-tools, which we need in clcon. Sorry :) 
+;; Note: if you want that buddens-readtable features supported your 
+;; national language, use tune-russian-letters-for-buddens-readtable-a below
+;; as a template
 (asdf:load-system :budden-tools)
 
 (budden-tools:def-toplevel-progn "load winmerge-strings" ()
@@ -107,16 +114,27 @@
   (asdf:load-system :russian-budden-tools)
   )
 
+(defun tune-russian-letters-for-buddens-readtable-a ()
+  (assert (null (named-readtables:find-readtable :buddens-readtable-a)))
+  (setf budden-tools::*def-symbol-reamacro-additional-name-starting-characters*
+        (append budden-tools::*def-symbol-reamacro-additional-name-starting-characters*
+                russian-budden-tools::*cyrillic-characters*)))
+
+(tune-russian-letters-for-buddens-readtable-a)
+
 (BUDDEN-TOOLS:def-toplevel-progn "load some systems" ()
   (asdf:load-system :perga) 
   (asdf:load-system :buddens-readtable)
   (asdf:load-system :editor-budden-tools)   
   )
 
-; (import 'named-readtables:in-readtable :cl-user)
+;;;;;;;;;;;;;;;;;; Setting print-pretty to t  ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 (setf *print-pretty* t)
 ;(setf *print-circle* t)
+
+;;;;;;;;;;;;;;;;; Loading editor backend ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (let ((*compile-print* nil))
   (asdf::load-system
@@ -124,20 +142,25 @@
    #-oduvan-invisible :oduvanchik.clx
    ))
 
-;(defun unix (program &rest args)
-;  (sb-ext:run-program program args :search t :output *standard-output* :wait t))
+)
+
+;;;;;;;;;;;;;;;;;; Loading server ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (asdf:load-system :clcon-server)
-; (asdf:load-system :lime) ; just to navigate through sources
+; (asdf:load-system :lime) ; enable it just to navigate through sources
+
+;;;;;;;;;;;;;;;;;; Starting server ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; note this is already second swank server
 ; first was created in .sbclrc to be able to connect to from EMACS
 (swank:create-server :port 4009 :dont-close t)
 
-; start editor backend
+;;;;;;;;;;;;;;;;;; Starting editor backend ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (clco:start-oduvanchik)
 
-;; start frontend. CallBatFromGuiDetached.exe is used to bypass problems
-;; with run-program
+;;;;;;;;;;;;;;;;;; Starting editor frontend ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; CallBatFromGuiDetached.exe is used to bypass problems with run-program
 (uiop/run-program:run-program "c:\\clcon\\bin\\util\\CallBatFromGuiDetached.exe c:\\clcon\\bin\\clcon-client.cmd") 
 
