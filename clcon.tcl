@@ -2098,6 +2098,25 @@ proc ::tkcon::OpenForEdit { parent fn initialdir } {
     return $fn
 }
 
+# Let user to choose file name when saving file
+proc ::tkcon::GetFileNameForSave {parent type} {
+    set savecmd [list tk_getSaveFile]
+    set fn ""
+    set types {
+        {{Lisp Files}   {.lisp .asd}}
+        {{Tcl Files}	{.tcl .tk}}
+        {{Text Files}	{.txt}}
+        {{All Files}	*}
+    }
+    if {[catch {eval $savecmd [list -filetypes $types          \
+                                    -parent $parent            \
+                                    -title "Save $type"]} fn]} {
+        return ""
+    } else {
+        return $fn
+    }
+}
+
 
 ## ::tkcon::Save - saves the console or other widget buffer to a file
 ## This does not eval in a slave because it's not necessary
@@ -2118,25 +2137,18 @@ proc ::tkcon::Save { {fn ""} {type ""} {opt ""} {mode w} } {
 	if {$type == 5 || $type == -1} return
 	set type $s($type)
     }
-    set savecmd [list tk_getSaveFile]
     if {$type eq "widget"} {
         set parent $opt
     } else {
         set parent $PRIV(console)
     }
-    if {$fn eq ""} {
-	set types {
-	    {{Lisp Files}       {.lisp .asd}}
-	    {{Tcl Files}	{.tcl .tk}}
-	    {{Text Files}	{.txt}}
-	    {{All Files}	*}
-	}
-	if {[catch {eval $savecmd [list -defaultextension .tcl   \
-				       -filetypes $types         \
-				       -parent $parent           \
-				       -title "Save $type"]} fn]
-	     || $fn eq ""} return
+    if {$fn eq {}} {
+        set fn [GetFileNameForSave $parent $type]
+        if {$fn eq {}} {
+            return
+        }
     }
+    
     set type [string tolower $type]
     switch $type {
 	stdin -	stdout - stderr {
