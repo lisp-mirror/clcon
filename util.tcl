@@ -5,6 +5,17 @@ proc QuoteStringForRegexp {s} {
     regsub -all {[][{}()\\^$*+?.]} $s {\\&} s
     return $s
 }
+
+
+proc UnixFileNameToWindows {fn} {
+    regsub -all {(/)} $fn {\\} fn
+    return $fn
+}
+
+proc WindowsFileNameToUnix {fn} {
+    regsub -all {(\\)} $fn {/} fn
+    return $fn
+}
     
 proc CountOccurancesOfSubstring {substring string} {
     set substring [QuoteStringForRegexp $substring]

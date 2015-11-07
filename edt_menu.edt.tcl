@@ -14,6 +14,24 @@ namespace eval ::edt {
     proc EditNewFile {} {
         ::edt::edit -type newfile -- ""
     }
+
+    proc CurrentBufferPathnameToClipboard {style} {
+        set clcon_text [c_btext]
+        set FileNameUnix [[$clcon_text cget -opened_file] cget -filename]
+        switch -exact -- $style {
+            unix {
+                set FileName $FileNameUnix
+            }
+            windows {
+                set FileName [::UnixFileNameToWindows $FileNameUnix]
+            }
+            default {
+                error "Unexpected style $style"
+            }
+        }
+        clipboard clear
+        clipboard append $FileName
+    }
         
     # If ContinueIfNoBackend, binding would check precense of oduvan-backend,
     # and if it is absend, would call continue so that other bindings would work.
@@ -154,6 +172,14 @@ namespace eval ::edt {
         $m add command -label "Save As..."  -underline 0 \
             -command [wesppt [list ::edt::SaveAs $Bi $w.text]]
         $m add separator
+
+        set cmd {::edt::CurrentBufferPathnameToClipboard "unix"}
+        $m add command -label "2.File name to clipboard (unix style)" \
+            -underline 0 -command $cmd
+
+        set cmd {::edt::CurrentBufferPathnameToClipboard "windows"}
+        $m add command -label "3.File name to clipboard (windows style)" \
+            -underline 0 -command $cmd
 
         set CloseFile [wesppt [list ::edt::EditCloseFile $Bi]]
         $m add command -label "Close" -accel "Control-w" -command $CloseFile

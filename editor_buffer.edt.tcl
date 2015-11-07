@@ -4,7 +4,7 @@ namespace eval ::edt {
     proc CanonicalizeFileName {name} {
         global tcl_platform
         if {$tcl_platform(platform) == "windows"} {
-            regsub -all {(\\)} $name {/} name
+            set name [::WindowsFileNameToUnix $name]
             return [string tolower $name]
         } else {
             return string
