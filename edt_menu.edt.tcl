@@ -181,10 +181,8 @@ namespace eval ::edt {
         $m add command -label "3.File name to clipboard (windows style)" \
             -underline 0 -command $cmd
 
-        set CloseFile [wesppt [list ::edt::EditCloseFile $Bi]]
-        $m add command -label "Close" -accel "Control-w" -command $CloseFile
-        bind SingleMod$w <Control-Key-w> $CloseFile
-        
+        $m add separator
+
         $m add command -label "4.Reload some of IDE sources" -underline 0 \
 	    -command ::tkcon::ReloadSomeIDESources
 
@@ -196,6 +194,12 @@ namespace eval ::edt {
         }
         menu $s -disabledforeground $COLOR(disabled) -postcommand [list ::recent::RecentMenu $m]
  	$m add cascade -label "5.Open recent ..." -underline 0 -underline 0 -menu $s
+
+        $m add separator
+        set CloseFile [wesppt [list ::edt::EditCloseFile $Bi]]
+        $m add command -label "Close" -accel "Control-w" -command $CloseFile
+        bind SingleMod$w <Control-Key-w> $CloseFile
+        
 
         
         
