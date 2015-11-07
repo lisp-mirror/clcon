@@ -70,8 +70,9 @@ and which is activated after showing message box. See also write-code-to-pass-to
       (parse-location-into-file-and-pos loc)
     (cond
       ((and file offset)
-       (let ((escaped-file (tcl-escape-filename file))
-             (offset-2 (format nil "{1.0+ ~A chars}" offset)))
+       (let* ((escaped-file (tcl-escape-filename file))
+              (offset-15 (editor-budden-tools::fix-offset-2 file offset))
+              (offset-2 (format nil "{1.0+ ~A chars}" offset-15)))
          (format stream "tkcon::EditFileAtOffset ~A ~A" escaped-file offset-2)))
       (t
        (let* ((qLocation (cl-tk:tcl-escape (prin1-to-string loc)))
