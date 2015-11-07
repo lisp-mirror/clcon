@@ -281,10 +281,22 @@ sldb-break-with-default-debugger
 
 
 
-Трассирвока tcl
+Трассировка tcl
 ----------------
 ..proc trace_report {args} { putd "trace_report: $args"; dump_all_stack_putd }
 ..trace add execution ::edt::Bi2W leave trace_report
+
+
+Трассировка LISP
+---------------
+ХОтим захватить значение первого аргумента в переменную
+`
+(defvar *capture* nil)
+(defun aga (x) x)
+(trace aga :print (setf *capture* (sb-debug:arg 0)))
+(aga 4)
+*capture* == 4
+`
 
 
 пытаемся сделать один trace-output на всё
@@ -336,3 +348,42 @@ MakeSwankConnection ->
                          (substitute 
                           #\/ #\\ 
                           (string-trim +whitespace+ (CAPI-WIN32-LIB::GET-CLIPBOARD-TEXT))))))
+
+
+=======================================================
+Пытаемся поправить навигацию для юникода:
+
+clcon-server:server-lookup-definition - точка входа
+трассируем sb-introspect:find-definition-sources-by-name
+=>
+#S(sb-introspect:definition-source
+    :pathname
+    :form-path
+    :character-offset
+    :file-write-date)
+
+
+Поиск по исходникам SBCL:
+
+(clco:FIND-STRING-IN-FILES "character-offset" (clco:FILES-BY-GLOB-LIST "c:/clcon/sbcl/1.2.16/source/**/*.lisp"))
+
+sb-c::debug-source-start-positions - присваивает character-offset, но 
+это акссесор структуры debug-source, поля start-positions - массив всех форм. 
+
+(defun debug-source-for-info (info &key function) - она его возвращает. Трассировать? 
+
+Итак, sb-c::file-info содержит positions, где и находится наша позиция. 
+Грепаем file-info. 
+
+Находим sb-int:form-tracking-stream-form-start-byte-pos
+и 
+sb-int:form-tracking-stream-form-start-char-pos
+
+Это подозрительно. 
+
+В итоге находим 
+
+sb-impl::%read-preserving-whitespace
+
+и там код, к-рый вызывает file-offset. Однако emacs справляется с ситуацией.
+Попробуем применить editor-budden-tools::goto-offset
