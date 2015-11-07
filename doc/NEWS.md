@@ -1,5 +1,9 @@
 clcon news
 
+trunk
+=====
+- "New" and "Save As" now obey tradition
+
 0.3.1 relative to 0.3.0
 ================================
 - package is displayed in the console and is used to find source when editing a file; previously, cl-user was always assumed
@@ -14,3 +18,6 @@ will be accepted and this inconvinience will go away.
 and clco:files-by-glob-list
 
 - fixed some really nasty bugs and introduced some new bugs 
+
+- in the editor, open dialog uses directory of current file as initial directory
+
