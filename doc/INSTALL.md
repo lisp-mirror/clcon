@@ -25,10 +25,13 @@ Repositories of clcon components (clcon, oduvanchik, budden-tools) are at c:\clc
 
 Linux: 
 -----------
-I sometimes need EMACS to check what is the right client/server dialog. I forked SLIME and enabled it to understand readtables in the file,
-see https://github.com/budden/slime. But this breaks my current installed version of SLIME. So I suspend further development on Linux. 
-I hope my pull request will be accepted to SLIME's trunk, in which case I'll restore installation procedure for Linux. 
-Until that time, you can download repo at older 0.3.0 version and read installation instruction for that version inside your clone of the repo.
+Read carefully the following:
+
+ ../load-clcon-server-linux.lisp
+ 
+ https://bitbucket.org/budden/clcon/wiki/Portion%20of%20my%20.emacs%20relevant%20to%20clcon
+
+Then adapt for your needs. If something is wrong, feel free to contact me (budden73@gmail.com)
     
 ### Demo tour
 

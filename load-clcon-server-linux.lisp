@@ -1,5 +1,20 @@
-;;; Clcon server startup script 
+;;; Clcon server startup script for Linux
+
 (in-package :cl-user)
+
+;; Enable stepping in any code we compile (but see 'Starting SWANK' below) 
+(proclaim '(optimize (debug 3) (compilation-speed 0) (speed 0) (space 0) (safety 3)))
+
+(mapc 'require '(sb-bsd-sockets sb-posix sb-introspect sb-cltl2 asdf))
+
+(setf sb-impl::*default-external-format* :utf-8)
+
+#-quicklisp
+(let ((quicklisp-init "/s2/lib/ql.sbcl.l/setup.lisp"
+                                       ))
+  (when (probe-file quicklisp-init)
+    (load quicklisp-init)))
+
 
 ;;;;;;;;;;;;;;;;; Preliminary checks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (assert (eq sb-impl::*default-external-format* :utf-8) ()
@@ -15,22 +30,41 @@
 
 (when (find-package :swank)
   (error "Clcon server unable to load: swank is loaded already. Your plan:
- 1. remove swank initialization from initialization files
- 2. remove swank's fasls which are normally at ~A
- 3. retry" "~/.slime/fasl"))
+ 1. remove swank's fasls which are normally at ~A
+ 2. start sbcl with: 
+ sbcl --no-userinit --load <this file>
+
+ See also https://bitbucket.org/budden/clcon/wiki/Portion%20of%20my%20.emacs%20relevant%20to%20clcon
+"
+         "~/.slime/fasl"))
 
 ;; Disable stepping in SWANK 
 (proclaim '(optimize (debug 3) (compilation-speed 3)))
 
 ;; Load SWANK
+;; Note we currently need patched version of SLIME and NAMED-READTABLES
+;; which can be loaded from
+;; https://github.com/budden
+;; If you want to use EMACS too, relevant portion of .emacs is in WIKI (thanks to GPL)
+;; https://bitbucket.org/budden/clcon/wiki/Portion%20of%20my%20.emacs%20relevant%20to%20clcon
+;; clone them into your quicklisp/local-projects, e.g.
+;;
+;; sudo apt-get install git
+;; cd ~/quicklisp/local-projects
+;; git clone https://github.com/budden/named-readtables
+;; git clone https://github.com/budden/slime
+
 
 (load (merge-pathnames "swank-loader.lisp" (ql:where-is-system :swank)))
 ; (setq swank-loader::*fasl-directory* "c:/clcon/fasl-cache/swank/")
 (swank-loader:init)
 (swank:swank-require '(swank-asdf swank-repl swank-fancy-inspector)) 
 
-;; Enable stepping everywhere
+;; Enable stepping in all other places but SWANK
 (proclaim '(optimize (debug 3) (compilation-speed 0) (speed 0) (space 0) (safety 3)))
+
+;;;;;;;;;;;;;;;; Starting auxilary server for EMACS ;;;;;;;;;;;;;;;;;;;;;;;;
+(swank:create-server :port 4005 :dont-close t)
 
 ;;;;;;;;;;;;;;;;;; Trying to send all tracing to SBCL console ;;;;;;;;;;;;
 
@@ -44,6 +78,7 @@
 
 ;;;;;;;;;;;;;;;;;; Loading dependencies ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(asdf:load-system :budden-tools-asdf)
 (ql:quickload :alexandria)
 (ql:quickload :split-sequence)
 (ql:quickload :cl-tk)
@@ -120,6 +155,4 @@
 ;; This is clcon server
 (swank:create-server :port 4009 :dont-close t)
 
-;; Auxilary server to connect to from EMACS
-(swank:create-server :port 4005 :dont-close t)
  
