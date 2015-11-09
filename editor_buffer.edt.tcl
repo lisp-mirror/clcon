@@ -7,7 +7,7 @@ namespace eval ::edt {
             set name [::WindowsFileNameToUnix $name]
             return [string tolower $name]
         } else {
-            return string
+            return $name
         }
     }
 
