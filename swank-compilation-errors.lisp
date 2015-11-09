@@ -44,7 +44,8 @@
 
 (defun compile-file-for-tcl (filename load-p &rest options)
   "Backend for ::edt::CompileAndLoadTheFile . Rather untraditional c-s dialog. We normally do such things in tcl. It can be sometimes more convenient to edit though as we're in Lisp"
-  (let* ((compilation-result (apply #'swank:compile-file-for-emacs filename load-p options))
+  (let* ((pathname (pathname filename))
+         (compilation-result (apply #'swank:compile-file-for-emacs pathname load-p options))
          (success (swank::compilation-result-successp compilation-result))
          (notes (swank::compilation-result-notes compilation-result))
          (serial 0)
