@@ -10,8 +10,8 @@
 (setf sb-impl::*default-external-format* :utf-8)
 
 #-quicklisp
-(let ((quicklisp-init "/s2/lib/ql.sbcl.l/setup.lisp"
-                                       ))
+(let ((quicklisp-init "~/ql.sbcl.l/setup.lisp"
+        ))
   (when (probe-file quicklisp-init)
     (load quicklisp-init)))
 
@@ -56,7 +56,13 @@
 
 
 (load (merge-pathnames "swank-loader.lisp" (ql:where-is-system :swank)))
-; (setq swank-loader::*fasl-directory* "c:/clcon/fasl-cache/swank/")
+
+;; relocate slime fasls so that they are not confused with default SLIME install
+(setq swank-loader::*fasl-directory* 
+      (merge-pathnames "slime-budden/"
+                       (asdf:apply-output-translations "")
+                       ))
+
 (swank-loader:init)
 (swank:swank-require '(swank-asdf swank-repl swank-fancy-inspector)) 
 
@@ -142,7 +148,6 @@
 
 (asdf:load-system :clcon-server)
 
-
 ;;;;;;;;;;;;;;;;;; Starting editor backend ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -151,8 +156,10 @@
 
 ;;;;;;;;;;;;;;;;;; Starting server ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-;; This is clcon server
+;; This is clcon server. There is also aux server for EMACS, see above
+;; Also when we are in EMACS, EMACS tries to load third server time,
+;; I don't know the result of this effort
 (swank:create-server :port 4009 :dont-close t)
+
 
  
