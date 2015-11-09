@@ -20,6 +20,7 @@ namespace eval ::autotests {
         ::tkcon::Prompt
         $con insert end $partial_namespace
         event generate $con <<TkCon_ExpandTcl>>
+        event generate $con <<TkCon_ExpandTcl>>
         # Here we can afford it, as unfinished activity leads to failure of the test.
         # In general case, I don't know how to ensure that clear and prompt commands are
         # fully completed
