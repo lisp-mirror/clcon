@@ -1,8 +1,10 @@
 clcon news
 
-trunk
+0.3.2 vs 0.3.1 
 =====
 - "New" and "Save As" now obey tradition
+- Fixed nasty bugs in Linux version - editor didn't work at all
+- Updated Linux startup script and installation instructions
 
 0.3.1 relative to 0.3.0
 ================================

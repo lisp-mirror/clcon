@@ -1,4 +1,4 @@
-Clcon demo tour - online version is for trunk, file release version is in the release
+Clcon 0.3.2 demo tour 
 ===============
 
 Clcon is a building site. Excavators buzz. Pits, traps, naked electric wires wait you there.
@@ -45,7 +45,7 @@ Compiling file from editor
 At the console, open test/error-browser-sample-file.lisp file for editing.
 There are at least two ways to do that: via file open dialog (Control-O)
 or via console ed command:
-``.edit /s2/clcon/test/error-browser-sample-file.lisp`` or 
+``.edit ~/ql.sbcl.l/local-projects/clcon/test/error-browser-sample-file.lisp`` or 
 ``.edit c:/clcon/lp/clcon/test/error-browser-sample-file.lisp``
 for Windows file release. While typing in filename, use Control-F3 for completion.
 
@@ -98,17 +98,16 @@ When you enter line starting from `.. `, at the IDE prompt, the line will be tre
 
 Editing files
 ---------
-All files are now highlighted according to lisp mode, and you can even edit them! Beware that editor is extremely complex inside and it can still contain uncovered bugs - be sure to save your files frequently. `Save as` command works too, but it does not reopen newly created file, you have to open it manually. 
+All files are now highlighted according to lisp mode, and you can even edit them! Beware that editor is extremely complex inside and it can still contain uncovered bugs - be sure to save your files frequently. 
 
-When the file is modified, its tab is marked with asterik. Also asterik is shown in the buffer list (invoked by `Control-F12`). 
+When the file is modified, its tab is marked with asterik. Also asterik is shown in the buffer list (invoked by `Control-F12`).  
 
-Interesting commands while editing lisp are "indent" (`Tab` key) and "indent new line"  (`Shift-Return`). Also you can note highlight of opening paren when you stay at closing one. Also we have "Lisp" menu with several lisp mode commands (not currently bound to menus, but should work). Find source for now assumes common-lisp-user package, so it is of limited use. 
+Interesting commands while editing lisp are "indent" (`Tab` key) and "indent new line"  (`Shift-Return`). Also you can note highlight of opening paren when you stay at closing one. Also we have "Lisp" menu with several lisp mode commands (not currently bound to keyboard, but should work). 
 
-Also we have rather lame tcl indentation. Tcl find source ignores current namespace, so it is of limited use. 
+Also we have rather lame tcl indentation. It is invoked with `Control-Return`. Tcl find source in the editor ignores current namespace, so it is of limited use. 
 
 Find in files
 --------
-This is very new tool, and it is a bit lame, but I have find it useful already.
 Type at the console: 
 `.fics buf1`
 (Here "fics" is an abbreviation for "find-in-clcon-sources")
