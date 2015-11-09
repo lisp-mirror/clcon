@@ -1,4 +1,4 @@
-Clcon <TRUNK> installation and startup 
+Clcon 0.3.2 installation and startup 
 ==============
 
 Warning
@@ -55,6 +55,8 @@ You can try trunk, but it is better to load latest tagged "release", 0.3.2. Note
 #### Lisp libraries and clcon components
 
     cd /s2/lib/ql.sbcl.l/local-projects
+    # Force local system index to refresh
+    rm system-index.txt 
     hg clone https://bitbucket.org/budden/budden-tools
     git clone https://github.com/budden/slime 
     git clone https://github.com/budden/named-readtables
