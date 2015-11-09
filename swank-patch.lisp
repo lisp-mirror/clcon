@@ -5,8 +5,10 @@
 
 (defun log-to-file (format &rest args)
   (declare (ignorable format args))
-  (with-open-file (out *log-file* :direction :output :if-exists :append :if-does-not-exist :create)
-    (format out format args)))
+  ;; 454321
+  ;;(with-open-file (out *log-file* :direction :output :if-exists :append :if-does-not-exist :create)
+  ;;  (format out format args))
+  )
 
 (defstruct (connection-extra-data (:conc-name ced-))
   tcl-connection-p
