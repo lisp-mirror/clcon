@@ -8,7 +8,8 @@ namespace eval ::edt {
     variable OpenParenHighlightFont 10
 
 
-    # see oi::state-font
+    # see oi::state-font . To show pallette, call ::edt::DisplayTestTextInColor red
+    # No error having two "light coral" - s - one of them has other background
     set ColorTable [ExtractValuesFromNumberedInitializator {
        0 black
        1 rosybrown     
@@ -20,11 +21,11 @@ namespace eval ::edt {
        7 rosybrown     
        8 "dark blue"   
        9 darkgoldenrod        
-       10 "light coral" 
+       10 {light coral}
        11 "cyan"        
        12 "medium orchid"    
        13 "medium purple"   
-       14 "moccasin"        
+       14 {light coral}
        15 purple           
        16 "dark grey"       
     }
