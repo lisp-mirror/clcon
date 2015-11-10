@@ -100,3 +100,19 @@ proc BooleanToAsterik {b} {
         return ""
     }
 }        
+
+
+proc ExtractValuesFromNumberedInitializator {list} {
+    set i 0 
+    set result [list]
+    foreach l $list {
+        if { $i % 2 == 1 } {
+           lappend result $l
+        } else {
+           ::mprs::AssertEq $l [expr {$i / 2}]
+        }
+        incr i
+    }
+    return $result
+}
+    
