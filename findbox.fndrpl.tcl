@@ -80,8 +80,7 @@ namespace eval ::fndrpl {
 
             set cmd "::fndrpl::ReplaceAll $area"
             button $find.f2.button4 -text "replace all" -command $cmd -width 10 -height 1 -underline 8
-            bind $find <Alt-Key-a>  $cmd
-            bind $find <Alt-Key-Cyrillic_ef>  $cmd
+            ::clcon_key::b bind $find <Alt-Key-a>  $cmd
             
             pack $find.f2.button3 $find.f2.button4 $find.f2.button2  -pady 4
         } else {

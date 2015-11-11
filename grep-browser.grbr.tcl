@@ -207,7 +207,7 @@ namespace eval ::grbr {
         set m [menu [::tkcon::MenuButton $menu "1.File" file]]
         $m add command -label "1.Dismiss" -underline 0 -accel "Escape" -command [list destroy $w]
         bind $w <Escape>		[list destroy $w]
-        bind $w <Control-Key-w>		[list destroy $w]
+        ::clcon_key::b bind $w <Control-Key-w> [list destroy $w]
     }
 
     proc TitleListEditMenu {grbr menu} {

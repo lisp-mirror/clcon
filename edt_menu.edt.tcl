@@ -123,8 +123,7 @@ namespace eval ::edt {
 
         set cmd [wesppt [list ::edt::FindSourceCommand $btext]]
         $m add command -label "Find Source" -accel "Alt-." -command $cmd
-        bind SingleMod$w <Alt-period> $cmd
-        bind SingleMod$w <Alt-Key-Cyrillic_yu> $cmd
+        ::clcon_key b bind SingleMod$w <Alt-period> $cmd
     }
 
     proc EnableDisableMenuItems {} {
@@ -161,13 +160,11 @@ namespace eval ::edt {
         catch { ::clcon_text::PathToAFile $btext } initialdir
         set cmd [list ::tkcon::OpenForEdit $tw "" $initialdir]
 	$m add command -label "Open" -command $cmd -accel "Control-Key-O"
-        bind SingleMod$w <Control-Key-o> "$cmd; break"
-        bind SingleMod$w <Control-Key-Cyrillic_shcha> "$cmd; break"
+        ::clcon_key::b bind SingleMod$w <Control-Key-o> "$cmd; break"
 
         set cmd [wesppt [list ::edt::Save $Bi $w.text]]
         $m add command -label "Save" -command $cmd -accel "Control-S"
-        bind SingleMod$w <Control-Key-s> $cmd
-        bind SingleMod$w <Control-Key-Cyrillic_yeru> $cmd
+        ::clcon_key::b bind SingleMod$w <Control-Key-s> $cmd
         
         $m add command -label "Save As..."  -underline 0 \
             -command [wesppt [list ::edt::SaveAs $Bi $w.text]]
@@ -198,7 +195,7 @@ namespace eval ::edt {
         $m add separator
         set CloseFile [wesppt [list ::edt::EditCloseFile $Bi]]
         $m add command -label "Close" -accel "Control-w" -command $CloseFile
-        bind SingleMod$w <Control-Key-w> $CloseFile
+        ::clcon_key::b bind SingleMod$w <Control-Key-w> $CloseFile
         
 
         
@@ -218,8 +215,7 @@ namespace eval ::edt {
         $m add separator
 	set cmd [wesppt [list ::fndrpl::OpenFindBox $btext "text" "find" {}]]
         $m add command -label "Find" -under 0 -command $cmd -accel "Control-F"
-        bind SingleMod$w <Control-Key-f> $cmd
-        bind SingleMod$w <Control-Key-Cyrillic_a> $cmd
+        ::clcon_key::b bind SingleMod$w <Control-Key-f> $cmd
 
         set cmd [list ::fndrpl::FindIt $btext]
 	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd 
@@ -227,8 +223,7 @@ namespace eval ::edt {
 
 	set cmd [wesppt [list ::fndrpl::OpenFindBox $btext "text" "replace" {}]]
         $m add command -label "Replace" -under 0 -command $cmd -accel "Control-h"
-        bind SingleMod$w <Control-Key-h> "$cmd; break"
-        bind SingleMod$w <Control-Key-Cyrillic_er> "$cmd; break"
+        ::clcon_key::b bind SingleMod$w <Control-Key-h> "$cmd; break"
 
         $m add separator
         # this command works for both lisp and tcl so we put it at edit menu

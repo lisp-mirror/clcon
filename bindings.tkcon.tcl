@@ -25,26 +25,26 @@ namespace eval tkcon {
         #bind TkConsole <<NextLine>> {}
         #bind TkConsole <<PrevLine>> {}
 
-        ## Now make all our virtual event bindings
+        ## Disabled tkcon bindings: 
+        #    <<TkCon_Slave>>		<$PRIV(CTRL)Key-1>
+        #    <<TkCon_Master>>	<$PRIV(CTRL)Key-2>
+        #    <<TkCon_Main>>		<$PRIV(CTRL)Key-3>
+        #    <<TkCon_About>>		<$PRIV(CTRL)-A>
+        #    <<TkCon_New>>		<$PRIV(CTRL)-N>
+        #    <<TkCon_NewTab>>	<$PRIV(CTRL)-T>
+        #    <<TkCon_NextTab>>	<Control-Key-Tab>
+        #    <<TkCon_PrevTab>>	<Control-Shift-Key-Tab>
+
+        ## Now make all our international event bindings
         set bindings {
             <<TkCon_Exit>>		<$PRIV(CTRL)-q>
-            <<TkCon_New>>		<$PRIV(CTRL)-N>
-            <<TkCon_NewTab>>	<$PRIV(CTRL)-T>
-            <<TkCon_NextTab>>	<Control-Key-Tab>
-            <<TkCon_PrevTab>>	<Control-Shift-Key-Tab>
             <<TkCon_Close>>		<$PRIV(CTRL)-w>
-            <<TkCon_About>>		<$PRIV(CTRL)-A>
             <<TkCon_Find>>		<$PRIV(CTRL)F>
-            <<TkCon_Slave>>		<$PRIV(CTRL)Key-1>
-            <<TkCon_Master>>	<$PRIV(CTRL)Key-2>
-            <<TkCon_Main>>		<$PRIV(CTRL)Key-3>
             <<TkCon_ExpandFile>>	<Control-Key-F3>
             <<TkCon_ExpandTcl>>	        <Control-Alt-Key-u>
-            <<TkCon_ExpandTcl>>	        <Control-Alt-Key-Cyrillic_ghe>
             <<TkCon_ExpandLisp>>	<Control-Alt-Key-i>
             <<TkCon_ExpandLisp>>	<Key-Tab>
             <<TkCon_LispFindDefinition>> <Alt-period>
-            <<TkCon_LispFindDefinition>> <Alt-Key-Cyrillic_yu>
             <<TkCon_TclFindDefinition>> <Control-Key-F9>
             <<TkCon_Tab>>		<Control-i>
             <<TkCon_Tab>>		<Alt-i>
@@ -67,9 +67,11 @@ namespace eval tkcon {
             lappend bindings <<TkCon_Popup>> <Button-3>
         }
         foreach {ev key} [subst -nocommand -noback $bindings] {
-            event add $ev $key
-            ## Make sure the specific key won't be defined
-            bind TkConsole $key {}
+            foreach variation [::clcon_key::AlternateKeys $key] {
+                event add $ev $variation
+                ## Make sure the specific key won't be defined
+                bind TkConsole $key {}
+            }
         }
 
         # The same for TkConsoleTextOverrides
@@ -96,8 +98,7 @@ namespace eval tkcon {
 
         set cmd { ::fndrpl::OpenFindBox $::tkcon::PRIV(console) "text" "find" {}}
         bind $PRIV(root) <<TkCon_Find>>	$cmd
-        bind $PRIV(root) <Control-Key-f>	$cmd
-        bind $PRIV(root) <Control-Key-Cyrillic_a> $cmd
+        ::clcon_key::b bind $PRIV(root) <Control-Key-f> $cmd
         
         bind $PRIV(root) <<TkCon_Slave>>	{
             ::tkcon::Attach {}

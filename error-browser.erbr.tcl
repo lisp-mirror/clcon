@@ -436,8 +436,7 @@ namespace eval ::erbr {
 
         set cmd [list ::fndrpl::OpenFindBox $tbl "tablelist" "find" {}]
         $m add command -label "2.Find" -under 0 -command $cmd -accel "Control-F" 
-        bind $w <Control-Key-f> $cmd
-        bind $w <Control-Key-Cyrillic_a> $cmd
+        ::clcon_key::b bind $w <Control-Key-f> $cmd
 
         $m add separator
 

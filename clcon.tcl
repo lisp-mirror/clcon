@@ -1227,8 +1227,7 @@ proc ::tkcon::InitMenus {w title} {
 
         set cmd [list ::tkcon::OpenForEdit $w "" ""]
 	$m add command -label "Open for edit" -command $cmd -accel "Control-O"
-        bind TkConsoleTextOverrides <Control-Key-o> "$cmd; break"
-        bind TkConsole <Control-Key-Cyrillic_shcha> "$cmd; break"
+        ::clcon_key::b bind TkConsoleTextOverrides <Control-Key-o> "$cmd; break"
         
 	$m add command -label "2.Load Tcl File" -underline 0 -command ::tkcon::Load
 	$m add cascade -label "3.Save console output..."  -underline 0 -menu $m.save
@@ -1348,8 +1347,7 @@ proc ::tkcon::InitMenus {w title} {
         set cmd [list ::fndrpl::OpenFindBox $text "text" "find" {}]
 	$m add command -label "Find"  -underline 0 -accel $PRIV(ACC)F \
             -command $cmd
-        bind TkConsole <Control-Key-f> $cmd
-        bind TkConsole <Control-Key-Cyrillic_a> $cmd
+        ::clcon_key::b bind TkConsole <Control-Key-f> $cmd
 
         set cmd [list ::fndrpl::FindIt $text]
 	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd 

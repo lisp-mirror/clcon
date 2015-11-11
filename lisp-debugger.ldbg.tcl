@@ -531,17 +531,15 @@ namespace eval ::ldbg {
 	$m add command -label "Copy"  -accel "Control-C" \
             -command $cmd
         
-        bind $bodytag <Control-Key-c> $cmd
-        bind $bodytag <Control-Key-Cyrillic_es> $cmd
+        ::clcon_key::b bind $bodytag <Control-Key-c> $cmd
         bind $bodytag <Control-Key-Insert> $cmd
         
         set cmd [list ::fndrpl::OpenFindBox $tbl "tablelist" "find" "::ldbg::FramesTablelistEnsurePopulated"]
 	$m add command -label "Find"  -accel "Control-f" \
             -command $cmd
         
-        bind $bodytag <Control-Key-f>	   $cmd
-        bind $bodytag <Control-Key-Cyrillic_a> $cmd
-        
+        ::clcon_key::b bind $bodytag <Control-Key-f>	   $cmd
+     
 
         set cmd [list ::fndrpl::FindIt $tbl]
 	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd -state disabled

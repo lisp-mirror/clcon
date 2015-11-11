@@ -258,8 +258,7 @@ namespace eval ::insp {
         $m add separator
         $m add command -label "Dismiss" -underline 0 -accel "Control-w" \
             -command [list destroy $w]
-        bind $w <Control-Key-w>		[list destroy $w]
-        bind $w <Control-Key-Cyrillic_tse>		[list destroy $w]
+        ::clcon_key::b bind $w <Control-Key-w>		[list destroy $w]
     }
 
     proc EditMenu {w menu text} {
@@ -270,8 +269,7 @@ namespace eval ::insp {
 
         $m add command -label "Find" -under 0 \
             -command [list ::fndrpl::OpenFindBox $text "text" "find" {}]
-        bind $w <Control-Key-f>             [list ::tkcon::Findbox $text]
-        bind $w <Control-Key-Cyrillic_a>             [list ::tkcon::Findbox $text]
+        ::clcon_key::b bind $w <Control-Key-f>             [list ::tkcon::Findbox $text]
     }    
 
 

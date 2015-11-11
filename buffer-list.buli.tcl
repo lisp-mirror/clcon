@@ -180,25 +180,11 @@ namespace eval ::buli {
     }
 
     proc TitleListWindowMenu {w menu} {
-        ## Window Menu
-        ##
-        set m [menu [::tkcon::MenuButton $menu "7.Window" window]]
-        set cmd ::buli::BufferListBox
-	$m add command -label "Buffer list" -accel "Control-F12" \
-            -command $cmd -state disabled 
-        #bind $w <Control-Key-F12> $cmd
-        #
-        set cmd [list ::tkcon::FocusConsole]
-	$m add command -label "Console" -accel "Control-." \
-            -command $cmd
-        bind $w <Control-Key-period> $cmd
-        bind $w <Control-Key-Cyrillic_yu> $cmd
-        #
-        set cmd [list ::edt::ShowSomeEditor]
-        $m add command -label "Editor" -accel "Control-Shift-e" \
-            -command $cmd
-        bind $w <Control-Shift-E> $cmd
-        bind $w <Control-Shift-Key-Cyrillic_U> $cmd
+        variable ::tkcon::COLOR
+        set m [::tkcon::MenuButton $menu "7.Window" window]
+	menu $m -disabledforeground $COLOR(disabled) \
+		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]
+        ::window_menu::WindowMenuKeyBindings $w $w $w
     }
     
 
