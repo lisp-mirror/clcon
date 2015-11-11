@@ -4,12 +4,50 @@ namespace eval ::edt {
     variable ColorTable
     variable NumberOfPendingHighlights 0
 
-    set ColorTable {
-        black blue red orange cyan
-        blue gray brown "dark grey"
-        "dark blue" "gold" "light coral"
-        "cyan" "medium orchid" "medium purple"
-        "moccasin"
+    # See also odu::*open-paren-highlight-font*
+    variable OpenParenHighlightFont 10
+
+
+    # see oi::state-font
+    set ColorTable [ExtractValuesFromNumberedInitializator {
+       0 black
+       1 rosybrown     
+       2 firebrick     
+       3 gold
+       4 forestgreen   
+       5 blue 
+       6 orchid        
+       7 rosybrown     
+       8 "dark blue"   
+       9 darkgoldenrod        
+       10 "light coral" 
+       11 "cyan"        
+       12 "medium orchid"    
+       13 "medium purple"   
+       14 "moccasin"        
+       15 purple           
+       16 "dark grey"       
+    }
+    ]
+
+    proc DisplayTestTextInColor {auxColor} {
+        variable ColorTable
+        variable ::tkcon::OPT
+        set tl [string cat .displayTestTextInColor [GenNamedCounter DisplayTestTextInColor]]
+        toplevel $tl
+        set i 0
+        set ct $ColorTable
+        lappend ct $auxColor
+        puts $ct
+        foreach color [concat $ColorTable [list $auxColor]] {
+          set txt $tl.text$i
+          text $txt
+          $txt configure -foreground $color -height 1 -font $OPT(font)
+          $txt insert 1.0 "$i $color"
+          grid $txt 
+          incr i
+        }
+        focus $tl
     }
 
     proc HighlightTagName {i} {
@@ -18,12 +56,15 @@ namespace eval ::edt {
     
     proc CreateHighlightTags {text} {
         variable ColorTable
+        variable OpenParenHighlightFont
         set i 0
         foreach e $ColorTable {
             set TagName [HighlightTagName $i]
             $text tag configure $TagName -foreground $e
             incr i
         }
+        # Opening paren will be on special backgroun
+        $text tag configure [HighlightTagName $OpenParenHighlightFont] -background green
     }
 
     proc ApplyHighlightToLineSegment {text OldCharPos CharPos OldFont LineNumber} {
