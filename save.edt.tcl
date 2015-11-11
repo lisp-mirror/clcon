@@ -1,7 +1,7 @@
 ## Save file. Stolen from tcltextedit
 namespace eval ::edt {
     proc FILESaveRequest {initialfile} {
-        set non_canon [tk_getSaveFile -title {Save file} -initialfile $initialfile]
+        set non_canon [tk_getSaveFile -title {Save file} -initialfile $initialfile -parent [::edt::theTW]]
         return [CanonicalizeFileName $non_canon]
     }
 
@@ -60,7 +60,6 @@ namespace eval ::edt {
         set FileName [$opened_file cget -filename]
         # set UntitledBuffer 1
         set NewFileName [FILESaveRequest {}]
-        showVar NewFileName
 
         if {$NewFileName eq {}} {
             return 0
