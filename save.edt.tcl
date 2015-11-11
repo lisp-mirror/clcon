@@ -49,7 +49,7 @@ namespace eval ::edt {
             return 0
         } else {
             # There is a quant of time to modify file and harm us. 
-            DoSaveFile $Bi $clcon_text $FileName $Renaming
+            DoSaveFile $Bi $clcon_text $FileName 0
         }
     }
 
