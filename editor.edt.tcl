@@ -17,7 +17,7 @@
 namespace eval ::edt {
 
     proc ShowSomeEditor {} {
-        ::gui_util::FocusWindowByName [cTW] [c_text]
+        ::gui_util::FocusWindowByName [theTW] [c_text]
         return 
     }
 
@@ -78,7 +78,7 @@ namespace eval ::edt {
         set newBi [AnyBufferBi]
         if {$newBi eq {}} {
             # no more buffers - let's kill the editor window
-            after idle [list destroy [cTW]]
+            after idle [list destroy [theTW]]
         } else {
             SwitchToBuffer $newBi do_nothing
             set w [Bi2W $Bi]
@@ -210,7 +210,7 @@ namespace eval ::edt {
         variable ::tkcon::OPT
 
         set Bi [cBi]
-        set tw [cTW]
+        set tw [theTW]
         set w [cW]
         set WStatusBar [Bi2WStatusBar $Bi]
         set btext [c_btext]
@@ -288,7 +288,7 @@ namespace eval ::edt {
         set MRUWinListEntry [lindex [SearchBiInMRUWinList [cBi]] 1]
         set word [dict get $MRUWinListEntry path]
 
-        set tw [cTW]
+        set tw [theTW]
         set w [cW]
         set btext [c_btext]
         set textt [c_text]

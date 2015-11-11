@@ -227,7 +227,7 @@ namespace eval ::edt {
     }
 
     proc cMenuBar {{SubMenuSuffix {}}} {
-        string cat [cTW] ".mbar" $SubMenuSuffix
+        string cat [theTW] ".mbar" $SubMenuSuffix
     }
 
     # Initialization of editor GUI, buffer-independent part.

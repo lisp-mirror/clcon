@@ -148,7 +148,7 @@ namespace eval ::edt {
         ## Note that this is not a menu creation command!
         set Bi [cBi]
         set w [cW]
-        set tw [cTW]
+        set tw [theTW]
         set btext [c_btext]
         
         set m [cMenuBar .file]
