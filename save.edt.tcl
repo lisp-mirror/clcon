@@ -15,8 +15,8 @@ namespace eval ::edt {
         close $f 
         if {$Renaming} {
             $clcon_text edit modified 0
-            EditCloseFile $Bi
             ::tkcon::DoOpenFileForEdit $FileName
+            EditCloseFile $Bi
         } else {
             ::mprs::AssertEq $FileName [[$clcon_text cget -opened_file] cget -filename]
             [$clcon_text cget -opened_file] configure -filemtime $mtime

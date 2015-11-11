@@ -225,10 +225,17 @@ namespace eval ::edt {
         return $result
     }
 
+
     # Reorganizes windows according to their usage order
     # Refreshes buffer list. LastUsedTw can be {} when deleting window!
-    proc UpdateMRUAndBufferList {LastUsedTw} {
-        putd "We should have reordered windows here. See recent.tcl"
+    proc UpdateMRUAndBufferList {LastUsedBi} {
+        variable EditorMRUWinList
+        lassign [SearchBiInMRUWinList $LastUsedBi] index entry
+        if {$index>=0} {
+            set x [lreplace $EditorMRUWinList $index $index]
+            set EditorMRUWinList [linsert $x 0 $entry]
+        }
+        #putd "We should have reordered windows here. See recent.tcl"
         after idle ::buli::RefreshData
     }
 
