@@ -75,7 +75,7 @@ namespace eval ::window_menu {
         set script [WrapCmdForKeyboard $w $thatWindow 0 $cmd]
         ::tkcon::international_bind bind $DoubleModBindtag <Control-Shift-R> $script    }
 
-
+    # FIXME rename without "Dynamic" word. See recent and history menus for a sample or develop something new. 
     proc DynamicWindowMenu {w m} {
         ## Window Menu
         ## Creates menu commands only. Keyboard bindings are created in ::window_menu::WindowMenuKeyBindings
