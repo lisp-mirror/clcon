@@ -1,5 +1,15 @@
 clcon news
 
+<<TRUNK>> vs 0.3.2
+=====
+- Most of the tools have "Window" menu with shortcuts to switch to console, editor, debugger, error browser, editor buffer list. 
+- Keyboard shortcuts like "control-s" work regardless of CAPS LOCK state and in Russian keyboard layout. 
+- Completion now works as in slime-c-p-c, e.g. with package completion enabled.
+- Fixed some bugs in "New" and "Save As"
+- Fixed #||# highlight
+- Maybe improved highlight colors
+
+
 0.3.2 vs 0.3.1 
 =====
 - "New" and "Save As" now obey tradition
