@@ -45,7 +45,7 @@ proc ::tkcon::ExpandLispSymbol {w str tmp} {
     # string quoting is a bullshit here!
     set Quoted [QuoteLispObjToString $str]
     set PackageName [QuoteLispObjToString $PRIV(CurrentPackageDisplayName)]
-    set LispCmd "(swank:simple-completions $Quoted '$PackageName)"
+    set LispCmd "(swank:completions $Quoted '$PackageName)"
     set OnReply [concat ::tkcon::ExpandLispSymbolC1 [list $w $str $tmp] "\$EventAsList"]]
     EvalInSwankAsync $LispCmd $OnReply :find-existing
     return -code 12120374 ""
@@ -59,9 +59,10 @@ proc ::tkcon::ExpandLispSymbol {w str tmp} {
 proc ::tkcon::ExpandLispSymbolC1 {w str tmp EventAsList} {
     set ExpansionsAndBestMatch [::mprs::ParseReturnOk $EventAsList]
 
-    # showVar ExpansionsAndBestMatch
+    set LeashedResult [lindex [::mprs::Unleash [lindex $EventAsList 1]] 1]
 
-    if {[::mprs::Null [lindex $ExpansionsAndBestMatch 0]]} {
+    if {[::mprs::Null $LeashedResult]} {
+        bell
         return
     }
     
