@@ -242,6 +242,18 @@ namespace eval ::grbr {
         
     }
 
+
+    proc TitleListWindowMenu {w menu} {
+        variable ::tkcon::COLOR
+        set tbl [GetTitleListMenuTbl $w]
+        set text [HeaderOfGrepBrowser $w]
+        set m [::tkcon::MenuButton $menu "7.Window" window]
+	menu $m -disabledforeground $COLOR(disabled) \
+		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]
+        ::window_menu::WindowMenuKeyBindings $w $w $w
+    }
+
+
     proc ClearTitleList {grbr} {
         set TitleListWindow $grbr
         
@@ -325,6 +337,7 @@ namespace eval ::grbr {
         
         TitleListFileMenu $w $menu
         TitleListEditMenu $w $menu
+        TitleListWindowMenu $w $menu
 
         return $w    
     }

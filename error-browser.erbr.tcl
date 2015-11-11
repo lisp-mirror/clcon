@@ -452,6 +452,17 @@ namespace eval ::erbr {
         
     }
 
+    proc TitleListWindowMenu {w menu} {
+        variable ::tkcon::COLOR
+        set tbl [GetTitleListMenuTbl $w]
+        set text [HeaderOfErrorBrowser $w]
+        set m [::tkcon::MenuButton $menu "7.Window" window]
+	menu $m -disabledforeground $COLOR(disabled) \
+		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]
+        ::window_menu::WindowMenuKeyBindings $w $w $w
+    }
+    
+
     # proc SortOrderBooleanToWord {x} {
     #     if {$x == 0} { decreasing } else { increasing }
     # }
@@ -510,9 +521,7 @@ namespace eval ::erbr {
         variable TitleListWindow
 
         # ---------------------------- make toplevel window TitleListWindow -----------    
-        variable ::tkcon::PRIV
-        # Create unique edit window toplevel
-        set w $PRIV(base).erbrTlv
+        set w [::ide_structure::ErrorBrowserToplevelWindowName]
         # puts $w
         if {[winfo exists $w]} {
             ClearTitleList
@@ -575,6 +584,7 @@ namespace eval ::erbr {
         
         TitleListFileMenu $w $menu
         TitleListEditMenu $w $menu
+        TitleListWindowMenu $w $menu
         #TitleListInspectMenu $w $menu $w.body.text
 
         return $w    

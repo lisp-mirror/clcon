@@ -68,11 +68,16 @@ namespace eval ::window_menu {
         set cmd [list ::gui_util::FocusWindowByName $thatWindow]
         set script [WrapCmdForKeyboard $w $thatWindow 0 $cmd]
         ::tkcon::international_bind bind $DoubleModBindtag <Control-Shift-D> $script
-    }
+
+        set thatWindow [::ide_structure::ErrorBrowserToplevelWindowName]
+        set cmd [list ::gui_util::FocusWindowByName $thatWindow]
+        set script [WrapCmdForKeyboard $w $thatWindow 0 $cmd]
+        ::tkcon::international_bind bind $DoubleModBindtag <Control-Shift-R> $script    }
+
 
     proc DynamicWindowMenu {w m} {
         ## Window Menu
-        ## Creates menu commands only. Keyboard bindings are created in another function
+        ## Creates menu commands only. Keyboard bindings are created in ::window_menu::WindowMenuKeyBindings
         ## Which must be called explicitly when window is created
         ## w is a widget 
         ## m is a window submenu. It must be supplied by caller, e.g.:
@@ -111,6 +116,12 @@ namespace eval ::window_menu {
         set cmd [list ::gui_util::FocusWindowByName $thatWindow]
         CalcEnabledForOneItem $thatWindow 0
         $m add command -label "Debugger" -accel "Control-Shift-d" \
+            -command $cmd -state $state
+
+        set thatWindow [::ide_structure::ErrorBrowserToplevelWindowName]
+        set cmd [list ::gui_util::FocusWindowByName $thatWindow]
+        CalcEnabledForOneItem $thatWindow 0
+        $m add command -label "Error browser" -accel "Control-Shift-r" \
             -command $cmd -state $state
     }
     

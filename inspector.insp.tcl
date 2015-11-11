@@ -226,6 +226,7 @@ namespace eval ::insp {
         FileMenu $w $menu $w.body.text
         EditMenu $w $menu $w.body.text
         InspectMenu $w $menu $w.body.text
+        WindowMenu $w $menu $w.body.text
 
         return $w
     }
@@ -288,6 +289,17 @@ namespace eval ::insp {
         bind $w <F5> [list ::insp::InspectorReinspect $w]
         
     }    
+
+    # text is ignored
+    proc WindowMenu {w menu text} {
+        variable ::tkcon::COLOR
+        set m [::tkcon::MenuButton $menu "7.Window" window]
+
+	menu $m -disabledforeground $COLOR(disabled) \
+		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]
+
+        ::window_menu::WindowMenuKeyBindings $w $w $w
+    }
 
 
     proc TitleOfInspector {w} {

@@ -18,3 +18,10 @@ proc ::ide_structure::BufferListBoxWindowName {} {
     variable ::tkcon::PRIV
     return $PRIV(base).buliTlv
 }
+
+
+proc ::ide_structure::ErrorBrowserToplevelWindowName {} {
+    variable ::tkcon::PRIV
+    # Create unique edit window toplevel
+    return $PRIV(base).erbrTlv
+}
