@@ -63,6 +63,8 @@ namespace eval ::clcon_text {
 
     ::snit::type opened_file {
         option -filename {}
+        # we can distinguish existing file from new one by -filemtime:
+        # for new files it is empty
         option -filemtime {}
     }
     
