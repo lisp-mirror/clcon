@@ -1024,6 +1024,11 @@ namespace eval ::ldbg {
         #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
     }
 
+    proc DebuggerToplevelWindowName {} {
+        variable ::tkcon::PRIV
+        return $PRIV(base).ldbgTlv
+    }
+    
     
     # Make toplevel widget and its children
     # Returns window
@@ -1035,7 +1040,7 @@ namespace eval ::ldbg {
         # ---------------------------- make toplevel window MainWindow -----------    
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
-        set w $PRIV(base).ldbgTlv
+        set w [DebuggerToplevelWindowName]
         if {[winfo exists $w]} {
             ClearStackFramesTableList
             return $w

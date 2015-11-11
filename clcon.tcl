@@ -1025,10 +1025,14 @@ proc ::tkcon::CurrentConsole {} {
     return $PRIV(console)
 }
 
-
+## FIXME rename TopLevel to Toplevel everywhere.
+proc ::tkcon::ConsoleToplevelWindow {} {
+    variable PRIV
+    return $PRIV(root)
+}
 proc ::tkcon::FocusConsole {} {
     variable PRIV
-    set w $PRIV(root)
+    set w [ConsoleToplevelWindow]
     set txt $PRIV(console)
     ::gui_util::FocusWindowByName $w $txt
 }
@@ -3170,6 +3174,7 @@ proc ::tkcon::ReloadSomeIDESources2 {} {
     TkconSourceHere edt_structure.edt.tcl
     TkconSourceHere editor_buffer.edt.tcl
     TkconSourceHere menu.recent.tcl
+    TkconSourceHere window_menu.tcl
     TkconSourceHere edt_menu.edt.tcl
     TkconSourceHere editor.edt.tcl
     TkconSourceHere highlight.edt.tcl
