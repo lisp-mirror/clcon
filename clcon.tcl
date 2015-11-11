@@ -164,6 +164,7 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
     # as any error in it likely means a spoiled image.
     TkconSourceHere util.tcl
     TkconSourceHere gui_util.tcl
+    TkconSourceHere ide_structure.tcl
     TkconSourceHere ro_outer_synonyms.ro_out.tcl
     TkconSourceHere text2odu.tcl
     TkconSourceHere btext.tcl
@@ -176,7 +177,9 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
     TkconSourceHere findreplace.tcl
     TkconSourceHere findbox.fndrpl.tcl
     TkconSourceHere recent.tcl
-}
+	TkconSourceHere window_menu.tcl
+}    
+
 
 ::tkcon::ReloadSomeIDESources1
 
@@ -1411,18 +1414,16 @@ proc ::tkcon::InitMenus {w title} {
 
     ## Window Menu
     ##
-    foreach m [list [menu $w.window] [menu $w.pop.window]] {
-        set cmd [list ::buli::BufferListBox]
-	$m add command -label "Buffer list" -underline 0 -accel "Control-F12" \
-            -command $cmd
-        bind $PRIV(root) <Control-Key-F12> $cmd
-        #
-        set cmd [list ::edt::ShowSomeEditor]
-	$m add command -label "Editor" -underline 0 -accel "Control-Shift-e" \
-            -command $cmd
-        bind $PRIV(root) <Control-Shift-E> $cmd
-        bind $PRIV(root) <Control-Shift-Key-Cyrillic_U> $cmd
-    }
+    set m $w.window
+    menu $m -disabledforeground $COLOR(disabled) \
+        -postcommand [list ::window_menu::DynamicWindowMenu $w $m]
+
+    set m $w.pop.window
+    menu $m -disabledforeground $COLOR(disabled) \
+        -postcommand [list ::window_menu::DynamicWindowMenu $w $m]
+
+    set rr $PRIV(root)
+    ::window_menu::WindowMenuKeyBindings $rr $rr $rr
     
     ## Help Menu
     ##
@@ -3174,7 +3175,6 @@ proc ::tkcon::ReloadSomeIDESources2 {} {
     TkconSourceHere edt_structure.edt.tcl
     TkconSourceHere editor_buffer.edt.tcl
     TkconSourceHere menu.recent.tcl
-    TkconSourceHere window_menu.tcl
     TkconSourceHere edt_menu.edt.tcl
     TkconSourceHere editor.edt.tcl
     TkconSourceHere highlight.edt.tcl

@@ -273,7 +273,8 @@ namespace eval ::edt {
         }
 
 	menu $m -disabledforeground $COLOR(disabled) \
-		-postcommand [list ::window_menu::DynamicWindowMenu $w SingleMod$w DoubleMod$w $m]
+		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]
+        ::window_menu::WindowMenuKeyBindings $w SingleMod$w DoubleMod$w
 
 
         ## Secret Menu

@@ -1,4 +1,5 @@
 # Bindings for console (but not the ones from the menu)
+# FIXME - rename to console_bindings.tkcon.tcl 
 
 namespace eval tkcon {
 

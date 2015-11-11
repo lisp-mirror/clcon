@@ -553,7 +553,8 @@ namespace eval ::ldbg {
         variable ::tkcon::COLOR
         set m [::tkcon::MenuButton $menu "7.Window" window]
 	menu $m -disabledforeground $COLOR(disabled) \
-		-postcommand [list ::window_menu::DynamicWindowMenu $w $w $w $m]
+		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]
+        ::window_menu::WindowMenuKeyBindings $w $w $w
     }
 
     # Fills Restarts variable
@@ -1010,12 +1011,6 @@ namespace eval ::ldbg {
         #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
     }
 
-    proc DebuggerToplevelWindowName {} {
-        variable ::tkcon::PRIV
-        return $PRIV(base).ldbgTlv
-    }
-    
-    
     # Make toplevel widget and its children
     # Returns window
     proc PrepareGui1 {} {
@@ -1026,7 +1021,7 @@ namespace eval ::ldbg {
         # ---------------------------- make toplevel window MainWindow -----------    
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
-        set w [DebuggerToplevelWindowName]
+        set w [::ide_structure::DebuggerToplevelWindowName]
         if {[winfo exists $w]} {
             ClearStackFramesTableList
             return $w
