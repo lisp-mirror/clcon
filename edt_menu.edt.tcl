@@ -187,7 +187,7 @@ namespace eval ::edt {
 	    -command ::tkcon::ReloadSomeIDESources
 
         ## Recent menu (clone from clcon.tcl, but we need to delete menu as this
-        ## code is called many times) 111
+        ## code is called many times) 
         set s $m.recent
         if {[winfo exists $s]} {
             destroy $s
@@ -264,6 +264,9 @@ namespace eval ::edt {
         bind SingleMod$w <Control-Key-F9> "$cmd; break"
         
         ## Window Menu 
+
+        ## As with Recent menu, we need to delete menu as this
+        ## code is called many times 
         set m [cMenuBar .window] 
         if {[winfo exists $m]} {
             destroy $m
