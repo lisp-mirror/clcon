@@ -235,7 +235,7 @@ namespace eval ::edt {
 
 
     proc PerformSwitchToBufferAction {action} {
-        set tw [cTW]
+        set tw [theTW]
         switch -exact $action {
             "" -
             focus {
