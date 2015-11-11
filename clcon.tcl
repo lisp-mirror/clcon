@@ -24,12 +24,6 @@ exec wish "$0" ${1+"$@"}
 ## Copyright (c) Denis Budyak 2015
 ## 
 
-#budden if {$tcl_version < 8.4} {
-#budden     return -code error "tkcon requires at least Tcl/Tk 8.4"
-#budden } else {
-#budden     package require Tk 8.4
-#budden }
-
 encoding system utf-8
 
 # Try to load record_definition as early as possible to get access to all
@@ -38,6 +32,23 @@ namespace eval ::tkcon {
     variable ScriptDirectory 
     set ScriptDirectory [file dirname [info script]]
 }
+
+
+proc ::tkcon::CheckPatchlevel {} {
+    regsub -all {[a-zA-Z.]} [info patchlevel] {.} dd
+    set p [split $dd {.}]
+    set ma [lindex $p 0]
+    set mi [lindex $p 1]
+    set su [lindex $p 2]
+    if { $ma < 8 || $mi < 6 || $su < 2 } {
+        error "Clcon requires Tcl/Tk >= 8.6.2"
+    }
+}
+
+
+ ::tkcon::CheckPatchlevel
+
+
 
 ## TkconSourceHere - buddens command to load file from the same dir where
 # clcon itself is located. Be sure to load into main interpreter when you need it:
