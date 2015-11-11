@@ -148,7 +148,7 @@ namespace eval ::edt {
         ## Note that this is not a menu creation command!
         set Bi [cBi]
         set w [cW]
-        set tw [cTW]
+        set tw [theTW]
         set btext [c_btext]
         
         set m [cMenuBar .file]
@@ -187,7 +187,7 @@ namespace eval ::edt {
 	    -command ::tkcon::ReloadSomeIDESources
 
         ## Recent menu (clone from clcon.tcl, but we need to delete menu as this
-        ## code is called many times)
+        ## code is called many times) 
         set s $m.recent
         if {[winfo exists $s]} {
             destroy $s
@@ -263,21 +263,19 @@ namespace eval ::edt {
         $m add command -label "Tcl find source" -accel <Control-Key-F9> -command $cmd
         bind SingleMod$w <Control-Key-F9> "$cmd; break"
         
-        ## Window Menu
-        ##
-        set m [cMenuBar .window]
-        ::gui_util::ClearMenu $m
-        
-        set cmd ::buli::BufferListBox
-	$m add command -label "Buffer list" -underline 0 -accel "Control-F12" \
-            -command $cmd
-        bind SingleMod$w <Control-Key-F12> [concat $cmd ";" break]
-        #
-        set cmd [list ::tkcon::FocusConsole]
-	$m add command -label "Console" -underline 0 -accel "Control-." \
-            -command $cmd
-        bind SingleMod$w <Control-Key-period> $cmd
-        
+        ## Window Menu 
+
+        ## As with Recent menu, we need to delete menu as this
+        ## code is called many times 
+        set m [cMenuBar .window] 
+        if {[winfo exists $m]} {
+            destroy $m
+        }
+
+	menu $m -disabledforeground $COLOR(disabled) \
+		-postcommand [list ::window_menu::DynamicWindowMenu $w SingleMod$w DoubleMod$w $m]
+
+
         ## Secret Menu
         ##
         set m [cMenuBar .secret]

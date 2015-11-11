@@ -224,6 +224,11 @@ namespace eval ::buli {
         #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
     }
 
+
+    proc BufferListBoxWindowName {} {
+        variable ::tkcon::PRIV
+        return $PRIV(base).buliTlv
+    }
     
     # Make toplevel widget and its children
     # Returns window
@@ -233,7 +238,7 @@ namespace eval ::buli {
         # ---------------------------- make toplevel window TitleListWindow -----------    
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
-        set w $PRIV(base).buliTlv
+        set w [BufferListBoxWindowName]
         if {[winfo exists $w]} {
             ClearTitleList
             return $w

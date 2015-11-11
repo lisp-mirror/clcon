@@ -105,14 +105,16 @@ namespace eval ::edt {
         return [Bi2W $internal_cBi]
     }
 
-    # the only editing window
-    # FIXME rename to something other, as window the only one. E.g. to theTW
     proc cTW {} {
+        error "Use theTW instead"
+    }
+    
+    proc theTW {} {
         return [Bi2TW {}]
     }
 
     proc theNotebook {} {
-        string cat [cTW] .frammy
+        string cat [theTW] .frammy
     }
 
     # returns current clcon_text == btext
@@ -233,7 +235,7 @@ namespace eval ::edt {
 
 
     proc PerformSwitchToBufferAction {action} {
-        set tw [cTW]
+        set tw [theTW]
         switch -exact $action {
             "" -
             focus {
@@ -279,7 +281,7 @@ namespace eval ::edt {
     proc ShowingBufferChanged {} {
 
         set w [cW]
-        set tw [cTW]
+        set tw [theTW]
         
         SetupEditorWindowWhenSwitchingToIt
 
@@ -319,7 +321,7 @@ namespace eval ::edt {
             
             AddToWindowLists $key $Bi
 
-            set tw [cTW]
+            set tw [theTW]
             set w [cW]
 
             EnsureSingleEditorWindowExists

@@ -413,7 +413,8 @@ namespace eval ::ldbg {
         }
         # showVar StepperMenuPathname
         
-        .ldbgTlv.mbar entryconfigure [StepperMenuTitle] -state $state
+        set DebuggerMenuBar [string cat $DbgToplevelWindow .mbar]
+        $DebuggerMenuBar entryconfigure [StepperMenuTitle] -state $state
     }
     
     # This is a contiuation assigned on reply on initialization request 
@@ -549,25 +550,10 @@ namespace eval ::ldbg {
     }
     
     proc MakeMainWindowWindowMenu {w menu} {
-        ## Window Menu
-        ##
-        set m [menu [::tkcon::MenuButton $menu "7.Window" window]]
-        set cmd ::buli::BufferListBox
-	$m add command -label "Buffer list" -accel "Control-F12" \
-            -command $cmd 
-        #bind $w <Control-Key-F12> $cmd
-        #
-        set cmd [list ::tkcon::FocusConsole]
-	$m add command -label "Console" -accel "Control-." \
-            -command $cmd
-        bind $w <Control-Key-period> $cmd
-        bind $w <Control-Key-Cyrillic_yu> $cmd
-        #
-        set cmd [list ::edt::ShowSomeEditor]
-        $m add command -label "Editor" -accel "Control-Shift-e" \
-            -command $cmd
-        bind $w <Control-Shift-E> $cmd
-        bind $w <Control-Shift-Key-Cyrillic_U> $cmd
+        variable ::tkcon::COLOR
+        set m [::tkcon::MenuButton $menu "7.Window" window]
+	menu $m -disabledforeground $COLOR(disabled) \
+		-postcommand [list ::window_menu::DynamicWindowMenu $w $w $w $m]
     }
 
     # Fills Restarts variable
@@ -1024,6 +1010,11 @@ namespace eval ::ldbg {
         #    bind $w.tf.tbl <<ListBoxSelect>> [list DoOnSelect $w.tf.tbl]
     }
 
+    proc DebuggerToplevelWindowName {} {
+        variable ::tkcon::PRIV
+        return $PRIV(base).ldbgTlv
+    }
+    
     
     # Make toplevel widget and its children
     # Returns window
@@ -1035,7 +1026,7 @@ namespace eval ::ldbg {
         # ---------------------------- make toplevel window MainWindow -----------    
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
-        set w $PRIV(base).ldbgTlv
+        set w [DebuggerToplevelWindowName]
         if {[winfo exists $w]} {
             ClearStackFramesTableList
             return $w
