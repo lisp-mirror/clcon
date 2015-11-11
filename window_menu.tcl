@@ -40,6 +40,7 @@ namespace eval ::window_menu {
     # We must create menu keybindings as we're preparing window
     # In contrast, menu itself is created dynamically when use activates menu bar
     # So we may need keybindings before we have menu created.
+    # See also ::window_menu::DynamicWindowMenu
     proc WindowMenuKeyBindings {w SingleModBindtag DoubleModBindtag} {
         ## Window Menu
         ## w is a widget to accept keyboard bindings, 
@@ -133,7 +134,7 @@ namespace eval ::window_menu {
 ##
 # ARGS:	m	- menu widget
 ## KILL ME - i'm just a code sample
-proc ::tkcon::HistoryMenu4 m {
+proc ::tkcon::HistoryMenu m {
     variable PRIV
 
     if {![winfo exists $m]} return
