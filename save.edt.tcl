@@ -70,7 +70,7 @@ namespace eval ::edt {
         if {$NewFileName eq {}} {
             return 0
         } elseif {[IsFileBeingEdited $NewFileName]} {
-            tk_messageBox -parent $clcon_text -message "File is open in the editor already. Can't save"
+            tk_messageBox -parent $clcon_text -message "File is open in the editor already. Can't save to it"
             return 0
         } else {
             # There is a quant of time to modify file and harm us. 
