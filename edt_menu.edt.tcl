@@ -123,7 +123,7 @@ namespace eval ::edt {
 
         set cmd [wesppt [list ::edt::FindSourceCommand $btext]]
         $m add command -label "Find Source" -accel "Alt-." -command $cmd
-        ::clcon_key b bind SingleMod$w <Alt-period> $cmd
+        ::clcon_key::b bind SingleMod$w <Alt-period> $cmd
     }
 
     proc EnableDisableMenuItems {} {

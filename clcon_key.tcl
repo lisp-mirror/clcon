@@ -1,5 +1,5 @@
 ﻿########### Namespace ####################################
-
+   
 namespace eval ::clcon_key {
     variable LetterMap
     }
@@ -11,7 +11,7 @@ proc ::clcon_key::FillLetterMapWin32 {} {
     variable LetterMap
     set LetterMap [dict create]
     set originals [aux2]
-    set Russians [aux1]
+    set Russians [aux1win32]
     set i 0
     foreach o $originals {
         set Bucket [list]
@@ -29,7 +29,7 @@ proc ::clcon_key::FillLetterMapWin32 {} {
 	dict set LetterMap i {I oslash Ooblique}
 }
 
-proc ::clcon_key::aux1 {} {return {
+proc ::clcon_key::aux1win32 {} {return {
     {а agrave
     } {б aacute
     } {в acircumflex
@@ -70,10 +70,65 @@ proc clcon_key::aux2 {} {
 }
 
 
+proc ::clcon_key::aux1x {} {return {
+    Cyrillic_a   
+    Cyrillic_be  
+    Cyrillic_ve  
+    Cyrillic_ghe
+    Cyrillic_de
+    Cyrillic_ie
+    Cyrillic_io
+    Cyrillic_zhe
+    Cyrillic_ze
+    Cyrillic_i
+    Cyrillic_shorti
+    Cyrillic_ka
+    Cyrillic_el
+    Cyrillic_em
+    Cyrillic_en
+    Cyrillic_o
+    Cyrillic_pe
+    Cyrillic_er
+    Cyrillic_es
+    Cyrillic_te
+    Cyrillic_u
+    Cyrillic_ef
+    Cyrillic_ha
+    Cyrillic_tse
+    Cyrillic_che
+    Cyrillic_sha
+    Cyrillic_shcha
+    Cyrillic_hardsign
+    Cyrillic_yeru
+    Cyrillic_softsign
+    Cyrillic_e
+    Cyrillic_yu
+    Cyrillic_ya
+    }
+}
+
 
 proc ::clcon_key::FillLetterMapX {} {
     variable LetterMap
-    set LetterMap [dict create period [list ю]]
+    set LetterMap [dict create]
+    set LetterMap [dict create]
+    set originals [aux2]
+    set Russians [aux1x]
+    set i 0
+    foreach o $originals {
+        set Bucket [list]
+        set isLetter [expr {[string length $o] == 1}]
+        if {$isLetter} {
+            lappend Bucket [string toupper $o]
+        }
+        set Russian [lindex $Russians $i]
+        set RussianJustLetter [lindex [split $Russian _] 1]
+        set CapitalRussian [string cat Cyrillic_ [string toupper $RussianJustLetter]]
+        lappend Bucket $Russian $CapitalRussian
+
+        dict set LetterMap $o $Bucket
+        incr i
+    }
 }
 
 
