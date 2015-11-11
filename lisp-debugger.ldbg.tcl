@@ -60,8 +60,10 @@ namespace eval ::ldbg {
     # index of item in StackFrameHeaders with that RowName
     proc RowNameToFrameNo {RowName} {
         variable StackFrameHeaders
+        set RowPath [split $RowName _]
+        set WeBelieveThatFramePart [lindex $RowPath 0]
         dict for {frameNo item} $StackFrameHeaders {
-            if {[dict get $item RowName] eq $RowName} {
+            if {[dict get $item RowName] eq $WeBelieveThatFramePart} {
                 return $frameNo
             }
         }
