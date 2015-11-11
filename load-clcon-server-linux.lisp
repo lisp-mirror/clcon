@@ -42,18 +42,7 @@
 (proclaim '(optimize (debug 3) (compilation-speed 3)))
 
 ;; Load SWANK
-;; Note we currently need patched version of SLIME and NAMED-READTABLES
-;; which can be loaded from
-;; https://github.com/budden
-;; If you want to use EMACS too, relevant portion of .emacs is in WIKI (thanks to GPL)
-;; https://bitbucket.org/budden/clcon/wiki/Portion%20of%20my%20.emacs%20relevant%20to%20clcon
-;; clone them into your quicklisp/local-projects, e.g.
-;;
-;; sudo apt-get install git
-;; cd ~/quicklisp/local-projects
-;; git clone https://github.com/budden/named-readtables
-;; git clone https://github.com/budden/slime
-
+;; Note we currently need patched version of SLIME and NAMED-READTABLES, see doc/INSTALL.md
 
 (load (merge-pathnames "swank-loader.lisp" (ql:where-is-system :swank)))
 
@@ -64,7 +53,7 @@
                        ))
 
 (swank-loader:init)
-(swank:swank-require '(swank-asdf swank-repl swank-fancy-inspector)) 
+(swank:swank-require '(swank-asdf swank-repl swank-fancy-inspector swank-c-p-c)) 
 
 ;; Enable stepping in all other places but SWANK
 (proclaim '(optimize (debug 3) (compilation-speed 0) (speed 0) (space 0) (safety 3)))
