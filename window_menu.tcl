@@ -56,24 +56,24 @@ namespace eval ::window_menu {
         
         set cmd ::tkcon::FocusConsole
         set script [WrapCmdForKeyboard $w ::ide_structure::BufferListBoxWindowName 1 $cmd]
-        ::tkcon::international_bind bind $SingleModBindtag <Control-Key-period> $script
+        ::clcon_key::b bind $SingleModBindtag <Control-Key-period> $script
             # bind $w <Control-Key-Cyrillic_yu> $script
 
         set cmd ::edt::ShowSomeEditor
         set thatWindow [::ide_structure::EditorToplevelWindowName]
         set script [WrapCmdForKeyboard $w $thatWindow 0 $cmd]
-        ::tkcon::international_bind bind $DoubleModBindtag <Control-Shift-E> $script
+        ::clcon_key::b bind $DoubleModBindtag <Control-Shift-E> $script
         # bind $w <Control-Shift-Key-Cyrillic_U> $script
         
         set thatWindow [::ide_structure::DebuggerToplevelWindowName]
         set cmd [list ::gui_util::FocusWindowByName $thatWindow]
         set script [WrapCmdForKeyboard $w $thatWindow 0 $cmd]
-        ::tkcon::international_bind bind $DoubleModBindtag <Control-Shift-D> $script
+        ::clcon_key::b bind $DoubleModBindtag <Control-Shift-D> $script
 
         set thatWindow [::ide_structure::ErrorBrowserToplevelWindowName]
         set cmd [list ::gui_util::FocusWindowByName $thatWindow]
         set script [WrapCmdForKeyboard $w $thatWindow 0 $cmd]
-        ::tkcon::international_bind bind $DoubleModBindtag <Control-Shift-R> $script    }
+        ::clcon_key::b bind $DoubleModBindtag <Control-Shift-R> $script    }
 
     # FIXME rename without "Dynamic" word. See recent and history menus for a sample or develop something new. 
     proc DynamicWindowMenu {w m} {

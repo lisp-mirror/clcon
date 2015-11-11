@@ -4076,6 +4076,7 @@ proc ::tkcon::ReloadSomeIDESources3 {} {
     } elseif { $::tkcon::ENABLE_UNKNOWN == -1 } {
         TkconSourceHere tkcon-unknown-mini.tcl
     }
+    TkconSourceHere clcon_key.tcl
     TkconSourceHere bindings.tkcon.tcl
 }
 

@@ -3,13 +3,6 @@
 
 namespace eval tkcon {
 
-
-    # This is only a stub. bind_bareword is just for searching the sources.
-    proc international_bind {bind_bareword tag EnglishKey command} {
-        ::mprs::AssertEq $bind_bareword "bind"
-        $bind_bareword $tag $EnglishKey $command
-    }    
-
     proc Bindings {} {
         variable PRIV
         global tcl_platform tk_version
