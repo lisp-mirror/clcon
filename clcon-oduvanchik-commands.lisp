@@ -6,9 +6,10 @@
 (defcommand "Find Source" (p)
     "Find source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
     ""
-  (let* ((s (symbol-string-at-point))
+  (let* ((s ;(symbol-string-at-point)
+          (get-symbol-from-current-point))
          (code (clco::server-lookup-definition s (odu::package-at-point))))
-    code))
+    code)) 
 
 
 (defcommand "Sync Cursor" (p)
@@ -330,7 +331,6 @@
   (declare (ignore previous max-non-alphanumeric))
   (perga-implementation:perga function
     (let point (odu::current-point))
-    (budden-tools::show-expr point)
     (unless (BUDDEN-TOOLS::packages-seen-p *readtable*)
       (unless (member :create-new (budden-tools:splice-list keyargs) :key 'car)
         (setf keyargs (append keyargs (list :create-new t))))
@@ -372,11 +372,11 @@
         (odu::character-offset lookup-end 1)
         (incf lookup-end-count -1))
       (let ss (clco::string-between-marks symbol-beginning lookup-end))
-      ;2012-12-19 (let *package* (editor::buffer-package-to-use (point-buffer point)))
-      ;(let pack *package*)
-      ;(show-expr *package*)
-      ;(let budden-tools::*inhibit-readmacro* t)
-      (let package (odu::package-at-point))
+      (let package (or
+                    (find-package (odu::package-at-point))
+                    (progn
+                      (warn "unable to learn package at ~S. Assuming cl-user" point)
+                      (find-package :cl-user))))
       (cond
        (create-new
         (ignore-errors

@@ -1,24 +1,28 @@
 ; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*- 
 (in-package :clco)
 
-(defun swank-find-definitions-for-clcon (name package-name)
-  "Return a list ((DSPEC LOCATION) ...) of definitions for NAME.
-DSPEC is a string and LOCATION a source location. NAME is a string. See also swank:find-definitions-for-emacs. FIXME must be called in the context of current buffer"
-  (let* ((package-or-nil (find-package package-name))
-         (swank::*buffer-package* 
-          (cond
-           (package-or-nil
-            package-or-nil
-            )
-           (t
-            (error "Package ~S not found" package-name)
-            )))
-         (swank::*buffer-readtable* (standard-readtable)))
-    (multiple-value-bind (symbol found)
-        (swank::find-definitions-find-symbol-or-package name)
-      (when found
-        (swank::find-definitions symbol))
-    )))
+(defun swank-find-definitions-for-clcon (name-or-symbol &key package-name)
+  "Return a list ((DSPEC LOCATION) ...) of definitions for NAME-OR-SYMBOL. If name-or-symbol is string, we also need package-name.
+DSPEC is a string and LOCATION a source location. See also swank:find-definitions-for-emacs"
+  (etypecase name-or-symbol
+    (symbol
+     (swank::find-definitions name-or-symbol))
+    (string
+     (let* ((package-or-nil (find-package package-name))
+            (swank::*buffer-package* 
+             (cond
+              (package-or-nil
+               package-or-nil
+               )
+              (t
+               (error "Package ~S not found" package-name)
+               )))
+            (swank::*buffer-readtable* (standard-readtable)))
+       (multiple-value-bind (symbol found)
+                            (swank::find-definitions-find-symbol-or-package name-or-symbol)
+         (when found
+           (swank::find-definitions symbol))
+         )))))
 
 (defun print-one-hyperlink-tcl-source (stream text file offset &key (index "output"))
   "Generates tcl code which prints out one hyperlink"
@@ -103,14 +107,14 @@ and which is activated after showing message box. See also write-code-to-pass-to
   (format stream "::tkcon::FocusConsole; "))
   
 
-(defun server-lookup-definition (text &optional (package-name (package-name *package*)))
-  "text is a name of a lisp object which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
+(defun server-lookup-definition (name-or-symbol &optional (package-name (package-name *package*)))
+  "name-or-symbol is a name of a lisp object or object itself which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
   (let* ((dspecs-and-locations
-          (swank-find-definitions-for-clcon text package-name))
+          (swank-find-definitions-for-clcon name-or-symbol :package-name package-name))
          (l (length dspecs-and-locations)))
     (with-output-to-string (ou)
       (case l
-        (0 (print-just-line ou (format nil "No definitions found for ~A" text)))
+        (0 (print-just-line ou (format nil "No definitions found for ~A" name-or-symbol)))
         (t
          (when (> l 1)
            (write-code-to-show-console ou))
@@ -142,7 +146,6 @@ and which is activated after showing message box. See also write-code-to-pass-to
                     (write-code-to-pass-to-loc ou location :mode :eval))))
         (eval-in-tcl (format nil "set w ~A; ~A" parent code))
         ))))
-
 
 
 ;get-token-prefix
