@@ -14,7 +14,6 @@
 (defcommand "Sync Cursor" (p)
     "Debug-time command to sync cursor. There were no need to make it a command"
     "Does nothing but printing current cursor position. The rely upon the fact that clco::call-oduvanchik-function-with-clcon_text syncs cursor of backend buffer with that of clcon_text"
-  (oduvan-invisible-maybe-highlight-open-parens) ; just experiment... 
   (multiple-value-bind (row col)
       (oi::mark-row-and-col (current-point))
     (clco:eval-in-tcl
@@ -305,3 +304,113 @@
         (= (length all-line-chars)
            (length (remove-duplicates all-line-chars)))
       (print "Some line-chars coincide"))))
+
+
+
+
+
+
+(defun mark-buffer (mark) (odu::line-buffer (odu::mark-line mark)))
+
+
+(defcommand "Test Get Symbol From Current Point" (p)
+    "Find source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
+    ""
+  (let* ((s (get-symbol-from-current-point)))
+    (print s)
+    nil))
+
+
+(defun get-symbol-from-current-point (&REST keyargs &KEY (PREVIOUS T) (MAX-LENGTH 100) (MAX-NON-ALPHANUMERIC 15) (CREATE-NEW nil))
+  "editor::get-symbol-from-point используется в редакторе, когда хотим забрать символ из текущей точки буфера. Что мы делаем в адвайсе?
+  Полностью подменяем команду. Читаем символ с помощью ридера, переключённого в спец. режим. 
+  Если с пакетом неясность, ищем все символы с таким именем и предлагаем пользователю выбор.   
+  Имеем возможность не создавать символ при попытке забрать его из буфера - это аккуратная политика. 
+  Выражение a^b рассматриваем как два символа a и b "
+  (declare (ignore previous max-non-alphanumeric))
+  (perga-implementation:perga function
+    (let point (odu::current-point))
+    (budden-tools::show-expr point)
+    (unless (BUDDEN-TOOLS::packages-seen-p *readtable*)
+      (unless (member :create-new (budden-tools:splice-list keyargs) :key 'car)
+        (setf keyargs (append keyargs (list :create-new t))))
+      (return-from function (odu::symbol-string-at-point)))
+    (let p1 (odu::copy-mark point :temporary))
+    (let buf-beg (oi::buffer-start-mark (mark-buffer point)))
+    (let buf-end (oi::buffer-end-mark (mark-buffer point)))
+    (let rest-length (or max-length -1))
+    (let symbol-beginning nil)
+    (let v-in-symbol nil) ; истина, когда внутри символа
+    (let cur-in-symbol nil) ; истина, когда текущий char относится к символу
+    ; looking for a symbol at or before point
+    (do () ((not (and (> rest-length 0)
+                  (odu::mark> p1 buf-beg))) nil) 
+      (unless (odu::mark= p1 buf-end)
+        (let next-char (odu::next-character p1))
+        (unless next-char (error "No character there"))
+        (setf cur-in-symbol (editor-budden-tools::char-can-be-in-symbol next-char)))
+      (when cur-in-symbol
+        (unless v-in-symbol
+           ;(setf symbol-end (copy-point p1 :temporary))
+          (setf v-in-symbol t)))
+      (when v-in-symbol
+        (unless cur-in-symbol
+          (odu::character-offset p1 1)
+          (setf symbol-beginning (odu::copy-mark p1 :temporary))
+          (return nil)))
+      (odu::character-offset p1 -1)
+      (incf rest-length -1)
+      )
+    ; find the end of the symbol
+    (when symbol-beginning
+      (let lookup-end (odu::copy-mark symbol-beginning :temporary))
+      (let lookup-end-count max-length)
+      (do () ((not (and (odu::mark< lookup-end buf-end)
+                        (or 
+                         (null max-length) 
+                         (> lookup-end-count 0)))) nil)
+        (odu::character-offset lookup-end 1)
+        (incf lookup-end-count -1))
+      (let ss (clco::string-between-marks symbol-beginning lookup-end))
+      ;2012-12-19 (let *package* (editor::buffer-package-to-use (point-buffer point)))
+      ;(let pack *package*)
+      ;(show-expr *package*)
+      ;(let budden-tools::*inhibit-readmacro* t)
+      (let package (odu::package-at-point))
+      (cond
+       (create-new
+        (ignore-errors
+          (let ((budden-tools::*inhibit-readmacro* t)
+                (*package* package)
+                )
+            (read-from-string ss))))
+       (t 
+        (:@ multiple-value-bind (maybe-potential-symbol maybe-error)
+                   (ignore-errors
+                    (let ((sbcl-reader-budden-tools-lispworks:*return-package-and-symbol-name-from-read* t)
+                          (*package* package)
+                          (budden-tools::*inhibit-readmacro* t))
+                      (read-from-string ss))
+                    ))
+        (cond
+         ((typep maybe-error 'error) ; maybe-symbol can be nil, and read returns position. 
+                                     ; so we check if there is a error
+          (values nil nil) ; no symbol
+          )
+         ((sbcl-reader-budden-tools-lispworks:potential-symbol-p maybe-potential-symbol)
+          (editor-budden-tools::process-potential-symbol maybe-potential-symbol package)
+          )
+           
+         ;((not (symbolp maybe-symbol))
+         ; (editor-error "~S is not a symbol name" maybe-symbol))
+         ((and (consp maybe-potential-symbol)
+               (eq (car maybe-potential-symbol) 'budden-tools:|^|)
+               (SBCL-READER-BUDDEN-TOOLS-LISPWORKS:potential-symbol-p (second maybe-potential-symbol)))
+          (editor-budden-tools::process-potential-symbol (second maybe-potential-symbol) package))
+
+         (t ; in some modes we should not err
+          (values nil nil)
+          )
+         )
+        )
+       ))))
