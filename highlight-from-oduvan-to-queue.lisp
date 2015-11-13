@@ -84,16 +84,23 @@
     )))
 
 
-(defun encode-last-package-or-readtable-name-sent-to-tcl-type (x)
+(defun encode-last-package-name-sent-to-tcl-type (x)
   "Encodes value of oi::last-package-or-readtable-name-sent-to-tcl-type to be sent to lisp"
   (etypecase x
     ((eql :unknown) "{0}")
     (string (format nil "{1 ~A}" (cl-tk:tcl-escape x)))))
 
+(defun encode-last-readtable-name-sent-to-tcl-type (x)
+  "Encodes value of oi::last-package-or-readtable-name-sent-to-tcl-type to be sent to lisp"
+  (etypecase x
+    (string (assert (string= x "UNKNOWN")) "{0}") ; unknown
+    (symbol (format nil "{1 ~A}" (cl-tk:tcl-escape (string x))))))
+
+
 (defun notify-package-change (clcon_text-pathname package-name-or-info buffer)
   "See also odu::send-package-to-clcon, notify-readtable-change"
   (let ((package-info
-         (encode-last-package-or-readtable-name-sent-to-tcl-type
+         (encode-last-package-name-sent-to-tcl-type
           package-name-or-info)))
     (post-highlight-event
      (make-highlight-event
@@ -107,7 +114,7 @@
 (defun notify-readtable-change (clcon_text-pathname readtable-name-or-info buffer)
   "Clone of notify-package-change"
   (let ((readtable-info
-         (encode-last-package-or-readtable-name-sent-to-tcl-type
+         (encode-last-readtable-name-sent-to-tcl-type
           readtable-name-or-info)))
     (post-highlight-event
      (make-highlight-event

@@ -111,7 +111,7 @@ namespace eval ::edt {
         if {[lindex $data 0]} {
             set $clcon_text.StatusBarInfo(Readtable) [lindex $data 1]
         } else {
-            set $clcon_text.StatusBarInfo(Readtable) {#<NoLispData>}
+            set $clcon_text.StatusBarInfo(Readtable) {??UNKNOWN??}
         }
     }
 

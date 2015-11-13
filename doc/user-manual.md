@@ -115,6 +115,10 @@ have file/Reload some of IDE sources which reloads all sources excluding clcon.t
 
 ```.help``` lists available IDE commands (no real help, sorry :) )
 
+It is recommended to use your initialization file to define new IDE commands. 
+
+To view the source of the IDE command, type it as `::clconcmd::tapr` and press `Control-F9` on the text.
+
 Tcl escapes
 -----------
 Place two dots and a space (`.. `) directly at the IDE prompt to pass arbitrary tcl command to tcl interpreter. Use Control-Alt-U to complete tcl names. E.g. this will display tk's message box. 
@@ -132,9 +136,34 @@ Press Ctrl-F3 to complete filename (at least it will work undex *nix).
 
 Saving files 
 -------------------------
-WARNING! As you close the IDE, there is no warning about unsaved files. Also there is no (yet) modified flag at editor window. Be careful! We currently sometimes use IDE to edit it's own source but we recommend that you avoid editing files until IDE is developed enough.
-Also note that as some part of IDE crash, editor might become crashed too. If you have crashed swank connection, first of all try to disable "Oduvan-backend" flag at prefs menu in the console. After that, try Secret/Unfreeze command if your editor appears hanged up. With two that measures, you have good chances to save your work. But, again, don't rely upon IDE. 
+WARNING! 
+
+As you close the IDE, there is sometimes no warning about unsaved files. Also there is a bug in tab switching code so tab names at some point can mismatch real file name of the file being edited. Also note that as some part of IDE crash, editor might become crashed too. Be careful! 
+
+If you have crashed swank connection, first of all try to disable "Oduvan-backend" flag at prefs menu in the console. After that, try Secret/Unfreeze command if your editor appears hanged up. With two that measures, you have good chances to save your work. But, again, don't rely upon IDE. 
 Normally, to save files, use "File" menu or Control-s keyboard shortcut. 
+
+Named readtables support
+-------------------------
+We have support for named readtables in files. Clcon only recognizes keywords as readtable-names. If the file contains a line
+
+`(optional-package:in-readtable :readtable-name)`
+
+lines below that line are considered to be in that readtable. You can have several in-readtable statements in the file though it is not recommended, every `in-readtable` statement acts up to the next `in-readtable` statement. Note that the code before first "in-readtable" statement is assumed to be in readtable nil, but when compiling a file, it will use current readtable indeed. 
+
+If line is affected by above lying `in-readtable` statement, and package is known at this point of the file, swank:*readtable-alist* variable 
+is used to determine a readtable to use. 
+
+Note that is *readtable-alist* is modified, clcon ignores the change until it occasionally recalculates cached value of readtable for current line. 
+Also note that :named-readtables had a cludge that modified *readtable-alist* very frequently and chaotically. This cludge is removed in forked version
+of named-readtables installed with clcon. 
+
+To ensure that change is noted, close and reopen the file. 
+
+Readtable names are upcased regardless of everything when in the editor. When file is being compiled, in-readtable statement parsing 
+depends on actual current *readtable* around compilation. 
+
+Opening files with "in-readtable" forms have side effect - uppercased readtable names are interned into keyword package. 
 
 Debugger
 --------

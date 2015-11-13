@@ -8,7 +8,7 @@
     ""
   (let* ((s ;(symbol-string-at-point)
           (get-symbol-from-current-point))
-         (code (clco::server-lookup-definition s (odu::package-at-point))))
+         (code (clco::server-lookup-definition s (odu::package-at-point) (odu::readtable-at-point))))
     code)) 
 
 
@@ -45,7 +45,7 @@
          (line (mark-line p))
          (buffer (line-buffer line))
          (package (odu::package-at-point-if-known))
-         (last-package (oi::buffer-last-buffer-name-sent-to-tcl buffer))
+         (last-package (oi::buffer-last-package-name-sent-to-tcl buffer))
          )
     (cond
      ((equalp package last-package)
@@ -54,7 +54,7 @@
       )
      (t
       (send-package-to-clcon clcon_text package buffer)
-      (setf (oi::buffer-last-buffer-name-sent-to-tcl buffer) package)
+      (setf (oi::buffer-last-package-name-sent-to-tcl buffer) package)
       t
       ))))
 
