@@ -4745,6 +4745,7 @@ proc ::tkcon::ReloadSomeIDESources4 {} {
     TkconSourceHere buffer-list.buli.tcl
     TkconSourceHere lisp-debugger.ldbg.tcl
     TkconSourceHere tcltextedit-unsorted.tcl
+    TkconSourceHere clconcmd_inner.tcl
     TkconSourceHere clconcmd.tcl
     TkconSourceHere clcon-oduvanchik-commands.odu.tcl
     TkconSourceHere expand.tkcon.tcl

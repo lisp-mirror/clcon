@@ -73,5 +73,15 @@ Currently defined commands are: "
         ::tkcon::FocusConsole
         ::tkcon::SendEventToSwank $form {puts ""} 1 {:find-existing}
     }
+
+    # 
+    proc finf {args} {
+        # Find in files. Last arg is always a string to be found. Do we need to precede it with -- when it coincides with options? 
+        # Named args are -d - list of dir globs, -t - list of file type globs 
+        set keys [lrange $args 0 end-1]
+        set string [lindex $args end]
+        named_args $keys {-dirs "c:/s2/clcon" -types "asd lisp"}
+        ::clconcmd_inner::finf_inner $(-dirs) $(-types) $string
+    }
 }
     
