@@ -21,12 +21,15 @@ You can also change this option in runtime from 'Prefs' menu. Changed value is n
 Initialization file
 -------------------
 Windows: %HOME%\clcon.cfg
+
 Linux: ~/.clconrc 
 
 Completion
 ----------
 Completion of lisp symbols works in console, use **Tab** to complete lisp symbol prefix (may contain package or part of package name).
+
 Use **Ctrl-F3** to complete filename (Unix-style, names containing space may not work). 
+
 Use Control-Alt-u to complete tcl name. Be sure to type in a space after ".."  
 
 Find source command
@@ -49,20 +52,21 @@ Abbrev for "find in clcon sources". Accepts one argument: tcl string.
 More general find in files command. 
 
 Synopsys:
+
 `.finf -dirs {c:/x/y other_unix_style_dirs} -types {c h cpp} searchString`
 
 Default types are {asd lisp}. String is tcl string, use tcl quoting. 
 
 ### presets for .finf
-Usually good IDEs have "presets" for finding in some places. To imitate this,
+Good IDEs have "presets" for finding in some places. To imitate this,
 you can create your own commands at initialization file, e.g.
-  ```proc ::clconcmd::finf_budden_tools {searchString} {
-      ::clconcmd::finf -dirs c:/clcon/lp/budden-tools $searchString
-  }``` 
+
+`proc ::clconcmd::finf_budden_tools {searchString} {::clconcmd::finf -dirs c:/clcon/lp/budden-tools $searchString}`
 
 ## Lisp functions for the search
 
 There are also Lisp functions for the search. Example of searching for either of two strings:
+
 `(clco::present-text-filtering-results (union (clco::filter-many-files (clco::clcon-sources) "wesppt") (clco::filter-many-files (clco::clcon-sources) "WrapEventScriptForFreezedText") :test 'equalp))`
 
 This is rather lame, as lines are not sorted appropriately when merging two sets.
