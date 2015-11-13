@@ -76,12 +76,14 @@ Currently defined commands are: "
 
     # 
     proc finf {args} {
-        # Find in files. Last arg is always a string to be found. Do we need to precede it with -- when it coincides with options? 
-        # Named args are -d - list of dir globs, -t - list of file type globs 
-        set keys [lrange $args 0 end-1]
+        # Find in files. Synopsys ([[]] means optional part)
+        # .finf [[ -types list_of_types ]] dirs string
+        # default list of types is {asd lisp}
+        set keys [lrange $args 0 end-2]
+        set dirs [lindex $args end-1]
         set string [lindex $args end]
-        named_args $keys {-dirs "c:/s2/clcon" -types "asd lisp"}
-        ::clconcmd_inner::finf_inner $(-dirs) $(-types) $string
+        named_args $keys {-types "asd lisp"}
+        ::clconcmd_inner::finf_inner $dirs $(-types) $string
     }
 }
     

@@ -51,17 +51,19 @@ Abbrev for "find in clcon sources". Accepts one argument: tcl string.
 ## .finf
 More general find in files command. 
 
-Synopsys:
+Synopsys ([[]] means optional part)
 
-`.finf -dirs {c:/x/y other_unix_style_dirs} -types {c h cpp} searchString`
+  `.finf [[ -types list_of_types ]] dirs searchString`
 
-Default types are {asd lisp}. String is tcl string, use tcl quoting. 
+Default list_of_types is {asd lisp} . Dirs is a list of string.
+
+Use tcl quoting for all args.
 
 ### presets for .finf
 Good IDEs have "presets" for finding in some places. To imitate this,
 you can create your own commands at initialization file, e.g.
 
-`proc ::clconcmd::finf_budden_tools {searchString} {::clconcmd::finf -dirs c:/clcon/lp/budden-tools $searchString}`
+`proc ::clconcmd::finf_budden_tools {searchString} {::clconcmd::finf c:/clcon/lp/budden-tools $searchString}`
 
 ## Lisp functions for the search
 
