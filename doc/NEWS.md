@@ -2,6 +2,7 @@ clcon news
 
 <<TRUNK>> vs 0.3.2
 =====
+- Support of named-readtables by the editor, see [user manual](user-manual.md)
 - Most of the tools have "Window" menu with shortcuts to switch to console, editor, debugger, error browser, editor buffer list. 
 - Keyboard shortcuts like "control-s" work regardless of CAPS LOCK state and in Russian keyboard layout. 
 - Completion now works as in slime-c-p-c, e.g. with package completion enabled.
