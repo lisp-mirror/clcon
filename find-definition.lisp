@@ -1,7 +1,18 @@
 ; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*- 
 (in-package :clco)
 
-(defun swank-find-definitions-for-clcon (name-or-symbol &key package-name readtable-name)
+
+(defun find-readtable-or-use-default (readtable-name)
+  (multiple-value-bind (result error)
+                       (ignore-errors (named-readtables:find-readtable readtable-name))
+    (typecase error
+     (error
+      (warn "Error when finding readtable: ~S" error)
+      (named-readtables:find-readtable nil))
+     (t
+      result))))
+
+(defun swank-find-definitions-for-clcon (name-or-symbol &key package-name (readtable-name nil))
   "Return a list ((DSPEC LOCATION) ...) of definitions for NAME-OR-SYMBOL. If name-or-symbol is string, we also need package-name and readtable-name. Package-name is a string, readtable-name is a keyword or nil. DSPEC is a string and LOCATION a source location. See also swank:find-definitions-for-emacs"
   (etypecase name-or-symbol
     (symbol
@@ -16,7 +27,7 @@
               (t
                (error "Package ~S not found" package-name)
                )))
-            (swank::*buffer-readtable* (standard-readtable)))
+            (swank::*buffer-readtable* (find-readtable-or-use-default readtable-name)))
        (multiple-value-bind (symbol found)
                             (swank::find-definitions-find-symbol-or-package name-or-symbol)
          (when found
