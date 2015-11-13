@@ -30,7 +30,7 @@
 
 
 (defun eval-package-change (e)
-  "See also clco::notify-package-change"
+  "See also clco::notify-package-change, eval-readtable-change"
   (let* ((cmd (format nil "::edt::CurrentPackageChange ~A ~A"
                       (highlight-event-clcon_text-pathname e)
                       (--> e string))
@@ -40,7 +40,19 @@
       (clco:eval-in-tcl cmd :nowait nil))))
 
 
+(defun eval-readtable-change (e)
+  "Clone of eval-package-change"
+  (let* ((cmd (format nil "::edt::CurrentReadtableChange ~A ~A"
+                      (highlight-event-clcon_text-pathname e)
+                      (--> e string))
+           ))
+    (swank::with-connection ((--> e swank-connection))
+      ;; we should carefully synchronize them indeed
+      (clco:eval-in-tcl cmd :nowait nil))))
+
+
 (defun highlight-dispatcher-thread-function ()
+  "Events are supplied to a queue by clco::post-highlight-event"
   (loop
      (let ((e (pop-highlight-event-queue)))
        (when e
@@ -53,6 +65,8 @@
             )
            (package-change
             (eval-package-change e))
+           (readtable-change
+            (eval-readtable-change e))
    )))))
 
 

@@ -44,6 +44,7 @@
     highlight-single-line
     cancel-highlighting
     package-change ; we entered into a place where we have another package in the same buffer, or we obtained or lost information of it
+    readtable-change
     shutdown-highlight-dispatcher ; called at the exit
     ))
 
@@ -57,7 +58,7 @@
   )
 
 (defun post-highlight-event (event)
-  "Can be invoked in any thread"
+  "Can be invoked in any thread. Events are then processed by clco::highlight-dispatcher-thread-function"
   #-clcon-oduvan (print `(post-higlight-event ,event))
   #+clcon-oduvan
   (bt:with-lock-held (*highlight-event-queue-lock*)
@@ -83,21 +84,36 @@
     )))
 
 
-(defun encode-last-buffer-name-sent-to-tcl-type (x)
-  "Encodes value of oi::last-buffer-name-sent-to-tcl-type to be sent to lisp"
+(defun encode-last-package-or-readtable-name-sent-to-tcl-type (x)
+  "Encodes value of oi::last-package-or-readtable-name-sent-to-tcl-type to be sent to lisp"
   (etypecase x
     ((eql :unknown) "{0}")
     (string (format nil "{1 ~A}" (cl-tk:tcl-escape x)))))
 
 (defun notify-package-change (clcon_text-pathname package-name-or-info buffer)
-  "See also odu::send-package-to-clcon"
+  "See also odu::send-package-to-clcon, notify-readtable-change"
   (let ((package-info
-         (encode-last-buffer-name-sent-to-tcl-type package-name-or-info)))
+         (encode-last-package-or-readtable-name-sent-to-tcl-type
+          package-name-or-info)))
     (post-highlight-event
      (make-highlight-event
       :kind 'package-change
       :clcon_text-pathname clcon_text-pathname
       :string package-info
+      :swank-connection (oi::variable-value 'odu::swank-connection :buffer buffer)
+      ))))
+
+
+(defun notify-readtable-change (clcon_text-pathname readtable-name-or-info buffer)
+  "Clone of notify-package-change"
+  (let ((readtable-info
+         (encode-last-package-or-readtable-name-sent-to-tcl-type
+          readtable-name-or-info)))
+    (post-highlight-event
+     (make-highlight-event
+      :kind 'readtable-change
+      :clcon_text-pathname clcon_text-pathname
+      :string readtable-info
       :swank-connection (oi::variable-value 'odu::swank-connection :buffer buffer)
       ))))
 

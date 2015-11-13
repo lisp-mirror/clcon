@@ -105,6 +105,7 @@ namespace eval ::clcon_text {
             global $self.StatusBarInfo
             set $self.StatusBarInfo(CursorPos) {}
             set $self.StatusBarInfo(Package) {CL-USER}
+            set $self.StatusBarInfo(Readtable) {NIL}
         }
         destructor {
             $options(-opened_file) destroy

@@ -466,4 +466,5 @@ namespace eval ::tkcon {
         set PRIV(CurrentPackageDisplayName) [::mprs::Unleash [lindex $EventAsList 2]]
         puts stderr "PRIV(CurrentPackageName) = $PRIV(CurrentPackageName)"
     }
+
 }

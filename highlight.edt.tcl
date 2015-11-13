@@ -94,13 +94,24 @@ namespace eval ::edt {
     }
 
     # Display change of current package in a status bar
-    # see also ::tkcon::ChangeCurrentPackageA
+    # see also ::tkcon::ChangeCurrentPackageA, ::edt::CurrentReadtableChange
     proc CurrentPackageChange {clcon_text data} {
         global $clcon_text.StatusBarInfo
         if {[lindex $data 0]} {
-            set $clcon_text.StatusBarInfo(package) [lindex $data 1]
+            set $clcon_text.StatusBarInfo(Package) [lindex $data 1]
         } else {
-            set $clcon_text.StatusBarInfo(package) {CL-USER}
+            set $clcon_text.StatusBarInfo(Package) {CL-USER}
+        }
+    }
+
+
+    # Clone of ::edt::CurrentPackageChange
+    proc CurrentReadtableChange {clcon_text data} {
+        global $clcon_text.StatusBarInfo
+        if {[lindex $data 0]} {
+            set $clcon_text.StatusBarInfo(Readtable) [lindex $data 1]
+        } else {
+            set $clcon_text.StatusBarInfo(Readtable) {#<NoLispData>}
         }
     }
 

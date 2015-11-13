@@ -40,7 +40,7 @@
 
 
 (defun maybe-send-package-to-tcl (clcon_text)
-  "Send package at current-point if it is known. We assume and do not check that clcon_text corresponds to current buffer. Returns t if package was sent"
+  "Send package at current-point if it is known. We assume and do not check that clcon_text corresponds to current buffer. Returns t if package was sent. See also maybe-send-readtable-to-tcl"
   (let* ((p (current-point))
          (line (mark-line p))
          (buffer (line-buffer line))
@@ -55,6 +55,25 @@
      (t
       (send-package-to-clcon clcon_text package buffer)
       (setf (oi::buffer-last-buffer-name-sent-to-tcl buffer) package)
+      t
+      ))))
+
+(defun maybe-send-readtable-to-tcl (clcon_text)
+  "Similar to maybe-send-package-to-tcl"
+  (let* ((p (current-point))
+         (line (mark-line p))
+         (buffer (line-buffer line))
+         (rt (odu::readtable-at-point-if-known))
+         (last-rt (oi::buffer-last-readtable-name-sent-to-tcl buffer))
+         )
+    (cond
+     ((equalp rt last-rt)
+      ; do nothing
+      nil
+      )
+     (t
+      (send-readtable-to-clcon clcon_text rt buffer)
+      (setf (oi::buffer-last-readtable-name-sent-to-tcl buffer) rt)
       t
       ))))
 
@@ -182,12 +201,22 @@
              )))))))
 
 (defun send-package-to-clcon (clcon_text package buffer)
-  "Posts event of package change to a highlight events queue"
+  "Posts event of package change to a highlight events queue. See also send-readtable-to-clcon"
   #-oduvan-enable-highlight
   (declare (ignore clcon_text package buffer))
   #+oduvan-enable-highlight
   (clco::notify-package-change clcon_text package buffer)
   )
+
+
+(defun send-readtable-to-clcon (clcon_text rt buffer)
+  "Similar to send-package-to-clcon"
+  #-oduvan-enable-highlight
+  (declare (ignore clcon_text rt buffer))
+  #+oduvan-enable-highlight
+  (clco::notify-readtable-change clcon_text rt buffer)
+  )
+
 
 (defmethod oi::recompute-tags-up-to (end-line (background (eql t)))
   "We always recompute everything to the end of file. end-line is required to know buffer only"
