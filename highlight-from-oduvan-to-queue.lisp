@@ -45,6 +45,7 @@
     cancel-highlighting
     package-change ; we entered into a place where we have another package in the same buffer, or we obtained or lost information of it
     readtable-change
+    mode-change ; editor mode changed
     shutdown-highlight-dispatcher ; called at the exit
     ))
 
@@ -85,7 +86,7 @@
 
 
 (defun encode-last-package-name-sent-to-tcl-type (x)
-  "Encodes value of oi::last-package-or-readtable-name-sent-to-tcl-type to be sent to lisp"
+  "Encodes value of oi::last-package-name-sent-to-tcl-type to be sent to lisp"
   (etypecase x
     ((eql :unknown) "{0}")
     (string (format nil "{1 ~A}" (cl-tk:tcl-escape x)))))
@@ -123,6 +124,20 @@
       :string readtable-info
       :swank-connection (oi::variable-value 'odu::swank-connection :buffer buffer)
       ))))
+
+(defun notify-mode-change (clcon_text-pathname mode-name-or-info buffer)
+  "Clone of notify-package-change"
+  (let ((mode-info
+         (encode-last-package-name-sent-to-tcl-type
+          mode-name-or-info)))
+    (post-highlight-event
+     (make-highlight-event
+      :kind 'mode-change
+      :clcon_text-pathname clcon_text-pathname
+      :string mode-info
+      :swank-connection (oi::variable-value 'odu::swank-connection :buffer buffer)
+      ))))
+
 
 
 (defun shutdown-highlight-dispatcher ()

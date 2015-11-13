@@ -223,18 +223,23 @@ namespace eval ::edt {
 
         frame $WStatusBar
 
-        label $WStatusBar.packageTitle -text "PKG"
+        label $WStatusBar.modeTitle -text "mode"
+        label $WStatusBar.mode -relief sunken -borderwidth 1 -anchor w -width 10 -textvariable $btext.StatusBarInfo(Mode)
+
+        label $WStatusBar.packageTitle -text "pkg"
         label $WStatusBar.package -relief sunken -borderwidth 1 -anchor w -width 34 -textvariable $btext.StatusBarInfo(Package)
-        label $WStatusBar.readtableTitle -text "RT"
-        label $WStatusBar.readtable -relief sunken -borderwidth 1 -anchor w -width 34 -textvariable $btext.StatusBarInfo(Readtable)
+        label $WStatusBar.readtableTitle -text "rt"
+        label $WStatusBar.readtable -relief sunken -borderwidth 1 -anchor w -width 24 -textvariable $btext.StatusBarInfo(Readtable)
         label $WStatusBar.cursor -relief sunken -borderwidth 1 -anchor e -width 6 \
 	    -textvariable $btext.StatusBarInfo(CursorPos)
 
-        grid $WStatusBar.packageTitle -row 0 -column 0 -sticky nws
-        grid $WStatusBar.package -row 0 -column 1 
-        grid $WStatusBar.readtableTitle -row 0 -column 2 -sticky nws
-        grid $WStatusBar.readtable -row 0 -column 3 
-        grid $WStatusBar.cursor -row 0 -column 4 -sticky nes         
+        grid $WStatusBar.modeTitle -row 0 -column 0 -sticky nws
+        grid $WStatusBar.mode -row 0 -column 1 
+        grid $WStatusBar.packageTitle -row 0 -column 2 -sticky nws
+        grid $WStatusBar.package -row 0 -column 3 
+        grid $WStatusBar.readtableTitle -row 0 -column 4 -sticky nws
+        grid $WStatusBar.readtable -row 0 -column 5 
+        grid $WStatusBar.cursor -row 0 -column 6 -sticky news 
 
         # $tw.text configure -send_to_lisp 1
         # ::btext::clearHighlightClasses $btext

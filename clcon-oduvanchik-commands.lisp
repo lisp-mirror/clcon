@@ -77,6 +77,26 @@
       t
       ))))
 
+(defun maybe-send-mode-to-tcl (clcon_text)
+  "Send mode at current-point if it is known. We assume and do not check that clcon_text corresponds to current buffer. Returns t if package was sent. See also maybe-send-readtable-to-tcl"
+  (let* ((p (current-point))
+         (line (mark-line p))
+         (buffer (line-buffer line))
+         (mode (first (oi::buffer-modes buffer)))
+         (last-mode (oi::buffer-last-mode-name-sent-to-tcl buffer))
+         )
+    (cond
+     ((equalp mode last-mode)
+      ; do nothing
+      nil
+      )
+     (t
+      (send-mode-to-clcon clcon_text mode buffer)
+      (setf (oi::buffer-last-mode-name-sent-to-tcl buffer) mode)
+      t
+      ))))
+
+
 (defun oduvan-invisible-maybe-highlight-open-parens ()
   "Rework of odu::maybe-highlight-open-parens. Works in the current buffer. 
  It looks like working with parens is independent of buffer highlighting. So we don't
@@ -215,6 +235,15 @@
   (declare (ignore clcon_text rt buffer))
   #+oduvan-enable-highlight
   (clco::notify-readtable-change clcon_text rt buffer)
+  )
+
+
+(defun send-mode-to-clcon (clcon_text mode buffer)
+  "Clone of send-package-to-clcon"
+  #-oduvan-enable-highlight
+  (declare (ignore clcon_text mode buffer))
+  #+oduvan-enable-highlight
+  (clco::notify-mode-change clcon_text mode buffer)
   )
 
 

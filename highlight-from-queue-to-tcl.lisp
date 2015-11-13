@@ -51,6 +51,15 @@
       (clco:eval-in-tcl cmd :nowait nil))))
 
 
+(defun eval-mode-change (e)
+  "Clone of eval-mode-change"
+  (let* ((cmd (format nil "::edt::CurrentModeChange ~A ~A"
+                      (highlight-event-clcon_text-pathname e)
+                      (--> e string))))
+    (swank::with-connection ((--> e swank-connection))
+      (clco:eval-in-tcl cmd :nowait nil))))
+
+
 (defun highlight-dispatcher-thread-function ()
   "Events are supplied to a queue by clco::post-highlight-event"
   (loop
@@ -67,6 +76,8 @@
             (eval-package-change e))
            (readtable-change
             (eval-readtable-change e))
+           (mode-change
+            (eval-mode-change e))
    )))))
 
 

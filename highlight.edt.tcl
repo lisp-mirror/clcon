@@ -115,6 +115,17 @@ namespace eval ::edt {
         }
     }
 
+    # Clone of ::edt::CurrentPackageChange
+    proc CurrentModeChange {clcon_text data} {
+        global $clcon_text.StatusBarInfo
+        if {[lindex $data 0]} {
+            set $clcon_text.StatusBarInfo(Mode) [lindex $data 1]
+        } else {
+            set $clcon_text.StatusBarInfo(Mode) {?UNKNOWN?}
+        }
+    }
+
+
     proc DoApplyHighlightToLine {clcon_text s} {
         # text could disappear
         catch {

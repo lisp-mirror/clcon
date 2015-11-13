@@ -103,6 +103,7 @@ namespace eval ::clcon_text {
             bind $win <<ContinueUnfreeze>> "$self Unfreeze"
             ::edt::CreateHighlightTags $self
             global $self.StatusBarInfo
+            set $self.StatusBarInfo(Mode) Lisp
             set $self.StatusBarInfo(CursorPos) {}
             set $self.StatusBarInfo(Package) {CL-USER}
             set $self.StatusBarInfo(Readtable) {NIL}

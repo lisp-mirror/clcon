@@ -63,6 +63,7 @@
            (oduvan-invisible-maybe-highlight-open-parens)
            (maybe-send-package-to-tcl clcon_text)
            (maybe-send-readtable-to-tcl clcon_text)
+           (maybe-send-mode-to-tcl clcon_text)
            (check-something-ok cursor-point)
            )))))
   nil)
