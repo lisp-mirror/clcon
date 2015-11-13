@@ -1,4 +1,4 @@
-﻿Clcon 0.3.2 user manual
+﻿Clcon <<TRUNK>> user manual
 ===========
 
 Command line options
@@ -18,6 +18,11 @@ You can also change this option in runtime from 'Prefs' menu. Changed value is n
 
 ```-oduvan-backend 1``` - supposes that oduvanchik runs on SWANK side and enables some lisp-specific editor features (implementation is under construction). You can also change it via Pres menu bar submenu.
 
+Initialization file
+-------------------
+Windows: %HOME%\clcon.cfg
+Linux: ~/.clconrc 
+
 Completion
 ----------
 Completion of lisp symbols works in console, use **Tab** to complete lisp symbol prefix (may contain package or part of package name).
@@ -35,15 +40,34 @@ Find source for tcl accepts fully-qualified identifier. Invoke it with Control-F
 
 Find in files
 -------------
-Can be called from lisp only or as an IDE command. 
-See IDE command `.fics`. There are also Lisp functions for the search:
+There is no GUI for find in files. 
 
-### Example of searching for either of two strings:
+## .fics
+Abbrev for "find in clcon sources". Accepts one argument: tcl string.
+
+## .finf
+More general find in files command. 
+
+Synopsys:
+`.finf -dirs {c:/x/y other_unix_style_dirs} -types {c h cpp} searchString`
+
+Default types are {asd lisp}. String is tcl string, use tcl quoting. 
+
+### presets for .finf
+Usually good IDEs have "presets" for finding in some places. To imitate this,
+you can create your own commands at initialization file, e.g.
+  ```proc ::clconcmd::finf_budden_tools {searchString} {
+      ::clconcmd::finf -dirs c:/clcon/lp/budden-tools $searchString
+  }``` 
+
+## Lisp functions for the search
+
+There are also Lisp functions for the search. Example of searching for either of two strings:
 `(clco::present-text-filtering-results (union (clco::filter-many-files (clco::clcon-sources) "wesppt") (clco::filter-many-files (clco::clcon-sources) "WrapEventScriptForFreezedText") :test 'equalp))`
-This is rather lame, as lines are not sorted appropriately when merging two sets. 
-See source of that lisp function to learn how to write your own file search functions. 
 
-### Example of searching string in files specified by globs
+This is rather lame, as lines are not sorted appropriately when merging two sets.
+
+Example of searching string in files specified by globs (superseded by `.finf`)
 
 `(clco:FIND-STRING-IN-FILES "f4" (clco:FILES-BY-GLOB-LIST "c:/clcon/lp/**/*.lisp" "c:/clcon/lp/**/*.asd"))`
 

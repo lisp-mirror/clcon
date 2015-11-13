@@ -198,6 +198,7 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
 #
 # Calls:	::tkcon::InitUI
 # Outputs:	errors found in tkcon's resource file
+# Called from AtSource at least, buf also from tkcon command. 
 ##
 proc ::tkcon::Init {args} {
     variable VERSION
@@ -379,6 +380,9 @@ proc ::tkcon::Init {args} {
 	set PRIV(root) .tkcon
     }
 
+    ## Before processing user profile, create clconcmd namespace so that use can create his commands
+    namespace eval ::clconcmd {}
+
     ## Do platform specific configuration here, other than defaults
     ### Use tkcon.cfg filename for resource filename on non-unix systems
     ### Determine what directory the resource file should be in
@@ -386,19 +390,19 @@ proc ::tkcon::Init {args} {
 	macintosh	{
 	    if {![interp issafe]} {cd [file dirname [info script]]}
 	    set envHome		PREF_FOLDER
-	    set rcfile		tkcon.cfg
-	    set histfile	tkcon.hst
+	    set rcfile		clcon.cfg
+	    set histfile	clcon.hst
 	    catch {console hide}
 	}
 	windows		{
 	    set envHome		HOME
-	    set rcfile		tkcon.cfg
-	    set histfile	tkcon.hst
+	    set rcfile		clcon.cfg
+	    set histfile	clcon.hst
 	}
 	unix		{
 	    set envHome		HOME
-	    set rcfile		.tkconrc
-	    set histfile	.tkcon_history
+	    set rcfile		.clconrc
+	    set histfile	.clcon_history
 	}
     }
     if {[info exists env($envHome)]} {
@@ -650,7 +654,7 @@ proc ::tkcon::InitSlave {slave {slaveargs {}} {slaveargv0 {}}} {
 	set errorInfo ${__tkcon_error}
 	unset __tkcon_error
     }
-    $slave eval { namespace eval ::clconcmd {} }
+    # $slave eval { namespace eval ::clconcmd {} }
     foreach cmd $PRIV(slaveprocs) { $slave eval [dump proc $cmd] }
     foreach cmd $PRIV(slavealias) { $slave alias $cmd $cmd }
     interp alias $slave ::ls $slave ::dir -full
