@@ -2,6 +2,7 @@ clcon news
 
 <<TRUNK>> vs 0.3.2
 =====
+- documented initialization file and its use
 - Control-u clears command line
 - Basic multiline command support (use `Control-Return` to enter subsequent lines and `Return` to eval) 
 - Support of named-readtables by the editor, see [user manual](user-manual.md)
