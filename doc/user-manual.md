@@ -153,14 +153,18 @@ We have support for named readtables in files. Clcon only recognizes keywords as
 
 lines below that line are considered to be in that readtable. You can have several in-readtable statements in the file though it is not recommended, every `in-readtable` statement acts up to the next `in-readtable` statement. Note that the code before first "in-readtable" statement is assumed to be in readtable nil, but when compiling a file, it will use current readtable indeed. 
 
-If line is affected by above lying `in-readtable` statement, and package is known at this point of the file, swank:*readtable-alist* variable 
-is used to determine a readtable to use. 
+If 
 
-Note that is *readtable-alist* is modified, clcon ignores the change until it occasionally recalculates cached value of readtable for current line. 
-Also note that :named-readtables had a cludge that modified *readtable-alist* very frequently and chaotically. This cludge is removed in forked version
-of named-readtables installed with clcon. 
+  i) there is no `in-readtable` statements above current line, or closest `in-readtable` statement specifies readtable named NIL, 
 
-To ensure that change is noted, close and reopen the file. 
+  ii) an in-package form is present above this line 
+
+swank:*readtable-alist* variable is used to determine a readtable to use from the latest `in-package` form above the line. This is a caveat as we must have obeyed explicit `(in-readtable nil)`. Hope to fix it later. 
+
+Note that is *readtable-alist* is modified, clcon does not note the change until it occasionally recalculates cached value of readtable for current line. 
+To ensure that the change is noted, close and reopen the file. 
+
+Also note that canonical :named-readtables implementation has a cludge that can modify *readtable-alist* very frequently and chaotically. This cludge is removed in forked version of named readtables library installed with clcon. 
 
 Readtable names are upcased regardless of everything when in the editor. When file is being compiled, in-readtable statement parsing 
 depends on actual current *readtable* around compilation. 
@@ -233,7 +237,10 @@ as we have tcl escapes alredy.
 
 Multiline commands
 ------------------
-Not supported, neither in lisp, nor in tcl. Don't try them
+To type in multiline command, separated lines with `Control-Return` instead of just `Return`. 
+Also you can paste multiline commands. Clcon currently have no smart parser which could determine 
+end of the command automatically. Pressing `Return` sends current command to interpreter. If it 
+is unfinished, error would occur. 
 
 Also Read tkcon manual
 ----------------------

@@ -101,7 +101,12 @@ and which is activated after showing message box. See also write-code-to-pass-to
             )))
        ))))
 
-
+(defmethod editor-budden-tools:goto-xy (pathname row col)
+  (check-type row integer)
+  (check-type col integer)
+  (let* ((escaped-file (tcl-escape-filename pathname))
+         (command (format nil "tkcon::EditFileAtOffset ~A ~A.~A" escaped-file row col)))
+    (eval-in-tcl command :nowait nil)))
 
 (defun write-code-to-pass-to-file-line-char (stream file line char)
   "Writes code which would pass to file at line and char. Lines start from 1, chars start from 0. See also write-code-to-pass-to-loc 
