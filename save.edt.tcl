@@ -17,11 +17,14 @@ namespace eval ::edt {
             $clcon_text edit modified 0
             ::tkcon::DoOpenFileForEdit $FileName
             EditCloseFile $Bi
+            # We have no switch to buffer function, so we call ::edt::edit
+            ::edt::edit -file -- $FileName
         } else {
             ::mprs::AssertEq $FileName [[$clcon_text cget -opened_file] cget -filename]
             [$clcon_text cget -opened_file] configure -filemtime $mtime
             $clcon_text edit modified 0
         }
+        return 1
     }
 
     proc FileLessBufferP {clcon_text} {
