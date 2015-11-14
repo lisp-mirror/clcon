@@ -389,7 +389,10 @@ namespace eval ::clcon_text {
                 if {![$clcon_text UsesLispP]} {
                     return
                 }
-                set lispCmd "(clco:notify-oduvan-construct-backend-buffer $qId)"
+                # FIXME clcon_text_to_file_name must be in this namespace. 
+                lassign [::edt::clcon_text_to_file_name $clcon_text] FileName Reason
+                set qFileName [lq $FileName]
+                set lispCmd "(clco:notify-oduvan-construct-backend-buffer $qId $qFileName)"
             }
             DestroyBackendBuffer {
                 # We don't check if current buffer uses lisp, as it can not exist now already. But we at least should check is we have lisp at all.
