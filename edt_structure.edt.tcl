@@ -77,6 +77,14 @@ namespace eval ::edt {
         return [string cat [Bi2W $Bi] ".text"]
     }
 
+    # Avoid it. Start from Bi everywhere.  
+    #proc clcon_text2Bi {clcon_text} {
+    #    if {[winfo class $clcon_text] ne "Btext"]} {
+    #        error "$clcon_text must be of class Btext"
+    #    }
+    #lindex [split $clcon_text .] end-1
+    #}
+
     # returns text embedded into clcon_text
     proc Bi2_text {Bi} {
         checkValidBi $Bi

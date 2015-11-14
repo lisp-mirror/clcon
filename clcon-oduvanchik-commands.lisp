@@ -40,13 +40,14 @@
 
 
 (defun maybe-send-package-to-tcl (clcon_text)
-  "Send package at current-point if it is known. We assume and do not check that clcon_text corresponds to current buffer. Returns t if package was sent. See also maybe-send-readtable-to-tcl"
+  "Send package at current-point if it is known. We assume and check that clcon_text corresponds to current buffer. Returns t if package was sent. See also maybe-send-readtable-to-tcl"
   (let* ((p (current-point))
          (line (mark-line p))
          (buffer (line-buffer line))
          (package (odu::package-at-point-if-known))
          (last-package (oi::buffer-last-package-name-sent-to-tcl buffer))
          )
+    (assert (eq buffer (oi::clcon_text-to-buffer clcon_text)))
     (cond
      ((equalp package last-package)
       ; do nothing
@@ -66,6 +67,7 @@
          (rt (odu::readtable-at-point-if-known))
          (last-rt (oi::buffer-last-readtable-name-sent-to-tcl buffer))
          )
+    (assert (eq buffer (oi::clcon_text-to-buffer clcon_text)))
     (cond
      ((equalp rt last-rt)
       ; do nothing
