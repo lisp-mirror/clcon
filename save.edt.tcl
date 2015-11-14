@@ -36,14 +36,16 @@ namespace eval ::edt {
     }
 
     # Returns 1 if file was saved. Can modify clcon_text data.
-    proc Save {Bi clcon_text} {
+    proc Save {Bi clcon_text warn_if_does_not_need_save} {
         set opened_file [$clcon_text cget -opened_file]
         set FileName [$opened_file cget -filename]
         if {[FileLessBufferP $clcon_text]} {
             SaveAs $Bi $clcon_text
         } elseif {![$clcon_text edit modified]} {
-            tk_messageBox -parent $clcon_text -message "No changes to save"
-            return 0
+            if {$warn_if_does_not_need_save} {
+              tk_messageBox -parent $clcon_text -message "No changes to save"
+            }
+            return 0  
         } elseif {[$opened_file cget -filemtime] < [file mtime $FileName]} {
             tk_messageBox -parent $clcon_text -message "File have changed by another program. Can't save (yet)"
             return 0

@@ -58,7 +58,7 @@ namespace eval ::edt {
         return $cmdBreak
     }
 
-    proc MakeLispModeMenu {w btext} {
+    proc MakeLispModeMenu {Bi w btext} {
 
         set m [cMenuBar .lisp]
         ::gui_util::ClearMenu $m
@@ -162,7 +162,7 @@ namespace eval ::edt {
 	$m add command -label "Open" -command $cmd -accel "Control-Key-O"
         ::clcon_key::b bind SingleMod$w <Control-Key-o> "$cmd; break"
 
-        set cmd [wesppt [list ::edt::Save $Bi $w.text]]
+        set cmd [wesppt [list ::edt::Save $Bi $w.text 1]]
         $m add command -label "Save" -command $cmd -accel "Control-S"
         ::clcon_key::b bind SingleMod$w <Control-Key-s> $cmd
         
@@ -235,7 +235,7 @@ namespace eval ::edt {
         
         ## Lisp mode Menu
         ##
-        MakeLispModeMenu $w $btext
+        MakeLispModeMenu $Bi $w $btext
         
         ## Tcl mode Menu
         ## 

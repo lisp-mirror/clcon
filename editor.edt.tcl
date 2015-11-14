@@ -49,7 +49,7 @@ namespace eval ::edt {
             set UserReplyToSaveRequest [YesNoCancel "Closing $word" "$word2 $tab_name not saved. Save?" $textt]
             switch -exact $UserReplyToSaveRequest {
                 "yes" {
-                    Save $clcon_text
+                    Save $Bi $clcon_text 0
                     return 1
                 }
                 "no" {
