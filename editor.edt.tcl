@@ -68,12 +68,22 @@ namespace eval ::edt {
         }
     }
         
+    proc MaybeAddToRecentWhenClosing {Bi} {
+        set clcon_text [Bi2btext $Bi]
+        set opened_file [$clcon_text cget -opened_file]
+        set FileName [$opened_file cget -filename]
+        if {![FileLessBufferP $clcon_text]} {
+            ::recent::AddRecent $FileName
+        }
+    }
+    
     # close file (without saving for now)  
     proc EditCloseFile {Bi} {
         if {![SaveDontSaveOrCancel $Bi]} {
             return
         }
         RemoveWindowFromLists $Bi
+        MaybeAddToRecentWhenClosing $Bi
         # UpdateMRUAndBufferList {}
         set newBi [AnyBufferBi]
         if {$newBi eq {}} {
