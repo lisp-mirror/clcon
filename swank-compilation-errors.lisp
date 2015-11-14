@@ -42,8 +42,8 @@
             (cl-tk:tcl-escape code-to-jump-to-location))))
   
 
-(defun compile-file-for-tcl (filename load-p &rest options)
-  "Backend for ::edt::CompileAndLoadTheFile . Rather untraditional c-s dialog. We normally do such things in tcl. It can be sometimes more convenient to edit though as we're in Lisp"
+(defun compile-lisp-file-for-tcl (filename load-p &rest options)
+  "Value of oduvanchik::compile-and-load-buffer-file-function for Lisp mode"
   (let* ((pathname (pathname filename))
          (compilation-result (apply #'swank:compile-file-for-emacs pathname load-p options))
          (success (swank::compilation-result-successp compilation-result))
@@ -59,6 +59,17 @@
         ))
     ))
 
+
+(setf (oduvanchik-interface:variable-value 'oduvanchik::compile-and-load-buffer-file-function :mode "Lisp")
+      'compile-lisp-file-for-tcl)
+
+
+(defun compile-file-for-tcl (clcon_text filename)
+  "Backend for ::edt::CompileAndLoadTheFile . Rather untraditional c-s dialog. We normally do such things in tcl. It can be sometimes more convenient to edit though as we're in Lisp"
+  (let* ((buffer (oi::clcon_text-to-buffer clcon_text))
+         (mode (first (oi::buffer-modes buffer)))
+         (fn (oduvanchik-interface:variable-value 'oduvanchik::compile-and-load-buffer-file-function :mode mode)))
+    (funcall fn filename t)))
 
 (defun load-system-for-tcl (system-name &rest options)
   "Backend for ::edt::CompileAndLoadTheFile . Rather untraditional c-s dialog. We normally do such things in tcl. It can be sometimes more convenient to edit though as we're in Lisp"

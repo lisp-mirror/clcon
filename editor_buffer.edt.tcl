@@ -80,11 +80,13 @@ namespace eval ::edt {
         return [list $word $opts $tail]
     }
 
-    proc CompileAndLoadTheFile {clcon_text} {
+    proc CompileAndLoadTheFile {Bi} {
+        set clcon_text [Bi2btext $Bi]
         set opened_file [$clcon_text cget -opened_file]
         set FileName [$opened_file cget -filename]
         set qFileName [::tkcon::QuoteLispObjToString $FileName]
-        set form "(clco::compile-file-for-tcl $qFileName t)"
+        ::edt::Save $Bi $clcon_text 0
+        set form "(clco::compile-file-for-tcl \"$clcon_text\" $qFileName)"
         ::tkcon::FocusConsole
         ::tkcon::SendEventToSwank $form {} 1 {:find-existing}
     }

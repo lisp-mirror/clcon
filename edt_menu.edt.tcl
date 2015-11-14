@@ -70,7 +70,7 @@ namespace eval ::edt {
         # $m add command -label $oduCmd -accel "F11" -command $cmd
         # bind $w <F11> $cmd
 
-        set cmd [list ::edt::CompileAndLoadTheFile $btext]
+        set cmd [list ::edt::CompileAndLoadTheFile $Bi]
         $m add command -label "0.Compile and load" -underline 0 -command $cmd -accel "F7"
         bind NoMod$w <F7> $cmd
 
