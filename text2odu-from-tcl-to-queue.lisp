@@ -62,7 +62,7 @@
 (defstruct text2odu-event
   (kind (budden-tools:mandatory-slot 'kind) :type text2odu-event-kind)
   (clcon_text-pathname nil :type (or null string)) 
-  (string nil :type (or null string)) ; string to insert
+  (string nil :type (or null string)) ; string argument, e.g. string to insert
   (fn-and-args nil :type (or null (cons symbol t))) ; fn-and-args for call-oduvanchik-function-with-clcon_text
   (options nil :type (or null (cons string t))) ; options for call-oduvanchik-function-with-clcon_text
   (beg nil :type (or null row-col)) ; begin index
@@ -108,12 +108,13 @@
   nil
   )
 
-(defun notify-oduvan-construct-backend-buffer (clcon_text-pathname)
+(defun notify-oduvan-construct-backend-buffer (clcon_text-pathname filename)
   "Called from tcl when text is created, from arbitrary thread. See also oduvanchik::eval-construct-backend-buffer; ::clcon_text::MaybeSendToLisp"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'construct-backend-buffer
     :clcon_text-pathname clcon_text-pathname
+    :string filename
     :swank-connection swank::*emacs-connection*
     )))
 
