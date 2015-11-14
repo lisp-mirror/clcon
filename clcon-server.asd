@@ -35,5 +35,7 @@
                (:file "start-and-shutdown-oduvanchik" :description "start and shutdown stuff")
                (:file "clcon-oduvanchik-commands" :description "Our lisp mode and other application-level oduvanchik commands for clcon"
                       )
+               (:file "clcon-oduvanchik-callbacks" :description "Some (not all) callbacks from oduvanchik to tcl"
+                      )
                )
   )

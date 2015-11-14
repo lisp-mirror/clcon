@@ -42,6 +42,8 @@
     (clco-oduvanchik-key-bindings::set-clco-oduvanchik-key-bindings)
     (start-text2odu-dispatcher)
     (start-highlight-dispatcher)
+    #+clcon (setf oi::*beep-function* 'odu::bell-with-tcl)
+    #+clcon (odu::decorate-oduvanchik-message)
     ))
 
 (defun shutdown-oduvanchik-via-keyboard-buffer ()
