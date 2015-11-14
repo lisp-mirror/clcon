@@ -27,16 +27,30 @@ namespace eval ::edt {
         return 1
     }
 
-    proc FileLessBufferP {clcon_text} {
+    # Returns list of filename and explanation:
+    # Explanation is "" if there is a file mapped to buffer,
+    # or "no_file" if there is no file intended (e.g. error buffer)
+    # or "new_file" if file was never saved.
+    proc clcon_text_to_file_name {clcon_text} {
         set opened_file [$clcon_text cget -opened_file]
         if {$opened_file eq {}} {
-            return 1
+            return {"" "no_file"} 
         } elseif {[$opened_file cget -filemtime] eq {}} {
-            return 1
+            return {"" "new_file"}
         } else {
-            return 0
+            return [list [$opened_file cget -filename] ""]
         }
     }
+
+    proc FileLessBufferP {clcon_text} {
+        lassign [clcon_text_to_file_name $clcon_text] filename reason
+        if {$reason eq ""} {
+            return 0
+        } else {
+            return 1
+        }
+    }
+    
 
     # Returns 1 if file was saved. Can modify clcon_text data.
     proc Save {Bi clcon_text warn_if_does_not_need_save} {
