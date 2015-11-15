@@ -64,6 +64,19 @@
       'compile-lisp-file-for-tcl)
 
 
+(defun compile-tcl-file-for-tcl (filename load-p &rest options)
+  "Value of oduvanchik::compile-and-load-buffer-file-function for Tcl mode"
+  (declare (ignore load-p options))
+  (let* ((q-pathname (clco::tcl-escape-filename filename)))
+    (format t "~%Loading ~A into tcl...~%" q-pathname)
+    (eval-in-tcl (format nil "source ~A" q-pathname)
+                 )))
+
+
+(setf (oduvanchik-interface:variable-value 'oduvanchik::compile-and-load-buffer-file-function :mode "Tcl")
+      'compile-tcl-file-for-tcl)
+
+
 (defun compile-file-for-tcl (clcon_text filename)
   "Backend for ::edt::CompileAndLoadTheFile . Rather untraditional c-s dialog. We normally do such things in tcl. It can be sometimes more convenient to edit though as we're in Lisp"
   (let* ((buffer (oi::clcon_text-to-buffer clcon_text))

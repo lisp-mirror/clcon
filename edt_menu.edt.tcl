@@ -70,10 +70,6 @@ namespace eval ::edt {
         # $m add command -label $oduCmd -accel "F11" -command $cmd
         # bind $w <F11> $cmd
 
-        set cmd [list ::edt::CompileAndLoadTheFile $Bi]
-        $m add command -label "0.Compile and load" -underline 0 -command $cmd -accel "F7"
-        bind NoMod$w <F7> $cmd
-
         ::erbr::AddNextAndPreviousCompilerMessagesCommands $m SingleMod$w 1
 
         $m add separator
@@ -170,6 +166,12 @@ namespace eval ::edt {
             -command [wesppt [list ::edt::SaveAs $Bi $w.text]]
         $m add separator
 
+        set cmd [list ::edt::CompileAndLoadTheFile $Bi]
+        $m add command -label "Save, Compile and Load this file" -command $cmd -accel "F7"
+        bind NoMod$w <F7> $cmd
+
+        $m add separator
+
         set cmd {::edt::CurrentBufferPathnameToClipboard "unix"}
         $m add command -label "2.File name to clipboard (unix style)" \
             -underline 0 -command $cmd
@@ -232,7 +234,6 @@ namespace eval ::edt {
             -command $cmd -accel "F12"
         bind NoMod$w <F12> [concat $cmd ";" break]
 
-        
         ## Lisp mode Menu
         ##
         MakeLispModeMenu $Bi $w $btext
@@ -242,8 +243,7 @@ namespace eval ::edt {
         set m [cMenuBar .tcl]
         ::gui_util::ClearMenu $m
         
-        set SendToSlave [wesppt "::tkcon::EvalSlave \
-		    eval \[$btext get 1.0 end-1c\]"]
+        set SendToSlave [wesppt "puts {If you are editing a file, it is recommended to use 'Save, Compile and Load this file' command in the editor's file menu instead to be able to locate to sources of procs\nLoading your buffer...}; ::tkcon::EvalSlave eval \[$btext get 1.0 end-1c\]; puts Done"]
         $m add command -label "1. Send Text To Slave" \
             -underline 0 -command $SendToSlave
 
