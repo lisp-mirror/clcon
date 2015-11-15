@@ -383,18 +383,24 @@
 
 
 (defun get-symbol-from-current-point (&REST keyargs &KEY (PREVIOUS T) (MAX-LENGTH 100) (MAX-NON-ALPHANUMERIC 15) (CREATE-NEW nil))
-  "editor::get-symbol-from-point используется в редакторе, когда хотим забрать символ из текущей точки буфера. Что мы делаем в адвайсе?
-  Полностью подменяем команду. Читаем символ с помощью ридера, переключённого в спец. режим. 
-  Если с пакетом неясность, ищем все символы с таким именем и предлагаем пользователю выбор.   
-  Имеем возможность не создавать символ при попытке забрать его из буфера - это аккуратная политика. 
-  Выражение a^b рассматриваем как два символа a и b "
-  (declare (ignore previous max-non-alphanumeric))
+  "Если мы в нашей таблице чтения, читаем символ с помощью ридера, переключённого в спец. режим. Если с пакетом неясность, ищем все символы с таким именем и предлагаем пользователю выбор. Имеем возможность не создавать символ при попытке забрать его из буфера - это аккуратная политика. 
+  Выражение a^b рассматриваем как два символа a и b. 
+
+  create-new - разрешить создавать символ. Если мы не в нашей таблице чтения (null (packages-seen-p...)) , то create-new игнорируется и символ может быть создан
+
+  Возвращает строку, из которой можно прочитать этот символ, либо (values nil nil), если ничего нет.
+  "
+  (declare (ignore previous max-non-alphanumeric keyargs))
   (perga-implementation:perga function
     (let point (odu::current-point))
-    (unless (BUDDEN-TOOLS::packages-seen-p *readtable*)
-      (unless (member :create-new (budden-tools:splice-list keyargs) :key 'car)
-        (setf keyargs (append keyargs (list :create-new t))))
-      (return-from function (odu::symbol-string-at-point)))
+    (let readtable (or (named-readtables:find-readtable (odu::readtable-at-point))
+                       (named-readtables:find-readtable nil)))
+    (let package-designator (odu::package-at-point))
+    (let our-readtable (budden-tools::packages-seen-p readtable))
+    ;(unless (BUDDEN-TOOLS::packages-seen-p *readtable*)
+    ;  (unless (member :create-new (budden-tools:splice-list keyargs) :key 'car)
+    ;    (setf keyargs (append keyargs (list :create-new t))))
+    ;  (return-from function (odu::symbol-string-at-point)))
     (let p1 (odu::copy-mark point :temporary))
     (let buf-beg (oi::buffer-start-mark (mark-buffer point)))
     (let buf-end (oi::buffer-end-mark (mark-buffer point)))
@@ -402,7 +408,7 @@
     (let symbol-beginning nil)
     (let v-in-symbol nil) ; истина, когда внутри символа
     (let cur-in-symbol nil) ; истина, когда текущий char относится к символу
-    ; looking for a symbol at or before point
+    ; Движемся назад от текущей точки и ищем начало символа, записывая в p1
     (do () ((not (and (> rest-length 0)
                   (odu::mark> p1 buf-beg))) nil) 
       (unless (odu::mark= p1 buf-end)
@@ -411,7 +417,6 @@
         (setf cur-in-symbol (editor-budden-tools::char-can-be-in-symbol next-char)))
       (when cur-in-symbol
         (unless v-in-symbol
-           ;(setf symbol-end (copy-point p1 :temporary))
           (setf v-in-symbol t)))
       (when v-in-symbol
         (unless cur-in-symbol
@@ -421,7 +426,7 @@
       (odu::character-offset p1 -1)
       (incf rest-length -1)
       )
-    ; find the end of the symbol
+    ; Для не нашей таблицы нужно найти конец символа. Для нашей - просто вырезать кусок максимально возможной длины, т.к. мы будем читать символ ридером
     (when symbol-beginning
       (let lookup-end (odu::copy-mark symbol-beginning :temporary))
       (let lookup-end-count max-length)
@@ -429,15 +434,22 @@
                         (or 
                          (null max-length) 
                          (> lookup-end-count 0)))) nil)
+        (unless our-readtable
+          (unless (editor-budden-tools::char-can-be-in-symbol (odu::next-character lookup-end))
+            (setf lookup-end (oi::copy-mark lookup-end :temporary))
+            (return)))
         (odu::character-offset lookup-end 1)
         (incf lookup-end-count -1))
       (let ss (clco::string-between-marks symbol-beginning lookup-end))
       (let package (or
-                    (find-package (odu::package-at-point))
+                    (find-package package-designator)
                     (progn
                       (warn "unable to learn package at ~S. Assuming cl-user" point)
                       (find-package :cl-user))))
       (cond
+       ((not our-readtable)
+        (clco::string-between-marks symbol-beginning lookup-end)
+        )
        (create-new
         (ignore-errors
           (let ((budden-tools::*inhibit-readmacro* t)
