@@ -238,9 +238,12 @@ as we have tcl escapes alredy.
 Multiline commands
 ------------------
 To type in multiline command, separated lines with `Control-Return` instead of just `Return`. 
-Also you can paste multiline commands. Clcon currently have no smart parser which could determine 
-end of the command automatically. Pressing `Return` sends current command to interpreter. If it 
-is unfinished, error would occur. 
+Clcon currently have no smart parser which could determine end of the command automatically. 
+Pressing `Return` sends current command to interpreter. If this is an unfinished Lisp command, 
+error would show up with the debugger. 
+
+In theory, you can alos paste multiline commands. But if text in the clipboard ends with 
+newline character, pasting would invoke immediate evaluation. Combined with the fact that 
 
 Also Read tkcon manual
 ----------------------
