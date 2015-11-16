@@ -187,7 +187,7 @@ namespace eval tkcon {
                 if {[$w compare insert < limit]} { $w mark set insert end }
                 $w insert insert $txt
                 $w see insert
-                if {[string match *\n* $txt]} { ::tkcon::Eval $w }
+                # if {[string match *\n* $txt]} { ::tkcon::Eval $w }
             }
         }
 
