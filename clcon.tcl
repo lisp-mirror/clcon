@@ -259,7 +259,7 @@ proc ::tkcon::Init {args} {
 	edit		::edt::edit
 	tclexpandorder	{Variable Procname}
 	font		{}
-	history		48
+	history		500
 	hoterrors	1
 	library		{}
 	lightbrace	1
