@@ -27,7 +27,7 @@ Platforms where testing is
 [See here](https://bitbucket.org/budden/clcon/wiki/Screenshots)
 
 ## Project goals
-- GUI for [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine) (achieved already)
+- CCL support
 - 1.0 release with all bugs fixed
 
 ## Current state
@@ -76,5 +76,6 @@ documentation is inside the release. **Do not read online documentation** then!
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-- close at least 2 bugs per week
+- CCL
 - implement lisp completion in the editor
+- keep number of open bugs from growing 
