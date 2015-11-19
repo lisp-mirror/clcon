@@ -34,6 +34,12 @@
 ;; Enable stepping everywhere else (this code is duplicated in .sbclrc)
 (proclaim '(optimize (debug 3) (compilation-speed 0) (speed 0) (space 0) (safety 3)))
 
+(sb-ext:RESTRICT-COMPILER-POLICY 'debug 3)
+(sb-ext:RESTRICT-COMPILER-POLICY 'safety 3)
+; protect from further modifications forever
+(defun ignore-all (&rest args) (declare (ignore args)))
+(setf (symbol-function 'sb-ext:restrict-compiler-policy) #'ignore-all)
+
 (asdf:load-system :uiop) ;; loading uiop is simple
 (map () 'load ;; loading asdf/defsystem is tricky
      (mapcar 'asdf:component-pathname
