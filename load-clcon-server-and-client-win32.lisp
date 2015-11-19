@@ -151,7 +151,7 @@
 
 ; note this is already second swank server
 ; first was created in .sbclrc to be able to connect to from EMACS
-(swank:create-server :port 4009 :dont-close t)
+(swank:create-server :port *clcon-swank-port* :dont-close t)
 
 ;;;;;;;;;;;;;;;;;; Starting editor backend ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -160,5 +160,6 @@
 ;;;;;;;;;;;;;;;;;; Starting editor frontend ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; CallBatFromGuiDetached.exe is used to bypass problems with run-program
-(uiop/run-program:run-program "c:\\clcon\\bin\\util\\CallBatFromGuiDetached.exe c:\\clcon\\bin\\clcon-client.cmd") 
+(let ((cmd (format nil "c:\\clcon\\bin\\util\\CallBatFromGuiDetached.exe c:\\clcon\\bin\\clcon-client.cmd -swank-port ~A" *clcon-swank-port*)))
+  (uiop/run-program:run-program cmd))
 
