@@ -63,9 +63,6 @@
   (SETQ *READTABLE* (COPY-READTABLE *READTABLE*))
   (SETF (READTABLE-CASE *READTABLE*) :UPCASE))
 
-;(pushnew :budden *features*)
-;(pushnew :russian *features*)
-
 ; :clcon-oduvan means clcon uses oduvan. 
 (pushnew :clcon-oduvan *features*)
 (pushnew :oduvanchik *features*)
