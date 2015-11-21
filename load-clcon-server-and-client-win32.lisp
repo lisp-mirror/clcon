@@ -36,9 +36,9 @@
 
 (sb-ext:RESTRICT-COMPILER-POLICY 'debug 3)
 (sb-ext:RESTRICT-COMPILER-POLICY 'safety 3)
-; protect from further modifications forever
-(defun ignore-all (&rest args) (declare (ignore args)))
-(setf (symbol-function 'sb-ext:restrict-compiler-policy) #'ignore-all)
+;; uncomment next two lines protect from further calls to restrict-compiler-policy forever
+;;(defun ignore-all (&rest args) (declare (ignore args)))
+;;(setf (symbol-function 'sb-ext:restrict-compiler-policy) #'ignore-all)
 
 (asdf:load-system :uiop) ;; loading uiop is simple
 (map () 'load ;; loading asdf/defsystem is tricky
