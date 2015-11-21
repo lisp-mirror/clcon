@@ -22,12 +22,6 @@
 
 ;;;;;;;;;;;;;;;;;; End of trying to send all tracing to SBCL console ;;;;;;;;;;;;
 
-;; example of local projects. Do we need it? 
-;;(ql:quickload :quickproject)
-;;(quickproject:make-project "c:/clcon/lp/budden-tools" :depends-on '(:alexandria :cl-fad :split-sequence :cl-utilities :named-readtables :cl-ppcre :swank :closer-mop))
-;;(quickproject:make-project "c:/clcon/lp/oduvanchik"  :depends-on '(:alexandria :trivial-gray-streams :iterate :babel :cl-ppcre :named-readtables :budden-tools :split-sequence))
-;; 
-
 ;; piece from my init.lisp
 (defparameter *clcon-root* #+win32 (pathname "c:/clcon/") #+unix (pathname "/s2/sw/"))
 
