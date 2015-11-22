@@ -1264,7 +1264,7 @@ proc ::tkcon::InitMenus {w title} {
  	$m add cascade -label "5.Open recent ..." -underline 0 -underline 0 -menu $s
 
 	$m add separator
-	$m add command -label "6.Quit" -command exit
+	$m add command -label "Quit" -command ::tkcon::Destroy -accel "Control-W"
     }
         
     ## Console Menu
