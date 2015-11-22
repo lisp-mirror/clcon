@@ -24,13 +24,15 @@ Windows: %HOME%\clcon.cfg
 
 Linux: ~/.clconrc 
 
-Completion
-----------
+Completion and substitution
+---------------------------
 Completion of lisp symbols works in console, use **Tab** to complete lisp symbol prefix (may contain package or part of package name).
 
 Use **Ctrl-F3** to complete filename (Unix-style, names containing space may not work). 
 
 Use Control-Alt-u to complete tcl name. Be sure to type in a space after ".."  
+
+Pressing Control-Return places unix-styled directory of currently selected editor buffer into the command prompt. If you press Control-Return again, file name will be added to directory to form complete file name. 
 
 Find source command
 -------------------
@@ -237,7 +239,7 @@ as we have tcl escapes alredy.
 
 Multiline commands
 ------------------
-To type in multiline command, separated lines with `Control-Return` instead of just `Return`. 
+To type in multiline command, separated lines with `Shift-Return` instead of just `Return`. 
 Clcon currently have no smart parser which could determine end of the command automatically. 
 Pressing `Return` sends current command to interpreter. If this is an unfinished Lisp command, 
 error would show up with the debugger. 

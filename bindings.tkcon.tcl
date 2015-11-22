@@ -48,8 +48,8 @@ namespace eval tkcon {
             <<TkCon_TclFindDefinition>> <Control-Key-F9>
             <<TkCon_Tab>>		<Control-i>
             <<TkCon_Tab>>		<Alt-i>
-            <<TkCon_Newline>>	<Control-Key-Return>
-            <<TkCon_Newline>>	<Control-Key-KP_Enter>
+            <<TkCon_Newline>>	<Shift-Key-Return>
+            <<TkCon_Newline>>	<Shift-Key-KP_Enter>
             <<TkCon_Eval>>		<Return>
             <<TkCon_Eval>>		<KP_Enter>
             <<TkCon_Clear>>		<Control-l>
@@ -59,6 +59,8 @@ namespace eval tkcon {
             <<TkCon_NextSearch>>	<Control-s>
             <<TkCon_Transpose>>	<Control-t>
             <<TkCon_ClearLine>>	<Control-u>
+            <<TkCon_CurrentPathAndFileName>> <Control-Key-Return>
+            <<TkCon_CurrentPathAndFileName>> <Control-Key-KP_Enter>
         }
         if {$PRIV(AQUA)} {
             lappend bindings <<TkCon_Popup>> <Control-Button-1> \
@@ -347,6 +349,10 @@ namespace eval tkcon {
             }
             ::tkcon::Insert %W $::tkcon::PRIV(tmp)
             %W see end
+        }
+        bind TkConsole <<TkCon_CurrentPathAndFileName>> {
+            ::edt::CurrentPathAndFileNameToConsole %W
+            break 
         }
         catch {bind TkConsole <Key-Page_Up>   { tk::TextScrollPages %W -1 }}
         catch {bind TkConsole <Key-Prior>     { tk::TextScrollPages %W -1 }}

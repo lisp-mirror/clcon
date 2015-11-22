@@ -32,6 +32,26 @@ namespace eval ::edt {
         clipboard clear
         clipboard append $FileName
     }
+
+
+    # Types in buffer pathname to console
+    proc CurrentPathAndFileNameToConsole {ignore} {
+        variable ::tkcon::PRIV
+        set con $PRIV(console)
+        set clcon_text [c_btext]
+        set FileNameUnix [[$clcon_text cget -opened_file] cget -filename]
+        set dir [file dirname $FileNameUnix]
+        set len [string length $dir]
+        set just_file [string range $FileNameUnix $len end]
+        set start_index [string cat "insert-" $len "c"] 
+        set MaybeDirTypedIn [$con get $start_index insert]
+        if {$MaybeDirTypedIn eq $dir} {
+            $con insert insert $just_file
+        } else {
+            $con insert insert $dir
+        }
+    }
+
         
     # If ContinueIfNoBackend, binding would check precense of oduvan-backend,
     # and if it is absend, would call continue so that other bindings would work.
