@@ -5,8 +5,11 @@ clcon news
 - basic support of editor modes. Modes are auto-selected by file type. F7's action
 depends on mode. There are tcl and lisp mode. 
 - documented initialization file and its use
+- Block cursor in the editor - better visible
+- Highlight in the editor is better visible
 - Control-u clears command line
-- Basic multiline command support (use `Control-Return` to enter subsequent lines and `Return` to eval) 
+- Basic multiline command support (use `Shift-Return` to enter subsequent lines and `Return` to eval) 
+- At the console, Control-Enter pastes directory and, if pressed again, file name of current editor buffer
 - Support of named-readtables by the editor, see [user manual](user-manual.md)
 - Most of the tools have "Window" menu with shortcuts to switch to console, editor, debugger, error browser, editor buffer list. 
 - Keyboard shortcuts like "control-s" work regardless of CAPS LOCK state and in Russian keyboard layout. 
@@ -14,6 +17,8 @@ depends on mode. There are tcl and lisp mode.
 - Fixed some bugs in "New" and "Save As"
 - Fixed #||# highlight
 - Maybe improved highlight colors
+- Fixed bug: quit from main console menu ignored unsaved files
+- Windows: Switched to SBCL 1.3.0
 
 
 0.3.2 vs 0.3.1 
