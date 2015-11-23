@@ -17,7 +17,7 @@ proc ::completions_menu::do_return {tl} {
     set return_flag 1    
 }
     
-proc ::completions_menu::do_cancel {find} {
+proc ::completions_menu::do_cancel {tl} {
     variable return_flag 
     variable return_value
     set tbl [path_to_tbl $tl]
