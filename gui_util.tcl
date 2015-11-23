@@ -139,22 +139,94 @@ namespace eval ::gui_util {
     } 
 }
 
+proc ::gui_util::scrollable_menu_do_return {find} {
+    variable call_scrollable_menu_return_flag 
+    variable call_scrollable_menu_return_value
+    set tbl $find.tf.tbl
+    set call_scrollable_menu_return_value [$tbl get active active]
+    set call_scrollable_menu_return_flag 1    
+}
+    
+proc ::gui_util::scrollable_menu_do_cancel {find} {
+    variable call_scrollable_menu_return_flag 
+    variable call_scrollable_menu_return_value
+    set tbl $find.tf.tbl
+    set call_scrollable_menu_return_value {}
+    set call_scrollable_menu_return_flag 1    
+}
+
 
 # Billet only
-proc call_scrollable_menu {} {
+# Args: items is a list
+# Returns: item selected or "" is Esc (Control-w) pressed
+proc ::gui_util::call_scrollable_menu {items args} {
+    named_args $args {-owner {} -title "::gui_util::call_scrollable_menu"}
+
     # rename to generated toplevel id
-    set items {a b c}
-    set find .fixme
-    catch {destroy $find}
+    variable call_scrollable_menu_return_flag 0
+    variable call_scrollable_menu_return_value {}
 
-    toplevel $find
-    wm title $find "Find"
-    wm resizable $find 0 0
+    set tl .scrollable_menu
 
-    bind $find <Escape> "destroy $find"
-    ::clcon_key::b bind $find <Control-Key-w> "destroy $find"
+    catch {destroy $tl}
 
-    grab $find
+    toplevel $tl
+    wm title $tl $(-title)
+    # wm resizable $tl 0 0
 
+    set w $tl
+    frame $w.tf
+    set tbl $w.tf.tbl
+        
+    tablelist::tablelist $tbl -columns {30 "Items to select"} -stretch 0 \
+        -showlabels 0 \
+        -foreground \#000000 \
+        -font tkconfixed -borderwidth 1 -highlightthickness 0 \
+        -width [expr {30+2}]
 
+    $tbl columnconfigure 0 -wrap true
+
+    $tbl insertlist 0 $items
+
+    set f1 $w.tf
+    scrollbar $f1.sy -orient v -command [list $tbl yview]
+    $tbl configure -yscrollcommand [list $f1.sy set]
+    grid $tbl - $f1.sy -sticky news
+    grid columnconfigure $f1 0 -weight 1
+    grid columnconfigure $f1 1 -weight 1
+    grid rowconfigure $f1 0 -weight 1
+
+    #pack $w.header -side top -fill x
+    #pack $f1 -fill both -expand 1
+    pack $f1 -side top -fill both -expand 1
+
+    set esc_binding "after 0 ::gui_util::scrollable_menu_do_cancel [list $tl]"
+
+    bind $tl <Escape> "$esc_binding ; break"
+    ::clcon_key::b bind $tl <Control-Key-w> "$esc_binding ; break"
+
+    set ok_binding "after 0 ::gui_util::scrollable_menu_do_return [list $tl]; break"
+
+    bind $tl <Return> $ok_binding
+    bind $tl <Double-1> $ok_binding
+
+    wm protocol $tl WM_DELETE_WINDOW $esc_binding
+
+    ::tablelist_util::GotoIndex $tbl 0 
+
+    focus $tbl
+    grab $tl
+
+    set call_scrollable_menu_return_value {}
+
+    vwait ::gui_util::call_scrollable_menu_return_flag
+
+    catch {destroy $tl}
+
+    if {$(-owner) ne {}} {
+        focus $(-owner)
     }
+
+    return $call_scrollable_menu_return_value
+
+}
