@@ -383,14 +383,16 @@
 
 
 (defun get-symbol-from-current-point (&REST keyargs &KEY (PREVIOUS T) (MAX-LENGTH 100) (MAX-NON-ALPHANUMERIC 15) (CREATE-NEW nil))
-  "Если мы в нашей таблице чтения, читаем символ с помощью ридера, переключённого в спец. режим. Если с пакетом неясность, ищем все символы с таким именем и предлагаем пользователю выбор. Имеем возможность не создавать символ при попытке забрать его из буфера - это аккуратная политика. 
+  "See also odu::symbol-string-at-point . Если мы в нашей таблице чтения, читаем символ с помощью ридера, переключённого в спец. режим. Если с пакетом неясность, ищем все символы с таким именем и предлагаем пользователю выбор. Имеем возможность не создавать символ при попытке забрать его из буфера - это аккуратная политика. 
   Выражение a^b рассматриваем как два символа a и b. 
 
   create-new - разрешить создавать символ. Если мы не в нашей таблице чтения (null (packages-seen-p...)) , то create-new игнорируется и символ может быть создан
 
   Возвращает строку, из которой можно прочитать этот символ, либо (values nil nil), если ничего нет.
+
+  previous - если истина, мы берём подходящий символ спереди. Если nil, то мы должны стоять уже внутри символа
   "
-  (declare (ignore previous max-non-alphanumeric keyargs))
+  (declare (ignore max-non-alphanumeric keyargs))
   (perga-implementation:perga function
     (let point (odu::current-point))
     (let readtable (or (named-readtables:find-readtable (odu::readtable-at-point))
@@ -409,18 +411,27 @@
     (let v-in-symbol nil) ; истина, когда внутри символа
     (let cur-in-symbol nil) ; истина, когда текущий char относится к символу
     ; Движемся назад от текущей точки и ищем начало символа, записывая в p1
-    (do () ((not (and (> rest-length 0)
-                  (odu::mark> p1 buf-beg))) nil) 
-      (unless (odu::mark= p1 buf-end)
-        (let next-char (odu::next-character p1))
-        (unless next-char (error "No character there"))
-        (setf cur-in-symbol (editor-budden-tools::char-can-be-in-symbol next-char)))
+    (let checked-when-we-must-be-in-symbol-initially nil)
+    (when (odu::mark= p1 buf-beg)
+      (oduvanchik-interface:loud-message "Can not complete or indent at the beginning of buffer")
+      (return-from function (values nil nil)))
+    (do ()
+        ((not (and (> rest-length 0)
+                   (odu::mark> p1 buf-beg))) nil)
+      (let prev-char (odu::previous-character p1))
+      (setf cur-in-symbol (editor-budden-tools::char-can-be-in-symbol prev-char))
+      (unless checked-when-we-must-be-in-symbol-initially
+        (when
+            (and (not previous) ; Должны стоять в символе изначально
+                 (not cur-in-symbol) ; и не стоим в символе
+                 )
+          (return-from function (values nil nil)))
+        (setf checked-when-we-must-be-in-symbol-initially t))
       (when cur-in-symbol
         (unless v-in-symbol
           (setf v-in-symbol t)))
       (when v-in-symbol
         (unless cur-in-symbol
-          (odu::character-offset p1 1)
           (setf symbol-beginning (odu::copy-mark p1 :temporary))
           (return nil)))
       (odu::character-offset p1 -1)
@@ -497,22 +508,33 @@
   (clco:eval-in-tcl cmd :nowait nil)
   ))
 
-(defcommand "Complete Symbol With Budden Tools"
+(defcommand "Indent or Complete Symbol With Budden Tools"
      (p) "Complete Symbol With Local Package Nicknames and advanced readtable-case"
          "Complete Symbol With Local Package Nicknames and advanced readtable-case"
   (declare (ignorable p))
   ;; получаем исходный текст, который нужно завершить
-  (let* ((str (symbol-string-at-point))
-         (str-len (length str))
-         (package-name (or (package-at-point) :cl-user))
+  (let* ((str (get-symbol-from-current-point :previous nil))
+         (str-len (length str)))
+    (cond
+     ((= str-len 0)
+      (budden-tools:show-expr "ZERO")
+      (indent-command nil)
+      (beginning-of-line-command nil))
+     (t
+      (budden-tools::show-expr str)
+      (complete-symbol-with-budden-tools-inner str str-len)
+      ))))
+
+(defun complete-symbol-with-budden-tools-inner (str str-len)
+  (let* ((package-name (or (package-at-point) :cl-user))
          ;(package (or (find-package package-name) :cl-user))
          (rt-name (readtable-at-point))
          (rt (named-readtables:find-readtable rt-name))
          #|(res (budden-tools::do-complete-symbol-with-budden-tools
-               str
-               package
-               #'error
-               (lambda (show-list) (call-scrollable-menu show-list nil))))|#
+                 str
+                 package
+                 #'error
+                 (lambda (show-list) (call-scrollable-menu show-list nil))))|#
          (completions
           (let ((*readtable* rt))
             (swank:completions str package-name)))

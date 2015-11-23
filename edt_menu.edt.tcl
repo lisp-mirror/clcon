@@ -113,7 +113,7 @@ namespace eval ::edt {
 
         OduFnMenuItem $w $m $btext indent 
 
-        OduFnMenuItem $w $m $btext complete-symbol-with-budden-tools -accel "<Tab>" -bindtag NoMod$w
+        OduFnMenuItem $w $m $btext indent-or-complete-symbol-with-budden-tools -accel "<Tab>" -bindtag NoMod$w
 
         set cmd [wesppt [list clcon_text::CallOduvanchikFunction $btext "odu::indent-region-command nil" {} {send_selection 1}]]
         
