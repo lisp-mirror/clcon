@@ -188,7 +188,7 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
     TkconSourceHere findreplace.tcl
     TkconSourceHere findbox.fndrpl.tcl
     TkconSourceHere recent.tcl
-	TkconSourceHere window_menu.tcl
+    TkconSourceHere window_menu.tcl
 }    
 
 
@@ -3193,6 +3193,7 @@ proc ::tkcon::ReloadSomeIDESources2 {} {
     TkconSourceHere highlight.edt.tcl
     TkconSourceHere inspector.insp.tcl
     TkconSourceHere save.edt.tcl
+    TkconSourceHere completions_menu.tcl
 }
 
 ::tkcon::ReloadSomeIDESources2 

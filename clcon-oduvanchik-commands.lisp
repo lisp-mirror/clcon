@@ -493,7 +493,7 @@
   (let*
       ((qlist (mapcar 'cl-tk:tcl-escape list))
        (qtitle (cl-tk:tcl-escape title))
-       (cmd (format nil "::gui_util::call_scrollable_menu [list~{ ~A~}] -owner [list ~A] -title ~A" qlist owner qtitle)))
+       (cmd (format nil "::completions_menu::run [list~{ ~A~}] -owner [list ~A] -title ~A" qlist owner qtitle)))
   (clco:eval-in-tcl cmd :nowait nil)
   ))
 

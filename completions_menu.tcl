@@ -1,37 +1,42 @@
 ## Completions menu
 
-proc ::gui_util::scrollable_menu_path_to_tbl {tl} {
+namespace eval ::completions_menu {
+    variable return_flag 
+    variable return_value
+}
+
+proc ::completions_menu::path_to_tbl {tl} {
     return $tl.tf.tbl
 }
 
-proc ::gui_util::scrollable_menu_do_return {tl} {
-    variable call_scrollable_menu_return_flag 
-    variable call_scrollable_menu_return_value
-    set tbl [scrollable_menu_path_to_tbl $tl]
-    set call_scrollable_menu_return_value [$tbl get active active]
-    set call_scrollable_menu_return_flag 1    
+proc ::completions_menu::do_return {tl} {
+    variable return_flag 
+    variable return_value
+    set tbl [path_to_tbl $tl]
+    set return_value [$tbl get active active]
+    set return_flag 1    
 }
     
-proc ::gui_util::scrollable_menu_do_cancel {find} {
-    variable call_scrollable_menu_return_flag 
-    variable call_scrollable_menu_return_value
-    set tbl [scrollable_menu_path_to_tbl $tl]
-    set call_scrollable_menu_return_value {}
-    set call_scrollable_menu_return_flag 1    
+proc ::completions_menu::do_cancel {find} {
+    variable return_flag 
+    variable return_value
+    set tbl [path_to_tbl $tl]
+    set return_value {}
+    set return_flag 1    
 }
 
 
 # Billet only
 # Args: items is a list
 # Returns: item selected or "" is Esc (Control-w) pressed
-proc ::gui_util::call_scrollable_menu {items args} {
-    named_args $args {-owner {} -title "::gui_util::call_scrollable_menu" -width 40}
+proc ::completions_menu::run {items args} {
+    named_args $args {-owner {} -title "::completions_menu::run" -width 40}
 
     # rename to generated toplevel id
-    variable call_scrollable_menu_return_flag 0
-    variable call_scrollable_menu_return_value {}
+    variable return_flag 0
+    variable return_value {}
 
-    set tl .scrollable_menu
+    set tl .completions_menu
 
     catch {destroy $tl}
 
@@ -39,7 +44,7 @@ proc ::gui_util::call_scrollable_menu {items args} {
     wm title $tl $(-title)
 
     frame $tl.tf
-    set tbl [scrollable_menu_path_to_tbl $tl]
+    set tbl [path_to_tbl $tl]
         
     tablelist::tablelist $tbl -columns [list $(-width) "Invisible label"] -stretch 0 \
         -showlabels 0 \
@@ -61,12 +66,12 @@ proc ::gui_util::call_scrollable_menu {items args} {
 
     pack $f1 -side top -fill both -expand 1
 
-    set esc_binding "after 0 ::gui_util::scrollable_menu_do_cancel [list $tl]"
+    set esc_binding "after 0 ::completions_menu::do_cancel [list $tl]"
 
     bind $tl <Escape> "$esc_binding ; break"
     ::clcon_key::b bind $tl <Control-Key-w> "$esc_binding ; break"
 
-    set ok_binding "after 0 ::gui_util::scrollable_menu_do_return [list $tl]; break"
+    set ok_binding "after 0 ::completions_menu::do_return [list $tl]; break"
 
     bind $tl <Return> $ok_binding
     bind $tl <Double-1> $ok_binding
@@ -78,9 +83,9 @@ proc ::gui_util::call_scrollable_menu {items args} {
     focus $tbl
     grab $tl
 
-    set call_scrollable_menu_return_value {}
+    set return_value {}
 
-    vwait ::gui_util::call_scrollable_menu_return_flag
+    vwait ::completions_menu::return_flag
 
     catch {destroy $tl}
 
@@ -88,6 +93,6 @@ proc ::gui_util::call_scrollable_menu {items args} {
         focus $(-owner)
     }
 
-    return $call_scrollable_menu_return_value
+    return $return_value
 
 }
