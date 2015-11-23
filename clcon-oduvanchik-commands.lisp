@@ -517,11 +517,9 @@
          (str-len (length str)))
     (cond
      ((= str-len 0)
-      (budden-tools:show-expr "ZERO")
       (indent-command nil)
       (beginning-of-line-command nil))
      (t
-      (budden-tools::show-expr str)
       (complete-symbol-with-budden-tools-inner str str-len)
       ))))
 
