@@ -488,9 +488,14 @@
        ))))
 
 
-(defun call-scrollable-menu (list owner)
+(defun call-scrollable-menu (list &key (owner "") (title "odu::call-scrollable-menu"))
   "Stub - always select first completion"
-  (first list))
+  (let*
+      ((qlist (mapcar 'cl-tk:tcl-escape list))
+       (qtitle (cl-tk:tcl-escape title))
+       (cmd (format nil "::gui_util::call_scrollable_menu [list~{ ~A~}] -owner [list ~A] -title ~A" qlist owner qtitle)))
+  (clco:eval-in-tcl cmd :nowait nil)
+  ))
 
 (defcommand "Complete Symbol With Budden Tools"
      (p) "Complete Symbol With Local Package Nicknames and advanced readtable-case"
@@ -500,7 +505,7 @@
   (let* ((str (symbol-string-at-point))
          (str-len (length str))
          (package-name (or (package-at-point) :cl-user))
-         (package (or (find-package package-name) :cl-user))
+         ;(package (or (find-package package-name) :cl-user))
          (rt-name (readtable-at-point))
          (rt (named-readtables:find-readtable rt-name))
          #|(res (budden-tools::do-complete-symbol-with-budden-tools
@@ -511,8 +516,21 @@
          (completions
           (let ((*readtable* rt))
             (swank:completions str package-name)))
-         (res (caar completions))
+         (completion-list (first completions))
+         ; (longest-completion (second completions))
          )
-    (when res
+    (flet ((replace-str-with (res)
       (delete-previous-character-command str-len)
-      (insert-string (current-point) res))))
+      (insert-string (current-point) res)))
+    (cond
+     ((null completion-list)
+      (bell-with-tcl))
+     ((null (second completion-list))
+      (replace-str-with (first completion-list)))
+     (t
+      (let ((choice
+             (call-scrollable-menu completion-list :title "Comletions:")))
+        (unless (string= choice "")
+          (replace-str-with choice)))
+      )))))
+
