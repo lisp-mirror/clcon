@@ -259,8 +259,9 @@ namespace eval ::edt {
             -yscrollcommand [list $w.sy set] \
             -foreground $COLOR(stdin) \
             -background $COLOR(bg) \
-            -insertbackground $COLOR(cursor) \
+            -insertbackground grey \
             -font $::tkcon::OPT(font) -borderwidth 1 -highlightthickness 0 \
+            -blockcursor 1  \
             -undo 1
         catch {
             # 8.5+ stuff
@@ -268,6 +269,7 @@ namespace eval ::edt {
             $btext configure -tabs [list $tabsp left] -tabstyle wordprocessor
         }
 
+        $btext configure -inactiveselectbackground [$btext cget -selectbackground]
         bind $btext <<Modified>> [list ::edt::TextModified $Bi]
 
         scrollbar $w.sx -orient h -command [list $w.text xview]
