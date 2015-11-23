@@ -486,3 +486,33 @@
          )
         )
        ))))
+
+
+(defun call-scrollable-menu (list owner)
+  "Stub - always select first completion"
+  (first list))
+
+(defcommand "Complete Symbol With Budden Tools"
+     (p) "Complete Symbol With Local Package Nicknames and advanced readtable-case"
+         "Complete Symbol With Local Package Nicknames and advanced readtable-case"
+  (declare (ignorable p))
+  ;; получаем исходный текст, который нужно завершить
+  (let* ((str (symbol-string-at-point))
+         (str-len (length str))
+         (package-name (or (package-at-point) :cl-user))
+         (package (or (find-package package-name) :cl-user))
+         (rt-name (readtable-at-point))
+         (rt (named-readtables:find-readtable rt-name))
+         #|(res (budden-tools::do-complete-symbol-with-budden-tools
+               str
+               package
+               #'error
+               (lambda (show-list) (call-scrollable-menu show-list nil))))|#
+         (completions
+          (let ((*readtable* rt))
+            (swank:completions str package-name)))
+         (res (caar completions))
+         )
+    (when res
+      (delete-previous-character-command str-len)
+      (insert-string (current-point) res))))
