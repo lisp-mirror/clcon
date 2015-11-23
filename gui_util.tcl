@@ -139,10 +139,14 @@ namespace eval ::gui_util {
     } 
 }
 
-proc ::gui_util::scrollable_menu_do_return {find} {
+proc ::gui_util::scrollable_menu_path_to_tbl {tl} {
+    return $tl.tf.tbl
+}
+
+proc ::gui_util::scrollable_menu_do_return {tl} {
     variable call_scrollable_menu_return_flag 
     variable call_scrollable_menu_return_value
-    set tbl $find.tf.tbl
+    set tbl [scrollable_menu_path_to_tbl $tl]
     set call_scrollable_menu_return_value [$tbl get active active]
     set call_scrollable_menu_return_flag 1    
 }
@@ -150,7 +154,7 @@ proc ::gui_util::scrollable_menu_do_return {find} {
 proc ::gui_util::scrollable_menu_do_cancel {find} {
     variable call_scrollable_menu_return_flag 
     variable call_scrollable_menu_return_value
-    set tbl $find.tf.tbl
+    set tbl [scrollable_menu_path_to_tbl $tl]
     set call_scrollable_menu_return_value {}
     set call_scrollable_menu_return_flag 1    
 }
@@ -160,7 +164,7 @@ proc ::gui_util::scrollable_menu_do_cancel {find} {
 # Args: items is a list
 # Returns: item selected or "" is Esc (Control-w) pressed
 proc ::gui_util::call_scrollable_menu {items args} {
-    named_args $args {-owner {} -title "::gui_util::call_scrollable_menu"}
+    named_args $args {-owner {} -title "::gui_util::call_scrollable_menu" -width 40}
 
     # rename to generated toplevel id
     variable call_scrollable_menu_return_flag 0
@@ -172,23 +176,21 @@ proc ::gui_util::call_scrollable_menu {items args} {
 
     toplevel $tl
     wm title $tl $(-title)
-    # wm resizable $tl 0 0
 
-    set w $tl
-    frame $w.tf
-    set tbl $w.tf.tbl
+    frame $tl.tf
+    set tbl [scrollable_menu_path_to_tbl $tl]
         
-    tablelist::tablelist $tbl -columns {30 "Items to select"} -stretch 0 \
+    tablelist::tablelist $tbl -columns [list $(-width) "Invisible label"] -stretch 0 \
         -showlabels 0 \
         -foreground \#000000 \
         -font tkconfixed -borderwidth 1 -highlightthickness 0 \
-        -width [expr {30+2}]
+        -width [expr {$(-width)+2}]
 
     $tbl columnconfigure 0 -wrap true
 
     $tbl insertlist 0 $items
 
-    set f1 $w.tf
+    set f1 $tl.tf
     scrollbar $f1.sy -orient v -command [list $tbl yview]
     $tbl configure -yscrollcommand [list $f1.sy set]
     grid $tbl - $f1.sy -sticky news
@@ -196,8 +198,6 @@ proc ::gui_util::call_scrollable_menu {items args} {
     grid columnconfigure $f1 1 -weight 1
     grid rowconfigure $f1 0 -weight 1
 
-    #pack $w.header -side top -fill x
-    #pack $f1 -fill both -expand 1
     pack $f1 -side top -fill both -expand 1
 
     set esc_binding "after 0 ::gui_util::scrollable_menu_do_cancel [list $tl]"
