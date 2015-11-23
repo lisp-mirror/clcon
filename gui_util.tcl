@@ -138,3 +138,23 @@ namespace eval ::gui_util {
         return 
     } 
 }
+
+
+# Billet only
+proc call_scrollable_menu {} {
+    # rename to generated toplevel id
+    set items {a b c}
+    set find .fixme
+    catch {destroy $find}
+
+    toplevel $find
+    wm title $find "Find"
+    wm resizable $find 0 0
+
+    bind $find <Escape> "destroy $find"
+    ::clcon_key::b bind $find <Control-Key-w> "destroy $find"
+
+    grab $find
+
+
+    }

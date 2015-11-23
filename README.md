@@ -27,7 +27,6 @@ Platforms where testing is
 [See here](https://bitbucket.org/budden/clcon/wiki/Screenshots)
 
 ## Project goals
-- CCL support
 - 1.0 release with all bugs fixed
 
 ## Current state
@@ -76,6 +75,5 @@ documentation is inside the release. **Do not read online documentation** then!
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-- CCL
 - implement lisp completion in the editor
-- keep number of open bugs from growing 
+- keep number of open bugs from growing
