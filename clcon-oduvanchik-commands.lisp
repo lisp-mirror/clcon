@@ -488,7 +488,7 @@
        ))))
 
 
-(defun call-scrollable-menu (list &key (owner "") (title "odu::call-scrollable-menu"))
+(defun completions-menu-run (list &key (owner "") (title "odu::call-scrollable-menu"))
   "Stub - always select first completion"
   (let*
       ((qlist (mapcar 'cl-tk:tcl-escape list))
@@ -529,7 +529,7 @@
       (replace-str-with (first completion-list)))
      (t
       (let ((choice
-             (call-scrollable-menu completion-list :title "Comletions:")))
+             (completions-menu-run completion-list :title "Comletions:")))
         (unless (string= choice "")
           (replace-str-with choice)))
       )))))
