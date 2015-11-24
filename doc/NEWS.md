@@ -1,7 +1,8 @@
 clcon news
 
-<<TRUNK>> vs 0.3.2
+0.3.3 vs 0.3.2
 =====
+- lisp completion in the editor
 - basic support of editor modes. Modes are auto-selected by file type. F7's action
 depends on mode. There are tcl and lisp mode. 
 - documented initialization file and its use
@@ -18,6 +19,7 @@ depends on mode. There are tcl and lisp mode.
 - Fixed #||# highlight
 - Maybe improved highlight colors
 - Fixed bug: quit from main console menu ignored unsaved files
+- Fixed bug: incorrect code navigation in the error browser
 - Windows: Switched to SBCL 1.3.0
 
 

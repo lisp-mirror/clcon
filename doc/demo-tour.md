@@ -1,4 +1,4 @@
-Clcon 0.3.2 demo tour 
+Clcon 0.3.3 demo tour 
 ===============
 
 Clcon is a building site. Excavators buzz. Pits, traps, naked electric wires wait you there.
@@ -16,21 +16,21 @@ After you pressed return, you see that printing occurs with intervals. This expe
 
 Apropos, completion, find definition
 -------------
-Completion and find definition works best in the console. Keyboard accelerators are shown in "Edit" menu.
+Keyboard accelerators are shown in "Edit" menu.
 
 ### Lisp
 At the console, enter `.apr -lookup-` to list all symbols containing "-lookup-" substring in their name. 
 At the console, type in `clco:serv` and press `Tab`. Name will expand to `clco:server-lookup-definition`. 
 Now press `Alt-.` Editor window will pop up and source of function you typed will be seen. You can press Alt-. at
 any lisp definition in the editor and jump to its source. If there are more then one definition (e.g. for FORMAT function), list of "hyperlinks"
-will show up at the console. Click on either of them with mouse to open an appropriate source.
+will show up at the console. Click on either of them with mouse to open an appropriate source. In the editor, completion works also - type `clco:s-l-d` in the editor and press `Tab`. Note that if there is no constituent character under cursor, Tab works as indent-line-command. 
 
 
 ### Tcl
 Return to the console with `Control-.`.
 At the console, enter `.tapr cap` to list all tcl procs, commands and vars containing substring `cap` in their name. Position a keyboard cursor at any of them and press Control-F9 to go to its source. 
 Return to the console with `Control-.` . Type a space and then `snit::Ca`. Then press `Control-Alt-u` . Name will expand to 
-`::snit::Capitalize`. Press `Control-F9` and jump to a source of tcl proc. We only now support procs, not variables. 
+`::snit::Capitalize`. Press `Control-F9` and jump to a source of tcl proc. We only now support procs, not variables. Note that "find source" for tcl works for fully qualified names only. 
 
 ### File name
 Return to the console with `Control-.`. Type a space and then some partial file name in Unix style, e.g. `c:/win` under Windows or `/bi` under Unix

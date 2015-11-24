@@ -1,4 +1,4 @@
-Clcon 0.3.2 installation and startup 
+Clcon 0.3.3 installation and startup 
 ==============
 
 Warning
@@ -50,7 +50,7 @@ Linux: INSTALLATION PROCEDURE NOT TESTED!
 
 #### Decide clcon version
 
-You can try trunk, but it is better to load latest tagged "release", 0.3.2. Note that online documentation usually describes trunk. To be sure that it matches software functionality, read not the online documentation, but documentation you have installed. 
+You can try trunk, but it is better to load latest tagged "release", 0.3.3. Note that online documentation usually describes trunk. To be sure that it matches software functionality, read not the online documentation, but documentation you have installed. 
 
 #### Lisp libraries and clcon components
 
@@ -60,9 +60,9 @@ You can try trunk, but it is better to load latest tagged "release", 0.3.2. Note
     hg clone https://bitbucket.org/budden/budden-tools
     git clone https://github.com/budden/slime 
     git clone https://github.com/budden/named-readtables
-    # to download clcon's trunk, remove '-u 0.3.2' 
-    hg clone -u 0.3.2 https://bitbucket.org/budden/oduvanchik
-    hg clone -u 0.3.2 https://bitbucket.org/budden/clcon
+    # to download clcon's trunk, remove '-u 0.3.3' 
+    hg clone -u 0.3.3 https://bitbucket.org/budden/oduvanchik
+    hg clone -u 0.3.3 https://bitbucket.org/budden/clcon
 
 ### Build and start server
 
