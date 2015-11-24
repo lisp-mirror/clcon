@@ -108,6 +108,7 @@
 ; comment next line if code highlight causes problems
 (pushnew :oduvan-enable-highlight *features*)
 
+(pushnew :clcon *features*)
 
 ;;;;;;;;;;;;;;;;;; Carefully loading buddens-readtable ;;;;;;;;;;;;;;;;;
 
