@@ -76,5 +76,4 @@ documentation is inside the release. **Do not read online documentation** then!
 MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
-- implement lisp completion in the editor
 - keep number of open bugs from growing
