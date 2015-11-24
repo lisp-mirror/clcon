@@ -34,17 +34,25 @@
            (swank::find-definitions symbol))
          )))))
 
-(defun print-one-hyperlink-tcl-source (stream text file offset &key (index "output"))
+(defun edit-file-at-offset-code (file offset fix-offset-p)
+  (let* ((escaped-file (tcl-escape-filename file))
+         (offset-15
+          (if fix-offset-p
+              (editor-budden-tools::fix-offset-2 file offset)
+              offset))
+         (offset-2 (format nil "{1.0+ ~A chars}"
+                           offset-15
+                           )))
+    (format nil "::tkcon::EditFileAtOffset ~A ~A" escaped-file offset-2)))
+
+(defun print-one-hyperlink-tcl-source (stream text file offset &key (index "output") fix-offset-p)
   "Generates tcl code which prints out one hyperlink"
-  (let ((escaped-text (cl-tk:tcl-escape text))
-        (escaped-file (tcl-escape-filename file))
-        (offset-2 (format nil "{1.0+ ~A chars}" offset))
-        )
-    (format stream "::tkcon::WriteActiveText $w ~A ~A {::tkcon::EditFileAtOffset ~A ~A}; $w insert ~A \\\n; "
+  (let* ((escaped-text (cl-tk:tcl-escape text))
+         (edit-file-code (edit-file-at-offset-code file offset fix-offset-p)))
+    (format stream "::tkcon::WriteActiveText $w ~A ~A {~A}; $w insert ~A \\\n; "
             escaped-text
             index
-            escaped-file
-            offset-2
+            edit-file-code
             index)))
 
 (defun print-just-line (stream text &key (index "output"))
@@ -62,44 +70,45 @@
        (values file position)))
     (t nil)))  
 
-(defun write-one-dspec-and-location (link-text location stream &key (index "output"))
-  "It is also used by compilation-error browse, some arbitrary string is passed instead of dspec. Beware!"
+(defun write-one-dspec-and-location (link-text location stream &key (index "output") fix-offset-p)
+  "It is also used by compilation-error browse, some arbitrary string is passed instead of dspec. Beware! 
+  fix-offset-p - magic boolean value, set experimentally
+  "
   (let ((printed-dspec link-text))
     (multiple-value-bind (file position)
         (parse-location-into-file-and-pos location)
       (cond
         ((and file position)
-         (print-one-hyperlink-tcl-source stream printed-dspec file position :index index))
+         (print-one-hyperlink-tcl-source stream printed-dspec file position :index index :fix-offset-p fix-offset-p))
         (t ; something wrong with location
          (print-just-line stream printed-dspec :index index))))))
 
-(defun write-code-to-pass-to-loc (stream loc &key (mode :text))
+(defun write-code-to-pass-to-loc (stream loc &key (mode :text) fix-offset-p)
   "Writes code which would help to pass to location. 
    If mode = :text we will insert the code into text widget. 
    If mode = :eval we will eval the code in the context where $w contains some widget. 
-This widget is required as a parent of tk_messageBox which we show when we unable to locate
-and which is activated after showing message box. See also write-code-to-pass-to-file-line-char
-"
+   This widget is required as a parent of tk_messageBox which we show when we unable to locate
+   and which is activated after showing message
+   "
   (multiple-value-bind (file offset)
-      (parse-location-into-file-and-pos loc)
+                       (parse-location-into-file-and-pos loc)
     (cond
-      ((and file offset)
-       (let* ((escaped-file (tcl-escape-filename file))
-              (offset-15 (editor-budden-tools::fix-offset-2 file offset))
-              (offset-2 (format nil "{1.0+ ~A chars}" offset-15)))
-         (format stream "tkcon::EditFileAtOffset ~A ~A" escaped-file offset-2)))
-      (t
-       (let* ((qLocation (cl-tk:tcl-escape (prin1-to-string loc)))
-              (message (format nil "Unable to locate to definition ~A" qLocation)))
-         (ecase mode
-           (:text 
-            (print-just-line stream message))
-           (:eval
-            (format
-             stream
-             "tk_messageBox -parent $w -message {~A} ~% focus $w" message)
-            )))
-       ))))
+     ((and file offset)
+      (format stream "~A; " 
+              (edit-file-at-offset-code file offset fix-offset-p))
+      )
+     (t
+      (let* ((qLocation (cl-tk:tcl-escape (prin1-to-string loc)))
+             (message (format nil "Unable to locate to definition ~A" qLocation)))
+        (ecase mode
+          (:text 
+           (print-just-line stream message))
+          (:eval
+           (format
+            stream
+            "tk_messageBox -parent $w -message {~A} ~% focus $w" message)
+           )))
+      ))))
 
 (defmethod editor-budden-tools:goto-xy (pathname row col)
   (check-type row integer)
@@ -139,10 +148,10 @@ and which is activated after showing message box. See also write-code-to-pass-to
            (destructuring-bind (dspec loc) dal
              (cond
                ((= l 1)
-                (write-code-to-pass-to-loc ou loc))
+                (write-code-to-pass-to-loc ou loc :fix-offset-p t))
                (t
                 (let ((link-text (prin1-to-string dspec)))
-                  (write-one-dspec-and-location link-text loc ou))))))
+                  (write-one-dspec-and-location link-text loc ou :fix-offset-p t))))))
          (when (> l 1)
            (write-code-to-see-console-end ou))
          )))))
@@ -163,7 +172,7 @@ and which is activated after showing message box. See also write-code-to-pass-to
   (let ((location (swank:frame-source-location frame-id)))
     (when location
       (let ((code (with-output-to-string (ou)
-                    (write-code-to-pass-to-loc ou location :mode :eval))))
+                    (write-code-to-pass-to-loc ou location :mode :eval :fix-offset-p t))))
         (eval-in-tcl (format nil "set w ~A; ~A" parent code))
         ))))
 
