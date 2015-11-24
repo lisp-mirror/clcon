@@ -121,6 +121,8 @@ and which is activated after showing message box. See also write-code-to-pass-to
 (defun write-code-to-show-console (stream)
   (format stream "::tkcon::FocusConsole; "))
   
+(defun write-code-to-see-console-end (stream)
+  (format stream "::$::tkcon::PRIV(console) see end; "))
 
 (defun server-lookup-definition (name-or-symbol &optional (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*)))
   "name-or-symbol is a name of a lisp object or object itself which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
@@ -140,7 +142,10 @@ and which is activated after showing message box. See also write-code-to-pass-to
                 (write-code-to-pass-to-loc ou loc))
                (t
                 (let ((link-text (prin1-to-string dspec)))
-                  (write-one-dspec-and-location link-text loc ou)))))))))))
+                  (write-one-dspec-and-location link-text loc ou))))))
+         (when (> l 1)
+           (write-code-to-see-console-end ou))
+         )))))
 
 
 ;; (:location (:file "/home/denis/setup/sbcl-1.2.7/src/code/eval.lisp")
