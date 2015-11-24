@@ -25,16 +25,17 @@ Now press `Alt-.` Editor window will pop up and source of function you typed wil
 any lisp definition in the editor and jump to its source. If there are more then one definition (e.g. for FORMAT function), list of "hyperlinks"
 will show up at the console. Click on either of them with mouse to open an appropriate source. In the editor, completion works also - type `clco:s-l-d` in the editor and press `Tab`. Note that if there is no constituent character under cursor, Tab works as indent-line-command. 
 
-
 ### Tcl
 Return to the console with `Control-.`.
-At the console, enter `.tapr cap` to list all tcl procs, commands and vars containing substring `cap` in their name. Position a keyboard cursor at any of them and press Control-F9 to go to its source. 
+Clean up current command with `Control-u` and enter `.tapr cap` to list all tcl procs, commands and vars containing substring `cap` in their name. Position a keyboard cursor at any of them and press Control-F9 to go to its source. 
 Return to the console with `Control-.` . Type a space and then `snit::Ca`. Then press `Control-Alt-u` . Name will expand to 
-`::snit::Capitalize`. Press `Control-F9` and jump to a source of tcl proc. We only now support procs, not variables. Note that "find source" for tcl works for fully qualified names only. 
+`::snit::Capitalize`. Press `Control-F9` and jump to a source of tcl proc. Note this is source from the library, not the source of clcon. Rather convenient. We only now support procs, not variables. Note that "find source" for tcl works for fully qualified names only. 
 
 ### File name
 Return to the console with `Control-.`. Type a space and then some partial file name in Unix style, e.g. `c:/win` under Windows or `/bi` under Unix
 and then press `Control-F3`. Name will expand to `c:/windows` or `/bin`. 
+
+Pressing `Control-Return` at the console inserts path to the file currently selected in the editor. Pressing `Control-Return` again adds file name. 
 
 Switching between windows
 -----------
@@ -71,7 +72,7 @@ There is also search in the stack list. Tree without a search is a dense forest!
 
 You can evaluate values in the context of stack frame. Select topmost stack frame (of function `G`) in the frame list and choose `Stack/Eval in frame` from debugger menu bar. New window titled "eval in frame"
 will pop up. Note package is prompted at window's title. Type `y` in the window and press `Return`. Console will be activated and result of your evaluation 
-will be printed there. 
+will be printed there. Press `Control-Shift-d` to return to the debugger.
 
 Also we have "Restarts" menu at menubar. We could call either of them.
 Or we could just close debugger window with cross or with closing command of your Window Manager (e.g. Alt-F4),
@@ -123,4 +124,4 @@ Again, press `Space` or `Return` to go to source. `Return` closes declaration li
 
 Code to extract declarations says tcl from lisp, but is extremely simple - no warranty. Also note that declarations are extracted from
  the file, not from the buffer. So if file is open in the editor and modified, locations will be inexact. 
-Also widget's design is not that perfect. At least I used it dozen of times and found it can be useful sometimes. 
+Also widget's design is not that perfect. At least I use it simetimes and found it useful. 
