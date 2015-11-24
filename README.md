@@ -27,7 +27,7 @@ Platforms where testing is
 [See here](https://bitbucket.org/budden/clcon/wiki/Screenshots)
 
 ## Project goals
-- 1.0 release with all bugs fixed
+- Permissively licenenced GUI for embedding of CL and CL-based languages into applications
 
 ## Current state
 See [news](doc/NEWS.md)
@@ -77,3 +77,4 @@ MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
 
 ## Roadmap
 - keep number of open bugs from growing
+- issure 1.0 someday
