@@ -41,10 +41,11 @@ If you want to try using clcon, first of all take a [demo tour](doc/demo-tour.md
 
 ## Current features
 - REPL for Lisp and Tcl with history
-- Completion, find source, apropos for Lisp and TCl (completion only works in REPL)
+- Completion, find source, apropos for Lisp
+- Limited completion, find source, apropos for Tcl
 - Find in files
 - Debugger, Stepper, Inspector from SWANK 
-- Editor with lisp syntax highlight, autoindent, lisp forms navigation
+- Multi-tabbed Editor with lisp syntax highlight, autoindent, lisp forms navigation
 - Compile lisp from IDE, compilation error browser with "jump to source"
 - List definitions in a file for Lisp and Tcl (very primitive version)
 
@@ -63,7 +64,7 @@ documentation is inside the release. **Do not read online documentation** then!
 
 [Demo tour (trunk version)](doc/demo-tour.md) - a footpath through best views of some features of clcon.
 
-[User manual (trunc version)](doc/user-manual.md) 
+[User manual (trunk version)](doc/user-manual.md) 
 
 [Wiki](https://bitbucket.org/budden/clcon/wiki/) - contains [screenshots](https://bitbucket.org/budden/clcon/wiki/Screenshots), but otherwise is not very useful.  
 
