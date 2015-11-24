@@ -65,12 +65,7 @@ When I need to call lisp from tcl, I just use tcl string-handling procedures to 
 
 ## tcl functions ##
 ###::tkcon::QuoteLispToString###
-E.g. example from find definition machinery: 
-    set Quoted [::tkcon::QuoteLispObjToString $str]
-    set LispCmd "(cl:progn (clcon-server:server-lookup-definition $Quoted))"
-    set SwankReply [::tkcon::EvalInSwankSync $LispCmd]`
-
-QuoteLispToString was really tested only for passing symbol names, beware!
+See uses in the source (.fics QuoteLispObjToString)
 
 ## lisp functions ##
 None. Code must be sent in a form such that SWANK could read it.
