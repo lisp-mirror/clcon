@@ -1,7 +1,7 @@
 ## Copyright (c) Denis Budyak 2015
 ## Test case for bug 70
 ## Bug description: tcl completion: when part of namespace is given, variables not shown in completion list
-## Load this file with tcsoh test/regression70.tcl
+## Load this file with .tcsoh test/auto/regression70.tcl
 
 namespace eval ::autotests {
     variable NormalTime 1 # Scale of a time. In a slow computer, increase it.

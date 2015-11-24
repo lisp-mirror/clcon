@@ -3,7 +3,7 @@
 ## 
 ## "First of all try evaluate something:
 ##     (dotimes (i 10) (print i) (sleep 0.5)) "
-## Load this file with .tcsoh test/demo_tour_autotest_1.tcl
+## Load this file with .tcsoh test/auto/demo_tour_autotest_1.tcl
 
 namespace eval ::autotests {
     variable NormalTime 1 # Scale of a time. In a slow computer, increase it.
