@@ -524,6 +524,8 @@
        ; so we check if there is a error
        (values "" nil) ; no symbol
        )
+      ((symbolp maybe-potential-symbol)
+       (values ss maybe-potential-symbol))
       ((sbcl-reader-budden-tools-lispworks:potential-symbol-p maybe-potential-symbol)
        (assert (null editor-budden-tools::*in-find-source*))
        ; if this assertion is not true, we could return not the symbol
@@ -533,8 +535,11 @@
            (editor-budden-tools::process-potential-symbol
             maybe-potential-symbol package)
            )
-
-       (values ss symbol))
+       (cond
+        (found
+         (values ss symbol))
+        (t
+         (values "" nil))))
       
       ;((not (symbolp maybe-symbol))
       ; (editor-error "~S is not a symbol name" maybe-symbol))
