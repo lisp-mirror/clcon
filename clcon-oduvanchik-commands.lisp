@@ -6,10 +6,12 @@
 (defcommand "Find Source" (p)
     "Find source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
     ""
-  (let* ((s ;(symbol-string-at-point)
-          (get-symbol-from-current-point))
-         (code (clco::server-lookup-definition s (odu::package-at-point) (odu::readtable-at-point))))
-    code)) 
+  (multiple-value-bind (string symbol) (get-symbol-from-current-point)
+    (let ((code
+           (clco::server-lookup-definition (or symbol string)
+                                           (odu::package-at-point)
+                                           (odu::readtable-at-point))))
+      code)))
 
 
 (defcommand "Sync Cursor" (p)
@@ -374,26 +376,50 @@
 (defun mark-buffer (mark) (odu::line-buffer (odu::mark-line mark)))
 
 
-(defcommand "Test Get Symbol From Current Point" (p)
-    "Find source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
-    ""
-  (let* ((s (get-symbol-from-current-point)))
-    (print s)
-    nil))
+(defun where-is-mark-relative-to-symbol (p1)
+  "0 - mark is just after the end of symbol string
+   1 - mark is inside or just after the end of symbol string
+   2 - mark is not in symbol string. Syntax info is ignored, we look
+   just at the char itself
+   3 - mark is at the beginning of symbol string"
+  (perga-implementation:perga
+   (let prev-char (odu::previous-character p1))
+   (let prev-in-symbol
+         (and prev-char
+              (editor-budden-tools::char-can-be-in-symbol prev-char)))
+   (let next-char (odu::next-character p1))
+   (let next-in-symbol
+         (and next-char
+              (editor-budden-tools::char-can-be-in-symbol next-char)))
+   (cond
+    ((and (not prev-in-symbol) (not next-in-symbol))
+     2)
+    ((and prev-in-symbol (not next-in-symbol))
+     0)
+    ((and (not prev-in-symbol) next-in-symbol)
+     3)
+    (t
+     1))))
 
-
-(defun get-symbol-from-current-point (&REST keyargs &KEY (PREVIOUS T) (MAX-LENGTH 100) (MAX-NON-ALPHANUMERIC 15) (CREATE-NEW nil))
+(defun get-symbol-from-current-point (&REST keyargs &KEY (PREVIOUS 1) (MAX-LENGTH 100) (MAX-NON-ALPHANUMERIC 15) (CREATE-NEW nil))
   "See also odu::symbol-string-at-point . Если мы в нашей таблице чтения, читаем символ с помощью ридера, переключённого в спец. режим. Если с пакетом неясность, ищем все символы с таким именем и предлагаем пользователю выбор. Имеем возможность не создавать символ при попытке забрать его из буфера - это аккуратная политика. 
   Выражение a^b рассматриваем как два символа a и b. 
 
   create-new - разрешить создавать символ. Если мы не в нашей таблице чтения (null (packages-seen-p...)) , то create-new игнорируется и символ может быть создан
 
-  Возвращает строку, из которой можно прочитать этот символ, либо (values nil nil), если ничего нет.
+  Возвращает два значения:
+  1. Строка символа, к-рая под курсором, даже если мы её не знаем. 
+  2. Если мы в нашей таблице чтения и под курсором - символ, то возвращает этот символ. Если мы не знаем такого символа или не в нашей таблице чтения, возвращаем nil
+  3. Если строки символа нет, вернёт (values \"\" nil)
 
-  previous - если истина, мы берём подходящий символ спереди. Если nil, то мы должны стоять уже внутри символа
+  previous -
+    0 мы должны стоять уже внутри символа (возможно, в конце)
+    1 мы берём подходящий символ выше по тексту или тот, в котором стоим. 
+    2 мы должны стоять в конце символа, иначе пищим.
   "
   (declare (ignore max-non-alphanumeric keyargs))
   (perga-implementation:perga function
+    (check-type previous (integer 0 2))
     (let point (odu::current-point))
     (let readtable (or (named-readtables:find-readtable (odu::readtable-at-point))
                        (named-readtables:find-readtable nil)))
@@ -411,22 +437,27 @@
     (let v-in-symbol nil) ; истина, когда внутри символа
     (let cur-in-symbol nil) ; истина, когда текущий char относится к символу
     ; Движемся назад от текущей точки и ищем начало символа, записывая в p1
-    (let checked-when-we-must-be-in-symbol-initially nil)
+    (let checked-where-we-must-be-initially nil)
     (when (odu::mark= p1 buf-beg)
       (oduvanchik-interface:loud-message "Can not complete or indent at the beginning of buffer")
-      (return-from function (values nil nil)))
+      (return-from function (values "" nil)))
     (do ()
         ((not (and (> rest-length 0)
                    (odu::mark> p1 buf-beg))) nil)
       (let prev-char (odu::previous-character p1))
       (setf cur-in-symbol (editor-budden-tools::char-can-be-in-symbol prev-char))
-      (unless checked-when-we-must-be-in-symbol-initially
-        (when
-            (and (not previous) ; Должны стоять в символе изначально
-                 (not cur-in-symbol) ; и не стоим в символе
-                 )
-          (return-from function (values nil nil)))
-        (setf checked-when-we-must-be-in-symbol-initially t))
+      (unless checked-where-we-must-be-initially
+        (let where-we-are (where-is-mark-relative-to-symbol p1))
+        (cond
+         ((and (= previous 0) ; Должны стоять в символе изначально
+               (not (member where-we-are '(0 1))) ; и не стоим в символе
+               )
+          (return-from function (values "" nil)))
+         ((and (= previous 2)
+               (/= where-we-are 0))
+          (bell-with-tcl) 
+          (return-from function (values "" nil))))  
+        (setf checked-where-we-must-be-initially t))
       (when cur-in-symbol
         (unless v-in-symbol
           (setf v-in-symbol t)))
@@ -438,65 +469,92 @@
       (incf rest-length -1)
       )
     ; Для не нашей таблицы нужно найти конец символа. Для нашей - просто вырезать кусок максимально возможной длины, т.к. мы будем читать символ ридером
-    (when symbol-beginning
-      (let lookup-end (odu::copy-mark symbol-beginning :temporary))
-      (let lookup-end-count max-length)
-      (do () ((not (and (odu::mark< lookup-end buf-end)
-                        (or 
-                         (null max-length) 
-                         (> lookup-end-count 0)))) nil)
-        (unless our-readtable
-          (unless (editor-budden-tools::char-can-be-in-symbol (odu::next-character lookup-end))
-            (setf lookup-end (oi::copy-mark lookup-end :temporary))
-            (return)))
-        (odu::character-offset lookup-end 1)
-        (incf lookup-end-count -1))
-      (let ss (clco::string-between-marks symbol-beginning lookup-end))
-      (let package (or
-                    (find-package package-designator)
-                    (progn
-                      (warn "unable to learn package at ~S. Assuming cl-user" point)
-                      (find-package :cl-user))))
-      (cond
-       ((not our-readtable)
-        (clco::string-between-marks symbol-beginning lookup-end)
-        )
-       (create-new
-        (ignore-errors
-          (let ((budden-tools::*inhibit-readmacro* t)
-                (*package* package)
-                )
-            (read-from-string ss))))
-       (t 
-        (:@ multiple-value-bind (maybe-potential-symbol maybe-error)
-                   (ignore-errors
-                    (let ((sbcl-reader-budden-tools-lispworks:*return-package-and-symbol-name-from-read* t)
-                          (*package* package)
-                          (budden-tools::*inhibit-readmacro* t))
-                      (read-from-string ss))
-                    ))
-        (cond
-         ((typep maybe-error 'error) ; maybe-symbol can be nil, and read returns position. 
-                                     ; so we check if there is a error
-          (values nil nil) ; no symbol
-          )
-         ((sbcl-reader-budden-tools-lispworks:potential-symbol-p maybe-potential-symbol)
-          (editor-budden-tools::process-potential-symbol maybe-potential-symbol package)
-          )
-           
-         ;((not (symbolp maybe-symbol))
-         ; (editor-error "~S is not a symbol name" maybe-symbol))
-         ((and (consp maybe-potential-symbol)
-               (eq (car maybe-potential-symbol) 'budden-tools:|^|)
-               (SBCL-READER-BUDDEN-TOOLS-LISPWORKS:potential-symbol-p (second maybe-potential-symbol)))
-          (editor-budden-tools::process-potential-symbol (second maybe-potential-symbol) package))
+    (cond
+     ((not symbol-beginning)
+      ; ничего нет
+      (return-from function (values "" nil)))
+     (t
+      (get-symbol-from-current-point-part-2
+       symbol-beginning max-length buf-end our-readtable create-new package-designator readtable point)
+      ))))
 
-         (t ; in some modes we should not err
-          (values nil nil)
-          )
-         )
-        )
-       ))))
+(defun get-symbol-from-current-point-part-2 (symbol-beginning max-length buf-end our-readtable create-new package-designator readtable point)
+  (perga-implementation:perga
+   (let lookup-end (odu::copy-mark symbol-beginning :temporary))
+   (let lookup-end-count max-length)
+   (do () ((not (and (odu::mark< lookup-end buf-end)
+                     (or 
+                      (null max-length) 
+                      (> lookup-end-count 0)))) nil)
+     (unless our-readtable
+       (unless (editor-budden-tools::char-can-be-in-symbol (odu::next-character lookup-end))
+         (setf lookup-end (oi::copy-mark lookup-end :temporary))
+         (return)))
+     (odu::character-offset lookup-end 1)
+     (incf lookup-end-count -1))
+   (let ss (clco::string-between-marks symbol-beginning lookup-end))
+   (let package (or
+                 (find-package package-designator)
+                 (progn
+                   (warn "unable to learn package at ~S. Assuming cl-user" point)
+                   (find-package :cl-user))))
+   (get-symbol-from-current-point-part-3 ss package readtable our-readtable create-new)))
+
+(defun get-symbol-from-current-point-part-3 (ss package readtable our-readtable create-new)
+  (perga-implementation:perga
+   (cond
+    ((not our-readtable)
+     (values ss nil)
+     )
+    (create-new
+     (ignore-errors
+      (let ((budden-tools::*inhibit-readmacro* t)
+            (*readtable* readtable)
+            (*read-eval* nil)
+            (*package* package)
+            )
+        (values ss (read-from-string ss)))))
+    (t 
+     (:@ multiple-value-bind (maybe-potential-symbol maybe-error)
+         (ignore-errors
+          (let ((sbcl-reader-budden-tools-lispworks:*return-package-and-symbol-name-from-read* t)
+                (*package* package)
+                (budden-tools::*inhibit-readmacro* t))
+            (read-from-string ss))
+          ))
+     (cond
+      ((typep maybe-error 'error) ; maybe-symbol can be nil, and read returns position. 
+       ; so we check if there is a error
+       (values "" nil) ; no symbol
+       )
+      ((sbcl-reader-budden-tools-lispworks:potential-symbol-p maybe-potential-symbol)
+       (assert (null editor-budden-tools::*in-find-source*))
+       ; if this assertion is not true, we could return not the symbol
+       ; we had under cursor, but something irrelevant
+
+       (:@ multiple-value-bind (symbol found)
+           (editor-budden-tools::process-potential-symbol
+            maybe-potential-symbol package)
+           )
+
+       (assert found)
+       (values ss symbol))
+      
+      ;((not (symbolp maybe-symbol))
+      ; (editor-error "~S is not a symbol name" maybe-symbol))
+      ((and (consp maybe-potential-symbol)
+            (eq (car maybe-potential-symbol) 'budden-tools:|^|)
+            (SBCL-READER-BUDDEN-TOOLS-LISPWORKS:potential-symbol-p (second maybe-potential-symbol)))
+       (:@ multiple-value-bind (symbol found)
+           (editor-budden-tools::process-potential-symbol (second maybe-potential-symbol) package))
+       (assert found)
+       (values ss symbol))
+      (t ; in some modes we should not err
+       (values "" nil)
+       )
+      )
+     )
+    ))) 
 
 
 (defun completions-menu-run (list &key (owner "") (title "odu::call-scrollable-menu"))
@@ -513,7 +571,7 @@
          "Complete Symbol With Local Package Nicknames and advanced readtable-case"
   (declare (ignorable p))
   ;; получаем исходный текст, который нужно завершить
-  (let* ((str (get-symbol-from-current-point :previous nil))
+  (let* ((str (get-symbol-from-current-point :previous 2))
          (str-len (length str)))
     (cond
      ((= str-len 0)
