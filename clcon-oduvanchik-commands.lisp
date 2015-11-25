@@ -379,9 +379,10 @@
 (defun where-is-mark-relative-to-symbol (p1)
   "0 - mark is just after the end of symbol string
    1 - mark is inside or just after the end of symbol string
-   2 - mark is not in symbol string. Syntax info is ignored, we look
+   2 - mark is at the beginning of symbol string
+   3 - mark is not in symbol string. Syntax info is ignored, we look
    just at the char itself
-   3 - mark is at the beginning of symbol string"
+   "
   (perga-implementation:perga
    (let prev-char (odu::previous-character p1))
    (let prev-in-symbol
@@ -393,24 +394,24 @@
               (editor-budden-tools::char-can-be-in-symbol next-char)))
    (cond
     ((and (not prev-in-symbol) (not next-in-symbol))
+     3)
+    ((and (not prev-in-symbol) next-in-symbol)
      2)
     ((and prev-in-symbol (not next-in-symbol))
      0)
-    ((and (not prev-in-symbol) next-in-symbol)
-     3)
     (t
      1))))
 
-(defun get-symbol-from-current-point (&REST keyargs &KEY (PREVIOUS 1) (MAX-LENGTH 100) (MAX-NON-ALPHANUMERIC 15) (CREATE-NEW nil))
+(defun get-symbol-from-current-point (&REST keyargs &KEY (PREVIOUS 1) (MAX-LENGTH 100) (MAX-NON-ALPHANUMERIC 15) (return-symbol-too t) (CREATE-NEW nil))
   "See also odu::symbol-string-at-point . Если мы в нашей таблице чтения, читаем символ с помощью ридера, переключённого в спец. режим. Если с пакетом неясность, ищем все символы с таким именем и предлагаем пользователю выбор. Имеем возможность не создавать символ при попытке забрать его из буфера - это аккуратная политика. 
   Выражение a^b рассматриваем как два символа a и b. 
 
   create-new - разрешить создавать символ. Если мы не в нашей таблице чтения (null (packages-seen-p...)) , то create-new игнорируется и символ может быть создан
 
   Возвращает два значения:
-  1. Строка символа, к-рая под курсором, даже если мы её не знаем. 
-  2. Если мы в нашей таблице чтения и под курсором - символ, то возвращает этот символ. Если мы не знаем такого символа или не в нашей таблице чтения, возвращаем nil
-  3. Если строки символа нет, вернёт (values \"\" nil)
+  1. Строка символа, к-рая под курсором, даже если мы не знаем такого символа
+  2. Если нас просили вернуть символ и под курсором - известный символ, либо нам разрешили его создать, то возвращает найденный или созданный символ. Если мы не знаем такого символа или не в нашей таблице чтения, возвращаем nil
+  Если строки символа нет, вернёт (values \"\" nil)
 
   previous -
     0 мы должны стоять уже внутри символа (возможно, в конце)
@@ -425,10 +426,6 @@
                        (named-readtables:find-readtable nil)))
     (let package-designator (odu::package-at-point))
     (let our-readtable (budden-tools::packages-seen-p readtable))
-    ;(unless (BUDDEN-TOOLS::packages-seen-p *readtable*)
-    ;  (unless (member :create-new (budden-tools:splice-list keyargs) :key 'car)
-    ;    (setf keyargs (append keyargs (list :create-new t))))
-    ;  (return-from function (odu::symbol-string-at-point)))
     (let p1 (odu::copy-mark point :temporary))
     (let buf-beg (oi::buffer-start-mark (mark-buffer point)))
     (let buf-end (oi::buffer-end-mark (mark-buffer point)))
@@ -450,7 +447,7 @@
         (let where-we-are (where-is-mark-relative-to-symbol p1))
         (cond
          ((and (= previous 0) ; Должны стоять в символе изначально
-               (not (member where-we-are '(0 1))) ; и не стоим в символе
+               (not (member where-we-are '(0 1 2))) ; и не стоим в символе
                )
           (return-from function (values "" nil)))
          ((and (= previous 2)
@@ -468,28 +465,27 @@
       (odu::character-offset p1 -1)
       (incf rest-length -1)
       )
-    ; Для не нашей таблицы нужно найти конец символа. Для нашей - просто вырезать кусок максимально возможной длины, т.к. мы будем читать символ ридером
     (cond
      ((not symbol-beginning)
       ; ничего нет
       (return-from function (values "" nil)))
      (t
       (get-symbol-from-current-point-part-2
-       symbol-beginning max-length buf-end our-readtable create-new package-designator readtable point)
+       symbol-beginning max-length buf-end our-readtable return-symbol-too create-new package-designator readtable point)
       ))))
 
-(defun get-symbol-from-current-point-part-2 (symbol-beginning max-length buf-end our-readtable create-new package-designator readtable point)
+(defun get-symbol-from-current-point-part-2 (symbol-beginning max-length buf-end our-readtable return-symbol-too create-new package-designator readtable point)
   (perga-implementation:perga
    (let lookup-end (odu::copy-mark symbol-beginning :temporary))
    (let lookup-end-count max-length)
+   ; Теперь нужно найти конец символа. Для нашей - просто вырезать кусок максимально возможной длины, т.к. мы будем читать символ ридером
    (do () ((not (and (odu::mark< lookup-end buf-end)
                      (or 
                       (null max-length) 
                       (> lookup-end-count 0)))) nil)
-     (unless our-readtable
-       (unless (editor-budden-tools::char-can-be-in-symbol (odu::next-character lookup-end))
-         (setf lookup-end (oi::copy-mark lookup-end :temporary))
-         (return)))
+     (unless (editor-budden-tools::char-can-be-in-symbol (odu::next-character lookup-end))
+       (setf lookup-end (oi::copy-mark lookup-end :temporary))
+       (return))
      (odu::character-offset lookup-end 1)
      (incf lookup-end-count -1))
    (let ss (clco::string-between-marks symbol-beginning lookup-end))
@@ -498,12 +494,12 @@
                  (progn
                    (warn "unable to learn package at ~S. Assuming cl-user" point)
                    (find-package :cl-user))))
-   (get-symbol-from-current-point-part-3 ss package readtable our-readtable create-new)))
+   (get-symbol-from-current-point-part-3 ss package readtable our-readtable return-symbol-too create-new)))
 
-(defun get-symbol-from-current-point-part-3 (ss package readtable our-readtable create-new)
+(defun get-symbol-from-current-point-part-3 (ss package readtable our-readtable return-symbol-too create-new)
   (perga-implementation:perga
    (cond
-    ((not our-readtable)
+    ((not (and our-readtable return-symbol-too))
      (values ss nil)
      )
     (create-new
@@ -517,10 +513,11 @@
     (t 
      (:@ multiple-value-bind (maybe-potential-symbol maybe-error)
          (ignore-errors
-          (let ((sbcl-reader-budden-tools-lispworks:*return-package-and-symbol-name-from-read* t)
-                (*package* package)
-                (budden-tools::*inhibit-readmacro* t))
-            (read-from-string ss))
+          (perga-implementation:perga 
+           (let sbcl-reader-budden-tools-lispworks:*return-package-and-symbol-name-from-read* t)
+           (let *package* package)
+           (let budden-tools::*inhibit-readmacro* t)
+           (read-from-string ss))
           ))
      (cond
       ((typep maybe-error 'error) ; maybe-symbol can be nil, and read returns position. 
@@ -537,7 +534,6 @@
             maybe-potential-symbol package)
            )
 
-       (assert found)
        (values ss symbol))
       
       ;((not (symbolp maybe-symbol))
