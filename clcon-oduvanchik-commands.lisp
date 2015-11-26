@@ -531,15 +531,19 @@
        ; if this assertion is not true, we could return not the symbol
        ; we had under cursor, but something irrelevant
 
-       (:@ multiple-value-bind (symbol found)
-           (editor-budden-tools::process-potential-symbol
-            maybe-potential-symbol package)
-           )
        (cond
-        (found
-         (values ss symbol))
+        (return-symbol-too
+         (:@ multiple-value-bind (symbol found)
+             (editor-budden-tools::process-potential-symbol
+              maybe-potential-symbol package)
+             )
+         (cond
+          (found
+           (values ss symbol))
+          (t
+           (values ss nil))))
         (t
-         (values "" nil))))
+         (values ss nil))))
       
       ;((not (symbolp maybe-symbol))
       ; (editor-error "~S is not a symbol name" maybe-symbol))
