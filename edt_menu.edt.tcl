@@ -127,13 +127,19 @@ namespace eval ::edt {
         $m add separator
 
         OduFnMenuItem $w $m $btext forward-form \
-            -ContinueIfNoBackend 1
-            # -accel <Control-Key-Right> -bindtag SingleMod$w 
+            -ContinueIfNoBackend 1              \
+            -accel <Alt-Key-Right> -bindtag SingleMod$w 
         
-        OduFnMenuItem $w $m $btext backward-form
+        OduFnMenuItem $w $m $btext backward-form \
+            -ContinueIfNoBackend 1              \
+            -accel <Alt-Key-Left> -bindtag SingleMod$w 
+        
         OduFnMenuItem $w $m $btext forward-list
         OduFnMenuItem $w $m $btext backward-list
-        OduFnMenuItem $w $m $btext forward-up-list
+        OduFnMenuItem $w $m $btext forward-up-list \
+            -ContinueIfNoBackend 1              \
+            -accel <Alt-Key-Up> -bindtag SingleMod$w 
+
         OduFnMenuItem $w $m $btext backward-up-list
         OduFnMenuItem $w $m $btext down-list
 
