@@ -513,6 +513,23 @@ namespace eval ::clcon_text {
         bind FreezableText $ev $script2
     }
 
+
+    proc SetCyrBindingsForText {} {
+        bind Text <Control-Key-Z> {}
+        bind Text <Control-Z> {}
+        ::clcon_key::b bind Text <Control-Key-z> {catch { %W edit undo }}
+        ::clcon_key::b bind Text <Control-Key-y> {catch { %W edit redo }}
+        # there was something wrong with tk_strictMotif
+        ::clcon_key::b bind Text <Control-k> {
+        if {[%W compare end != insert+1c]} {
+          if {[%W compare insert == {insert lineend}]} {
+            %W delete insert
+          } else {
+            %W delete insert {insert lineend}
+          }
+        }}
+    }
+
     # Fills FreezableText bindtag with wrapped bindings of Text
     # Tab and Shift-Tab bindings are bypassed - we do not like tabs in program code.
     proc InitBindingsOfFreezableText {} {
@@ -605,6 +622,8 @@ namespace eval ::clcon_text {
 
     
     # InitOneBindingOfFreezableText <Key-Return>
+    SetCyrBindingsForText
+
     InitBindingsOfFreezableText
 }
 

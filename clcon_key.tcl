@@ -26,7 +26,8 @@ proc ::clcon_key::FillLetterMapWin32 {} {
         dict set LetterMap $o $Bucket
         incr i
     }
-	dict set LetterMap i {I oslash Ooblique}
+    dict set LetterMap i {I oslash Ooblique}
+    dict set LetterMap z {Z ydiaeresis ssharp}
 }
 
 proc ::clcon_key::aux1win32 {} {return {

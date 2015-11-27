@@ -138,6 +138,15 @@ Use "File" menu, Control-o keyboard shortcut or
 ```.edit <filename>```
 Press Ctrl-F3 to complete filename (at least it will work undex *nix).
 
+Editing files
+-------------
+`Ctrl-z` - undo
+
+`Ctrl-y` - redo
+
+`Ctrl-k` - delete text to the end of line
+
+
 Saving files 
 -------------------------
 WARNING! 

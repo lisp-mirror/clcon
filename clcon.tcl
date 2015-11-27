@@ -179,6 +179,8 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
     TkconSourceHere ro_outer_synonyms.ro_out.tcl
     TkconSourceHere text2odu.tcl
     TkconSourceHere btext.tcl
+    TkconSourceHere cons.tcl
+    TkconSourceHere clcon_key.tcl
     TkconSourceHere clcon_text.tcl
     TkconSourceHere swank-connection.swcnn.tcl
     TkconSourceHere swank-io.tcl
@@ -4079,7 +4081,6 @@ proc ::tkcon::ReloadSomeIDESources3 {} {
     } elseif { $::tkcon::ENABLE_UNKNOWN == -1 } {
         TkconSourceHere tkcon-unknown-mini.tcl
     }
-    TkconSourceHere clcon_key.tcl
     TkconSourceHere bindings.tkcon.tcl
 }
 

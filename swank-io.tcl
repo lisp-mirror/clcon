@@ -24,7 +24,6 @@ namespace eval ::mprs {
 }
 
 # Load conses
-TkconSourceHere cons.tcl
 TkconSourceHere continuations.mprs.tcl
 TkconSourceHere send-to-swank.tcl
 

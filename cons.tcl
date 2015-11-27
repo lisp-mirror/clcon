@@ -1,5 +1,7 @@
 # format for receiving typed messages from lisp and parsing them.
 
+namespace eval ::mprs {}
+
 proc ::mprs::TypeTag {x} {
     string index $x 0
 }
