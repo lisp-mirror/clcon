@@ -257,7 +257,7 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
     } elseif { $Head eq ":new-package" } {
         ::tkcon::ChangeCurrentPackageB $EventAsList       
     } elseif { $Head eq ":new-features" } {
-        puts "::mprs::ProcessAsyncEvent: ignoring new features event: $EventAsList"
+        putd "::mprs::ProcessAsyncEvent: ignoring new features event: $EventAsList"
     } elseif { $Head eq ":ed" } {
         ::edt::ProcessEdRequest $EventAsList
     } elseif { $Head eq ":ping" } {
