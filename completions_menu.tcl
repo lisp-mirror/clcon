@@ -81,6 +81,7 @@ proc ::completions_menu::run {items args} {
     ::tablelist_util::GotoIndex $tbl 0 
 
     focus $tbl
+    $tbl see 0
     grab $tl
 
     set return_value {}
