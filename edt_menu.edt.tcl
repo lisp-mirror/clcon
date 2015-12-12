@@ -128,13 +128,34 @@ namespace eval ::edt {
         OduFnMenuItem $w $m $btext mark-defun 
         $m add separator
 
+        # ------------------------ modified right key ---------------------------
+    
+        #set cmd [wesppt [list event generate $btext <<NextWord>>]] 
+        #::clcon_key::b bind SingleMod$w <Alt-Key-Right> $cmd
+
         OduFnMenuItem $w $m $btext forward-form \
             -ContinueIfNoBackend 1              \
-            -accel <Alt-Key-Right> -bindtag SingleMod$w 
+            -accel <Control-Key-Right> -bindtag SingleMod$w 
+
+        OduFnMenuItem $w $m $btext forward-form-altering-selection \
+            -ContinueIfNoBackend 1                                 \
+            -accel <Control-Shift-Key-Right> -bindtag DoubleMod$w  \
+            -CallOduvanchikFunctionOptions {send_selection 1}
         
+        # ------------------------ modified left key ---------------------------
+
+        #set cmd [wesppt [list event generate $btext <<PrevWord>>]] 
+        #::clcon_key::b bind SingleMod$w <Alt-Key-Left> $cmd
+
         OduFnMenuItem $w $m $btext backward-form \
             -ContinueIfNoBackend 1              \
-            -accel <Alt-Key-Left> -bindtag SingleMod$w 
+            -accel <Control-Key-Left> -bindtag SingleMod$w 
+
+        OduFnMenuItem $w $m $btext backward-form-altering-selection \
+            -ContinueIfNoBackend 1                                 \
+            -accel <Control-Shift-Key-Left> -bindtag DoubleMod$w  \
+            -CallOduvanchikFunctionOptions {send_selection 1}
+
         
         OduFnMenuItem $w $m $btext forward-list
         OduFnMenuItem $w $m $btext backward-list
