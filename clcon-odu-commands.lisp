@@ -3,6 +3,33 @@
 (in-package :oduvanchik)
 (named-readtables::in-readtable :oduvanchik-ext-readtable)
 
+
+(defcommand "Forward Form Altering Selection" (p)
+  "Step to the next form extracting/contracting selection"
+  "If there is no selection, selects from point to the end of form. 
+   If we are at the end of selection, expand it. If we are at the beginning of selection, contract it"
+  (declare (ignore p))
+  (perga-implementation:perga
+   (let b (current-buffer))
+   (let m (buffer-mark b))
+   (let point (current-point))
+   (cond
+    ((region-active-p)
+     (let initial-order (mark< point m))
+     (forward-form-command nil)
+     (let final-order (mark< point m))
+     ; if we step above other end of selection, cancel selection completely
+     (unless (eq initial-order final-order)
+       (deactivate-region))
+     )
+    (t
+     (push-buffer-mark (copy-mark point))
+     (forward-form-command nil)
+     (activate-region)))
+   (when oi::*do-editing-on-tcl-side*
+     (oi::transfer-selection-to-clcon_text t))
+   ))
+
 (defcommand "Find Source" (p)
     "Find source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
     ""
