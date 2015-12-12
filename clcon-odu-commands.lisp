@@ -73,7 +73,8 @@
     ))
 
 
-(defun completions-menu-run (list &key (owner "") (title "odu::call-scrollable-menu"))
+(defun simple-listbox-menu (list &key (owner "") (title "odu::call-scrollable-menu"))
+  "Call-scrollable-menu"
   (let*
       ((qlist (mapcar 'cl-tk:tcl-escape list))
        (qtitle (cl-tk:tcl-escape title))
@@ -122,7 +123,7 @@
       (replace-str-with (first completion-list)))
      (t
       (let ((choice
-             (completions-menu-run completion-list :title "Comletions:")))
+             (simple-listbox-menu completion-list :title "Comletions:")))
         (unless (string= choice "")
           (replace-str-with choice)))
       )))))
