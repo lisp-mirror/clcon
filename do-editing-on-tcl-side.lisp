@@ -197,15 +197,28 @@
   (format nil "::edt::TextSetSelectionTo ~A ~A ~A"
           clcon_text (tcl-index-of-mark rmn-rb) (tcl-index-of-mark rmn-re)))
 
-(defmethod transfer-selection-to-clcon_text (region)
-  (let* ((rb (region-start region))
-         (re (region-end region))
-         (buffer (buffer-of-mark rb))
-         (clcon_text (buffer-to-clcon_text buffer)))
-    (when clcon_text
-      (call-tcl-simple
-       (tcl-code-to-select-region clcon_text rb re)
-       ))))
+(defun tcl-code-to-remove-selection (clcon_text)
+  "Tcl code to unselect what is currently selected"
+  (format nil "::edt::TextRemoveSelection ~A" clcon_text))
+
+(defmethod transfer-selection-to-clcon_text (dummy-parameter)
+  (declare (ignore dummy-parameter))
+  (perga-implementation:perga
+   (cond
+    ((region-active-p)
+     (let region (current-region t nil))
+     (let rb (region-start region))
+     (let re (region-end region))
+     (let buffer (buffer-of-mark rb))
+     (let clcon_text (buffer-to-clcon_text buffer))
+     (assert clcon_text)
+     (call-tcl-simple
+      (tcl-code-to-select-region clcon_text rb re)
+       ))
+    (t
+     (call-tcl-simple
+      (tcl-code-to-remove-selection (buffer-to-clcon_text (current-buffer)))))
+    )))
 
 
 (defmethod transfer-selection-from-clcon_text (buffer)
