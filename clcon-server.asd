@@ -35,6 +35,7 @@
                (:file "start-and-shutdown-oduvanchik" :description "start and shutdown stuff")
                (:file "clcon-odu-commands-infrastructure" :description "Infrastructure for oduvanchik commands"
                       )
+               (:file "lisp-symbol-at-odu-point" :description "Operating lisp symbol at point")
                (:file "clcon-odu-commands" :description "Our lisp mode and other application-level oduvanchik commands for clcon"
                       )
                (:file "clcon-odu-callbacks" :description "Some (not all) callbacks from oduvanchik to tcl"
