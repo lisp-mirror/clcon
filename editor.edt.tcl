@@ -391,8 +391,8 @@ namespace eval ::edt {
         set fn [string cat "odu::" $commandNameWoPrefix "-command"]
         set w [CurrentlyVisibleBuffer]
         set txt $w.text
-        set cmd [list clcon_text::CallOduvanchikFunction $txt "$fn nil"]
-        set wcmd [clcon_text::WrapEventScriptForFreezedText $cmd -destination $txt]
+        set cmd [list ::clcon_text::CallOduvanchikFunction $txt "$fn nil"]
+        set wcmd [::clcon_text::WrapEventScriptForFreezedText $cmd -destination $txt]
         eval $wcmd
     }   
 
