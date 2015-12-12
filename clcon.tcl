@@ -4753,7 +4753,7 @@ proc ::tkcon::ReloadSomeIDESources4 {} {
     TkconSourceHere tcltextedit-unsorted.tcl
     TkconSourceHere clconcmd_inner.tcl
     TkconSourceHere clconcmd.tcl
-    TkconSourceHere clcon-oduvanchik-commands.odu.tcl
+    TkconSourceHere clcon-odu-commands.odu.tcl
     TkconSourceHere expand.tkcon.tcl
 }
 

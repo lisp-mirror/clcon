@@ -33,9 +33,11 @@
                (:file "highlight-from-oduvan-to-queue" :description "Posting to *highlight-event-queue*")
                (:file "highlight-from-queue-to-tcl" :description "Sending highighting events to lisp")
                (:file "start-and-shutdown-oduvanchik" :description "start and shutdown stuff")
-               (:file "clcon-oduvanchik-commands" :description "Our lisp mode and other application-level oduvanchik commands for clcon"
+               (:file "clcon-odu-commands-infrastructure" :description "Infrastructure for oduvanchik commands"
                       )
-               (:file "clcon-oduvanchik-callbacks" :description "Some (not all) callbacks from oduvanchik to tcl"
+               (:file "clcon-odu-commands" :description "Our lisp mode and other application-level oduvanchik commands for clcon"
+                      )
+               (:file "clcon-odu-callbacks" :description "Some (not all) callbacks from oduvanchik to tcl"
                       )
                )
   )
