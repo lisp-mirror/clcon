@@ -13,7 +13,8 @@ proc ::completions_menu::do_return {tl} {
     variable return_flag 
     variable return_value
     set tbl [path_to_tbl $tl]
-    set return_value [$tbl get active active]
+    set return_value_overquoted [$tbl get active active]
+    set return_value [concat {*}[lindex $return_value_overquoted 0]]
     set return_flag 1    
 }
     
@@ -54,7 +55,8 @@ proc ::completions_menu::run {items args} {
 
     $tbl columnconfigure 0 -wrap true
 
-    $tbl insertlist 0 $items
+    set quoted_items [lmap x $items {list $x}]
+    $tbl insertlist 0 $quoted_items
 
     set f1 $tl.tf
     scrollbar $f1.sy -orient v -command [list $tbl yview]
