@@ -21,3 +21,25 @@
 (defun decorate-oduvanchik-message ()
   "To be called when starting oduvanchik from clcon"
   (decorate-function:decorate-function 'oi::message 'decorated-message))
+
+
+(defun simple-listbox-menu (list &key (owner "") (title "odu::call-scrollable-menu"))
+  "Call-scrollable-menu"
+  (let*
+      ((qlist (mapcar 'cl-tk:tcl-escape list))
+       (qtitle (cl-tk:tcl-escape title))
+       (cmd (format nil "::completions_menu::run [list~{ ~A~}] -owner [list ~A] -title ~A" qlist owner qtitle)))
+    (clco:eval-in-tcl cmd :nowait nil)
+    ))
+
+(defmethod oi::ask-user-about-editor-condition :around (condition)
+  (let* ((variants '("debug" "abort command (Esc key)" "quit lisp"))
+         (users-choice 
+          (simple-listbox-menu variants :title "Serious error in the editor"))
+         (variant-index
+          (position users-choice variants :test 'equal)))
+    (ecase variant-index
+      ((nil) :abort)
+      (0 :debug)
+      (1 :abort)
+      (2 :quit))))

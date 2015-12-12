@@ -72,16 +72,6 @@
      )
     ))
 
-
-(defun simple-listbox-menu (list &key (owner "") (title "odu::call-scrollable-menu"))
-  "Call-scrollable-menu"
-  (let*
-      ((qlist (mapcar 'cl-tk:tcl-escape list))
-       (qtitle (cl-tk:tcl-escape title))
-       (cmd (format nil "::completions_menu::run [list~{ ~A~}] -owner [list ~A] -title ~A" qlist owner qtitle)))
-  (clco:eval-in-tcl cmd :nowait nil)
-  ))
-
 (defcommand "Indent or Complete Symbol With Budden Tools"
      (p) "Complete Symbol With Local Package Nicknames and advanced readtable-case"
          "Complete Symbol With Local Package Nicknames and advanced readtable-case"
