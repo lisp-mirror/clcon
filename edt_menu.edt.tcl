@@ -57,13 +57,15 @@ namespace eval ::edt {
     # and if it is absend, would call continue so that other bindings would work.
     # Returns cmd with break. 
     proc OduFnMenuItem {w m btext oduCmd args} {
-        named_args $args {-accel {} -bindtag {} -ContinueIfNoBackend 0} 
+        named_args $args {-accel {} -bindtag {} -ContinueIfNoBackend 0 -CallOduvanchikFunctionOptions {}} 
         set oduFn [string cat "odu::" $oduCmd "-command"]
         set ScriptForBackend \
-            [wesppt [list clcon_text::CallOduvanchikFunction $btext "$oduFn nil"]] 
+            [wesppt [list clcon_text::CallOduvanchikFunction $btext \
+                          "$oduFn nil" "" $(-CallOduvanchikFunctionOptions)]] 
         set ScriptForBackendBreak \
-            [wesppt [list clcon_text::CallOduvanchikFunction $btext "$oduFn nil"] \
-                 -add-break 1] 
+            [wesppt [list clcon_text::CallOduvanchikFunction $btext \
+                          "$oduFn nil" "" $(-CallOduvanchikFunctionOptions)] \
+                    -add-break 1] 
         if {$(-ContinueIfNoBackend)} {
             set cmd [CodeToCallBackendOrContinue $btext $ScriptForBackend]
             set cmdBreak [CodeToCallBackendOrContinue $btext $ScriptForBackendBreak]
