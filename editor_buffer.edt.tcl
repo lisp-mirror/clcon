@@ -181,6 +181,10 @@ namespace eval ::edt {
         $text tag add sel $from $to
     }
 
+    proc TextRemoveSelection {text} {
+        $text tag remove sel 1.0 end
+    }
+
     proc e_indent {text {extra "    "}} {
         set w $text
         set lineno [expr {int([$w index insert])}]
