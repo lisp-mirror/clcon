@@ -212,6 +212,7 @@
   (let* ((coords (get-clcon_text-selection-coordinates buffer)))
     (cond
       ((null coords)
+       (deactivate-region buffer)
        nil)
       (t
        (destructuring-bind (beg-row beg-col end-row end-col) coords
@@ -227,7 +228,9 @@
               (odu::with-mark-in-row-col (m (clco::make-row-col :row beg-row :col beg-col))
                 (push-buffer-mark (copy-mark m) t)))
              (t
-              (error "transfer-selection-from-clcon-text: current-point must coincide with either beginning of selection or with end of selection")))))))))
+              (error "transfer-selection-from-clcon-text: current-point must coincide with either beginning of selection or with end of selection")))
+           (activate-region buffer)
+           ))))))
 
 
 (defun get-clcon_text-selection-coordinates (buffer)  
