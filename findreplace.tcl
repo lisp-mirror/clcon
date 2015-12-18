@@ -175,8 +175,6 @@ namespace eval ::fndrpl {
         variable glb
         variable greps
 
-        c $SearchString $SearchPos $SearchDir $findcase
-
         set greps ""
 
         if {$SearchString!=""} {
@@ -262,6 +260,55 @@ namespace eval ::fndrpl {
         
     }
 
+
+    proc CheckCharAgainstBoundaryPolicy {char policy} {
+        if {$char eq " "} {
+            return 1
+        } else {
+            return 0
+        }
+    }
+
+    # If location of SearchString found at FoundPos matches boundary policy, returns 1. Otherwise, returns 0
+    proc CheckFoundMatchAgainstBoundaryPolicy {text FoundPos} {
+        variable SearchState
+
+        if {$FoundPos eq {}} {
+            return 0
+        }
+
+        set SearchString [dict get $SearchState -searchStringQ]
+        set SearchDir [dict get $SearchState -direction]
+        set findcase [dict get $SearchState -findcase]
+        set BoundaryPolicy 1
+        # [dict get $SearchState -BoundaryPolicy]
+        
+        if {$FoundPos eq "1.0"} {
+            set MatchesAtLeft 1
+        } else {
+            set leftChar [$text get [string cat $FoundPos "-1c"]]
+            set MatchesAtLeft [CheckCharAgainstBoundaryPolicy $leftChar $BoundaryPolicy]
+        }
+
+        set RightIndex [$text index [string cat $FoundPos "+" [string length $SearchString] "c"]]        
+
+        if {$RightIndex eq [$text index end]} {
+            set MatchesAtRight 1
+        } else {
+            set rightChar [$text get $RightIndex]
+            set MatchesAtRight [CheckCharAgainstBoundaryPolicy $rightChar $BoundaryPolicy]
+        }
+
+        
+        if {$MatchesAtLeft && $MatchesAtRight} {
+            return 1
+        } else {
+            return 0
+        }
+    }
+    
+
+
     # Returns two values:
     # 1) 0 if not found, 1 if found, -1 if empty search string
     # 2) new SearchState
@@ -293,8 +340,22 @@ namespace eval ::fndrpl {
 
         set leng [string length $SearchString]
 
-        set SearchPos [ $text search $caset -$SearchDir -- $SearchString $SearchPos $limit]
-
+        while {1==1} {        
+            set SearchPos [ $text search $caset -$SearchDir -- $SearchString $SearchPos $limit]
+            if {$SearchPos == ""} {
+                break
+            }
+            if {[CheckFoundMatchAgainstBoundaryPolicy $text $SearchPos]} {
+                break
+            } 
+            if {$SearchDir == "forwards"} {
+                set delta "+1c"
+            } else {
+                set delta "-1c"
+            }
+            set SearchPos [string cat $SearchPos $delta]
+        }
+        
         if {$SearchPos != ""} {
             $text see $SearchPos
 
