@@ -7,6 +7,11 @@ proc ::tkcon::BeginningOfLispSymbolRegexp {} {
      return {[^\\][[:space:]$(),@'""]}
 }
 
+# It will fail in case of escaping
+proc ::tkcon::BoundOfLispSymbolRegexpSimplified {} {
+     return {[[:space:]$(),@'""]}
+}
+
 # for clcon, pass [$clcon_text RealText] here. For editor, pass [::edt::Bi2_text]
 proc ::tkcon::IsItConsole {text} {
     variable PRIV
