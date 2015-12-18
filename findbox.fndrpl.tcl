@@ -5,6 +5,7 @@ namespace eval ::fndrpl {
     # type of widget is specified by AreaType, can be "text" or "tablelist"
     # FndOrRepl can be "replace" or... not "replace", say, "find"
     # EnsurePopulatedCmd is relevant for AreaType eq "tablelist" only
+
     proc OpenFindBox {area AreaType FndOrRpl EnsurePopulatedCmd} {
         variable SearchString
         variable SearchDir
@@ -69,8 +70,6 @@ namespace eval ::fndrpl {
         frame $find.f2
         button $find.f2.button1 -text "Find Next" -command "$SearchCmd" -width 10 -height 1 
         
-        button $find.f2.button9 -text "Find allwindows" -command "destroy $find; ::fndrpl::GrepIt $area"  -width 10 -underline 0 -state disabled
-
         # Cancel is disabled due to issue 41
         button $find.f2.button2 -text "Cancel" -command "::fndrpl::CancelFind $area $find" -width 10 -underline 0 -state disabled
 
@@ -84,7 +83,7 @@ namespace eval ::fndrpl {
             
             pack $find.f2.button3 $find.f2.button4 $find.f2.button2  -pady 4
         } else {
-            pack $find.f2.button1 $find.f2.button9 $find.f2.button2  -pady 4
+            pack $find.f2.button1 $find.f2.button2  -pady 4
         }
 
 
@@ -103,11 +102,19 @@ namespace eval ::fndrpl {
             pack $find.l.f4.f.cbox1 $find.l.f4.f.cbox2 -side top -padx 0 -fill x
             pack $find.l.f4.f $find.l.f4.f3 -side left -padx 10
         } else {
-
             checkbutton $find.l.f4.cbox1 -text "3.Match case" -variable ::fndrpl::findcase -underline 0
             pack $find.l.f4.f3 -side left -padx 10
             pack $find.l.f4.cbox1 -side left -padx 10
         }
+
+        frame $find.l.f4.policyBox -borderwidth 2 -relief groove
+        radiobutton $find.l.f4.policyBox.any_bounds -text "Text" -underline 0 -variable ::fndrpl::BoundaryPolicy -value "any_bounds" 
+        radiobutton $find.l.f4.policyBox.lisp_identifier -text "Lisp identifier" -variable ::fndrpl::BoundaryPolicy -value "lisp_identifier" 
+
+        pack $find.l.f4.policyBox.any_bounds -side top -anchor w
+        pack $find.l.f4.policyBox.lisp_identifier -side bottom -anchor w
+        pack $find.l.f4.policyBox -side left -padx 10
+
 
         if {$FndOrRpl=="replace"} {
             puts "Bindings for alt-letter are not created for Replace"

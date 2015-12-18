@@ -61,8 +61,8 @@ namespace eval ::fndrpl {
     variable window 
 
     variable SearchString            ""
-    variable SearchPos               "1.0"
     variable SearchDir               "forwards"
+    variable BoundaryPolicy          "any_bounds"
     variable findcase                0
 
     # used in grep
@@ -94,6 +94,39 @@ namespace eval ::fndrpl {
     
     trace add variable SearchString write ::fndrpl::WhenSomeOfSearchVariablesChanged
     trace add variable findcase write ::fndrpl::WhenSomeOfSearchVariablesChanged
+
+    ## OldTkconFind - code from tkcon searches in text widget $w for $str and highlights it
+    ## If $str is empty, it just deletes any highlighting
+    # ARGS: w	- text widget
+    #	str	- string to search for
+    #	-case	TCL_BOOLEAN	whether to be case sensitive	DEFAULT: 0
+    #	-regexp	TCL_BOOLEAN	whether to use $str as pattern	DEFAULT: 0
+    ##
+    proc OldTkconFind {w str args} {
+        $w tag remove find 1.0 end
+        set truth {^(1|yes|true|on)$}
+        set opts  {}
+        foreach {key val} $args {
+            switch -glob -- $key {
+                -c* { if {[regexp -nocase $truth $val]} { set case 1 } }
+                -r* { if {[regexp -nocase $truth $val]} { lappend opts -regexp } }
+                default { return -code error "Unknown option $key" }
+            }
+        }
+        if {![info exists case]} { lappend opts -nocase }
+        if {$str eq ""} { return }
+        $w mark set findmark 1.0
+        # set InternalWidget [RoTextGetInternalWidget $w]
+        set InternalWidget $w
+        while {[set ix [eval $InternalWidget search $opts -count numc -- \
+                            $str findmark end]] ne ""} {
+            $w tag add find $ix ${ix}+${numc}c
+            $w mark set findmark ${ix}+1c
+        }
+        $w tag configure find -background $::tkcon::COLOR(blink)
+        catch {$w see find.first}
+        return [expr {[llength [$w tag ranges find]]/2}]
+    }
 
     proc greplist { text greps } {
         variable glb
@@ -164,65 +197,6 @@ namespace eval ::fndrpl {
         }
     }
 
-    # Was not updated to namespace. Unlikely to work
-    proc GrepIt {text} {
-        variable SearchString
-        variable SearchPos
-        variable SearchDir
-        variable findcase
-        variable current_window
-        variable window
-        variable glb
-        variable greps
-
-        set greps ""
-
-        if {$SearchString!=""} {
-            if {$findcase=="1"} {
-                set caset "-exact"
-            } else {
-                set caset "-nocase"
-            }
-            set limit end
-
-            set cont 1
-            set startw $current_window
-            set i 0
-
-            while {$cont==1} {
-                set SearchPos "1.0"
-
-
-                set found 1 
-                while {$found==1} {
-
-                    set leng [string length $SearchString]
-                    set SearchPos [ $text search $caset -$SearchDir -- $SearchString $SearchPos $limit]
-                    if {$SearchPos != ""} {
-                        set sta "[lindex [split $SearchPos {.}] 0].0"
-
-                        set str [list [string trim [$text get $sta "$sta+1 line"] "\n" ] ]
-                        set greps "$greps $current_window $sta {$str} "
-
-
-                        if {$SearchDir == "forwards"} {
-                            set SearchPos "$SearchPos+$leng char"
-                        }         
-                    } else {
-                        set found 0
-                    }
-                }
-
-                win::Next
-                if {$current_window==$startw} {set cont 0}
-
-            } 
-
-        }
-        greplist $text $greps
-    }
-
-
     ################################# Find proc #################################
 
     proc ProcessFindItResult {found} {
@@ -239,33 +213,42 @@ namespace eval ::fndrpl {
         }
     }
 
-    # Entry from FindBox dialog box to search process 
-    proc FindIt {text} {
+
+    # Creates SearchState and initiates search
+    # Returns whatever FindItI2 returns
+    proc FindItInner {text} {
         variable SearchDir
         variable SearchString
         variable findcase
         variable SearchState
+        variable BoundaryPolicy
 
-        set SearchState [dict create                       \
-                             -widgetWhereSought $text      \
-                             -startFrom     insert         \
-                             -direction     $SearchDir     \
-                             -searchStringQ $SearchString  \
-                             -findcase      $findcase      \
+        set SearchState [dict create                           \
+                             -widgetWhereSought $text          \
+                             -startFrom         insert         \
+                             -direction         $SearchDir     \
+                             -searchStringQ     $SearchString  \
+                             -findcase          $findcase      \
+                             -BoundaryPolicy    $BoundaryPolicy \
+                             -ReplaceCanceled   0               \
                         ]
+                        
+        return [FindItI2 $text]
+    }
+    
 
+    # Find command 
+    proc FindIt {text} {
         set found [FindItInner $text]
-
         ProcessFindItResult $found 
-        
     }
 
 
     proc CheckCharAgainstBoundaryPolicy {char policy} {
-        if {$char eq " "} {
-            return 1
+        if {$policy eq "lisp_identifier"} {
+            return [regexp [::tkcon::BoundOfLispSymbolRegexpSimplified] $char]
         } else {
-            return 0
+            return 1
         }
     }
 
@@ -280,8 +263,7 @@ namespace eval ::fndrpl {
         set SearchString [dict get $SearchState -searchStringQ]
         set SearchDir [dict get $SearchState -direction]
         set findcase [dict get $SearchState -findcase]
-        set BoundaryPolicy 1
-        # [dict get $SearchState -BoundaryPolicy]
+        set BoundaryPolicy [dict get $SearchState -BoundaryPolicy]
         
         if {$FoundPos eq "1.0"} {
             set MatchesAtLeft 1
@@ -309,13 +291,12 @@ namespace eval ::fndrpl {
     
 
 
-    # Returns two values:
-    # 1) 0 if not found, 1 if found, -1 if empty search string
-    # 2) new SearchState
-    # Side effects: moves insert, changes selection
+    # Returns:
+    # 0 if not found, 1 if found, -1 if empty search string
+    # Side effects: moves insert, changes selection, changes SearchState variable
     # ContinueP is irrelevant for text search, but we insert
     # ContinueP 1 in resulting searchstate.
-    proc FindItInner {text} {
+    proc FindItI2 {text} {
         variable SearchState
 
         set SearchPos [dict get $SearchState -startFrom]
@@ -324,6 +305,7 @@ namespace eval ::fndrpl {
         set findcase [dict get $SearchState -findcase]
 
         if {$SearchString eq ""} {
+            # dict set $SearchState -NoMoreMatches 1
             return -1
         }
         if {$findcase=="1"} {
@@ -369,132 +351,90 @@ namespace eval ::fndrpl {
 
             dict set SearchState -continueP 1
             dict set SearchState -startFrom $SearchPos
+
             return 1
 
         } else {
+            # dict set $SearchState -NoMoreMatches 1
             return 0
         }
 
     }
 
 
-    ## OldTkconFind - code from tkcon searches in text widget $w for $str and highlights it
-    ## If $str is empty, it just deletes any highlighting
-    # ARGS: w	- text widget
-    #	str	- string to search for
-    #	-case	TCL_BOOLEAN	whether to be case sensitive	DEFAULT: 0
-    #	-regexp	TCL_BOOLEAN	whether to use $str as pattern	DEFAULT: 0
-    ##
-    proc OldTkconFind {w str args} {
-        $w tag remove find 1.0 end
-        set truth {^(1|yes|true|on)$}
-        set opts  {}
-        foreach {key val} $args {
-            switch -glob -- $key {
-                -c* { if {[regexp -nocase $truth $val]} { set case 1 } }
-                -r* { if {[regexp -nocase $truth $val]} { lappend opts -regexp } }
-                default { return -code error "Unknown option $key" }
-            }
-        }
-        if {![info exists case]} { lappend opts -nocase }
-        if {$str eq ""} { return }
-        $w mark set findmark 1.0
-        # set InternalWidget [RoTextGetInternalWidget $w]
-        set InternalWidget $w
-        while {[set ix [eval $InternalWidget search $opts -count numc -- \
-                            $str findmark end]] ne ""} {
-            $w tag add find $ix ${ix}+${numc}c
-            $w mark set findmark ${ix}+1c
-        }
-        $w tag configure find -background $::tkcon::COLOR(blink)
-        catch {$w see find.first}
-        return [expr {[llength [$w tag ranges find]]/2}]
-    }
-
-    
-    # Was not updated to namespace. Unlikely to work
+    # Searches once. If object is found, queries replace and accomplishes it. 
+    # Returns 1 if we have to can continue search and relpace, 0 otherwise. 
+    # That is, if text if not found or we canceled multiple replace sequence, returns 0
     proc ReplaceIt {text} {
         variable SearchString
         variable SearchDir
         variable ReplaceString
         variable findcase
-        #variable window
-        #variable current_window
         variable rconfirm
-        variable SearchPos
+        variable SearchState
 
-        set SearchPos insert
-        #set window($current_window,echange) 1
-        #set window($current_window,change) 1
-
-        if {$findcase=="1"} {
-            set caset "-exact"
-        } else {
-            set caset "-nocase"
-        }
-        
-
-        if {$SearchDir == "forwards"} {
-            set limit end
-        } else {
-            set limit 1.0
-        }
+        dict set $SearchState -ReplaceCanceled 0
 
         set leng [string length $SearchString]
-        set SearchPos [ $text search $caset -$SearchDir -- $SearchString $SearchPos $limit]
+        set found [FindItInner $text] 
 
-        if {$SearchPos != ""} {
-            $text see $SearchPos
+        set SearchPos [dict get $SearchState -startFrom]
 
-            if {$rconfirm==1} { 
-                $text tag add sel $SearchPos  "$SearchPos+$leng char"
-                set reply [YesNoCancel "Replace" "Replace this match?" $text]
-                switch -exact $reply {
-                    yes { 
-                        $text delete $SearchPos "$SearchPos+$leng char"
-                        $text insert $SearchPos $ReplaceString
-                        $text tag remove sel $SearchPos
-                    }
-                    no {
-                        $text tag remove sel $SearchPos
-                    }
-                    cancel {
-                        $text tag remove sel $SearchPos
-                        set SearchPos "1.0"
-                        return
-                    }
+        ProcessFindItResult $found 
+
+        if {$found != 1} {
+            return 0
+        }
+        
+        ::mprs::AssertEq [expr {$SearchPos ne ""}] 1
+
+        $text see $SearchPos
+
+        if {$rconfirm==1} { 
+            $text tag add sel $SearchPos  "$SearchPos+$leng char"
+            set reply [YesNoCancel "Replace" "Replace this match?" $text]
+            switch -exact $reply {
+                yes { 
+                    $text delete $SearchPos "$SearchPos+$leng char"
+                    $text insert $SearchPos $ReplaceString
+                    $text tag remove sel $SearchPos
                 }
-            } else {
-                $text delete $SearchPos "$SearchPos+$leng char"
-                $text insert $SearchPos $ReplaceString
+                no {
+                    $text tag remove sel $SearchPos
+                }
+                cancel {
+                    $text tag remove sel $SearchPos
+                    dict set $SearchState -ReplaceCanceled 1
+                    return 0
+                }
             }
+        } else {
+            $text delete $SearchPos "$SearchPos+$leng char"
+            $text insert $SearchPos $ReplaceString
+        }
             
 
-            if {$SearchDir == "forwards"} {
-                tkTextSetCursor $text "$SearchPos+$leng char"        
-            } else { tkTextSetCursor $text $SearchPos }
-
+        if {$SearchDir == "forwards"} {
+            tkTextSetCursor $text "$SearchPos+$leng char"        
         } else {
-            set SearchPos "1.0"
+            tkTextSetCursor $text $SearchPos 
         }
+        return 1
     }
 
     # Was not updated to namespace. Unlikely to work
     proc ReplaceAll {text} {
-        #variable SearchString
-        #variable SearchDir
-        #variable ReplaceString
-        #variable findcase
-        #variable window
-        #variable current_window
+        variable SearchState
 
-        #set window($current_window,echange) 1
-        #set window($current_window,change) 1
+        set shouldContinue [ReplaceIt $text]
 
-        variable SearchPos
-        ReplaceIt $text 
-        while {$SearchPos!="1.0"} {
-            ReplaceIt $text 
+        while {$shouldContinue == 1} {
+
+            if {[dict get $SearchState -ReplaceCanceled]} {
+                break
+            }
+
+            set shouldContinue [ReplaceIt $text]
         }
     }
 
@@ -567,6 +507,7 @@ namespace eval ::fndrpl {
              -direction             $SearchDir                     \
              -searchStringQ         $searchStringQ                 \
              -findcase              $findcase                      \
+             -BoundaryPolicy        "any_bounds"                   \ 
             ]
         
         ::srchtblst::TreeSearchText $tablelist $EnsurePopulatedCmd {
