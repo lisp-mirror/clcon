@@ -86,6 +86,7 @@ namespace eval ::fndrpl {
             pack $find.f2.button1 $find.f2.button2  -pady 4
         }
 
+        # $find.l.f4 contains: up and down group box
 
         frame $find.l.f4
         frame $find.l.f4.f3 -borderwidth 2 -relief groove
@@ -94,34 +95,38 @@ namespace eval ::fndrpl {
         pack $find.l.f4.f3.up $find.l.f4.f3.down -side left 
 
 
+        frame $find.l.f4.f
+        checkbutton $find.l.f4.f.cbox1 -text "3.Match case" -variable ::fndrpl::findcase -underline 0
+        pack $find.l.f4.f.cbox1 -side left -padx 0 -fill x
+
         if {$FndOrRpl=="replace"} {
-            frame $find.l.f4.f
             set rconfirm 1
-            checkbutton $find.l.f4.f.cbox1 -text "3.Match case" -variable ::fndrpl::findcase -underline 0
             checkbutton $find.l.f4.f.cbox2 -text "Confirm replace"  -variable ::fndrpl::rconfirm -underline 0
-            pack $find.l.f4.f.cbox1 $find.l.f4.f.cbox2 -side top -padx 0 -fill x
-            pack $find.l.f4.f $find.l.f4.f3 -side left -padx 10
-        } else {
-            checkbutton $find.l.f4.cbox1 -text "3.Match case" -variable ::fndrpl::findcase -underline 0
-            pack $find.l.f4.f3 -side left -padx 10
-            pack $find.l.f4.cbox1 -side left -padx 10
+            pack $find.l.f4.f.cbox2 -side right -padx 0 -fill x
         }
 
-        frame $find.l.f4.policyBox -borderwidth 2 -relief groove
-        radiobutton $find.l.f4.policyBox.any_bounds -text "Text" -underline 0 -variable ::fndrpl::BoundaryPolicy -value "any_bounds" 
-        radiobutton $find.l.f4.policyBox.lisp_identifier -text "Lisp identifier" -variable ::fndrpl::BoundaryPolicy -value "lisp_identifier" 
+        pack $find.l.f4.f $find.l.f4.f3 -side left -padx 10
 
-        pack $find.l.f4.policyBox.any_bounds -side top -anchor w
-        pack $find.l.f4.policyBox.lisp_identifier -side bottom -anchor w
-        pack $find.l.f4.policyBox -side left -padx 10
+        if {$AreaType ne "tablelist"} {
+            frame $find.l.f4.policyBox -borderwidth 2 -relief groove
+            radiobutton $find.l.f4.policyBox.any_bounds -text "5.Text" -underline 0 -variable ::fndrpl::BoundaryPolicy -value "any_bounds" 
+            radiobutton $find.l.f4.policyBox.lisp_identifier -text "Lisp identifier" -variable ::fndrpl::BoundaryPolicy -value "lisp_identifier" 
+        
+            pack $find.l.f4.policyBox.any_bounds -side top -anchor w
+            pack $find.l.f4.policyBox.lisp_identifier -side bottom -anchor w
+            pack $find.l.f4.policyBox -side left -padx 10
+        }
 
+        if {$AreaType ne "tablelist"} {
+            bind $find <Alt-Key-5> "focus $find.l.f4.policyBox.any_bounds"
+        }
+
+        bind $find <Alt-Key-2> "focus $find.l.f4.f3.up"
+        bind $find <Alt-Key-3> "focus $find.l.f4.f.cbox1"
 
         if {$FndOrRpl=="replace"} {
-            puts "Bindings for alt-letter are not created for Replace"
         } else {
             bind $find <Alt-Key-1> "focus $find.l.f.f1.entry"
-            bind $find <Alt-Key-2> "focus $find.l.f4.f3.up"
-            bind $find <Alt-Key-3> "focus $find.l.f4.cbox1"
         }
 
         pack $find.l.f

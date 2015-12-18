@@ -103,8 +103,6 @@ namespace eval ::srchtblst {
             # We could describe it is a search feature though.
             set celltext [list [join [$tbl rowcget $CurName -text] \t]]
             set cmd [concat $CmdWithCaseOption $celltext]
-            putd "about to test row at $CurName = [$tbl index $CurName]"
-            showVarPutd cmd
             if {[eval $cmd]} {
                 # found 
                 ::tablelist_util::TreeSetTo $tbl $CurName

@@ -507,8 +507,7 @@ namespace eval ::fndrpl {
              -direction             $SearchDir                     \
              -searchStringQ         $searchStringQ                 \
              -findcase              $findcase                      \
-             -BoundaryPolicy        "any_bounds"                   \ 
-            ]
+             -BoundaryPolicy        "any_bounds"  ]
         
         ::srchtblst::TreeSearchText $tablelist $EnsurePopulatedCmd {
             ::fndrpl::ProcessFindItResult $found 
