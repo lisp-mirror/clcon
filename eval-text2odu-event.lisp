@@ -226,11 +226,12 @@
          (options (parse-ecofwct-options (clco::text2odu-event-options e)))
          (cont (clco::text2odu-event-far_tcl_cont_id e))
          )
-    (assert (and
-             (eq (symbol-package fn) (find-package :oduvanchik)) ; security limitation
-             (fboundp fn)) () "Symbol ~S funbound or have home-package different from :oduvanchik" fn)
-
     (swank::with-connection (connection) 
+
+      (assert (and
+               (eq (symbol-package fn) (find-package :oduvanchik)) ; security limitation
+               (fboundp fn)) () "Symbol ~S funbound or have home-package different from :oduvanchik" fn)
+
       (use-buffer buffer
         (odu::set-mark-to-row-and-col (current-point)
                                       (clco::row-col-row cur-row-col)

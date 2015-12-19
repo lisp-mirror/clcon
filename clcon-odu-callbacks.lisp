@@ -34,10 +34,16 @@
 
 (defmethod oi::ask-user-about-editor-condition :around (condition)
   (let* ((variants '("debug" "abort command (Esc key)" "quit lisp"))
+         (message (format nil "~A" condition))
+         (qmessage (cl-tk:tcl-escape message))
+         (cmd
+          (format nil "tk_messageBox -message ~A" qmessage))
+         (dummy1 (clco:eval-in-tcl cmd :nowait nil))
          (users-choice 
           (simple-listbox-menu variants :title "Serious error in the editor"))
          (variant-index
           (position users-choice variants :test 'equal)))
+    (declare (ignore dummy1))    
     (ecase variant-index
       ((nil) :abort)
       (0 :debug)
