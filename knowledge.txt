@@ -388,6 +388,8 @@ sb-impl::%read-preserving-whitespace
 и там код, к-рый вызывает file-offset. Однако emacs справляется с ситуацией.
 Попробуем применить editor-budden-tools::goto-offset
 
+==================================
+alpha - cheneyGC
 
 ========================================================
 CL-USER 17 > (EDITOR::call-scrollable-menu '("a" "b" "c") nil)
