@@ -144,6 +144,15 @@
 (asdf:load-system :clcon-server)
 ; (asdf:load-system :lime) ; enable it just to navigate through sources
 
+;;;;;;;;;;;;;;;;;; Loading some code which is not that important ;;;;;;;
+;; it would be nice to load it after starting the IDE
+
+(asdf:load-system :hyperdoc)
+;; usage: 
+;;   (hyperdoc:lookup "CL-PPCRE" "SCAN")
+;;   (hyperdoc:lookup "CL-USER" "CONS")
+
+
 ;;;;;;;;;;;;;;;;;; Starting server ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; note this is already second swank server
