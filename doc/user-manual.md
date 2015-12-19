@@ -214,8 +214,8 @@ Evals code in the context of the frame selected on the stack and prints result a
 ###Return from frame
 Prompts for lisp expression and returns it from the frame as if it was normal return. Found at "Stack" debugger menu. 
 
-###Stepping, watches
-SBCL supports stepping, but it is not done yet and this can be hard to do. Watches are useless without stepping.
+###Stepping, watch expressions
+Stepping is described in [demo tour](demo-tour.md). No watch expressions are available (but there are some other tools, e.g. trace). 
 
 ###Breakpoints
 Just insert [break](http://www.lispworks.com/documentation/lw60/CLHS/Body/f_break.htm) at appropriate place to enter debugger.
@@ -226,7 +226,8 @@ If you want to print debug messages as your code runs, use [trace](http://www.li
 Specific CL implementations usually have extensions for trace, read your Lisp's manual!
 
 Also you can just insert calls to [some of printing functions](http://www.lispworks.com/documentation/lw60/CLHS/Body/f_wr_pr.htm) 
-into your function and recompile it. 
+into your function and recompile the file where it is contained. Lisp is so great so you need not restart your program. As you enter
+your function next time, new definition applies.  
 
 Tcl errors
 ----------
