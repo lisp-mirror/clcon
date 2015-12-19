@@ -1,4 +1,11 @@
-﻿Clcon didn't attract great attention in the world. Most important, I have zero patches from third-party developers (not counting one patch for documentation). So rather soon I'll start localizing clcon in a "destructive" fashion. All English strings in clcon user interface would be replaced with Russian ones. Documentation will be translated and no further support of English version will continue. If someone is interested in keeping English version, there are two ways:
+# VERY IMPORTANT NEWS
+﻿
+Clcon didn't attract great attention in the world. Most important, I have zero patches from third-party developers (not counting one patch for documentation). So rather soon I'll start localizing clcon in a "destructive" fashion. All English strings in clcon user interface would be replaced with Russian ones. Documentation will be translated and no further support of English version will continue. If someone is interested in keeping English version, there are two ways:
+
+a) contribute
+
+b) donate
+
 ## What's that
 **clcon** is a cross-platform Common Lisp IDE under construction. Current release is 0.3.4 (see tags in repo). 
 
