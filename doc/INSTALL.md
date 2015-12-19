@@ -1,4 +1,4 @@
-Clcon 0.3.3 installation and startup 
+Clcon 0.3.4 installation and startup 
 ==============
 
 Warning
@@ -23,7 +23,7 @@ If all is ok, you have clcon with SBCL (use Alt-. to find sources of SBCL object
 
 Repositories of clcon components (clcon, oduvanchik, budden-tools) are at c:\clcon\lp - feel free to send patches :)
 
-Linux: INSTALLATION PROCEDURE NOT TESTED!
+Linux: INSTALLATION PROCEDURE NOT TESTED at 0.3.4!
 -----------
 
 ### Prerequisites
@@ -50,19 +50,26 @@ Linux: INSTALLATION PROCEDURE NOT TESTED!
 
 #### Decide clcon version
 
-You can try trunk, but it is better to load latest tagged "release", 0.3.3. Note that online documentation usually describes trunk. To be sure that it matches software functionality, read not the online documentation, but documentation you have installed. 
+You can try trunk, but it is better to load latest tagged "release", 0.3.4. Note that online documentation usually describes trunk. To be sure that it matches software functionality, read not the online documentation, but documentation you have installed. 
 
-#### Lisp libraries and clcon components
+#### Lisp libraries, part 1 and clcon components
 
     cd /s2/lib/ql.sbcl.l/local-projects
-    # Force local system index to refresh
-    rm system-index.txt 
     hg clone https://bitbucket.org/budden/budden-tools
     git clone https://github.com/budden/slime 
     git clone https://github.com/budden/named-readtables
-    # to download clcon's trunk, remove '-u 0.3.3' 
-    hg clone -u 0.3.3 https://bitbucket.org/budden/oduvanchik
-    hg clone -u 0.3.3 https://bitbucket.org/budden/clcon
+    # to download clcon's trunk, remove '-u 0.3.4' 
+    hg clone -u 0.3.4 https://bitbucket.org/budden/oduvanchik
+    hg clone -u 0.3.4 https://bitbucket.org/budden/clcon
+
+#### Lisp libraries, part 2
+
+hyperdoc, hyperspec-lookup, toposort: I patched two of these. The only way
+to get them is to download windows file release and get clcon/lp/third-party directory. Extract this directory as /s2/lib/ql.sbcl.l/local-projects/third-party .
+
+#### Refreshing system-index for quicklisp: 
+    cd /s2/lib/ql.sbcl.l/local-projects
+    rm system-index.txt 
 
 ### Build and start server
 

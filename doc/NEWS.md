@@ -1,5 +1,18 @@
 clcon news
 
+0.3.4 vs 0.3.3
+=====
+There is a feeling that quality degraded a bit since 0.3.3.
+Note that 0.3.4 may be last Engligh-language based version of clcon. 
+At any time I can start localization. 
+
+- f1 calls hyperdoc lookup. So you need some systems which hard to find. If you are on linux, download windows release and take them from windows release. 
+- lisp identifier search mode instead of word search found normally in text editors. Rather dumb but useful.
+- control-shift-key-right, control-shift-key-left mark lisp forms
+- some editor errors are captured without invokind debugger, user is allowed to dismiss such errors
+- some bugs are fixed, new bugs are added
+
+
 0.3.3 vs 0.3.2
 =====
 - lisp completion in the editor

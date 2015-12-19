@@ -1,4 +1,4 @@
-Clcon 0.3.3 demo tour 
+Clcon 0.3.4 demo tour 
 ===============
 
 Clcon is a building site. Excavators buzz. Pits, traps, naked electric wires wait you there.

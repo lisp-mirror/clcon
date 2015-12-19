@@ -9,7 +9,7 @@ a) contribute. Supply me a technology which allows to keep both versions. Russia
 b) donate.
 
 ## What's that
-**clcon** is a cross-platform Common Lisp IDE under construction. Current release is 0.3.3 (see tags in repo). 
+**clcon** is a cross-platform Common Lisp IDE under construction. Current release is 0.3.4 (see tags in repo). 
 
 ## Note about versions
 If your're reading this document online, this document describes trunk version. 
@@ -58,7 +58,7 @@ If you want to try using clcon, first of all take a [demo tour](doc/demo-tour.md
 - List definitions in a file for Lisp and Tcl (very primitive version)
 
 ## Installation and startup
-For windows, we have [file release](https://bitbucket.org/budden/clcon/downloads/clcon-0.3.3.zip)
+For windows, we have [file release](https://bitbucket.org/budden/clcon/downloads/clcon-0.3.4.zip)
 
 Also you can download 
 [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine/downloads/cl-stirling-engine-at-clcon-0.3.1.zip) which
