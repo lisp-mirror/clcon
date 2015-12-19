@@ -1,4 +1,4 @@
-﻿Clcon <<TRUNK>> user manual
+﻿Clcon 0.3.4 user manual
 ===========
 
 Command line options
@@ -279,3 +279,15 @@ Syntax highlighting
 Code highlighting is now rather humble. All files are painted as lisp regardless of extension.
 Also we have basic paren highlighting - when you stand after closing paren, editor highlights
 appropriate opening paren. 
+
+Getting help on lisp symbols
+----------------------------
+There is an online help on embedded lisp symbols. Just press F1 on
+a symbol in the console or in the editor. Some lisp libraries 
+support online help too. To learn which ones do support, try
+`.apr hyperdoc. You'll see `*hyperdoc-base-uri*` and/or `hyperspec-lookup`
+symbols in some packages. For theese packages, there is a probability to
+get help via pressing f1. 
+
+
+

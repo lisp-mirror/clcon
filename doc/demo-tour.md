@@ -10,26 +10,28 @@ First of all try evaluate something:
 
      (dotimes (i 10) (print i) (sleep 0.5))
 
-Note! You can not yet enter multi-line commands. As you press returns, input is sent to lisp REPL. So don't try to break your command into pretty several lines.
-
 After you pressed return, you see that printing occurs with intervals. This experiment shows that we have async I/O.
 
-Apropos, completion, find definition
+Note! To enter multi-line commands, use Shift-Key-Return (that is, Shift and Return). 
+
+
+Apropos, completion, find definition, help
 -------------
 Keyboard accelerators are shown in "Edit" menu.
 
 ### Lisp
 At the console, enter `.apr -lookup-` to list all symbols containing "-lookup-" substring in their name. 
-At the console, type in `clco:serv` and press `Tab`. Name will expand to `clco:server-lookup-definition`. 
-Now press `Alt-.` Editor window will pop up and source of function you typed will be seen. You can press Alt-. at
+At the console, type in `clco:s-l-d` and press `Tab`. Name will expand to clco:server-lookup-definition with the help of compound completion algorithm (swank-c-p-c contrib). Now press `Alt-.` Editor window will pop up and source of function you typed will be seen. You can press Alt-. at
 any lisp definition in the editor and jump to its source. If there are more then one definition (e.g. for FORMAT function), list of "hyperlinks"
-will show up at the console. Click on either of them with mouse to open an appropriate source. In the editor, completion works also - type `clco:s-l-d` in the editor and press `Tab`. Note that if there is no constituent character under cursor, Tab works as indent-line-command. 
+will show up at the console. Click on either of them with mouse to open an appropriate source. In the editor, completion works in similar way. Note that if there is no constituent character under cursor, Tab works as indent-line-command. 
+
+Finally set the cursor at the word `defun` and press `f1`. Web browser should open with hyperspec article about `defun`.  
 
 ### Tcl
 Return to the console with `Control-.`.
 Clean up current command with `Control-u` and enter `.tapr cap` to list all tcl procs, commands and vars containing substring `cap` in their name. Position a keyboard cursor at any of them and press Control-F9 to go to its source. 
 Return to the console with `Control-.` . Type a space and then `snit::Ca`. Then press `Control-Alt-u` . Name will expand to 
-`::snit::Capitalize`. Press `Control-F9` and jump to a source of tcl proc. Note this is source from the library, not the source of clcon. Rather convenient. We only now support procs, not variables. Note that "find source" for tcl works for fully qualified names only. 
+`::snit::Capitalize`. Press `Control-F9` and jump to a source of tcl proc. Note this is source from the library, not the source of clcon. Rather convenient. We only now support procs, not variables. Note that "find source" for tcl works for fully qualified names only. It only shows proper source if name starts from "::" (this is a bug).
 
 ### File name
 Return to the console with `Control-.`. Type a space and then some partial file name in Unix style, e.g. `c:/win` under Windows or `/bi` under Unix
@@ -39,8 +41,8 @@ Pressing `Control-Return` at the console inserts path to the file currently sele
 
 Switching between windows
 -----------
-In the editor, press `Control-.` to switch back to console. In the console, press `Control-Shift-e` to switch to editor. Press `Control-Tab`, `Control-Shift-Tab` to navigate through editor buffers. Press `Control-F12` to see buffer list widget.
-
+In the editor, press `Control-.` to switch back to console. In the console, press `Control-Shift-e` to switch to editor. Press `Control-Tab`, `Control-Shift-Tab` to navigate through editor buffers. Press `Control-F12` to see buffer list widget. In the widget, buffers are sorted by MRU.
+	
 Compiling file from editor
 ------------
 At the console, open test/error-browser-sample-file.lisp file for editing.
@@ -80,7 +82,7 @@ to call default restart, marked by asterik in restarts menu. Let's invoke "conti
 
 Now let's try stepper. 
 
-Warning! To make stepper work correctly, you need to load swank with stepper support disabled. This is true with windows release, but it depends on your initialization file on Linux. Hope to document it later, or see windows file release as an example. Also there are problems in stepper backend when you step out of the frame where you turned stepping mode on. Submit bug to SBCL tracker :) 
+Warning! To make stepper work correctly, you need to load swank with stepper support disabled. This is true with windows release, but it depends on your initialization file on Linux. Try following installation instructions. Also there are problems in stepper backend when you step out of the frame where you turned stepping mode on. Press "continue" if stepper shows up unexpectedly. Submit bug to SBCL tracker :) 
 
 With `Control-Up` at the console, bring up last command `(f 5)` to the prompt, and press `Return` to call it again. As debugger occurs, position windows so that
 you can see debugger and the editor at the same time. Choose `Stack/Switch to stepping mode` from menu bar. Editor window will pop up and current source will be highlighted. Press "F10" (Step next, or "Step over") watch how execution proceeds. Also note that stack and locals are shown in the debugger window. Press "f10" one more time, watch how execution proceeds. Then press "F5" (Continue, or resume to normal execution) to quit stepper mode. 
@@ -88,7 +90,7 @@ you can see debugger and the editor at the same time. Choose `Stack/Switch to st
 IDE commands. 
 ---------------------
 We like menus, but console-based ideology is nice too. So we have some kind of IDE command language. IDE commands start with `.`
-Type `.help` to see list of those.
+Type `.help` to see list of those. 
 
 Standalone inspector
 ----------
@@ -124,4 +126,4 @@ Again, press `Space` or `Return` to go to source. `Return` closes declaration li
 
 Code to extract declarations says tcl from lisp, but is extremely simple - no warranty. Also note that declarations are extracted from
  the file, not from the buffer. So if file is open in the editor and modified, locations will be inexact. 
-Also widget's design is not that perfect. At least I use it simetimes and found it useful. 
+Also widget's design is not that perfect. At least I use it sometimes and found it useful. 
