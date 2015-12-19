@@ -12,11 +12,12 @@
      (t
       result))))
 
-(defun swank-find-definitions-for-clcon (name-or-symbol &key package-name (readtable-name nil))
-  "Return a list ((DSPEC LOCATION) ...) of definitions for NAME-OR-SYMBOL. If name-or-symbol is string, we also need package-name and readtable-name. Package-name is a string, readtable-name is a keyword or nil. DSPEC is a string and LOCATION a source location. See also swank:find-definitions-for-emacs"
+
+(defun parse-name-or-symbol-to-symbol (name-or-symbol &key package-name (readtable-name nil))
+  "Given a data about symbol, tries its best to return the symbol Returns two values: symbol and found state"
   (etypecase name-or-symbol
     (symbol
-     (swank::find-definitions name-or-symbol))
+     (values name-or-symbol t))
     (string
      (let* ((package-or-nil (find-package package-name))
             (swank::*buffer-package* 
@@ -28,11 +29,17 @@
                (error "Package ~S not found" package-name)
                )))
             (swank::*buffer-readtable* (find-readtable-or-use-default readtable-name)))
-       (multiple-value-bind (symbol found)
-                            (swank::find-definitions-find-symbol-or-package name-or-symbol)
-         (when found
-           (swank::find-definitions symbol))
-         )))))
+       (swank::find-definitions-find-symbol-or-package name-or-symbol)))))
+  
+
+(defun swank-find-definitions-for-clcon (name-or-symbol &rest keyargs &key package-name (readtable-name nil))
+  "Return a list ((DSPEC LOCATION) ...) of definitions for NAME-OR-SYMBOL. If name-or-symbol is string, we also need package-name and readtable-name. Package-name is a string, readtable-name is a keyword or nil. DSPEC is a string and LOCATION a source location. See also swank:find-definitions-for-emacs"
+  (declare (ignorable package-name readtable-name))
+  (multiple-value-bind (symbol found)
+                       (apply #'parse-name-or-symbol-to-symbol name-or-symbol keyargs)
+    (when found
+      (swank::find-definitions symbol))))
+
 
 (defun edit-file-at-offset-code (file offset fix-offset-p)
   (let* ((escaped-file (tcl-escape-filename file))
@@ -156,7 +163,6 @@
            (write-code-to-see-console-end ou))
          )))))
 
-
 ;; (:location (:file "/home/denis/setup/sbcl-1.2.7/src/code/eval.lisp")
 ;;  (:position 4849)
 ;;  (:snippet "(defun simple-eval-in-lexenv (original-exp lexenv)
@@ -166,6 +172,7 @@
 ;;   (sb!c:with-compiler-error-resignalling
 ;;     (let ((exp (macroexpand original-exp lexenv)))
 ;;       (handler-bind "))
+
 
 (defun ldbg-edit-frame-source-location (frame-id parent)
   "We have frame id. Make IDE to open that location. Parent is a widget. If we unable to locate to source, we will issue a message with this widget as a parent"
@@ -177,6 +184,33 @@
         ))))
 
 
+(defun open-url (url)
+  #+windows
+  (budden0::cmd-c "start ~A" url)
+  #-windows
+  (print "Sorry, clco::open-url can not (yet) automatically open~%~A~%Please send me a patch~%" url)
+  nil)
+
 ;get-token-prefix
+
+(defun server-hyperdoc-lookup (name-or-symbol &optional (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*)))
+  "name-or-symbol is a name of a lisp object or object itself which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
+  (perga-implementation:perga
+    (:@ multiple-value-bind (symbol found) 
+          (parse-name-or-symbol-to-symbol name-or-symbol :package-name package-name :readtable-name readtable-name))
+    (cond
+     ((not found)
+      (oi:message "Didnt' find symbol ~S" name-or-symbol))
+     (t
+      (let urls-and-types
+       (hyperdoc:lookup (symbol-package symbol) (symbol-name symbol)))
+      (let urls
+        (mapcar 'cdr urls-and-types))
+      (let unique-urls
+        (remove-duplicates urls :test 'equal))
+      (dolist (url unique-urls)
+        (open-url url))
+      nil
+      ))))
 
 

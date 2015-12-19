@@ -55,9 +55,20 @@
     ""
   (multiple-value-bind (string symbol) (get-symbol-from-current-point)
     (let ((code
-           (clco::server-lookup-definition (or symbol string)
+           (clco:server-lookup-definition (or symbol string)
                                            (odu::package-at-point)
                                            (odu::readtable-at-point))))
+      code)))
+
+
+(defcommand "Hyperdoc Lookup" (p)
+    "Hyperdoc lookup"
+    ""
+  (multiple-value-bind (string symbol) (get-symbol-from-current-point)
+    (let ((code
+           (clco:server-hyperdoc-lookup (or symbol string)
+                                        (odu::package-at-point)
+                                        (odu::readtable-at-point))))
       code)))
 
 

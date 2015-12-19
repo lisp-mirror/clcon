@@ -45,6 +45,7 @@ namespace eval tkcon {
             <<TkCon_ExpandLisp>>	<Control-Alt-Key-i>
             <<TkCon_ExpandLisp>>	<Key-Tab>
             <<TkCon_LispFindDefinition>> <Alt-period>
+            <<TkCon_LispHyperdocLookup>> <Key-F1>
             <<TkCon_TclFindDefinition>> <Control-Key-F9>
             <<TkCon_Tab>>		<Control-i>
             <<TkCon_Tab>>		<Alt-i>
@@ -227,6 +228,10 @@ namespace eval tkcon {
         }
         bind TkConsole <<TkCon_LispFindDefinition>> {
             ::tkcon::LispFindDefinition %W
+            break ; # could check "%K" == "Tab"
+        }
+        bind TkConsole <<TkCon_LispHyperdocLookup>> {
+            ::tkcon::LispHyperdocLookup %W
             break ; # could check "%K" == "Tab"
         }
         bind TkConsole <<TkCon_TclFindDefinition>> {

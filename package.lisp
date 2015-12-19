@@ -7,6 +7,7 @@
            #:log-to-file
            #:ldbg-edit-frame-source-location
            #:server-lookup-definition
+           #:server-hyperdoc-lookup
            #:eval-in-tcl
            #:*clcon-source-directory*
                                         ; oduvan-backend

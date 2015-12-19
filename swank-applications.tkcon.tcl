@@ -109,12 +109,15 @@ proc ::tkcon::EditFileAtLine {filename line} {
     EditFileAtOffset $filename [string cat $line ".0"]
 }
 
-## ::tkcon::LispFindDefinition - 
-# ARGS:	w	- console text widget in which to find a symbol
-# See also: ::edt::FindSourceCommand
-## 
-proc ::tkcon::LispFindDefinition {w} {
+
+## ::tkcon::CallLispFunctionOnCurrentConsoleSymbol 
+# Calls lisp_fn with symbol string and current package on current symbol text in concole text_widget, 
+# and shedules tcl_continuation_fn {EventAsList} to be called upon return
+proc ::tkcon::CallLispFunctionOnCurrentConsoleSymbol {text_widget lisp_fn tcl_continuation_fn} {
     variable PRIV
+
+    set w $text_widget
+
     set exp [::tkcon::BeginningOfLispSymbolRegexp]
 
     if {[$w compare insert >= limit]} {
@@ -136,14 +139,30 @@ proc ::tkcon::LispFindDefinition {w} {
         return
     }
     
-    # string quoting is a bullshit here!
     set Quoted [QuoteLispObjToString $str]
     set Package [QuoteLispObjToString $PRIV(CurrentPackageName)]
-    set LispCmd "(cl:progn (clcon-server:server-lookup-definition $Quoted $Package))"
+    set LispCmd "($lisp_fn $Quoted $Package)"
    
-    ::tkcon::EvalInSwankAsync $LispCmd {::tkcon::LispFindDefinitionInnerContinuation $EventAsList} {:repl-thread}
-    
+    ::tkcon::EvalInSwankAsync $LispCmd "[list $tcl_continuation_fn] \$EventAsList" {:repl-thread}
 }
+
+
+## ::tkcon::LispFindDefinition - 
+# ARGS:	w	- console text widget in which to find a symbol
+# See also: ::edt::FindSourceCommand ,  odu::find-source-command
+## 
+proc ::tkcon::LispFindDefinition {w} {
+    CallLispFunctionOnCurrentConsoleSymbol $w "clcon-server:server-lookup-definition" "::tkcon::LispFindDefinitionInnerContinuation"
+}
+
+## ::tkcon::LispHyperdocLookup - 
+# ARGS:	w	- console text widget in which to find a symbol
+# See also: ::edt::FindSourceCommand ,  odu::find-source-command
+## 
+proc ::tkcon::LispHyperdocLookup {w} {
+    CallLispFunctionOnCurrentConsoleSymbol $w "clcon-server:server-hyperdoc-lookup" "::ProcedureNop"
+}
+
 
 
 

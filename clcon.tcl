@@ -1443,37 +1443,8 @@ proc ::tkcon::InitMenus {w title} {
     ## Help Menu
     ##
     foreach m [list [menu $w.help] [menu $w.pop.help]] {
-	$m add command -label "About " -command ::tkcon::About
-	if {![catch {package require ActiveTcl} ver]} {
-	    set cmd ""
-	    if {$tcl_platform(platform) == "windows"} {
-		package require registry
-		set ver [join [lrange [split $ver .] 0 3] .]
-		set key {HKEY_LOCAL_MACHINE\SOFTWARE\ActiveState\ActiveTcl}
-		if {![catch {registry get "$key\\$ver\\Help" ""} help]
-		    && [file exists $help]} {
-		    set cmd [list exec $::env(COMSPEC) /c start {} $help]
-		}
-	    } elseif {$tcl_platform(os) == "Darwin"} {
-		set ver ActiveTcl-[join [lrange [split $ver .] 0 1] .]
-		set rsc "/Library/Frameworks/Tcl.framework/Resources"
-		set help "$rsc/English.lproj/$ver/index.html"
-		if {[file exists $help]} {
-		    set cmd [list exec open $help]
-		}
-	    } elseif {$tcl_platform(platform) == "unix"} {
-		set help [file dirname [info nameofexe]]
-		append help /../html/index.html
-		if {[file exists $help]} {
-		    set cmd [list puts "Start $help"]
-		}
-	    }
-	    if {$cmd != ""} {
-		$m add separator
-		$m add command -label "ActiveTcl Help" -underline 10 \
-		    -command $cmd
-	    }
-	}
+        $m add command -label "About " -command ::tkcon::About
+        $m add command -label "Lisp Hyperdoc Lookup" -command "event generate <<TkCon_LispHyperdocLookup>>" -accel "<Key-F1>"
     }
 }
 

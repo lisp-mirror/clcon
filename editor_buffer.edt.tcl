@@ -137,6 +137,13 @@ namespace eval ::edt {
             ::edt::FindSourceContinuation $clcon_text $EventAsList
         }}
     }    
+
+
+    # See also ::tkcon::LispHyperdocLookup
+    proc LispHyperdocLookupCommand {text} {
+        set console [::tkcon::CurrentConsole]
+        ::clcon_text::CallOduvanchikFunction $text "odu::hyperdoc-lookup-command nil" ""
+    }    
     
     proc ReadFileIntoString {word {RemoveLastNewline 0}} {
         set obj [string cat "__tkcon" [GenNamedCounter "ReadFileObj"]]

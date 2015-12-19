@@ -171,6 +171,11 @@ namespace eval ::edt {
         set cmd [wesppt [list ::edt::FindSourceCommand $btext]]
         $m add command -label "Find Source" -accel "Alt-." -command $cmd
         ::clcon_key::b bind SingleMod$w <Alt-period> $cmd
+
+        $m add separator
+        set cmd [wesppt [list ::edt::LispHyperdocLookupCommand $btext]]
+        $m add command -label "Hyperdoc lookup" -accel "Key-F1" -command $cmd
+        ::clcon_key::b bind SingleMod$w <Key-F1> $cmd
     }
 
     proc EnableDisableMenuItems {} {
