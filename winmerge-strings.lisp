@@ -6,12 +6,18 @@
 (in-package :budden0)
 
 
-(defun call-bat (bat args &key (wait t))
-  (apply #'sb-ext:run-program
-         "c:/clcon/bin/util/CallBatFromGuiDetached.exe"
-         (cons bat args)
-         (dispatch-keyargs-simple wait)
-         ))
+(defun call-bat (bat args &key (wait t) redirect-output directory)
+  "Единственный надёжный способ запустить внешнюю программу из-под SBCL. Не знаю, как задать текущий каталог, видимо, нужно связывать *default-pathname-defaults*. Возвращает код возврата, если wait = t"
+  (let ((arglist nil))
+    (check-type redirect-output (or null string))
+    (when redirect-output
+      (setf arglist (append arglist `("-s" ,redirect-output))))
+    (setf arglist (append arglist (list bat) args))
+    (apply #'sb-ext:run-program
+           "c:/clcon/bin/util/CallBatFromGuiDetached.exe"
+           arglist
+           (dispatch-keyargs-simple wait directory)
+           )))
 
 (defun cmd-c (format &rest args) (asdf/run-program:run-program
                                   (apply #'format nil format args)
