@@ -1,88 +1,87 @@
-# VERY IMPORTANT NEWS
+# clcon - среда разработки для Common Lisp и будущего языка S2
+English version is not develped anymore, but it can be downloaded from https://bitbucket.org/budden/clcon_en . 
+
+## О языках
+clcon находится в процессе русификации. Часть документов может быть на Английском языке. 
 ﻿
-Clcon didn't attract great attention in the world. Most important, I have zero patches from third-party developers (not counting one patch for documentation). So rather soon I'll start localizing clcon in a "destructive" fashion. All English strings in clcon user interface would be replaced with Russian ones. Documentation will be translated and no further support of English version will continue. If someone is interested in keeping English version, there are two ways:
+## Что это? 
+**clcon** - это кросс-платформенная среда разработки для Common Lisp и создаваемого языка S2. Текущий релиз - 0.3.4 (см. теги в репозитории). 
 
-a) contribute
+## Замечание о версиях
+Если вы читаете этот документ в интернете, он относится к головной ревизии, а не к релизу. 
+Документация к релизу находится в c:/clcon/lp/clcon/readme.md после установки, либо в аналогичном месте под Unix. 
 
-b) donate
-
-## What's that
-**clcon** is a cross-platform Common Lisp IDE under construction. Current release is 0.3.4 (see tags in repo). 
-
-## Note about versions
-If your're reading this document online, this document describes trunk version. 
-Description of file release is under c:/clcon/lp/clcon/readme.md when release is installed.
-
-## Platform support
-Supported lisp implementation(s):
+## Поддерживаемые платформы
+Поддерживаемая реализация CL: 
 
 - SBCL
 
-Supported tcl version(s):
+Поддерживаемые версии Tcl:
 
-- tcl 8.6.3, 8.6.4
+- 8.6.3, 8.6.4
 
-Platforms where testing is 
+Тестируется на платформах:
 
-- Windows 7 (32 bit) - tested regularly
-- Debian 8 (32 bit) at x86 processor - tested occasionally
-- Debian 17.2 (64 bit) with the help of tombert's tcltk, see http://wiki.tcl.tk/668, tested occasionally
-- Windows 7 (64 bit), SBCL x86 - tested occasionally
+- Windows 7 (64 bit) - регулярное тестирование
+- Debian 8 (32 bit) x86 - иногда тестируется
+- Debian 17.2 (64 bit) - однажды тестировалось, см. http://wiki.tcl.tk/668
 
-## Screenshots
-[See here](https://bitbucket.org/budden/clcon/wiki/Screenshots)
+## Снимки экрана
+[См. сюда](https://bitbucket.org/budden/clcon/wiki/Screenshots)
 
-## Project goals
-- Permissively licenenced GUI for embedding of CL and CL-based languages into applications
+## Цели проекта
+- IDE под пермиссивной лицензией для встраивания CL или языков на платформе CL в приложения
 
-## Current state
-See [news](doc/NEWS.md)
+## Текущее состояние
+См [Новости](doc/NEWS.md)
 
-Clcon is at "alpha" stage. It is currently used for self development and shows itself rather robust in careful hands of its creator. Crashes or necessity to use EMACS are infrequent.
+Clcon находится в стадии "альфа". Я использую его как единственную среду разработки для программ на CL, в аккуратных руках его автора он работает приемлемо. Однако разного рода проблемы имеют место. 
 
-Clcon have most of essential features required for efficient CL development. 
-But some of them are still missing. 
+Clcon включает в себя большинство возможностей, нужных для эффективной разработки под Common Lisp. Но кое-чего пока не хватает.
 
-If you want to try using clcon, first of all take a [demo tour](doc/demo-tour.md).
 
-## Current features
-- Zero configuration on Windows. Just unpack one archive and work. 
-- REPL for Lisp and Tcl with history
-- Completion, find source, apropos for Lisp
-- Hyperdoc lookup for lisp
-- Limited completion, find source, apropos for Tcl
-- Find in files
-- Debugger, Stepper, Inspector from SWANK 
-- Multi-tabbed Editor with lisp syntax highlight, autoindent, lisp forms navigation
-- Compile lisp from IDE, compilation error browser with "jump to source"
-- List definitions in a file for Lisp and Tcl (very primitive version)
+Если вы хотите попробовать использовать clcon, начните с [демонстрационного сеанса](doc/demo-tour.md).
 
-## Installation and startup
-For windows, we have [file release](https://bitbucket.org/budden/clcon/downloads/clcon-0.3.4.zip)
+## Реализованные возможности
+- Не требует конфигурации. Скачайте один архив, распакуйте и работайте
+- Командная строка (REPL) для CL и Tcl с историей команд
+- Продолжение имени, переход к определению, поиск имени по подстоке для CL
+- Интернет-справка для стандартных функций CL и для некоторых библиотек
+- Продолжение имени, переход к определению, поиск имени по подстоке для Tcl (с ограничениями)
+- Поиск в файлах
+- Отладчик, пошаговое выполнение, инспектор из SWANK 
+- Редактор с закладками, подсветка синтаксиса лиспа, автоотступы, хождение по структуре лисповых форм
+- Компиляция отдельных файлов лиспа из среды разработки, просмотр ошибок компиляции с переходом к определению
+- Вывод списка определений в файле для языков CL и tcl (с ограничениями)
 
-Also you can download 
-[cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine/downloads/cl-stirling-engine-at-clcon-0.3.1.zip) which
-contains clcon 0.3.1 . Documentation related to release is in the file itself. 
+## Установка и запуск
+Для windows у нас есть [портативный файловый релиз](https://bitbucket.org/budden/clcon/downloads/clcon-0.3.4.zip), не требующий установки
 
-For Linux, see [doc/INSTALL.md](doc/INSTALL.md).
+Также вы можете загрузить 
+[cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine/downloads/cl-stirling-engine-at-clcon-0.3.1.zip), в которую входит clcon 0.3.1 . 
 
-## Documentation
-**Warning!** All documentation describes trunk version. If you download the release, 
-documentation is inside the release. **Do not read online documentation** then!
+По поводу установки под Linux, см [doc/INSTALL.md](doc/INSTALL.md).
 
-[Demo tour (trunk version)](doc/demo-tour.md) - a footpath through best views of some features of clcon.
+Обратите внимание, что точные инстукции по установке релиза находятся в самом релизе, а не на данном сайте.
 
-[User manual (trunk version)](doc/user-manual.md) 
+## Документация
+**Предупреждение!** Документация на сайте описывает головную версию и может отличаться от документации в релизе. 
+**Читайте документацию из релиза, а не документацию на данном сайте**!
 
-[Wiki](https://bitbucket.org/budden/clcon/wiki/) - contains [screenshots](https://bitbucket.org/budden/clcon/wiki/Screenshots), but otherwise is not very useful.  
+[Демонстрационный сеанс (головная версия)](doc/demo-tour.md) - демонстрирует основные возможности среды.
 
-[FAQ](https://bitbucket.org/budden/clcon/src/default/doc/FAQ.md)
+[Руководство пользователя (головная версия)](doc/user-manual.md) 
 
-[Docs directory, including some of the above](https://bitbucket.org/budden/clcon/src/default/doc/)
+[Wiki](https://bitbucket.org/budden/clcon/wiki/) - содержит [снимки экрана](https://bitbucket.org/budden/clcon/wiki/Screenshots), но больше в ней ничего полезного нет.  
 
-## License
-MIT (or BSD) license (see [tkcon's](http://tkcon.sourceforge.net/) copyright)
+[ЧАВО](https://bitbucket.org/budden/clcon/src/default/doc/FAQ.md)
 
-## Roadmap
-- keep number of open bugs from growing
-- issure 1.0 someday
+[Каталог документации, включающий некоторые из выше перечисленных документов](https://bitbucket.org/budden/clcon/src/default/doc/)
+
+## Лицензия
+На отдельные части clcon распространяется лицензия MIT, BSD, Public Domain или Artistic License. Clcon в целом - (С) Денис Будяк 2015-2016, лицензия MIT
+
+## Планы
+- развивать режим работы для S2
+- русифицировать всю среду
+- повышать качество (стараться, чтобы количество ошибок хотя бы не возрастало)
