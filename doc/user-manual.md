@@ -1,4 +1,4 @@
-﻿Clcon 0.3.4 user manual
+﻿Clcon 0.3.5 - Руководство пользователя
 ===========
 
 Command line options

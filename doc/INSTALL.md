@@ -1,4 +1,4 @@
-Clcon 0.3.4 installation and startup 
+Clcon 0.3.5 - Установка и запуск
 ==============
 
 Warning
@@ -23,7 +23,7 @@ If all is ok, you have clcon with SBCL (use Alt-. to find sources of SBCL object
 
 Repositories of clcon components (clcon, oduvanchik, budden-tools) are at c:\clcon\lp - feel free to send patches :)
 
-Linux: INSTALLATION PROCEDURE NOT TESTED at 0.3.4!
+Linux: ПРОЦЕДУРА УСТАНОВКИ НЕ ТЕСТИРОВАНА В ДАННОЙ ВЕРСИИ at 0.3.5!
 -----------
 
 ### Prerequisites
@@ -58,9 +58,9 @@ You can try trunk, but it is better to load latest tagged "release", 0.3.4. Note
     hg clone https://bitbucket.org/budden/budden-tools
     git clone https://github.com/budden/slime 
     git clone https://github.com/budden/named-readtables
-    # to download clcon's trunk, remove '-u 0.3.4' 
-    hg clone -u 0.3.4 https://bitbucket.org/budden/oduvanchik
-    hg clone -u 0.3.4 https://bitbucket.org/budden/clcon
+    # to download clcon's trunk, remove '-u 0.3.5' 
+    hg clone -u 0.3.5 https://bitbucket.org/budden/oduvanchik
+    hg clone -u 0.3.5 https://bitbucket.org/budden/clcon
 
 #### Lisp libraries, part 2
 
