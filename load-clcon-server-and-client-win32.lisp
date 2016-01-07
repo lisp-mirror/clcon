@@ -119,11 +119,20 @@
 
 (tune-russian-letters-for-buddens-readtable-a)
 
+
 (BUDDEN-TOOLS:def-toplevel-progn "load some systems" ()
   (asdf:load-system :perga) 
   (asdf:load-system :buddens-readtable)
   (asdf:load-system :editor-budden-tools)   
   )
+
+
+(defun test-defpackage-l2 ()
+  (assert
+   (budden-tools::packages-seen-p (named-readtables:find-readtable :buddens-readtable-a)))
+  (load (compile-file (at-clcon-root "lp/budden-tools/defpackage-l2-test.lisp"))))
+
+(test-defpackage-l2)
 
 ;;;;;;;;;;;;;;;;;; Setting print-pretty to t  ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
