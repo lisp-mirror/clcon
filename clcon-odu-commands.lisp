@@ -24,11 +24,19 @@
        (backward-form-command nil)))))   
    ))
 
+(defun forward-or-backward-char (forward-p)
+  (if forward-p
+      (forward-character-command nil)
+      (backward-character-command nil)))
+
 (defcommand "Forward Form Or Word" (p)
   "Step to the next form or word"
   "Если мы в комментарии или строке, перейти на слово вперёд. Иначе, перейти на форму вперёд"
   (declare (ignore p))
   (forward-or-backward-form-or-word t)
+  (deactivate-region)
+  (when oi::*do-editing-on-tcl-side*
+    (oi::transfer-selection-to-clcon_text t))
   )
 
 (defcommand "Backward Form Or Word" (p)
@@ -36,10 +44,14 @@
   "Если мы в комментарии или строке, перейти на слово вперёд. Иначе, перейти на форму вперёд"
   (declare (ignore p))
   (forward-or-backward-form-or-word nil)
+  (deactivate-region)
+  (when oi::*do-editing-on-tcl-side*
+    (oi::transfer-selection-to-clcon_text t))
   )
 
 
-(defun forward-or-backward-form-or-word-altering-selection (forward-p)
+(defun forward-or-backward-altering-selection (motion-fn forward-p)
+  "Двигается по тексту, расширяя или сужая выделение. motion-fn - команда перемещения, к-рая принимает направление - forward-p"
   (perga-implementation:perga
    (let b (current-buffer))
    (let m (buffer-mark b))
@@ -47,7 +59,7 @@
    (cond
     ((region-active-p)
      (let initial-order (mark< point m))
-     (forward-or-backward-form-or-word forward-p)
+     (funcall motion-fn forward-p)
      (let final-order (mark< point m))
      ; if we step above other end of selection, cancel selection completely
      (unless (eq initial-order final-order)
@@ -56,7 +68,7 @@
      )
     (t
      (push-buffer-mark (copy-mark point))
-     (forward-or-backward-form-or-word forward-p)
+     (funcall motion-fn forward-p)
      (activate-region)))
    (when oi::*do-editing-on-tcl-side*
      (oi::transfer-selection-to-clcon_text t))
@@ -69,7 +81,7 @@
    If we are at the end of selection, expand it. If we are at the beginning of selection, contract it.
    Если мы в комментарии или строке, двигаться по словам, а не по формам"
   (declare (ignore p))
-  (forward-or-backward-form-or-word-altering-selection t)
+  (forward-or-backward-altering-selection 'forward-or-backward-form-or-word t)
   )
 
 (defcommand "Backward Form Or Word Altering Selection" (p)
@@ -78,9 +90,22 @@
    If we are at the end of selection, expand it. If we are at the beginning of selection, contract it.
    Если мы в комментарии или строке, двигаться по словам, а не по формам"
   (declare (ignore p))
-  (forward-or-backward-form-or-word-altering-selection nil)
+  (forward-or-backward-altering-selection 'forward-or-backward-form-or-word nil)
   )
 
+(defcommand "Forward Character Altering Selection" (p)
+  "Перейти на букву вперёд, меняя выделение"
+  "Перейти на букву вперёд, меняя выделение"
+  (declare (ignore p))
+  (forward-or-backward-altering-selection 'forward-or-backward-char t)
+  )
+
+(defcommand "Backward Character Altering Selection" (p)
+  "Перейти на букву вперёд, меняя выделение"
+  "Перейти на букву вперёд, меняя выделение"
+  (declare (ignore p))
+  (forward-or-backward-altering-selection 'forward-or-backward-char nil)
+  )
 
 (defcommand "Find Source" (p)
     "Find source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"

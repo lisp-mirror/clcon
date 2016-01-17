@@ -54,7 +54,7 @@ namespace eval ::edt {
 
         
     # If ContinueIfNoBackend, binding would check precense of oduvan-backend,
-    # and if it is absend, would call continue so that other bindings would work.
+    # and if it is absent, would call continue so that other bindings would work.
     # Returns cmd with break. 
     proc OduFnMenuItem {w m btext oduCmd args} {
         named_args $args {-accel {} -bindtag {} -ContinueIfNoBackend 0 -CallOduvanchikFunctionOptions {}} 
@@ -141,6 +141,11 @@ namespace eval ::edt {
             -ContinueIfNoBackend 1                                 \
             -accel <Control-Shift-Key-Right> -bindtag DoubleMod$w  \
             -CallOduvanchikFunctionOptions {send_selection 1}
+
+        OduFnMenuItem $w $m $btext forward-character-altering-selection \
+            -ContinueIfNoBackend 1                                 \
+            -accel <Shift-Key-Right> -bindtag SingleMod$w  \
+            -CallOduvanchikFunctionOptions {send_selection 1}
         
         # ------------------------ modified left key ---------------------------
 
@@ -154,6 +159,12 @@ namespace eval ::edt {
         OduFnMenuItem $w $m $btext backward-form-or-word-altering-selection \
             -ContinueIfNoBackend 1                                 \
             -accel <Control-Shift-Key-Left> -bindtag DoubleMod$w  \
+            -CallOduvanchikFunctionOptions {send_selection 1}
+
+
+        OduFnMenuItem $w $m $btext backward-character-altering-selection \
+            -ContinueIfNoBackend 1                                 \
+            -accel <Shift-Key-Left> -bindtag SingleMod$w  \
             -CallOduvanchikFunctionOptions {send_selection 1}
 
         
