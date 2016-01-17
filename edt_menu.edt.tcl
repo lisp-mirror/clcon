@@ -130,28 +130,28 @@ namespace eval ::edt {
 
         # ------------------------ modified right key ---------------------------
     
-        #set cmd [wesppt [list event generate $btext <<NextWord>>]] 
+        #set cmd [wesppt [list event generate $btext <<NextWord>>] -add-break 1] 
         #::clcon_key::b bind SingleMod$w <Alt-Key-Right> $cmd
 
-        OduFnMenuItem $w $m $btext forward-form \
+        OduFnMenuItem $w $m $btext forward-form-or-word \
             -ContinueIfNoBackend 1              \
             -accel <Control-Key-Right> -bindtag SingleMod$w 
 
-        OduFnMenuItem $w $m $btext forward-form-altering-selection \
+        OduFnMenuItem $w $m $btext forward-form-or-word-altering-selection \
             -ContinueIfNoBackend 1                                 \
             -accel <Control-Shift-Key-Right> -bindtag DoubleMod$w  \
             -CallOduvanchikFunctionOptions {send_selection 1}
         
         # ------------------------ modified left key ---------------------------
 
-        #set cmd [wesppt [list event generate $btext <<PrevWord>>]] 
+        #set cmd [wesppt [list event generate $btext <<PrevWord>>] -add-break 1] 
         #::clcon_key::b bind SingleMod$w <Alt-Key-Left> $cmd
 
-        OduFnMenuItem $w $m $btext backward-form \
+        OduFnMenuItem $w $m $btext backward-form-or-word \
             -ContinueIfNoBackend 1              \
             -accel <Control-Key-Left> -bindtag SingleMod$w 
 
-        OduFnMenuItem $w $m $btext backward-form-altering-selection \
+        OduFnMenuItem $w $m $btext backward-form-or-word-altering-selection \
             -ContinueIfNoBackend 1                                 \
             -accel <Control-Shift-Key-Left> -bindtag DoubleMod$w  \
             -CallOduvanchikFunctionOptions {send_selection 1}

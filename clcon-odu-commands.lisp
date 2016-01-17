@@ -3,22 +3,51 @@
 (in-package :oduvanchik)
 (named-readtables::in-readtable :oduvanchik-ext-readtable)
 
+(defun forward-or-backward-form-or-word (forward-p)
+  "Если мы внутри строки или комментария, идти по словам. Иначе, идти по формам"
+  (perga-implementation:perga
+   (let point (current-point))
+   (let word-p (not (valid-spot point forward-p)))
+   (cond
+    (forward-p
+     (cond
+      (word-p
+       (forward-word-command nil)
+       )
+      (t
+       (forward-form-command nil))))
+    (t
+     (cond
+      (word-p
+       (backward-word-command nil))
+      (t
+       (backward-form-command nil)))))   
+   ))
 
-(defun forward-or-backward-form-altering-selection (forward-p)
+(defcommand "Forward Form Or Word" (p)
+  "Step to the next form or word"
+  "Если мы в комментарии или строке, перейти на слово вперёд. Иначе, перейти на форму вперёд"
+  (declare (ignore p))
+  (forward-or-backward-form-or-word t)
+  )
+
+(defcommand "Backward Form Or Word" (p)
+  "Step to the next form or word"
+  "Если мы в комментарии или строке, перейти на слово вперёд. Иначе, перейти на форму вперёд"
+  (declare (ignore p))
+  (forward-or-backward-form-or-word nil)
+  )
+
+
+(defun forward-or-backward-form-or-word-altering-selection (forward-p)
   (perga-implementation:perga
    (let b (current-buffer))
    (let m (buffer-mark b))
    (let point (current-point))
-   (flet do-step ()
-     (cond
-      (forward-p
-       (forward-form-command nil))
-      (t
-       (backward-form-command nil))))
    (cond
     ((region-active-p)
      (let initial-order (mark< point m))
-     (do-step)
+     (forward-or-backward-form-or-word forward-p)
      (let final-order (mark< point m))
      ; if we step above other end of selection, cancel selection completely
      (unless (eq initial-order final-order)
@@ -27,26 +56,29 @@
      )
     (t
      (push-buffer-mark (copy-mark point))
-     (do-step)     
+     (forward-or-backward-form-or-word forward-p)
      (activate-region)))
    (when oi::*do-editing-on-tcl-side*
      (oi::transfer-selection-to-clcon_text t))
    ))
 
-(defcommand "Forward Form Altering Selection" (p)
+
+(defcommand "Forward Form Or Word Altering Selection" (p)
   "Step to the next form extracting/contracting selection"
   "If there is no selection, selects from point to the end of form. 
-   If we are at the end of selection, expand it. If we are at the beginning of selection, contract it"
+   If we are at the end of selection, expand it. If we are at the beginning of selection, contract it.
+   Если мы в комментарии или строке, двигаться по словам, а не по формам"
   (declare (ignore p))
-  (forward-or-backward-form-altering-selection t)
+  (forward-or-backward-form-or-word-altering-selection t)
   )
 
-(defcommand "Backward Form Altering Selection" (p)
+(defcommand "Backward Form Or Word Altering Selection" (p)
   "Step to the previous form extracting/contracting selection"
   "If there is no selection, selects from point to the beginning of form. 
-   If we are at the end of selection, expand it. If we are at the beginning of selection, contract it"
+   If we are at the end of selection, expand it. If we are at the beginning of selection, contract it.
+   Если мы в комментарии или строке, двигаться по словам, а не по формам"
   (declare (ignore p))
-  (forward-or-backward-form-altering-selection nil)
+  (forward-or-backward-form-or-word-altering-selection nil)
   )
 
 
