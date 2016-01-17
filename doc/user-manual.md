@@ -27,10 +27,10 @@ Linux: ~/.clconrc
 ### Установка шрифта
 Впишите в файл инициализации: 
 
-tkcon font "Lucida Console" 10
+```tkcon font "Lucida Console" 10```
 
 Можно попробовать фонт, не перегружая программу, если написать в консоли
-.. tkcon font "Courier New" 10
+```.. tkcon font "Courier New" 10```
 
 Completion and substitution
 ---------------------------
