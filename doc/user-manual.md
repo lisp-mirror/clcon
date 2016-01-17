@@ -18,11 +18,19 @@ You can also change this option in runtime from 'Prefs' menu. Changed value is n
 
 ```-oduvan-backend 1``` - supposes that oduvanchik runs on SWANK side and enables some lisp-specific editor features (implementation is under construction). You can also change it via Pres menu bar submenu.
 
-Initialization file
+Файл инициализации
 -------------------
 Windows: %HOME%\clcon.cfg
 
 Linux: ~/.clconrc 
+
+### Установка шрифта
+Впишите в файл инициализации: 
+
+tkcon font "Lucida Console" 10
+
+Можно попробовать фонт, не перегружая программу, если написать в консоли
+.. tkcon font "Courier New" 10
 
 Completion and substitution
 ---------------------------
