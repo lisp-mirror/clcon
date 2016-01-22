@@ -34,7 +34,7 @@ namespace eval ::edt {
     }
 
 
-    # Types in buffer pathname to console
+    # Types in buffer pathname to console. See also ::tkcon::PasteAsLinuxFilename
     proc CurrentPathAndFileNameToConsole {ignore} {
         variable ::tkcon::PRIV
         set con $PRIV(console)

@@ -179,5 +179,13 @@ proc ::tkcon::TclFindDefinition {w} {
     }
 }
 
-
-
+## This proc is evidently misplaced! FIXME
+## Clone of ::edt::CurrentPathAndFileNameToConsole
+proc ::tkcon::PasteAsLinuxFilename {w} {
+    variable ::tkcon::PRIV
+    set con $PRIV(console)
+    set ClipText [clipboard get]
+    set UnixFilename [::WindowsFileNameToUnix $ClipText]
+    $con insert insert $UnixFilename
+}
+    

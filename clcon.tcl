@@ -1374,6 +1374,12 @@ proc ::tkcon::InitMenus {w title} {
 
         set cmd "event generate $text <<TkCon_TclFindDefinition>>; break"
         $m add command -label "Tcl find definition" -accel "Control-F9" -command $cmd
+
+        $m add separator
+
+        set cmd "event generate $text <<TkCon_PasteAsLinuxFilename>>; break"
+        $m add command -label "Paste as linux filename" -command $cmd
+
     }
 
     ## Interp Menu

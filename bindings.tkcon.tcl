@@ -238,6 +238,10 @@ namespace eval tkcon {
             ::tkcon::TclFindDefinition %W
             break ; # could check "%K" == "Tab"
         }
+        bind TkConsole <<TkCon_PasteAsLinuxFilename>> {
+            ::tkcon::PasteAsLinuxFilename %W
+            break 
+        }
         bind TkConsole <<TkCon_ExpandVar>> {
             if {[%W compare insert > limit]} {::tkcon::Expand %W var}
             break ; # could check "%K" == "Tab"
