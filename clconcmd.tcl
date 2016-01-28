@@ -85,5 +85,10 @@ Currently defined commands are: "
         named_args $keys {-types "asd lisp"}
         ::clconcmd_inner::finf_inner $dirs $(-types) $string
     }
+
+    proc edit_initialization_file {} {
+        variable ::tkcon::PRIV
+        edit $::tkcon::PRIV(rcfile)
+    }
 }
     
