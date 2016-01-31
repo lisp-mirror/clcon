@@ -1,5 +1,7 @@
 clcon FAQ
 
+[TOC]
+
 Which tcl/tk binding library do you use?
 ================================
 
@@ -23,3 +25,11 @@ What's wrong with SLIME?
 1. Emacs (unconventional interface)
 2. Emacs (GPL - can't embed it into commercial apps)
 3. Nothing - we use SLIME's backend, called SWANK.
+
+
+Я написал процедуру в файле .tcl и загружаю с помощью F7, но она не видна в среде
+===========================
+
+И при определении, и при вызове процедуры следует указать пространство имён. Например, глобальное:
+
+    proc ::МояПроцедура {} { ... }

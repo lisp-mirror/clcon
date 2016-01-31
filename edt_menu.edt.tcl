@@ -52,6 +52,15 @@ namespace eval ::edt {
         }
     }
 
+    # Extracts selection text. To use in utilities and user-level functions
+    proc GetTextSelectedInCurrentEditor {} {
+        set w [::edt::c_btext]
+        if {[$w tag nextrange sel 1.0 end] != ""} {
+            return [$w get sel.first sel.last]
+        } else {
+            return ""
+        }
+    }
         
     # If ContinueIfNoBackend, binding would check precense of oduvan-backend,
     # and if it is absent, would call continue so that other bindings would work.
