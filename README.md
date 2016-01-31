@@ -1,11 +1,12 @@
-# clcon - среда разработки для Common Lisp и будущего языка S2
+# clcon - среда разработки для Common Lisp, [языка Яр](https://bitbucket.org/budden/yar) и tcl/tk
+
 English version is not develped anymore, but it can be downloaded from https://bitbucket.org/budden/clcon_en . 
 
 ## О языках
 clcon находится в процессе русификации. Часть документов может быть на Английском языке. 
 ﻿
 ## Что это? 
-**clcon** - это кросс-платформенная среда разработки для Common Lisp, нового языка [Яр](https://bitbucket.org/budden/yar) и tcl/tk. Текущий релиз - 0.3.5 (см. теги в репозитории). 
+**clcon** - это кросс-платформенная среда разработки для Common Lisp, [нового языка Яр](https://bitbucket.org/budden/yar) и tcl/tk. Текущий релиз - 0.3.5 (см. теги в репозитории). 
 
 ## Замечание о версиях
 Если вы читаете этот документ в интернете, он относится к головной ревизии, а не к релизу. 
