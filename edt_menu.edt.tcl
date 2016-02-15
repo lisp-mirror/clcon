@@ -356,6 +356,9 @@ namespace eval ::edt {
         set cmd [list $btext Unfreeze]
         $m add command -label "1.Unfreeze (if oduvanchik hang)" -command $cmd
 
+        set cmd [list $btext ResetBackendBuffer]
+        $m add command -label "1.ResetBackendBuffer (kill, unfreeze and recreate)" -command $cmd
+
         set cmd [list ::tkcon::EvalInSwankAsync "(clco::compare-clcon_text-and-oduvanchik-buffer-contents \"$btext\")" {} {:find-existing}]
         $m add command -label "Check Oduvanchik Sync" -accel "F8" -command $cmd
         bind NoMod$w <F8> $cmd

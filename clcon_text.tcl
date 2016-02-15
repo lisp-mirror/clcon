@@ -210,6 +210,19 @@ namespace eval ::clcon_text {
         }
 
         
+        method ResetBackendBuffer {} {
+            if {![$self UsesLispP]} {
+                tk_messageBox -message "$self does not UsesLispP. Unable to recreate backend buffer"
+                return 
+            }
+            DestroyBackendBuffer $self 
+            $self configure -private_freezed_events_queue {}
+            $self configure -private_freeze_level 0
+            $self configure -private_freezed 0
+            ConstructBackendBuffer $self
+            MaybeSendToLisp $self ResendEntireTextToReconstructedBackendBuffer {}
+        }
+
         method Unfreeze {} {
             #putd "Entering Unfreeze"
             if {!$options(-send_to_lisp)} {
@@ -413,6 +426,15 @@ namespace eval ::clcon_text {
                 set e [lindex $arglist 1]
                 set qE [::text2odu::CoerceIndex $clcon_text $e]
                 set lispCmd "(clco:notify-oduvan-tcl-text-delete $qId $qB $qE)"
+            }
+            ResendEntireTextToReconstructedBackendBuffer {
+                if {![$clcon_text UsesLispP]} {
+                    return
+                }
+                set qIndex [::text2odu::CoerceIndex $clcon_text 1.0]
+                # I forgot this magic with end-1c. ::edt::DoSaveFile can spill the light...
+                set qText [lq [$clcon_text get 1.0 end-1c]]
+                set lispCmd "(clco:nti $qId $qIndex $qText)"
             }
             ConstructBackendBuffer {
                 if {![$clcon_text UsesLispP]} {
