@@ -242,6 +242,8 @@ namespace eval ::edt {
         label $WStatusBar.readtable -relief sunken -borderwidth 1 -anchor w -width 24 -textvariable $btext.StatusBarInfo(Readtable)
         label $WStatusBar.cursor -relief sunken -borderwidth 1 -anchor e -width 6 \
 	    -textvariable $btext.StatusBarInfo(CursorPos)
+        label $WStatusBar.connectionStatus -relief sunken -borderwidth 1 -anchor e -width 9 \
+            -textvariable $btext.StatusBarInfo(ConnectionStatus)
 
         grid $WStatusBar.modeTitle -row 0 -column 0 -sticky nws
         grid $WStatusBar.mode -row 0 -column 1 
@@ -249,7 +251,8 @@ namespace eval ::edt {
         grid $WStatusBar.package -row 0 -column 3 
         grid $WStatusBar.readtableTitle -row 0 -column 4 -sticky nws
         grid $WStatusBar.readtable -row 0 -column 5 
-        grid $WStatusBar.cursor -row 0 -column 6 -sticky news 
+        grid $WStatusBar.cursor -row 0 -column 6 -sticky nws 
+        grid $WStatusBar.connectionStatus -row 0 -column 7 -sticky news        
 
         # $tw.text configure -send_to_lisp 1
         # ::btext::clearHighlightClasses $btext

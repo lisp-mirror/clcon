@@ -101,6 +101,8 @@ namespace eval ::clcon_text {
             bindtags $win $NewBindTags
             bindtags $w $NewBindTags
             bind $win <<ContinueUnfreeze>> "$self Unfreeze"
+            bind $win <<UpdateFreezeIndicator>> "$self UpdateFreezeIndicator"
+            bind $win <<UpdateFreezeIndicatorLater>> "after 500 event generate $self <<UpdateFreezeIndicator>>"
             ::edt::CreateHighlightTags $self
             $self tag raise sel
 
@@ -109,6 +111,7 @@ namespace eval ::clcon_text {
             set $self.StatusBarInfo(CursorPos) {}
             set $self.StatusBarInfo(Package) {CL-USER}
             set $self.StatusBarInfo(Readtable) {NIL}
+            set $self.StatusBarInfo(ConnectionStatus) {?}
         }
         destructor {
             $options(-opened_file) destroy
@@ -187,7 +190,25 @@ namespace eval ::clcon_text {
             $self configure \
                 -private_freezed 1 \
                 -private_freeze_level [expr {1 + $options(-private_freeze_level)}]
+            event generate $self <<UpdateFreezeIndicatorLater>>
         }
+
+
+        method UpdateFreezeIndicator {} {
+            if {![winfo exists $self]} {
+                return
+            }
+            global $self.StatusBarInfo
+            if { $options(-private_freezed) } {
+                set new_status "FROZEN"
+            } elseif { [$self UsesLispP] }  { 
+                set new_status "connected"
+            } else {
+                set new_status {} 
+            }
+            set $self.StatusBarInfo(ConnectionStatus) $new_status
+        }
+
         
         method Unfreeze {} {
             #putd "Entering Unfreeze"
@@ -207,6 +228,7 @@ namespace eval ::clcon_text {
                     $self configure $pfl [expr {$options($pfl) - 1}]
                 }
             }
+            event generate $self <<UpdateFreezeIndicatorLater>>
         }
 
         method ContinueUnfreeze {} {
@@ -252,10 +274,13 @@ namespace eval ::clcon_text {
                         # Event queue empty, state is 2. just check that level is 1 and exit
                         ::mprs::AssertEq 1 $options($pfl)
                         $self configure -private_freezed 0 $pfl [expr {$options($pfl) - 1}]
+                        # looks like we will unfreeze now. Update indicator
+                        event generate $self <<UpdateFreezeIndicator>>
                         after idle [list ::clcon_text::tncm $self]
                     }
                 }
             }
+            event generate $self <<UpdateFreezeIndicatorLater>>
         }
 
         
@@ -287,10 +312,12 @@ namespace eval ::clcon_text {
             $clcon_text configure -send_to_lisp 1
             MaybeSendToLisp $clcon_text ConstructBackendBuffer {}
         }
+        event generate $clcon_text <<UpdateFreezeIndicator>>
     }
 
     proc DestroyBackendBuffer {clcon_text} {
         MaybeSendToLisp $clcon_text DestroyBackendBuffer {} {} 1
+        event generate $clcon_text <<UpdateFreezeIndicator>>
     }
 
     # Note that we have sent notification, or if notification
@@ -405,6 +432,7 @@ namespace eval ::clcon_text {
             }
             CallOduvanchikFunction {
                 if {![$clcon_text UsesLispP]} {
+                    event generate $clcon_text <<UpdateFreezeIndicator>>
                     return
                 }
                 set qB [::text2odu::CoerceIndex $clcon_text insert]
