@@ -32,7 +32,25 @@
     (clco:eval-in-tcl cmd :nowait nil)
     ))
 
-(defmethod oi::ask-user-about-editor-condition :around (condition)
+
+(defmethod oi::ask-user-about-editor-condition ((condition editor-error))
+  "editor-error is normal. If it has message, show it. If not, just beep. Then abort it (that is, ignore)"
+  (let* ((message (format nil "~A" condition)))
+    (print `(message ,message) *trace-output*)
+    (cond
+     ((string= message "")
+      (beep))
+     (t
+      (let*
+          ((qmessage (cl-tk:tcl-escape message))
+           (cmd
+            (format nil "tk_messageBox -message ~A -parent [::edt::c_text]" qmessage)
+            ))
+        (clco:eval-in-tcl cmd :nowait nil))
+      ))
+    :abort))
+
+(defmethod oi::ask-user-about-editor-condition ((condition serious-editor-error))
   (let* ((variants '("debug" "abort command (Esc key)" "quit lisp"))
          (message (format nil "~A" condition))
          (qmessage (cl-tk:tcl-escape message))
