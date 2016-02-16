@@ -28,6 +28,9 @@ clcon находится в процессе русификации. Часть 
 - Debian 8 (32 bit) x86 - иногда тестируется
 - Linux Mint 17.2 (64 bit) - однажды тестировалось, см. http://wiki.tcl.tk/668
 
+## Видео
+[См. сюда](https://www.youtube.com/watch?v=nMhwvZ56jHU)
+
 ## Снимки экрана
 [См. сюда](https://bitbucket.org/budden/clcon/wiki/Screenshots)
 
