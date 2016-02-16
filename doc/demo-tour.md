@@ -1,4 +1,4 @@
-Clcon 0.3.5 - Демонстрационный сеанс
+Clcon 0.3.6 - Демонстрационный сеанс
 ===============
 
 Clcon is a building site. Excavators buzz. Pits, traps, naked electric wires wait you there.

@@ -6,7 +6,7 @@ English version is not develped anymore, but it can be downloaded from https://b
 clcon находится в процессе русификации. Часть документов может быть на Английском языке. 
 ﻿
 ## Что это? 
-**clcon** - это кросс-платформенная среда разработки для Common Lisp, [нового языка Яр](https://bitbucket.org/budden/yar) и tcl/tk. Текущий релиз - 0.3.5 (см. теги в репозитории). 
+**clcon** - это кросс-платформенная среда разработки для Common Lisp, [нового языка Яр](https://bitbucket.org/budden/yar) и tcl/tk. Текущий релиз - 0.3.6 (см. теги в репозитории). 
 
 ## Замечание о версиях
 Если вы читаете этот документ в интернете, он относится к головной ревизии, а не к релизу. 
@@ -57,7 +57,7 @@ Clcon включает в себя большинство возможносте
 - Вывод списка определений в файле для языков CL и tcl (с ограничениями)
 
 ## Установка и запуск
-Для windows у нас есть [портативный файловый релиз](https://bitbucket.org/budden/clcon/downloads/clcon-0.3.5.zip), не требующий установки
+Для windows у нас есть [портативный файловый релиз](https://bitbucket.org/budden/clcon/downloads/clcon-0.3.6.zip), не требующий установки
 
 Также вы можете загрузить 
 [cl-stirling-engine](https://bitbucket.org/budden/cl-stirling-engine/downloads/cl-stirling-engine-at-clcon-0.3.1.zip), в которую входит clcon 0.3.1 . 
