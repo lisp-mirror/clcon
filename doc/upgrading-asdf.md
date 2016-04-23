@@ -1,5 +1,9 @@
-Как я апгрейдил asdf.
-1. Стёр asdf.fasl и uiop.fasl из контирбов.
-2. Скачал последний asdf в c:\clcon\sbcl\asdf-3.1.6
+РљР°Рє СЏ Р°РїРіСЂРµР№РґРёР» asdf.
+1. РЎС‚С‘СЂ asdf.fasl Рё uiop.fasl РёР· РєРѕРЅС‚РёСЂР±РѕРІ.
+2. РЎРєР°С‡Р°Р» РїРѕСЃР»РµРґРЅРёР№ asdf РІ c:\clcon\sbcl\asdf-3.1.6
+3. Р—Р°РїСѓСЃС‚РёР» sbcl:
+  - cmd
+  - set SBCL_HOME=c:\clcon\sbcl\1.3.4
+  - sbcl
 3. (load "c:/clcon/sbcl/asdf-3.1.6/tools/install-asdf.lisp")
-4. Установил атрибуты "только для чтения" для c:\clcon\sbcl\1.3.0\contrib\asdf.fasl, uiop.fasl, asdf.lisp. 
+4. РЈСЃС‚Р°РЅРѕРІРёР» Р°С‚СЂРёР±СѓС‚С‹ "С‚РѕР»СЊРєРѕ РґР»СЏ С‡С‚РµРЅРёСЏ" РґР»СЏ c:\clcon\sbcl\1.3.0\contrib\asdf.fasl, uiop.fasl, asdf.lisp. 
