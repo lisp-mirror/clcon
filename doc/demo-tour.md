@@ -62,6 +62,8 @@ Once you switched to editor, it is convenient to scroll through messages with Al
 Warning! Due to random positioning of windows, some views may be unpleasant to work with, so you might want to 
 resize/reposition them manually. Your feedback and patches to solve this are welcome. 
 
+Компиляция системы с удобной навигацией по предупреждениям описана в руководстве пользователя. 
+
 Debugger and stepper
 ------
 At the console, type in the following:

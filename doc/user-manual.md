@@ -1,7 +1,7 @@
 ﻿Clcon 0.3.6 - Руководство пользователя
 ===========
 
-Command line options
+Аргументы, параметры, ключи, опции командной строки
 --------------------
 Most of [tkcon's command line options](http://tkcon.sourceforge.net/docs/start.html), are kept intact.
 New options: 
@@ -36,7 +36,7 @@ Linux: ~/.clconrc
 Можно попробовать фонт, не перегружая программу, если написать в консоли
 ```.. tkcon font "Courier New" 10```
 
-Completion and substitution
+Автодополнение, продолжение и автоподстановка
 ---------------------------
 Completion of lisp symbols works in console, use **Tab** to complete lisp symbol prefix (may contain package or part of package name).
 
@@ -46,7 +46,7 @@ Use Control-Alt-u to complete tcl name. Be sure to type in a space after ".."
 
 Pressing Control-Return places unix-styled directory of currently selected editor buffer into the command prompt. If you press Control-Return again, file name will be added to directory to form complete file name. 
 
-Find source command
+Команда "Find source" - найти определение
 -------------------
 Find source command works best in console. Common-lisp package is assumed. Type 
 `defun` or, say, `print-object` on the fresh lisp prompt and press Alt-. 
@@ -55,7 +55,7 @@ If there are many, they are printed at console and you can click on either on th
 with keyboard now).
 Find source for tcl accepts fully-qualified identifier. Invoke it with Control-F9. 
 
-Find in files
+Искать в файлах, поиск в файлах
 -------------
 There is no GUI for find in files. 
 
@@ -92,15 +92,15 @@ Example of searching string in files specified by globs (superseded by `.finf`)
 `(clco:FIND-STRING-IN-FILES "f4" (clco:FILES-BY-GLOB-LIST "c:/clcon/lp/**/*.lisp" "c:/clcon/lp/**/*.asd"))`
 
 
-Connecting/disconnecting to/from SWANK
+Подключение к/отключение от SWANK
 --------------------------------------
 Use two items on Console menubar item
 
-Green text regions are hyperlinks
+Зелёные и подчёркнутые фрагменты текста - это гиперссылки
 ---------------------------------
 Some of output is in green. Green regions are clickable (sorry, some of them are only clickable with mouse now). 
 
-Switching between tools
+Переключение между окнами
 -----------------------
 Most of the tools are equipped with "Window" menu which allows to switch between tools. Current keyboard shortcuts:
 
@@ -108,7 +108,7 @@ Most of the tools are equipped with "Window" menu which allows to switch between
 - `Ctrl-.` - switch to console
 - `Ctrl-Shift-E` - switch to editor
 
-IDE Commands
+Команды среды разработки IDE (ИСР)
 ------------
 Place dot (.) in the first position of the command to invoke named IDE command. Currently there are only a few commands:
 
@@ -135,7 +135,7 @@ It is recommended to use your initialization file to define new IDE commands.
 
 To view the source of the IDE command, type it as `::clconcmd::tapr` and press `Control-F9` on the text.
 
-Tcl escapes
+Вызов команд Tcl 
 -----------
 Place two dots and a space (`.. `) directly at the IDE prompt to pass arbitrary tcl command to tcl interpreter. Use Control-Alt-U to complete tcl names. E.g. this will display tk's message box. 
 
@@ -143,14 +143,14 @@ Place two dots and a space (`.. `) directly at the IDE prompt to pass arbitrary 
 .. tk_messageBox -title "clcon" -message "Wow, it works!" -parent $::tkcon::PRIV(console)
 ```
 
-Opening files for editing
+Открытие файлов для редактирования
 -------------------------
 Use "File" menu, Control-o keyboard shortcut or
 .edit IDE command: 
 ```.edit <filename>```
 Press Ctrl-F3 to complete filename (at least it will work undex *nix).
 
-Editing files
+Редактирование файлов
 -------------
 `Ctrl-z` - undo
 
@@ -158,8 +158,7 @@ Editing files
 
 `Ctrl-k` - delete text to the end of line
 
-
-Saving files 
+Сохранение файлов
 -------------------------
 WARNING! 
 
@@ -168,7 +167,7 @@ As you close the IDE, there is sometimes no warning about unsaved files. Also th
 If you have crashed swank connection, first of all try to disable "Oduvan-backend" flag at prefs menu in the console. After that, try Secret/Unfreeze command if your editor appears hanged up. With two that measures, you have good chances to save your work. But, again, don't rely upon IDE. 
 Normally, to save files, use "File" menu or Control-s keyboard shortcut. 
 
-Named readtables support
+Поддержка именованных таблиц чтения (named-readtables)
 -------------------------
 We have support for named readtables in files. Clcon only recognizes keywords as readtable-names. If the file contains a line
 
@@ -194,7 +193,12 @@ depends on actual current *readtable* around compilation.
 
 Opening files with "in-readtable" forms have side effect - uppercased readtable names are interned into keyword package. 
 
-Debugger
+Компиляция
+----------
+Компиляция одного файла - F7 
+Компиляция системы (clco:load-system-for-tcl система . опции)
+
+Отладчик
 --------
 You fall into a debugger when something unusual happens, e.g. you divide at zero. You see the stack. 
 Open stack frames and watch locals. Possible actions in a debugger:
@@ -241,15 +245,15 @@ Also you can just insert calls to [some of printing functions](http://www.lispwo
 into your function and recompile the file where it is contained. Lisp is so great so you need not restart your program. As you enter
 your function next time, new definition applies.  
 
-Tcl errors
+Ошибки Tcl 
 ----------
 Many tcl errors printed in read are clickable with mouse. Error stack is shown by the click. Some procs in the stack are clickable.
 
-Multiple consoles, multiple tabs.
+Множественные консоли 
 ---------------------------------
 All is simple - don't use them. They are broken. I plan remove them soon. 
 
-What if my REPL hang up?
+Что делать, если мой REPL (ЦЧВП) повис?
 ------------------------
 menu bar/Connection/Disconnect from swank
 menu bar/Connection/Connect to swank
@@ -259,7 +263,7 @@ as you disconnect, you get into tcl prompt. Don't issue any commands, otherwise 
 with tcl commands which you can later run as lisp commands. I plan to remove tcl console functionality at all,
 as we have tcl escapes alredy.
 
-Multiline commands
+Многострочные команды лиспа
 ------------------
 To type in multiline command, separated lines with `Shift-Return` instead of just `Return`. 
 Clcon currently have no smart parser which could determine end of the command automatically. 
@@ -269,7 +273,7 @@ error would show up with the debugger.
 In theory, you can alos paste multiline commands. But if text in the clipboard ends with 
 newline character, pasting would invoke immediate evaluation. Combined with the fact that 
 
-Also Read tkcon manual
+Также читайте руководство по tkcon
 ----------------------
 clcon is fork of tkcon. Many of tkcon's functionality is destroyed, but some still work (and will work in the future).
 
@@ -280,27 +284,23 @@ It can also be found in ActiveTCL help file.
 ## What if I want to contribute
 Read issues
 
-
-Thread list and debugging
+Список нитей (тредов, потоков исполнения) и отладка потоков
 ------------------
 We have no GUI to debug threads. But we can get list of threads with 
 `(swank:list-threads)`, and then debug thread by its number in a list (not by thread id)
 with `(swank:debug-nth-thread <N>)` . Numbers are zero-based (not counting header). 
  
-Syntax highlighting
+Подсветка синтаксиса
 ------------------
-Code highlighting is now rather humble. All files are painted as lisp regardless of extension.
+Code highlighting is now rather humble. Поддерживается lisp и tcl. По умолчанию фалы красятся в лисп. 
 Also we have basic paren highlighting - when you stand after closing paren, editor highlights
 appropriate opening paren. 
 
-Getting help on lisp symbols
+Справка по лисповым символам
 ----------------------------
-There is an online help on embedded lisp symbols. Just press F1 on
-a symbol in the console or in the editor. Some lisp libraries 
-support online help too. To learn which ones do support, try
+Just press F1 on a symbol in the console or in the editor. Some lisp 
+libraries support online help too. To learn which ones do support, try
 `.apr hyperdoc. You'll see `*hyperdoc-base-uri*` and/or `hyperspec-lookup`
 symbols in some packages. For theese packages, there is a probability to
 get help via pressing f1. 
-
-
 
