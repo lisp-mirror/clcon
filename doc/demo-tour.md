@@ -4,16 +4,18 @@ Clcon 0.3.6 - Демонстрационный сеанс
 Clcon is a building site. Excavators buzz. Pits, traps, naked electric wires wait you there.
 But we'll try to lead you safe way through all interesting features of clcon.
 
-Console evaluation
+Clcon – это строительная площадка. Гудят экскаваторы, всюду подстерегают ямы, открытые люки, оголённые электрические провода. Но мы постараемся провести вас безопасной тропинкой и показать все интересные места. 
+
+
+Вычисления в консоли (REPL)
 -------------
-First of all try evaluate something:
+Для начала попробуйте что-нибудь вычислить в консоли:
 
-     (dotimes (i 10) (print i) (sleep 0.5))
+     (dotimes (й 10) (print й) (sleep 0.5))
 
-After you pressed return, you see that printing occurs with intervals. This experiment shows that we have async I/O.
+После нажатия Enter, вы обнаружите, что печать происходит с интервалами. Этот эксперимент показывает, что у нас есть асинхронный ввод/вывод.
 
-Note! To enter multi-line commands, use Shift-Key-Return (that is, Shift and Return). 
-
+Примечание! Для ввода многострочных команд используйте сочетание Shift-Return ( Shift-Enter ) (то есть,  одновременное нажатие Shift и Return (Enter)).
 
 Apropos, completion, find definition, help
 -------------
