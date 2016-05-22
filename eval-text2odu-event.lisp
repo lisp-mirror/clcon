@@ -141,7 +141,7 @@
 
       ; borrowed from odu::read-buffer-file
       (process-file-options b file-name)
-      (budden-tools::show-expr (clco::text2odu-event-swank-connection e))
+      ; (budden-tools::show-expr (clco::text2odu-event-swank-connection e))
       (setf (oi::variable-value 'odu::swank-connection :buffer b)
             (clco::text2odu-event-swank-connection e))
       )))
