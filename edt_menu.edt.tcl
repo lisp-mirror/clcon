@@ -128,7 +128,7 @@ namespace eval ::edt {
 
         set cmd [wesppt [list clcon_text::CallOduvanchikFunction $btext "odu::indent-region-command nil" {} {send_selection 1}]]
         
-        $m add command -label "Indent Region" -command $cmd 
+        $m add command -label "Проставить отступ в выденном фрагменте" -command $cmd 
        
         OduFnMenuItem $w $m $btext transpose-forms
         $m add separator
@@ -243,13 +243,13 @@ namespace eval ::edt {
         $m add separator
 
         set cmd [list ::edt::CompileAndLoadTheFile $Bi]
-        $m add command -label "Save, Compile and Load this file" -command $cmd -accel "F7"
+        $m add command -label "Сохранить, компилировать и загрузить этот файл" -command $cmd -accel "F7"
         bind NoMod$w <F7> $cmd
 
         $m add separator
 
         set cmd {::edt::CurrentBufferPathnameToClipboard "unix"}
-        $m add command -label "2.File name to clipboard (unix style)" \
+        $m add command -label "2.Копир.имя файла в буфер обмена (стиль unix)" \
             -underline 0 -command $cmd
 
         set cmd {::edt::CurrentBufferPathnameToClipboard "windows"}
