@@ -8,6 +8,9 @@
 
 (in-package :clco)
 
+;; Disable stepping here
+(proclaim '(optimize (debug 3) (compilation-speed 3)))
+
 (defvar *text2odu-disptatcher-start-shutdown-lock*
   (bt:make-lock "clcon-server::*text2odu-disptatcher-start-shutdown-lock*"))
 
