@@ -2,7 +2,41 @@
 
 ; for stepper, must be 
 ; debug > max(speed,compilation-speed,space)
-(declaim (optimize (debug 3) (speed 0) (compilation-speed 0) (space 0)))
+
+#| Находки:
+
+sb-c::maybe-expand-local-inline - условие, при котором наступает inline расширение
+
+  (if (and (policy call
+                   (and (>= speed space)
+                        (>= speed compilation-speed)))
+           (not (eq (functional-kind (node-home-lambda call)) :external))
+           (inline-expansion-ok call))
+
+sb-c::STORE-CLOSURE-DEBUG-POINTER - что-то полезное (возможно)
+
+А ТАКЖЕ НАДО ПОСМОТРЕТЬ НА INHIBIT-WARNINGS!!!
+
+|#
+
+(declaim (optimize (debug 3) (speed 0) (compilation-speed 2) (space 2) (safety 3)))
+
+;(declaim (optimize (sb-c::let-conversion 0)))
+;(declaim (optimize (sb-c::store-closure-debug-pointer 3)))
+
+(defun bubu (x)
+  (budden-tools:with-the1 y symbol x
+                          (break)
+                          (print y)))
+
+(defun obmanka3 (x) x)
+(declaim (notinline obmanka3))
+
+#|(defun f (x)
+  "Outer function"
+  (let ((y (obmanka2 x)))
+    (break)
+    (+ (g y) (+ x x))))|#
 
 (defun f (x)
   "Outer function"
