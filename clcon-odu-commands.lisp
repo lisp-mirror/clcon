@@ -117,6 +117,19 @@
                                            (odu::readtable-at-point))))
       code)))
 
+(defcommand "Find Symbol" (p)
+    "Find symbol with swank machinery."
+    ""
+  (multiple-value-bind (string symbol) (get-symbol-from-current-point)
+    (multiple-value-bind (symbol2 found)
+        (clco::parse-name-or-symbol-to-symbol (or symbol string)
+                                              :package-name (odu::package-at-point) 
+                                              :readtable-name (odu::readtable-at-point))
+      (if found 
+          (format nil "~a:~s" (package-name (symbol-package symbol2)) symbol2) 
+          ""))))
+
+
 
 (defcommand "Hyperdoc Lookup" (p)
     "Hyperdoc lookup"

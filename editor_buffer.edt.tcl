@@ -122,19 +122,42 @@ namespace eval ::edt {
             set proc [subst -nocommand {{w} {$code}}]
             # tk_messageBox -message $proc
             apply $proc [::tkcon::CurrentConsole]
-            $clcon_text Unfreeze
         } else {
             tk_messageBox -parent $clcon_text -message "FindSource command aborted"
-            $clcon_text Unfreeze
         }
+        $clcon_text Unfreeze
           
     }
 
+    proc FindSymbolContinuation {clcon_text EventAsList} {
+        set Head [::mprs::Unleash [lindex $EventAsList 0]]
+        ::mprs::AssertEq $Head ":return"
+        set l2 [::mprs::Unleash [lindex $EventAsList 1]]
+        set h2 [::mprs::Unleash [lindex $l2 0]]
+        if {$h2 eq ":ok"} {
+            set code [::mprs::Unleash [lindex $l2 1]]
+            #tk_messageBox -message $code
+            clipboard clear
+            clipboard append $code
+        } else {
+            tk_messageBox -parent $clcon_text -message "FindSymbol command aborted"
+        }
+        $clcon_text Unfreeze
+          
+    }
     # See also ::tkcon::LispFindDefinition
     proc FindSourceCommand {text} {
         set console [::tkcon::CurrentConsole]
         ::clcon_text::CallOduvanchikFunction $text "odu::find-source-command nil" {{
             ::edt::FindSourceContinuation $clcon_text $EventAsList
+        }}
+    }    
+
+    # See also ::tkcon::LispFindDefinition
+    proc FindSymbolCommand {text} {
+        set console [::tkcon::CurrentConsole]
+        ::clcon_text::CallOduvanchikFunction $text "odu::find-symbol-command nil" {{
+            ::edt::FindSymbolContinuation $clcon_text $EventAsList
         }}
     }    
 
