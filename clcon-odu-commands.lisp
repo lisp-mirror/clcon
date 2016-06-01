@@ -125,9 +125,10 @@
         (clco::parse-name-or-symbol-to-symbol (or symbol string)
                                               :package-name (odu::package-at-point) 
                                               :readtable-name (odu::readtable-at-point))
-      (if found 
-          (format nil "~a:~s" (package-name (symbol-package symbol2)) symbol2) 
-          ""))))
+      (cond 
+       ((not found) "")
+       ((find #\: (format nil "~s" symbol2)) (format nil "~s" symbol2))
+       (t (format nil "~a:~s" (package-name (symbol-package symbol2)) symbol2))))))
 
 
 
