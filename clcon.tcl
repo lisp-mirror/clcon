@@ -135,7 +135,7 @@ namespace eval ::tkcon {
     # Continuations for async events
     # dictionary: id->{procname context} for async events only
     variable SWANKAsyncContinuations
-    # Queue of all events (list, first element of a list is a first element of a queue)"
+    # Queue of all events (list, first element of a list is a first element of a queue)
     variable SWANKEventQueue {}
 
     # 1 when we are processing synchronous negotiation
@@ -1217,7 +1217,7 @@ proc ::tkcon::InitMenus {w title} {
 	eval [list $PRIV(popup).[string tolower $m] entryconfigure $l] $args
     }
 
-    foreach m [list 1.File 2.Console 3.Edit 4.Interp 5.Prefs 6.History 7.Window 8.Help] {
+    foreach m [list 1.Файл 2.Консоль 3.Правка 4.Tcl 5.Настройка 6.История 7.Окно 8.Справка] {
  	set l [string tolower [string range $m 2 end]]
  	MenuButton $w $m $l
  	$w.pop add cascade -label $m -underline 0 -menu $w.pop.$l
@@ -1225,221 +1225,220 @@ proc ::tkcon::InitMenus {w title} {
 
     ## File Menu
     ##
-    foreach m [list [menu $w.file -disabledforeground $COLOR(disabled)] \
-                   [menu $w.pop.file -disabledforeground $COLOR(disabled)]] {
+    foreach m [list [menu $w.файл -disabledforeground $COLOR(disabled)] \
+                   [menu $w.pop.файл -disabledforeground $COLOR(disabled)]] {
         
         set cmd ::edt::EditNewFile
-        $m add command -label "1.Edit new file" -underline 0 -command $cmd
+        $m add command -label "1.Создать и редактировать файл" -underline 0 -command $cmd
 
         set cmd [list ::tkcon::OpenForEdit $w "" ""]
-	$m add command -label "Open for edit" -command $cmd -accel "Control-O"
+	$m add command -label "Открыть для редактирования" -command $cmd -accel "Control-O"
         ::clcon_key::b bind TkConsoleTextOverrides <Control-Key-o> "$cmd; break"
         
-	$m add command -label "2.Load Tcl File" -underline 0 -command ::tkcon::Load
-	$m add cascade -label "3.Save console output..."  -underline 0 -menu $m.save
+	$m add command -label "2.Выполнить файл Tcl" -underline 0 -command ::tkcon::Load
+	$m add cascade -label "3.Сохранить поток консоли..."  -underline 0 -menu $m.save
 
 	$m add separator
 
         set cmd ::tkcon::ReloadSomeIDESources
-	$m add command -label "4.Reload some of IDE sources" -underline 0 \
+	$m add command -label "4.Перезагрузить часть исходных текстов ИСР (IDE)" -underline 0 \
 	    -command $cmd
 
 	## Save Menu
 	##
 	set s $m.save
 	menu $s -disabledforeground $COLOR(disabled)
-	$s add command -label "All"	-underline 0 \
+	$s add command -label "1.Всё"	-underline 0 \
 		-command {::tkcon::Save {} all}
-	$s add command -label "History"	-underline 0 \
+	$s add command -label "2.Историю"	-underline 0 \
 		-command {::tkcon::Save {} history}
-	$s add command -label "Stdin"	-underline 3 \
+	$s add command -label "3.Ввод (stdin)"	-underline 0 \
 		-command {::tkcon::Save {} stdin}
-	$s add command -label "Stdout"	-underline 3 \
+	$s add command -label "4.Вывод (stdout)"	-underline 0 \
 		-command {::tkcon::Save {} stdout}
-	$s add command -label "Stderr"	-underline 3 \
+	$s add command -label "5.Ошибки (stderr)"	-underline 0 \
             -command {::tkcon::Save {} stderr}
 
 
         ## Recent menu
         set s $m.recent
         menu $s -disabledforeground $COLOR(disabled) -postcommand [list ::recent::RecentMenu $m]
- 	$m add cascade -label "5.Open recent ..." -underline 0 -underline 0 -menu $s
+ 	$m add cascade -label "5.Открыть недавний..." -underline 0 -underline 0 -menu $s
 
 	$m add separator
-	$m add command -label "Quit" -command ::tkcon::Destroy -accel "Control-W"
+	$m add command -label "Выход" -command ::tkcon::Destroy -accel "Control-W"
     }
         
     ## Console Menu
     ##
-    foreach m [list [menu $w.console -disabledfore $COLOR(disabled)] \
-	    [menu $w.pop.console -disabledfore $COLOR(disabled)]] {
-	$m add command -label "$title Console"	-state disabled
+    foreach m [list [menu $w.консоль -disabledfore $COLOR(disabled)] \
+	    [menu $w.pop.консоль -disabledfore $COLOR(disabled)]] {
+	$m add command -label "Консоль - $title"	-state disabled
 
-        $m add command -label "1.Attach to SWANK" -underline 0 -command "::tkcon::OuterNewSwank"
-        $m add command -label "2.Disconnect from SWANK" -underline 0 -command "::tkcon::DisconnectFromSwank"
-        set WarnOnClear {"I dont know if we are in the evaluation now.\
- I'll print a prompt for you, but if your SWANK stopped\
- responding, this will not make it work. In this case try reconnecting\
- to SWANK or wait for your evaluation to return normally"}
+        $m add command -label "1.Подключиться к текстовому лисп-серверу SWANK" -underline 0 -command "::tkcon::OuterNewSwank"
+        $m add command -label "2.Отключиться от текстового лисп-сервера SWANK" -underline 0 -command "::tkcon::DisconnectFromSwank"
+        set WarnOnClear {"Я не знаю, находимся ли мы сейчас в состоянии вычисления.\
+ Я напечатаю для вас подсказку, но если ваш текстовый лисп-сервер SWANK не отвечает,\
+ то эта подсказка не заставить его работать снова. В этом случае попытайтесь\
+ переподключиться к текстовому лисп-серверу SWANK или подождите нормального завершения вашего вычисления"}
 
         # This is a FIXME. Best way to fix is not to print prompt at all and to just collect all characters which user prints. Completion and other context-dependent actions will be disbled until prompt occurs.
         
-	$m add command -label "3.Clear Console" \
+	$m add command -label "3.Очистить консоль" \
             -underline 0 \
             -command "\
   clear; \
   puts stderr $WarnOnClear ; \
   ::tkcon::Prompt"
         
-	$m add separator
+	#$m add separator
         
-	$m add cascade -label "Tkcon console menu (defunct) ..." -underline 0 -menu $m.tkcon_console
-	set su [menu $m.tkcon_console -disabledforeground $COLOR(disabled)]
+	#$m add cascade -label "Tkcon console menu (НЕ РАБОТАЕТ) ..." -underline 0 -menu $m.tkcon_console
+	#set su [menu $m.tkcon_console -disabledforeground $COLOR(disabled)]
         
-	$su add command -label "New Console" -underline 0 -accel $PRIV(ACC)N \
-            -command ::tkcon::New
-	$su add command -label "New Tab" -underline 4 -accel $PRIV(ACC)T \
-            -command ::tkcon::NewTab
-	$su add command -label "Delete Tab" -underline 0 \
-            -command ::tkcon::DeleteTab -state disabled
-	$su add command -label "Close Console" -underline 0 -accel $PRIV(ACC)w \
-            -command ::tkcon::Destroy
+	#$su add command -label "New Console" -underline 0 -accel $PRIV(ACC)N \
+        #    -command ::tkcon::New
+	#$su add command -label "New Tab" -underline 4 -accel $PRIV(ACC)T \
+        #    -command ::tkcon::NewTab
+	#$su add command -label "Delete Tab" -underline 0 \
+        #    -command ::tkcon::DeleteTab -state disabled
+	#$su add command -label "Close Console" -underline 0 -accel $PRIV(ACC)w \
+        #    -command ::tkcon::Destroy
 
-	$m add cascade -label "Attach To ... (defunct)" -underline 0 -menu $su.attach
+	#$m add cascade -label "Attach To ... (НЕ РАБОТАЕТ)" -underline 0 -menu $su.attach
 
 	## Attach Menu
 	##
-	set sub [menu $su.attach -disabledforeground $COLOR(disabled)]
-	$sub add cascade -label "Interpreter" -underline 0 -menu $sub.apps
-	$sub add cascade -label "Namespace"   -underline 0 -menu $sub.name
+	#set sub [menu $su.attach -disabledforeground $COLOR(disabled)]
+	#$sub add cascade -label "Interpreter" -underline 0 -menu $sub.apps
+	#$sub add cascade -label "Namespace"   -underline 0 -menu $sub.name
 
 	## Attach Console Menu
 	##
-	menu $sub.apps -disabledforeground $COLOR(disabled) \
-		-postcommand [list ::tkcon::AttachMenu $sub.apps]
+	#menu $sub.apps -disabledforeground $COLOR(disabled) \
+	#	-postcommand [list ::tkcon::AttachMenu $sub.apps]
 
 	## Attach Namespace Menu
 	##
-	menu $sub.name -disabledforeground $COLOR(disabled) \
-		-postcommand [list ::tkcon::NamespaceMenu $sub.name]
+	#menu $sub.name -disabledforeground $COLOR(disabled) \
+	#	-postcommand [list ::tkcon::NamespaceMenu $sub.name]
 
 	## Attach Socket Menu
 	##
-	$sub add cascade -label "Socket" -underline 0 -menu $sub.sock
-	menu $sub.sock -disabledforeground $COLOR(disabled) \
-	    -postcommand [list ::tkcon::SocketMenu $sub.sock]
+	#$sub add cascade -label "Socket" -underline 0 -menu $sub.sock
+	#menu $sub.sock -disabledforeground $COLOR(disabled) \
+	#    -postcommand [list ::tkcon::SocketMenu $sub.sock]
 
-	if {[tk windowingsystem] eq "x11"} {
-	    ## Attach Display Menu
-	    ##
-	    $sub add cascade -label "Display" -underline 0 -menu $sub.disp
-	    menu $sub.disp -disabledforeground $COLOR(disabled) \
-		    -postcommand [list ::tkcon::DisplayMenu $sub.disp]
-	}
+	#if {[tk windowingsystem] eq "x11"} {
+	#    ## Attach Display Menu
+	#    ##
+	#    $sub add cascade -label "Display" -underline 0 -menu $sub.disp
+	#    menu $sub.disp -disabledforeground $COLOR(disabled) \
+        #    -postcommand [list ::tkcon::DisplayMenu $sub.disp]
+	#}
     }
 
     ## Edit Menu
     ##
     set text $PRIV(console)
-    foreach m [list [menu $w.edit] [menu $w.pop.edit]] {
-	$m add command -label "Cut"   -underline 2 -accel $PRIV(ACC)x \
+    foreach m [list [menu $w.правка] [menu $w.pop.правка]] {
+	$m add command -label "Вырезать"   -underline 2 -accel $PRIV(ACC)x \
 		-command [list ::tkcon::Cut $text]
-	$m add command -label "Copy"  -underline 0 -accel $PRIV(ACC)c \
+	$m add command -label "Копировать"  -underline 0 -accel $PRIV(ACC)c \
 		-command [list ::tkcon::Copy $text]
-	$m add command -label "Paste" -underline 0 -accel $PRIV(ACC)v \
+	$m add command -label "Вставить" -underline 0 -accel $PRIV(ACC)v \
 		 -command [list ::tkcon::Paste $text]
+
+        set cmd "event generate $text <<TkCon_PasteAsLinuxFilename>>; break"
+        $m add command -label "Вставить как имя файла Linux" -command $cmd
+
 	$m add separator
 
         set cmd [list ::fndrpl::OpenFindBox $text "text" "find" {}]
-	$m add command -label "Find"  -underline 0 -accel $PRIV(ACC)F \
+	$m add command -label "Найти"  -underline 0 -accel $PRIV(ACC)F \
             -command $cmd
         ::clcon_key::b bind TkConsole <Control-Key-f> $cmd
 
         set cmd [list ::fndrpl::FindIt $text]
-	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd 
+	$m add command -label "Найти далее"  -underline 0 -accel "F3" -command $cmd 
         bind TkConsole <F3> $cmd
 
         $m add separator
         
         set cmd "event generate $text <<TkCon_ExpandLisp>>; break"
-        $m add command -label "Lisp complete" -accel "Tab, Control-Alt-i" -command $cmd
+        $m add command -label "Лисп: автодополнение" -accel "Tab, Control-Alt-i" -command $cmd
 
         set cmd "event generate $text <<TkCon_LispFindDefinition>>; break"
-        $m add command -label "Lisp find definition" -accel "Control-." -command $cmd
+        $m add command -label "Лисп: перейти к определению" -accel "Control-." -command $cmd
 
         $m add separator
         
         set cmd "event generate $text  <<TkCon_ExpandTcl>>; break"
-        $m add command -label "Tcl complete" -accel "Control-Alt-u" -command $cmd
+        $m add command -label "Tcl: автодополнение" -accel "Control-Alt-u" -command $cmd
 
         set cmd "event generate $text <<TkCon_TclFindDefinition>>; break"
-        $m add command -label "Tcl find definition" -accel "Control-F9" -command $cmd
-
-        $m add separator
-
-        set cmd "event generate $text <<TkCon_PasteAsLinuxFilename>>; break"
-        $m add command -label "Paste as linux filename" -command $cmd
+        $m add command -label "Tcl: перейти к определению" -accel "Control-F9" -command $cmd
 
     }
 
-    ## Interp Menu
+    ## Tcl Menu
     ##
-    foreach m [list $w.interp $w.pop.interp] {
+    foreach m [list $w.tcl $w.pop.tcl] {
 	menu $m -disabledforeground $COLOR(disabled) \
             -postcommand [list ::tkcon::InterpMenu $m]
     }
 
     ## Prefs Menu
     ##
-    foreach m [list [menu $w.prefs] [menu $w.pop.prefs]] {
+    foreach m [list [menu $w.настройка] [menu $w.pop.настройка]] {
 
         if {$::tkcon::OPT(putd-output-file) ne {}} {
             set PutdEnabledState normal
         } else {
             set PutdEnabledState disabled
         }           
-	$m add check -label "1.Putd-enabled" \
+	$m add check -label "1.Включить putd" \
 		-underline 0 -variable ::tkcon::OPT(putd-enabled) -state $PutdEnabledState
-	$m add check -label "2.Oduvan-backend" \
+	$m add check -label "2.Использовать сервер одуванчика" \
 		-underline 0 -variable ::tkcon::OPT(oduvan-backend)
-	$m add check -label "3.Non-Tcl Attachments (defunct)" \
+	$m add check -label "3.Non-Tcl Attachments (НЕ РАБОТАЕТ)" \
 		-underline 0 -variable ::tkcon::OPT(nontcl)
-	$m add check -label "4.Show Multiple Matches" \
+	$m add check -label "4.Показывать много найденных вхождений" \
 		-underline 0 -variable ::tkcon::OPT(showmultiple)
-	$m add check -label "5.Show Statusbar" \
+	$m add check -label "5.Показать строку состояния (status bar)" \
 	    -underline 5 -variable ::tkcon::OPT(showstatusbar) \
 	    -command {
 		if {$::tkcon::OPT(showstatusbar)} {
 		    grid $::tkcon::PRIV(statusbar)
 		} else { grid remove $::tkcon::PRIV(statusbar) }
 	    }
-	$m add cascade -label "6.Scrollbar" -underline 2 -menu $m.scroll
+	$m add cascade -label "6.Полоса прокрутки" -underline 2 -menu $m.scroll
 
 	## Scrollbar Menu
 	##
 	set m [menu $m.scroll]
-	$m add radio -label "Left" -value left \
+	$m add radio -label "Слева" -value left \
 		-variable ::tkcon::OPT(scrollypos) \
 		-command { grid configure $::tkcon::PRIV(scrolly) -column 0 }
-	$m add radio -label "Right" -value right \
+	$m add radio -label "Справа" -value right \
 		-variable ::tkcon::OPT(scrollypos) \
 		-command { grid configure $::tkcon::PRIV(scrolly) -column 2 }
     }
 
     ## History Menu
     ##
-    foreach m [list $w.history $w.pop.history] {
+    foreach m [list $w.история $w.pop.история] {
 	menu $m -disabledforeground $COLOR(disabled) \
 		-postcommand [list ::tkcon::HistoryMenu $m]
     }
 
     ## Window Menu
     ##
-    set m $w.window
+    set m $w.окно
     menu $m -disabledforeground $COLOR(disabled) \
         -postcommand [list ::window_menu::DynamicWindowMenu $w $m]
 
-    set m $w.pop.window
+    set m $w.pop.окно
     menu $m -disabledforeground $COLOR(disabled) \
         -postcommand [list ::window_menu::DynamicWindowMenu $w $m]
 
@@ -1448,9 +1447,9 @@ proc ::tkcon::InitMenus {w title} {
     
     ## Help Menu
     ##
-    foreach m [list [menu $w.help] [menu $w.pop.help]] {
-        $m add command -label "About " -command ::tkcon::About
-        $m add command -label "Lisp Hyperdoc Lookup" -command "event generate <<TkCon_LispHyperdocLookup>>" -accel "<Key-F1>"
+    foreach m [list [menu $w.справка] [menu $w.pop.справка]] {
+        $m add command -label "О программе" -command ::tkcon::About
+        $m add command -label "Поиск идентификатора в Common Lisp Hyperdoc" -command "event generate <<TkCon_LispHyperdocLookup>>" -accel "<Key-F1>"
     }
 }
 
@@ -1490,7 +1489,7 @@ proc ::tkcon::InterpMenu w {
     if {![winfo exists $w]} return
     $w delete 0 end
 
-    $w add command -label "This menu is defunct!!!" -state disabled
+    $w add command -label "Это меню не работает!!!" -state disabled
 
     foreach {app type} [Attach] break
     $w add command -label "[string toupper $type]: $app" -state disabled
@@ -1504,13 +1503,13 @@ proc ::tkcon::InterpMenu w {
     ## Show Last Error
     ##
     $w add separator
-    $w add command -label "Show Last Error" \
+    $w add command -label "Показать последнюю ошибку" \
 	    -command [list tkcon error $app $type]
 
     ## Packages Cascaded Menu
     ##
     $w add separator
-    $w add command -label "Manage Packages" -underline 0 \
+    $w add command -label "Управление пакетами Tcl" -underline 0 \
 	-command [list ::tkcon::InterpPkgs $app $type] \
         -state disabled
     # state disabled added by budden
@@ -1518,7 +1517,7 @@ proc ::tkcon::InterpMenu w {
     ## Init Interp
     ##
     $w add separator
-    $w add command -label "Send tkcon Commands" \
+    $w add command -label "Отправить команды tkcon" \
         -command [list ::tkcon::InitInterp $app $type] \
         -state disabled
     # state disabled added by budden
@@ -2135,8 +2134,8 @@ proc ::tkcon::Save { {fn ""} {type ""} {opt ""} {mode w} } {
     if {![regexp -nocase {^(all|history|stdin|stdout|stderr|widget)$} $type]} {
 	array set s { 0 All 1 History 2 Stdin 3 Stdout 4 Stderr 5 Cancel }
 	## Allow user to specify what kind of stuff to save
-	set type [tk_dialog $PRIV(base).savetype "Save Type" \
-		"What part of the text do you want to save?" \
+	set type [tk_dialog $PRIV(base).savetype "Тип сохранения" \
+		"Какую часть текста вы хотите сохранить?" \
 		questhead 0 $s(0) $s(1) $s(2) $s(3) $s(4) $s(5)]
 	if {$type == 5 || $type == -1} return
 	set type $s($type)
@@ -2169,7 +2168,7 @@ proc ::tkcon::Save { {fn ""} {type ""} {opt ""} {mode w} } {
 	}
     }
     if {[catch {open $fn $mode} fid]} {
-	return -code error "Save Error: Unable to open '$fn' for writing\n$fid"
+	return -code error "Ошибка сохранения: Не могу открыть '$fn' на запись\n$fid"
     }
     puts -nonewline $fid $data
     close $fid
@@ -2289,8 +2288,8 @@ proc ::tkcon::MainInit {} {
         
 	if {"" == $slave} {
 	    ## Main interpreter close request
-	    if {[tk_messageBox -parent $PRIV(root) -title "Quit tkcon?" \
-		     -message "Close all windows and exit tkcon?" \
+	    if {[tk_messageBox -parent $PRIV(root) -title "Выйти из clcon?" \
+		     -message "Закрыть все окна и выйти из clcon?" \
 		     -icon question -type yesno] == "yes"} { exit }
 	    return
 	} elseif {$slave == $::tkcon::OPT(exec)} {
@@ -2309,12 +2308,12 @@ proc ::tkcon::MainInit {} {
     if {$OPT(overrideexit)} {
 	## We want to do a couple things before exiting...
 	if {[catch {rename ::exit ::tkcon::FinalExit} err]} {
-	    puts stderr "tkcon might panic:\n$err"
+	    puts stderr "Возможно, clcon в панике:\n$err"
 	}
 	proc ::exit args {
 	    if {$::tkcon::OPT(usehistory)} {
 		if {[catch {open $::tkcon::PRIV(histfile) w} fid]} {
-		    puts stderr "unable to save history file:\n$fid"
+		    puts stderr "Не могу сохранить файл истории:\n$fid"
 		    # pause a moment, because we are about to die finally...
 		    after 1000
 		} else {
@@ -2844,7 +2843,7 @@ proc tkcon {cmd args} {
 	    ## 'getcommand' a replacement for [gets stdin]
 	    ## This forces a complete command to be input though
 	    if {[llength $args]} {
-		return -code error "wrong # args: must be \"tkcon getcommand\""
+		return -code error "Неверное число аргументов: должно быть \"tkcon getcommand\""
 	    }
 	    tkcon show
 	    set old [bind TkConsole <<TkCon_Eval>>]
@@ -2916,7 +2915,7 @@ proc tkcon {cmd args} {
 		set app  [lindex $args 0]
 		set type [lindex $args 1]
 		if {[catch {::tkcon::EvalOther $app $type set errorInfo} info]} {
-		    set info "error getting info from $type $app:\n$info"
+		    set info "Ошибка при получении информации из $type $app:\n$info"
 		}
 	    } else {
 		set info $PRIV(errorInfo)
@@ -3062,7 +3061,7 @@ proc tkcon {cmd args} {
 	    if {[llength [info command $new]]} {
 		uplevel \#0 $new $args
 	    } else {
-		return -code error "bad option \"$cmd\": must be\
+		return -code error "Неверная опция \"$cmd\": должна быть\
 			[join [lsort [list attach close console destroy \
 			font hide iconify load main master new save show \
 			slave deiconify version title bgerror]] {, }]"
@@ -3146,7 +3145,7 @@ proc tkcon_gets args {
     set len [llength $args]
     if {$len != 1 && $len != 2} {
 	return -code error \
-		"wrong # args: should be \"gets channelId ?varName?\""
+		"Неверное число аргументов: должно быть \"gets channelId ?varName?\""
     }
     if {[string compare stdin [lindex $args 0]]} {
 	return [uplevel 1 tkcon_tcl_gets $args]
@@ -3382,7 +3381,7 @@ proc dump {type args} {
 			append res [list proc $p $as [info body $p]]\n
 		    }
 		} elseif {$whine} {
-		    append res "\#\# No known proc $arg\n"
+		    append res "\#\# Неизвестная процедура $arg\n"
 		    set code error
 		}
 	    }
@@ -3391,7 +3390,7 @@ proc dump {type args} {
 	    # widget
 	    ## The user should have Tk loaded
 	    if {![llength [info command winfo]]} {
-		return -code error "winfo not present, cannot dump widgets"
+		return -code error "winfo отсутствует, не могу выгрузить элементы интерфейса"
 	    }
 	    if {![info exists fltr]} { set fltr .* }
 	    foreach arg $args {
@@ -3450,14 +3449,24 @@ proc dump {type args} {
     return -code $code [string trimright $res \n]
 }
 
-## idebug - interactive debugger
+## idebug - интерактивный отладчик
 #
 # idebug body ?level?
+#
+#       Печатает тело команды (если это процедура), находящейся 
+#       на заданном уровне стека, по умолчанию на текущем
 #
 #	Prints out the body of the command (if it is a procedure) at the
 #	specified level.  <i>level</i> defaults to the current level.
 #
 # idebug break
+#
+#       Создаёт точку останова в процедуре. Она сработает только в случае,
+#       если idebug включён и если id подходит к шаблону. В этом случае,
+#       Tkcon всплывёт и в нём будет показана подсказка idebug. Вам даются
+#       базовые возможности по просмотру стека, читать/писать переменные и
+#       выполнять команды tcl на любом уровне вложенности стека. Для режима
+#       отладки история команд хранится отдельно
 #
 #	Creates a breakpoint within a procedure.  This will only trigger
 #	if idebug is on and the id matches the pattern.  If so, TkCon will
@@ -3468,6 +3477,11 @@ proc dump {type args} {
 #
 # idebug echo|{echo ?id?} ?args?
 #
+#       То же, что "echo", но работает только когда idebug включён.
+#       Вы можете установить необязательный id, чтобы далее ограничить
+#       вызовы. Если id не указан, то по умолчанию это будет имя команды,
+#       в которой был сделан данный вызов.
+#
 #	Behaves just like "echo", but only triggers when idebug is on.
 #	You can specify an optional id to further restrict triggering.
 #	If no id is specified, it defaults to the name of the command
@@ -3475,19 +3489,34 @@ proc dump {type args} {
 #
 # idebug id ?id?
 #
+#       Запросить или установить idebug id. Этот id используется другими
+#       методами idebug, чтобы определить, нужно им работать 
+#       или нужно прикинуться ветошью. idebug id - это шаблон "глоб", по 
+#       умолчанию - * . 
+#
 #	Query or set the idebug id.  This id is used by other idebug
 #	methods to determine if they should trigger or not.  The idebug
 #	id can be a glob pattern and defaults to *.
 #
 # idebug off
 #
+#       Отключает idebug.
+# 
 #	Turns idebug off.
 #
 # idebug on ?id?
 #
+#       Включает idebug. Если задан id, то устанавливает idebug id в заданное
+#       значение.
+#
 #	Turns idebug on.  If 'id' is specified, it sets the id to it.
 #
 # idebug puts|{puts ?id?} args
+#
+#       То же, что puts, но работает только если idebug включён. 
+#       Вы можете задать необязательный id, чтобы далее ограничить вызовы.
+#       Если id не указан, то по умолчанию он равен имени команды, в которой
+#       был сделан вызов.
 #
 #	Behaves just like "puts", but only triggers when idebug is on.
 #	You can specify an optional id to further restrict triggering.
@@ -3496,6 +3525,12 @@ proc dump {type args} {
 #
 # idebug show type ?level? ?VERBOSE?
 #
+#       'type' - должен быть vars (переменные), locals (локальные) или globals
+#       (глобальные). Этот метод выведет переменные/локальные/глобальные, 
+#       присутствующие на заднном уровне. Если задано VERBOSE, то он выводит 
+#       дампы значений. 'level' - по умолчанию, уровень, на котором был вызван
+#       данный метод. 
+# 
 #	'type' must be one of vars, locals or globals.  This method
 #	will output the variables/locals/globals present in a particular
 #	level.  If VERBOSE is added, then it actually 'dump's out the
@@ -3503,6 +3538,9 @@ proc dump {type args} {
 #	method was called.
 #
 # idebug trace ?level?
+#
+#       Печатает стек от заданного уровня вверх до вершины стека. level 
+#       по умолчанию - текущий уровень.
 #
 #	Prints out the stack trace from the specified level up to the top
 #	level.  'level' defaults to the current level.
@@ -3592,24 +3630,24 @@ proc idebug {opt args} {
 		    b { set c [catch {idebug body $lvl} res] }
 		    o { set res [set IDEBUG(on) [expr {!$IDEBUG(on)}]] }
 		    h - ?	{
-			puts stderr "    +		Move down in call stack
-    -		Move up in call stack
-    .		Show current proc name and params
+			puts stderr "    +		Опуститься по стеку на оодин уровень
+    -		Подняться по стеку на один уровень
+    .		Показать имя текущей процедуры и параметры
 
-    v		Show names of variables currently in scope
-    V		Show names of variables currently in scope with values
-    l		Show names of local (transient) variables
-    L		Show names of local (transient) variables with values
-    g		Show names of declared global variables
-    G		Show names of declared global variables with values
-    t		Show a stack trace
-    T		Show a verbose stack trace
+    v		Показывает имена переменных в текущей области видимости
+    V		Показывает имена и значения переменных в текущей области видимости
+    l		Показывает имена локальных (local, transient) переменных
+    L		Показывает имена и значения локальных переменных
+    g		Показывает имена объявленных глобальных переменных
+    G		Показывает имена и значения объявленных глобальных переменных
+    t		Показывает стек
+    T		Показывает стек подробно
 
-    b		Show body of current proc
-    o		Toggle on/off any further debugging
-    c,q		Continue regular execution (Quit debugger)
-    h,?		Print this help
-    default	Evaluate line at current level (\#$level)"
+    b		Показывает тело текущей процедуры
+    o		Включет/выключает отладку
+    c,q		Продолжить обычное выполнение (покинуть отладчик)
+    h,?		Напечатать данную справку
+    default	Вычислить строчку на текущем уровне (\#$level)"
 		    }
 		    c - q break
 		    default { set c [catch {uplevel \#$level $line} res] }
@@ -3717,8 +3755,8 @@ proc observe {opt name args} {
 	co* {
 	    if {[regexp {^(catch|lreplace|set|puts|for|incr|info|uplevel)$} \
 		    $name]} {
-		return -code error "cannot observe \"$name\":\
-			infinite eval loop will occur"
+		return -code error "не могу наблюдать (observe) \"$name\":\
+			возникнет безконечный цикл вычислений"
 	    }
 	    set old ${name}@
 	    while {[llength [info command $old]]} { append old @ }
@@ -3751,9 +3789,9 @@ proc observe {opt name args} {
 	    ## What a useless method...
 	    if {[info exists tcl_observe($name)]} {
 		set i $tcl_observe($name)
-		set res "\"$name\" observes true command \"$i\""
+		set res "\"$name\" наблюдает (observes) true command \"$i\""
 		while {[info exists tcl_observe($i)]} {
-		    append res "\n\"$name\" observes true command \"$i\""
+		    append res "\n\"$name\" наблюдает (observes) true command \"$i\""
 		    set i $tcl_observe($name)
 		}
 		return $res
@@ -3763,8 +3801,8 @@ proc observe {opt name args} {
 	    set type [lindex $args 0]
 	    set args [lrange $args 1 end]
 	    if {![regexp {^[rwu]} $type type]} {
-		return -code error "bad [lindex [info level 0] 0] $opt type\
-			\"$type\", must be: read, write or unset"
+		return -code error "Плохой [lindex [info level 0] 0] $opt тип\
+			\"$type\", должен быть read, write или unset"
 	    }
 	    if {![llength $args]} { set args observe_var }
 	    foreach c [uplevel 1 [list trace vinfo $name]] {
@@ -3777,8 +3815,8 @@ proc observe {opt name args} {
 	    uplevel 1 [list trace vinfo $name]
 	}
 	default {
-	    return -code error "bad [lindex [info level 0] 0] option\
-		    \"[lindex $args 0]\", must be: [join [lsort \
+	    return -code error "Плохая [lindex [info level 0] 0] опция\
+		    \"[lindex $args 0]\", должна быть: [join [lsort \
 		    [list command cdelete cinfo variable vdelete vinfo]] {, }]"
 	}
     }
@@ -3907,8 +3945,8 @@ proc dir {args} {
 	    -a* {set s(all) 1} -f* {set s(full) 1}
 	    -l* {set s(long) 1} -- break
 	    default {
-		return -code error "unknown option \"$str\",\
-			should be one of: -all, -full, -long"
+		return -code error "Неизвестная опция \"$str\",\
+			должна быть одна из: -all, -full, -long"
 	    }
 	}
     }

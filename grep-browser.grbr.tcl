@@ -192,10 +192,10 @@ namespace eval ::grbr {
         set m $menu
 
         set cmdBack [list ::grbr::EditOtherCompilerMessage -1 $ShowSource]
-        $m add command -label "Goto prev match" -command $cmdBack -accel "Alt-F7"
+        $m add command -label "Предыдущая находка" -command $cmdBack -accel "Alt-F7"
 
         set cmdForward [list ::grbr::EditOtherCompilerMessage 1 $ShowSource]
-        $m add command -label "Goto next match" -command $cmdForward -accel "Alt-F8"
+        $m add command -label "Следующая находка" -command $cmdForward -accel "Alt-F8"
         foreach tag $tagListForKeys {
             # puts stderr $tag
             bind $tag <Alt-Key-F7> $cmdBack
@@ -204,8 +204,8 @@ namespace eval ::grbr {
     }
     
     proc TitleListFileMenu {w menu} {
-        set m [menu [::tkcon::MenuButton $menu "1.File" file]]
-        $m add command -label "1.Dismiss" -underline 0 -accel "Escape" -command [list destroy $w]
+        set m [menu [::tkcon::MenuButton $menu "1.Файл" file]]
+        $m add command -label "1.Закрыть" -underline 0 -accel "Escape" -command [list destroy $w]
         bind $w <Escape>		[list destroy $w]
         ::clcon_key::b bind $w <Control-Key-w> [list destroy $w]
     }
@@ -214,25 +214,25 @@ namespace eval ::grbr {
         set w $grbr
         set tbl [GetTitleListMenuTbl $w]
         set text [HeaderOfGrepBrowser $w]
-        set m [menu [::tkcon::MenuButton $menu "2.Edit" edit]]
-        $m add command -label "1.Copy" -under 0 -command [list tk_textCopy $tbl] -state disabled
+        set m [menu [::tkcon::MenuButton $menu "2.Правка" edit]]
+        $m add command -label "1.Копировать" -under 0 -command [list tk_textCopy $tbl] -state disabled
     #     $m add separator
 
         set cmd [list ::fndrpl::OpenFindBox $tbl "tablelist" "find" {}]
-        $m add command -label "2.Find" -under 0 -command $cmd -accel "Control-F" 
+        $m add command -label "2.Поиск" -under 0 -command $cmd -accel "Control-F" 
         bind $w <Control-Key-f> $cmd
         bind $w <Control-Key-Cyrillic_a> $cmd
 
         $m add separator
 
         set cmd [list ::grbr::JumpToCurrentLocation $grbr -close 0]
-        $m add command -label "Show source" -accel "<Space>" -command $cmd
+        $m add command -label "Показать исходный текст" -accel "<Space>" -command $cmd
         foreach tag [list [$tbl bodytag] $text] {
             bind $tag <space> $cmd
         }
 
         set cmd [list ::grbr::JumpToCurrentLocation $grbr -close 1]
-        $m add command -label "Goto source and close browser" -accel "<Return>" -command $cmd
+        $m add command -label "Закрыть список находок и показать исходный текст и " -accel "<Return>" -command $cmd
         foreach tag [list [$tbl bodytag] $text] {
             bind $tag <Return> [concat $cmd ";" break]
         }
@@ -247,7 +247,7 @@ namespace eval ::grbr {
         variable ::tkcon::COLOR
         set tbl [GetTitleListMenuTbl $w]
         set text [HeaderOfGrepBrowser $w]
-        set m [::tkcon::MenuButton $menu "7.Window" window]
+        set m [::tkcon::MenuButton $menu "7.Окно" window]
 	menu $m -disabledforeground $COLOR(disabled) \
 		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]
         ::window_menu::WindowMenuKeyBindings $w $w $w
@@ -271,7 +271,7 @@ namespace eval ::grbr {
 
         # puts $w
         if {[winfo exists $w]} {
-            error "Grep browser window $w already exists"
+            error "Окно просмотровщика находок $w уже существует"
         }
 
         grep_browser $w
@@ -288,7 +288,7 @@ namespace eval ::grbr {
 
 
         # title 
-        set word "File search matches browser"
+        set word "Просмотровщик находок в файлах"
 	wm title $w "$word"
 
         set TitleListWindow $w

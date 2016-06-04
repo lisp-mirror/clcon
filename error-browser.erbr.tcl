@@ -398,10 +398,10 @@ namespace eval ::erbr {
         set m $menu
 
         set cmdBack [list ::erbr::EditOtherCompilerMessage -1 $ShowSource]
-        $m add command -label "Goto prev compiler message" -command $cmdBack -accel "Alt-F7"
+        $m add command -label "К прыдедущему сообщению компилятора" -command $cmdBack -accel "Alt-F7"
 
         set cmdForward [list ::erbr::EditOtherCompilerMessage 1 $ShowSource]
-        $m add command -label "Goto next compiler message" -command $cmdForward -accel "Alt-F8"
+        $m add command -label "К следующему сообщению компилятора" -command $cmdForward -accel "Alt-F8"
         foreach tag $tagListForKeys {
             # puts stderr $tag
             bind $tag <Alt-Key-F7> [concat $cmdBack ";" break]
@@ -410,18 +410,18 @@ namespace eval ::erbr {
     }
     
     proc TitleListFileMenu {w menu} {
-        set m [menu [::tkcon::MenuButton $menu "1.File" file]]
-        #     $m add command -label "Save As..."  -underline 0 \
+        set m [menu [::tkcon::MenuButton $menu "1.Файл" file]]
+        #     $m add command -label "Сохранить как..."  -underline 0 \
             # 	-command [list ::tkcon::Save {} widget $text]
-    #     $m add command -label "Append To..."  -underline 0 \
+    #     $m add command -label "Добавить к..."  -underline 0 \
             # 	-command [list ::tkcon::Save {} widget $text a+]
         #     $m add separator
-        $m add command -label "1.Dismiss" -underline 0 -accel "Escape" -command [list destroy $w]
+        $m add command -label "1.Закрыть" -underline 0 -accel "Escape" -command [list destroy $w]
         bind $w <Escape>		[list destroy $w]
         #     bind $w <Control-Key-Cyrillic_tse>		[list destroy $w]
 
         set cmd ::erbr::ForceLoad
-        $m add command -label "!Force load fasl from failed compilation" -underline 0 -command $cmd
+        $m add command -label "!Принудительно загрузить откомпилированный файл из компиляции, потерпевшей неудачу" -underline 0 -command $cmd
         bind $w.header.text <exclam> $cmd
         set bodytag [$w.tf.tbl bodytag]
         bind $bodytag <exclam> $cmd
@@ -455,7 +455,7 @@ namespace eval ::erbr {
         variable ::tkcon::COLOR
         set tbl [GetTitleListMenuTbl $w]
         set text [HeaderOfErrorBrowser $w]
-        set m [::tkcon::MenuButton $menu "7.Window" window]
+        set m [::tkcon::MenuButton $menu "7.Окно" window]
 	menu $m -disabledforeground $COLOR(disabled) \
 		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]
         ::window_menu::WindowMenuKeyBindings $w $w $w

@@ -159,8 +159,8 @@ namespace eval ::buli {
     # }
 
     proc TitleListFileMenu {w menu} {
-         set m [menu [::tkcon::MenuButton $menu "1.File" file]]
-         $m add command -label "1.Close" -underline 0 -accel "Escape" -command [list destroy $w]
+         set m [menu [::tkcon::MenuButton $menu "1.Файл" file]]
+         $m add command -label "1.Закрыть" -underline 0 -accel "Escape" -command [list destroy $w]
         bind $w <Escape>		[list destroy $w]
     }
 
@@ -170,18 +170,18 @@ namespace eval ::buli {
     }
 
     proc TitleListBufferMenu {w menu} {
-        set m [menu [::tkcon::MenuButton $menu "2.Buffer" buffer]]
+        set m [menu [::tkcon::MenuButton $menu "2.Буфер" buffer]]
         
         set ActivateCmd "::buli::CellCmdForActiveCell $w.tf.tbl HideListAndShowBuffer"
-        $m add command -label "Activate" -accel "Return" -command $ActivateCmd
+        $m add command -label "Выбрать" -accel "Return" -command $ActivateCmd
 
         set CloseCmd "::buli::CellCmdForActiveCell $w.tf.tbl CloseBuffer"
-        $m add command -label "Close buffer or file" -accel "Delete" -command $CloseCmd
+        $m add command -label "Закрыть буфер или файл" -accel "Delete" -command $CloseCmd
     }
 
     proc TitleListWindowMenu {w menu} {
         variable ::tkcon::COLOR
-        set m [::tkcon::MenuButton $menu "7.Window" window]
+        set m [::tkcon::MenuButton $menu "7.Окно" window]
 	menu $m -disabledforeground $COLOR(disabled) \
 		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]
         ::window_menu::WindowMenuKeyBindings $w $w $w

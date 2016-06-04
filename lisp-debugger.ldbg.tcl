@@ -39,7 +39,7 @@ namespace eval ::ldbg {
     catch {font create tkconfixed -family Courier -size -20}
 
     proc StepperMenuTitle {} {
-        return "Stepper"
+        return "Ходьба"
     }
 
     proc InitData {} {
@@ -110,14 +110,14 @@ namespace eval ::ldbg {
                     return [list "Local" $x2no $localItem $frameItem]
                 }
                 "ct" {
-                    error "Wow! I'm not written!"
+                    error "Ура! Меня никто не написал!"
                 }
                 default {
                     break
                 }
             }
         }
-        error "wrong RowName $RowName"
+        error "неверный RowName = $RowName"
     }
 
     proc FramesTablelistEnsurePopulated {tbl row {contBody ProcedureNop}} {
@@ -172,7 +172,7 @@ namespace eval ::ldbg {
         set FramesAsList [::mprs::Unleash $frames]
         foreach lframe $FramesAsList {
             if {![::mprs::Consp $lframe]} { 
-                error "I thought that frame $lframe must be a cons"
+                error "Я думал, что кадр $lframe должен быть консом"
             }
             set frame [::mprs::Unleash $lframe]
             # (frameid text &optional (:restartable ?))
@@ -220,7 +220,7 @@ namespace eval ::ldbg {
         variable StackFrameHeaders
         set ParentFrameNo [RowNameToFrameNo $ParentRowName]
         dict set StackFrameHeaders $ParentFrameNo "CatchTags" $catchTagNo $CatchTag
-        set contents "\[Catch tag\] $CatchTag"
+        set contents "\[Ловушка (catch tag)\] $CatchTag"
         set row [$tbl insertchildren $ParentRowName end [list $contents]]
         set name [string cat $ParentRowName "_ct" $catchTagNo]
         $tbl rowconfigure $row -name $name
@@ -247,7 +247,7 @@ namespace eval ::ldbg {
             if {![llength [$tbl childkeys $RowName]]} {
                 set okList [::mprs::Unleash [lindex $EventAsList 1]]
                 if {[::mprs::Unleash [lindex $okList 0]] ne {:ok}} {
-                    error "Something wrong with the debugger: error showing locals"
+                    error "Что-то не так с отладчиком: ошибка при отображении локальных переменных"
                 }
                 # lact =  LocalsAndCatchTags
                 set lact [::mprs::Unleash [lindex $okList 1]]
@@ -392,7 +392,7 @@ namespace eval ::ldbg {
         variable DebugEvent
         set TitleListL [lindex $DebugEvent 3]
         if {![::mprs::Consp $TitleListL]} {
-            error "I expected a cons: $TitleListL"
+            error "Я ждал конс: $TitleListL"
         }
         set TitleList [::mprs::Unleash $TitleListL]
         set e1 [::mprs::Unleash [lindex $TitleList 0]]
@@ -484,65 +484,65 @@ namespace eval ::ldbg {
     }
 
     proc MakeMainWindowFileMenu {w menu} {
-        set m [menu [::tkcon::MenuButton $menu "1.File" file]]
+        set m [menu [::tkcon::MenuButton $menu "1.Файл" file]]
         set cmd "::ldbg::EditCurrentAsdfFile" 
-        $m add command -label "1. Edit current asdf file if defined" -underline 0 -command $cmd
+        $m add command -label "1. Редактировать текущий файл ASDF, если он определён" -underline 0 -command $cmd
 
         set cmd "::ldbg::EditCurrentAsdfSystem" 
-        $m add command -label "2. Edit current asdf system if defined" -underline 0 -command $cmd
+        $m add command -label "2. Редактировать текущую систему ASDF, если она определена" -underline 0 -command $cmd
 
         set cmd "::ldbg::ThrowToTopLevel $w"
-        $m add command -label "3. Close debugger and throw to top level" -underline 0 -command $cmd
+        $m add command -label "3. Закрыть отладчик и выброситься на верхний уровень" -underline 0 -command $cmd
     }
         
 
     proc MakeMainWindowStackMenu {w menu} {
-        set m [menu [::tkcon::MenuButton $menu "2.Stack" stack]]
+        set m [menu [::tkcon::MenuButton $menu "2.Стек" stack]]
         set tbl [GetFramesTablelist $w ]
 
         # FIXME redo all that strings to lists as with EnableStepping
         set cmd "::ldbg::CellCmdForActiveCell $tbl RowDblClick"
-        $m add command -label "Edit source/inspect local" -accel "Return" -command $cmd
+        $m add command -label "Перейти к определению/инспектор локальной переменной" -accel "Return" -command $cmd
         #
         set cmd "::ldbg::InspectCurrentCondition"
-        $m add command -label "1.Inspect current condition" -underline 0 -command $cmd
+        $m add command -label "1.Смотреть исключение в инспекторе" -underline 0 -command $cmd
 
         set cmd "::ldbg::CellCmdForActiveCell $tbl ReturnFromFrame"
-        $m add command -label "2.Return from frame" -underline 0 -command $cmd
+        $m add command -label "2.Вернуться из кадра..." -underline 0 -command $cmd
 
         set cmd "::ldbg::CellCmdForActiveCell $tbl RestartFrame"
-        $m add command -label "3.Restart frame" -underline 0 -command $cmd
+        $m add command -label "3.Перезапустить кадр" -underline 0 -command $cmd
 
         set cmd "::ldbg::CellCmdForActiveCell $tbl EvalInFrame"
-        $m add command -label "4.Eval in frame" -underline 0 -command $cmd
+        $m add command -label "4.Выполнить в кадре..." -underline 0 -command $cmd
 
         set cmd "::ldbg::CellCmdForActiveCell $tbl EvalInFramePrettyPrint"
-        $m add command -label "5.Eval in frame (pretty print)" -underline 0 -command $cmd
+        $m add command -label "5.Выполнить в кадре и лепо вывести..." -underline 0 -command $cmd
 
         set cmd [list ::ldbg::CellCmdForActiveCell $tbl EnableStepping]
-        $m add command -label "6.Switch to stepping mode" -underline 0 -command $cmd        
+        $m add command -label "6.Перейти в режим ходьбы" -underline 0 -command $cmd        
     }
     
     proc MakeMainWindowEditMenu {w menu} {
-        set m [menu [::tkcon::MenuButton $menu "3.Edit" edit]]
+        set m [menu [::tkcon::MenuButton $menu "3.Правка" edit]]
         set tbl [GetFramesTablelist $w ]
         set bodytag [$tbl bodytag]
         set cmd "::tablelist_util::CopyCurrentCell $tbl"
-	$m add command -label "Copy"  -accel "Control-C" \
+	$m add command -label "Копировать"  -accel "Control-C" \
             -command $cmd
         
         ::clcon_key::b bind $bodytag <Control-Key-c> $cmd
         bind $bodytag <Control-Key-Insert> $cmd
         
         set cmd [list ::fndrpl::OpenFindBox $tbl "tablelist" "find" "::ldbg::FramesTablelistEnsurePopulated"]
-	$m add command -label "Find"  -accel "Control-f" \
+	$m add command -label "Найти"  -accel "Control-f" \
             -command $cmd
         
         ::clcon_key::b bind $bodytag <Control-Key-f>	   $cmd
      
 
         set cmd [list ::fndrpl::FindIt $tbl]
-	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd -state disabled
+	$m add command -label "Найти далее"  -underline 0 -accel "F3" -command $cmd -state disabled
         #bind $tbl <F3> $cmd
         
     
@@ -551,7 +551,7 @@ namespace eval ::ldbg {
     
     proc MakeMainWindowWindowMenu {w menu} {
         variable ::tkcon::COLOR
-        set m [::tkcon::MenuButton $menu "7.Window" window]
+        set m [::tkcon::MenuButton $menu "7.Окно" window]
 	menu $m -disabledforeground $COLOR(disabled) \
 		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]
         ::window_menu::WindowMenuKeyBindings $w $w $w
@@ -562,7 +562,7 @@ namespace eval ::ldbg {
         variable DebugEvent
         set RestartsL [lindex $DebugEvent 4]
         if {![::mprs::Consp $RestartsL]} {
-            error "Expected cons: $RestartsL"
+            error "Ожидался конс: $RestartsL"
         }
         set restarts [::mprs::Unleash $RestartsL]
         set stepperMode 0
@@ -615,7 +615,7 @@ namespace eval ::ldbg {
         #vim.command('let s:sldb_level=-1')
         #retval = retval + '; Quit to level ' + r[2] + '\n' + get_prompt()
         set level [::mprs::Unleash [lindex $EventAsList 2]]
-        puts "; Quit to level $level"
+        puts "; Выход на уровень $level"
         set ::slimv::Ssldb_level $level
         if {$ContinuationId ne ""} {
             ::mprs::RunContinuation $ContinuationId $EventAsList
@@ -640,7 +640,7 @@ namespace eval ::ldbg {
         set ItemInfo [RowToItemInfo $tbl $RowName]
         set type [lindex $ItemInfo 0]
         if {$type ne "Local"} {
-            error "LocalInspectValue: not a local"
+            error "LocalInspectValue: это не локальная переменная"
         }
         set LocalNo [lindex $ItemInfo 1]
         set LocalItem [lindex $ItemInfo 2]
@@ -711,7 +711,7 @@ namespace eval ::ldbg {
         set thread [GetDebuggerThreadId]
         foreach {isok code}                                 \
             [ LameAskForLispExpression $MainWindow          \
-                  "Enter lisp expr (shift-enter=new line) and press Enter: cl-user>"
+                  "Введите выражение Лиспа (shift-enter=новая строка) и нажмите Enter: cl-user>"
              ] break
         if {$isok ne "ok"} {
             return
@@ -726,7 +726,7 @@ namespace eval ::ldbg {
         variable MainWindow
         set EventHead [lindex $EventAsList 0]
         if { $EventHead ne {:return} } {
-            puts stderr "Something wrong: in SWANK reply we expected :return, but get $EventHead"
+            puts stderr "Что-то не так: в ответе текстового лисп-сервера мы ожидали :return, но получили $EventHead"
         }
         set SwankReply [::mprs::Unleash [lindex $EventAsList 1]]
         set HeadSwankReply [lindex $SwankReply 0]
@@ -781,12 +781,12 @@ namespace eval ::ldbg {
         #set level [GetDebuggerLevel]
         foreach {isok code}                                      \
             [LameAskForLispExpression $MainWindow                \
-                 "Eval in frame (shift-enter=new line)$package>" \
+                 "Выполнить в кадре (shift-enter=новая строка)$package>" \
                 ] break
         if {$isok ne "ok"} {
             return
         }
-        puts ";;Eval in frame $FrameNo:"
+        puts ";;Выполняю в кадре $FrameNo:"
         puts ";;$package> $code"
         set qCode [::tkcon::QuoteLispObjToString $code]
         set thread [GetDebuggerThreadId]
@@ -836,7 +836,7 @@ namespace eval ::ldbg {
     }
 
     proc RestartFrame {RowName} {
-        error "FIXME: RestartFrame is not implemented properly"
+        error "ПРАВЬМЯ: Перезапуск кадра не реализован должным образом"
         variable MainWindow
         set FrameNo [RowNameToFrameNo $RowName]
         set thread [GetDebuggerThreadId]
@@ -852,9 +852,9 @@ namespace eval ::ldbg {
         variable InTheDebugger
         variable MainWindow
         if {!$InTheDebugger} {
-            tk_messageBox -parent $MainWindow -title "Stepper" -message "Debugger is not active"
+            tk_messageBox -parent $MainWindow -title "Ходьба" -message "Отладчик не активен"
         } elseif {!$StepperMode} {
-            tk_messageBox -parent $MainWindow -title "Stepper" -message "Stepper is not active"
+            tk_messageBox -parent $MainWindow -title "Ходьба" -message "Отладчик не активен"
         } else {
             InvokeSldbRestartByName $name
         }
@@ -879,7 +879,7 @@ namespace eval ::ldbg {
             set LispCmd "(clco::invoke-sldb-restart-by-name '$name)"
             ::tkcon::EvalInSwankAsync $LispCmd {} $thread
         } else {
-            tk_messageBox -parent $MainWindow -title "Restart" -message "Restart $name not found"
+            tk_messageBox -parent $MainWindow -title "Restart" -message "Команда перезапуска $name не найдена"
         }
         # Note we close the window just now, not after idle, as this can be stepper restart
         ::ldbg::CloseDebuggerWindow $MainWindow
@@ -947,7 +947,7 @@ namespace eval ::ldbg {
     
     proc MakeMainWindowRestartsMenu {w menu} {
         variable ::tkcon::COLOR
-        set m [::tkcon::MenuButton $menu "4.Restarts" restarts]
+        set m [::tkcon::MenuButton $menu "4.Команды перезапуска" restarts]
         menu $m -disabledforeground $::tkcon::COLOR(disabled) \
             -postcommand [list ::ldbg::FillRestartsMenu $m]
     }
@@ -966,10 +966,10 @@ namespace eval ::ldbg {
 
     # m is a menu. It can be in other window!
     proc FillStepperMenu {m bindtags} {
-        StepperMenuItem $m $bindtags "sb-ext:step-continue" "continue" <F5>
-        StepperMenuItem $m $bindtags "sb-ext:step-out" "step out" <Shift-F11>
-        StepperMenuItem $m $bindtags "sb-ext:step-next" "next" <F10>
-        StepperMenuItem $m $bindtags "sb-ext:step-into" "step into" <F11>
+        StepperMenuItem $m $bindtags "sb-ext:step-continue" "Продолжить" <F5>
+        StepperMenuItem $m $bindtags "sb-ext:step-out" "Выйти наружу" <Shift-F11>
+        StepperMenuItem $m $bindtags "sb-ext:step-next" "Шагнуть вдоль" <F10>
+        StepperMenuItem $m $bindtags "sb-ext:step-into" "Зайти внутрь" <F11>
     }
     
     proc MakeMainWindowStepperMenu {w menu} {
@@ -1034,7 +1034,7 @@ namespace eval ::ldbg {
      
         # title
         set level [GetDebuggerLevel]
-        set word "Debugger level $level"
+        set word "Отладчик, уровень $level"
         wm title $w $word
 
         set MainWindow $w
@@ -1056,7 +1056,7 @@ namespace eval ::ldbg {
         set tbl $w.tf.tbl
         
         tablelist::tablelist $tbl \
-            -columns {60 "Frame" left} \
+            -columns {60 "Кадры стека" left} \
             -stretch 0 -spacing 10 \
             -width 62   \
             -expandcommand "::ldbg::FramesTablelistEnsurePopulated"

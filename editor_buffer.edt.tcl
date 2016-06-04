@@ -123,7 +123,7 @@ namespace eval ::edt {
             # tk_messageBox -message $proc
             apply $proc [::tkcon::CurrentConsole]
         } else {
-            tk_messageBox -parent $clcon_text -message "FindSource command aborted"
+            tk_messageBox -parent $clcon_text -message "Команда FindSource завершилась ненормально"
         }
         $clcon_text Unfreeze
           
@@ -140,7 +140,7 @@ namespace eval ::edt {
             clipboard clear
             clipboard append $code
         } else {
-            tk_messageBox -parent $clcon_text -message "FindSymbol command aborted"
+            tk_messageBox -parent $clcon_text -message "Команда FindSymbol завершилась ненормально"
         }
         $clcon_text Unfreeze
           
@@ -274,7 +274,7 @@ namespace eval ::edt {
         variable ::tkcon::COLOR
         variable ::tkcon::OPT
 
-        wm protocol $tw WM_DELETE_WINDOW [list tk_messageBox -parent $tw -title "Attempt to close editor" -message "To remove editor window, close all edit buffers or just quit clcon"]
+        wm protocol $tw WM_DELETE_WINDOW [list tk_messageBox -parent $tw -title "Попытка закрыть редактор" -message "Чтобы закрыть редактора, закройте все окна редактора или выйдите из clcon"]
 
         set notebook [theNotebook]
         ttk::notebook $notebook
@@ -286,12 +286,12 @@ namespace eval ::edt {
         $tw configure -menu $menu
 
         # Make menu bar
-        menu [::tkcon::MenuButton $menu "1.File" file]
-        menu [::tkcon::MenuButton $menu "2.Edit" edit]
-        menu [::tkcon::MenuButton $menu "3.Lisp" lisp]
+        menu [::tkcon::MenuButton $menu "1.Файл" file]
+        menu [::tkcon::MenuButton $menu "2.Правка" edit]
+        menu [::tkcon::MenuButton $menu "3.Лисп" lisp]
         menu [::tkcon::MenuButton $menu "4.Tcl" tcl]
-        menu [::tkcon::MenuButton $menu "7.Window" window]        
-        menu [::tkcon::MenuButton $menu "Secret" secret]
+        menu [::tkcon::MenuButton $menu "7.Окно" window]        
+        menu [::tkcon::MenuButton $menu "Секрет" secret]
         
     }
     

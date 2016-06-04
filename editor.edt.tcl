@@ -46,7 +46,7 @@ namespace eval ::edt {
                 set word "file"
             }
             set word2 [string toupper $word 0]
-            set UserReplyToSaveRequest [YesNoCancel "Closing $word" "$word2 $tab_name not saved. Save?" $textt]
+            set UserReplyToSaveRequest [YesNoCancel "Закрытие $word" "$word2 $tab_name не сохранён. Сохранить?" $textt]
             switch -exact $UserReplyToSaveRequest {
                 "yes" {
                     Save $Bi $clcon_text 0
@@ -60,7 +60,7 @@ namespace eval ::edt {
                     return 0
                 }
                 default {
-                    error "logic error"
+                    error "Логическая ошибка"
                 }
             }
         } else {
@@ -233,12 +233,12 @@ namespace eval ::edt {
 
         frame $WStatusBar
 
-        label $WStatusBar.modeTitle -text "mode"
+        label $WStatusBar.modeTitle -text "язык"
         label $WStatusBar.mode -relief sunken -borderwidth 1 -anchor w -width 10 -textvariable $btext.StatusBarInfo(Mode)
 
-        label $WStatusBar.packageTitle -text "pkg"
+        label $WStatusBar.packageTitle -text "пак"
         label $WStatusBar.package -relief sunken -borderwidth 1 -anchor w -width 34 -textvariable $btext.StatusBarInfo(Package)
-        label $WStatusBar.readtableTitle -text "rt"
+        label $WStatusBar.readtableTitle -text "тч"
         label $WStatusBar.readtable -relief sunken -borderwidth 1 -anchor w -width 24 -textvariable $btext.StatusBarInfo(Readtable)
         label $WStatusBar.cursor -relief sunken -borderwidth 1 -anchor e -width 6 \
 	    -textvariable $btext.StatusBarInfo(CursorPos)
@@ -318,9 +318,9 @@ namespace eval ::edt {
         set textt [c_text]
 
         if {[string length $word] > 50} {
-            wm title $tw "Editor $btext - ...[string range $word end-48 end]"
+            wm title $tw "Редактор $btext - ...[string range $word end-48 end]"
         } else {
-            wm title $tw "Editor $btext - $word"
+            wm title $tw "Редактор $btext - $word"
         }
 
         foreach path [list $tw $w $btext $textt] {

@@ -82,7 +82,7 @@ namespace eval ::window_menu {
         ## Which must be called explicitly when window is created
         ## w is a widget 
         ## m is a window submenu. It must be supplied by caller, e.g.:
-        ## set m [menu [::tkcon::MenuButton $menu "7.Window" window]]
+        ## set m [menu [::tkcon::MenuButton $menu "7.Окно" window]]
         ## SelfCommand is a command to activate current window. It must
         ## match command calculated by this function and is used to 
         ## identify current window and to disable it
@@ -99,30 +99,30 @@ namespace eval ::window_menu {
         
         set cmd ::buli::BufferListBox
         CalcEnabledForOneItem [::ide_structure::BufferListBoxWindowName] 1
-	$m add command -label "Buffer list" -accel "Control-F12" \
+	$m add command -label "Список окон редактора" -accel "Control-F12" \
             -command $cmd -state $state
         
         set cmd ::tkcon::FocusConsole
         CalcEnabledForOneItem [::tkcon::ConsoleToplevelWindow] 0
-	$m add command -label "Console" -accel "Control-." \
+	$m add command -label "Консоль" -accel "Control-." \
             -command $cmd -state $state
 
         #
         set cmd ::edt::ShowSomeEditor
         CalcEnabledForOneItem [::edt::theTW] 0
-        $m add command -label "Editor" -accel "Control-Shift-e" \
+        $m add command -label "Редактор" -accel "Control-Shift-e" \
             -command $cmd -state $state
 
         set thatWindow [::ide_structure::DebuggerToplevelWindowName]
         set cmd [list ::gui_util::FocusWindowByName $thatWindow]
         CalcEnabledForOneItem $thatWindow 0
-        $m add command -label "Debugger" -accel "Control-Shift-d" \
+        $m add command -label "Отладчик лиспа" -accel "Control-Shift-d" \
             -command $cmd -state $state
 
         set thatWindow [::ide_structure::ErrorBrowserToplevelWindowName]
         set cmd [list ::gui_util::FocusWindowByName $thatWindow]
         CalcEnabledForOneItem $thatWindow 0
-        $m add command -label "Error browser" -accel "Control-Shift-r" \
+        $m add command -label "Список ошибок" -accel "Control-Shift-r" \
             -command $cmd -state $state
     }
     

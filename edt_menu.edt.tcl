@@ -26,7 +26,7 @@ namespace eval ::edt {
                 set FileName [::UnixFileNameToWindows $FileNameUnix]
             }
             default {
-                error "Unexpected style $style"
+                error "Неожиданный стиль $style"
             }
         }
         clipboard clear
@@ -189,16 +189,16 @@ namespace eval ::edt {
         $m add separator
 
         set cmd [wesppt [list ::edt::FindSourceCommand $btext]]
-        $m add command -label "Find Source" -accel "Alt-." -command $cmd
+        $m add command -label "Перейти к определению" -accel "Alt-." -command $cmd
         ::clcon_key::b bind SingleMod$w <Alt-period> $cmd
 
         $m add separator
         set cmd [wesppt [list ::edt::LispHyperdocLookupCommand $btext]]
-        $m add command -label "Hyperdoc lookup" -accel "Key-F1" -command $cmd
+        $m add command -label "Справка по идентиф-ру" -accel "Key-F1" -command $cmd
         ::clcon_key::b bind SingleMod$w <Key-F1> $cmd
 
         set cmd [wesppt [list ::edt::FindSymbolCommand $btext]]
-        $m add command -label "Symbol to Clipboard" -accel "Key-F2" -command $cmd
+        $m add command -label "Скопировать идентф-р в буфер обмена" -accel "Key-F2" -command $cmd
         ::clcon_key::b bind SingleMod$w <Key-F2> $cmd
     }
 
@@ -230,19 +230,19 @@ namespace eval ::edt {
         ::gui_util::ClearMenu $m
 
         set cmd ::edt::EditNewFile 
-        $m add command -label "1.New" -command $cmd
+        $m add command -label "1.Создать" -command $cmd
 
         set initialdir ""
         catch { ::clcon_text::PathToAFile $btext } initialdir
         set cmd [list ::tkcon::OpenForEdit $tw "" $initialdir]
-	$m add command -label "Open" -command $cmd -accel "Control-Key-O"
+	$m add command -label "Открыть" -command $cmd -accel "Control-Key-O"
         ::clcon_key::b bind SingleMod$w <Control-Key-o> "$cmd; break"
 
         set cmd [wesppt [list ::edt::Save $Bi $w.text 1]]
-        $m add command -label "Save" -command $cmd -accel "Control-S"
+        $m add command -label "Сохранить" -command $cmd -accel "Control-S"
         ::clcon_key::b bind SingleMod$w <Control-Key-s> $cmd
         
-        $m add command -label "Save As..."  -underline 0 \
+        $m add command -label "Сохранить как..."  -underline 0 \
             -command [wesppt [list ::edt::SaveAs $Bi $w.text]]
         $m add separator
 
@@ -257,12 +257,12 @@ namespace eval ::edt {
             -underline 0 -command $cmd
 
         set cmd {::edt::CurrentBufferPathnameToClipboard "windows"}
-        $m add command -label "3.File name to clipboard (windows style)" \
+        $m add command -label "3.Копир.имя файла в буфер обмена (стиль windows)" \
             -underline 0 -command $cmd
 
         $m add separator
 
-        $m add command -label "4.Reload some of IDE sources" -underline 0 \
+        $m add command -label "4.Перезагрузить часть исходных текстов ИСР (IDE)" -underline 0 \
 	    -command ::tkcon::ReloadSomeIDESources
 
         ## Recent menu (clone from clcon.tcl, but we need to delete menu as this
@@ -272,11 +272,11 @@ namespace eval ::edt {
             destroy $s
         }
         menu $s -disabledforeground $COLOR(disabled) -postcommand [list ::recent::RecentMenu $m]
- 	$m add cascade -label "5.Open recent ..." -underline 0 -underline 0 -menu $s
+ 	$m add cascade -label "5.Открыть недавний..." -underline 0 -underline 0 -menu $s
 
         $m add separator
         set CloseFile [wesppt [list ::edt::EditCloseFile $Bi]]
-        $m add command -label "Close" -accel "Control-w" -command $CloseFile
+        $m add command -label "Закрыть" -accel "Control-w" -command $CloseFile
         ::clcon_key::b bind SingleMod$w <Control-Key-w> $CloseFile
         
 
@@ -287,30 +287,30 @@ namespace eval ::edt {
         set m [cMenuBar .edit]
         ::gui_util::ClearMenu $m
 
-        $m add command -label "Cut"   -under 2 \
+        $m add command -label "Вырезать"   -under 2 \
             -command [wesppt [list tk_textCut $btext]]
-        $m add command -label "Copy"  -under 0 \
+        $m add command -label "Копировать"  -under 0 \
             -command [wesppt [list tk_textCopy $btext]]
-        $m add command -label "Paste" -under 0 \
+        $m add command -label "Вставить" -under 0 \
             -command [wesppt [list tk_textPaste $btext]]
         ##
         $m add separator
 	set cmd [wesppt [list ::fndrpl::OpenFindBox $btext "text" "find" {}]]
-        $m add command -label "Find" -under 0 -command $cmd -accel "Control-F"
+        $m add command -label "Искать" -under 0 -command $cmd -accel "Control-F"
         ::clcon_key::b bind SingleMod$w <Control-Key-f> $cmd
 
         set cmd [list ::fndrpl::FindIt $btext]
-	$m add command -label "Find again"  -underline 0 -accel "F3" -command $cmd 
+	$m add command -label "Найти далее"  -underline 0 -accel "F3" -command $cmd 
         bind NoMod$w <F3> $cmd
 
 	set cmd [wesppt [list ::fndrpl::OpenFindBox $btext "text" "replace" {}]]
-        $m add command -label "Replace" -under 0 -command $cmd -accel "Control-h"
+        $m add command -label "Найти и заменить" -under 0 -command $cmd -accel "Control-h"
         ::clcon_key::b bind SingleMod$w <Control-Key-h> "$cmd; break"
 
         $m add separator
         # this command works for both lisp and tcl so we put it at edit menu
         set cmd [list ::edt::FindCurrentFileDeclarations $btext]
-        $m add command -label "Show Current File declarations (no save!)" \
+        $m add command -label "Определения в текущем файле (без сохранения файла!)" \
             -command $cmd -accel "F12"
         bind NoMod$w <F12> [concat $cmd ";" break]
 
@@ -323,25 +323,25 @@ namespace eval ::edt {
         set m [cMenuBar .tcl]
         ::gui_util::ClearMenu $m
         
-        set SendToSlave [wesppt "puts {If you are editing a file, it is recommended to use 'Save, Compile and Load this file' command in the editor's file menu instead to be able to locate to sources of procs\nLoading your buffer...}; ::tkcon::EvalSlave eval \[$btext get 1.0 end-1c\]; puts Done"]
-        $m add command -label "1. Send Text To Slave" \
+        set SendToSlave [wesppt "puts {Если вы редактируете файл, рекомендуется вместо данной команды использовать команду 'Сохранить, компилировать и загрузить этот файл', чтобы была возможность переходить к определениям процедур\nЗагружаю ваш буфер...}; ::tkcon::EvalSlave eval \[$btext get 1.0 end-1c\]; puts Done"]
+        $m add command -label "1. Отправить текст в подчинённый интерпретатор" \
             -underline 0 -command $SendToSlave
 
         $m add separator
 
         set cmd [list ::edt::e_indent $btext]
-        $m add command -label "Tcl indent new line" -accel <Control-Key-Return> -command $cmd
+        $m add command -label "Tcl: вставить строчку с отступом" -accel <Control-Key-Return> -command $cmd
         bind DoubleMod$w <Control-Key-Return> "$cmd; break"
         
         $m add separator
         set cmd [list ::tkcon::TclFindDefinition [$btext RealText]]
-        $m add command -label "Tcl find source" -accel <Control-Key-F9> -command $cmd
+        $m add command -label "Tcl: перейти к определению" -accel <Control-Key-F9> -command $cmd
         bind SingleMod$w <Control-Key-F9> "$cmd; break"
         
         ## Window Menu 
 
-        ## As with Recent menu, we need to delete menu as this
-        ## code is called many times 
+        ## Так же как с меню "недавние", нам нужно удалить данное меню, псокольку 
+        ## этот код вызывается много раз
         set m [cMenuBar .window] 
         if {[winfo exists $m]} {
             destroy $m
@@ -358,17 +358,17 @@ namespace eval ::edt {
         ::gui_util::ClearMenu $m
         
         set cmd [list $btext Unfreeze]
-        $m add command -label "1.Unfreeze (if oduvanchik hang)" -command $cmd
+        $m add command -label "1.Разморозить (если одуванчик завис)" -command $cmd
 
         set cmd [list $btext ResetBackendBuffer]
-        $m add command -label "1.ResetBackendBuffer (kill, unfreeze and recreate)" -command $cmd
+        $m add command -label "Разморозить буфер в tcl/tk и пересоздать буфер одуванчика" -command $cmd
 
         set cmd [list ::tkcon::EvalInSwankAsync "(clco::compare-clcon_text-and-oduvanchik-buffer-contents \"$btext\")" {} {:find-existing}]
-        $m add command -label "Check Oduvanchik Sync" -accel "F8" -command $cmd
+        $m add command -label "Проверить совпадение буфера одуванчика и tcl/tk" -accel "F8" -command $cmd
         bind NoMod$w <F8> $cmd
 
         set cmd [wesppt [list ::edt::SyncCursor $btext]]
-        $m add command -label "Sync cursor" -accel "F9" -command $cmd
+        $m add command -label "Синхронизировать курсор одуванчика к tcl/tk" -accel "F9" -command $cmd
         bind NoMod$w <F9> $cmd
     }
 }

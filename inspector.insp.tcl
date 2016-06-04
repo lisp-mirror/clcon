@@ -99,7 +99,7 @@ namespace eval ::insp {
         
         # and now insert what we have parsed
         
-        [TitleOfInspector $w] RoInsert 1.0 "$InspectedTitle\nMagic numbers: $InspectedMagicNumbers"
+        [TitleOfInspector $w] RoInsert 1.0 "$InspectedTitle\nВолшебные числа: $InspectedMagicNumbers"
 
         if { $ObjectTooLarge } {
             set tag [::tkcon::UniqueTag $b]
@@ -115,7 +115,7 @@ namespace eval ::insp {
                         end \
                         "insp::InspectNthPart $w [::mprs::Unleash [lindex $item 2]]"
                 } else {
-                    $b RoInsert end "I don't know what is $s"
+                    $b RoInsert end "Я не знаю, что такое $s"
                 }
             } else {
                 $b RoInsert end [::mprs::Unleash $s]
@@ -250,40 +250,40 @@ namespace eval ::insp {
     }
 
     proc FileMenu {w menu text} {
-        set m [menu [::tkcon::MenuButton $menu "1.File" file]]
-        $m add command -label "Save As..."  -underline 0 \
+        set m [menu [::tkcon::MenuButton $menu "1.Файл" file]]
+        $m add command -label "Сохранить как..."  -underline 0 \
             -command [list ::tkcon::Save {} widget $text]
-        $m add command -label "Append To..."  -underline 0 \
+        $m add command -label "Добавить к..."  -underline 0 \
             -command [list ::tkcon::Save {} widget $text a+]
         $m add separator
-        $m add command -label "Dismiss" -underline 0 -accel "Control-w" \
+        $m add command -label "Закрыть" -underline 0 -accel "Control-w" \
             -command [list destroy $w]
         ::clcon_key::b bind $w <Control-Key-w>		[list destroy $w]
     }
 
     proc EditMenu {w menu text} {
-        set m [menu [::tkcon::MenuButton $menu "2.Edit" edit]]
-        $m add command -label "Copy"  -under 0 \
+        set m [menu [::tkcon::MenuButton $menu "2.Правка" edit]]
+        $m add command -label "Копировать"  -under 0 \
             -command [list tk_textCopy $text]
         $m add separator
 
-        $m add command -label "Find" -under 0 \
+        $m add command -label "Найти" -under 0 \
             -command [list ::fndrpl::OpenFindBox $text "text" "find" {}]
         ::clcon_key::b bind $w <Control-Key-f>             [list ::tkcon::Findbox $text]
     }    
 
 
     proc InspectMenu {w menu text} {
-        set m [menu [::tkcon::MenuButton $menu "3.Inspect" inspect]]
+        set m [menu [::tkcon::MenuButton $menu "3.Инспектор" inspect]]
 
-        $m add command -label "Back" -accelerator <BackSpace> -command [list ::insp::InspectorPop $w]
+        $m add command -label "Назад" -accelerator <BackSpace> -command [list ::insp::InspectorPop $w]
         bind $w <BackSpace> [list ::insp::InspectorPop $w]
         bind $w <Alt-Key-Left> [list ::insp::InspectorPop $w]
 
-        $m add command -label "Forward" -accelerator <Alt-Key-Right> -command [list ::insp::InspectorNext $w]
+        $m add command -label "Вперёд" -accelerator <Alt-Key-Right> -command [list ::insp::InspectorNext $w]
         bind $w <Alt-Key-Right> [list ::insp::InspectorNext $w]
 
-        $m add command -label "Refresh" -accelerator <F5> -command [list ::insp::InspectorReinspect $w]
+        $m add command -label "Обновить" -accelerator <F5> -command [list ::insp::InspectorReinspect $w]
         bind $w <F5> [list ::insp::InspectorReinspect $w]
         
     }    
@@ -291,7 +291,7 @@ namespace eval ::insp {
     # text is ignored
     proc WindowMenu {w menu text} {
         variable ::tkcon::COLOR
-        set m [::tkcon::MenuButton $menu "7.Window" window]
+        set m [::tkcon::MenuButton $menu "7.Окно" window]
 
 	menu $m -disabledforeground $COLOR(disabled) \
 		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]

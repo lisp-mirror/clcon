@@ -63,7 +63,7 @@
   (let ((filter 
          (etypecase mode
            (symbol 
-            (assert (eq mode :nocase) () "Only :nocase mode is supported")
+            (assert (eq mode :nocase) () "Поддерживается только режим :nocase")
             (lambda (expr line)
               (search expr line :test 'char-equal)))
            (function
@@ -99,7 +99,7 @@
          (list (make-filter-match
                 :filename display-filename
                 :line-number 1
-                :line (format nil "Error processing file: ~A" error)
+                :line (format nil "Ошибка обработки файла: ~A" error)
                 :start-position nil)))
         (t
          matches))
@@ -167,7 +167,7 @@
     (dolist (match results)
       (eval-in-tcl (calc-code-for-filter-match grbr match (incf serial)))
       (when (= serial print-progress-when)
-        (format t "~%loaded ~D messages into ~A" serial grbr)
+        (format t "~%загружено ~D сообщений в ~A" serial grbr)
         (setf print-progress-when (* print-progress-when 2))
         )
       )
@@ -181,7 +181,7 @@
   (clco::present-text-filtering-results
    (clco::filter-many-files (clco::clcon-sources) string)
    :title
-   (format nil "Find in Tcl Sources: ~A" string)))
+   (format nil "Поиск в исходниках clcon: ~A" string)))
 
 (defun find-string-in-files (string file-list &key regexp case-sensitive secondary-string)
   "For each string in file-list, calls directory. Then searches string in all of the files. See also clco:files-by-glob-list. Example is in the source"
@@ -192,7 +192,7 @@
   (clco::present-text-filtering-results
    (clco::filter-many-files file-list string)
    :title
-   (format nil "Find in ~A files: ~A" (length file-list) string))
+   (format nil "Поиск в ~A файле(ах): ~A" (length file-list) string))
   )
 
 (defun find-current-file-declarations (infile)
@@ -209,5 +209,5 @@
      (filter-one-file-or-err infile infile nil filter)
      )
    :title
-   (format nil "Declarations of ~%~A" infile)
+   (format nil "Объявления в ~%~A" infile)
    ))
