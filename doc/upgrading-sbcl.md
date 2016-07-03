@@ -16,4 +16,5 @@ ssleay32.dll
 7. delete-temporary-files.cmd
 8. Заново копируем uiop.fasl, asdf.fasl
 9. clcon-server-and-client.cmd
+10. Поменять SBCL_HOME в яр.cmd
 
