@@ -311,6 +311,14 @@ namespace eval ::ldbg {
             {} [GetDebuggerThreadId]
     }
 
+    proc EditInterpretedFrameSource {tbl RowName} {
+        set FrameNo [RowNameToFrameNo $RowName]
+        set TblForLisp [::tkcon::QuoteLispObjToString $tbl]
+        ::tkcon::EvalInSwankAsync                                                   \
+            "(clcon-server::ldbg-edit-interpreted-frame-source-location $FrameNo $TblForLisp)"   \
+            {} [GetDebuggerThreadId]
+    }
+
     proc RowDblClick {tbl RowName} {
         set ItemInfo [RowToItemInfo $tbl $RowName]
         set type [lindex $ItemInfo 0]
@@ -323,7 +331,7 @@ namespace eval ::ldbg {
             }
         } 
     }            
-    
+
     # Just as if user typed asdf::e in topmost frame. See also EditCurrentAsdfSystem
     proc EditCurrentAsdfFile {} {
         set thread [GetDebuggerThreadId]
@@ -350,6 +358,9 @@ namespace eval ::ldbg {
             }
             RowDblClick {
                 RowDblClick $tbl $RowName
+            }
+            EditInterpretedFrameSource { 
+                EditInterpretedFrameSource $tbl $RowName
             }
             ReturnFromFrame {
                 ReturnFromFrame $RowName
@@ -504,6 +515,9 @@ namespace eval ::ldbg {
         set cmd "::ldbg::CellCmdForActiveCell $tbl RowDblClick"
         $m add command -label "Перейти к определению/инспектор локальной переменной" -accel "Return" -command $cmd
         #
+        set cmd "::ldbg::CellCmdForActiveCell $tbl EditInterpretedFrameSource"
+        $m add command -label "0.Перейти к текущему интерпретируемому коду, если мы интерпретируем" -underline 0 -command $cmd
+
         set cmd "::ldbg::InspectCurrentCondition"
         $m add command -label "1.Смотреть исключение в инспекторе" -underline 0 -command $cmd
 

@@ -176,13 +176,47 @@
 
 (defun ldbg-edit-frame-source-location (frame-id parent)
   "We have frame id. Make IDE to open that location. Parent is a widget. If we unable to locate to source, we will issue a message with this widget as a parent"
-  (let ((location (swank:frame-source-location frame-id)))
-    (when location
-      (let ((code (with-output-to-string (ou)
+  (ldbg-edit-some-location (swank:frame-source-location frame-id) parent))
+
+(defun ldbg-edit-some-location (location parent)
+  "location - из EMACS. parent - widget отладчика (см. примеры). Если мы не можем попасть в исходник, мы сообщаем об этом, а видгет является родителем сообщения"
+  (when location
+    (let ((code (with-output-to-string (ou)
                     (write-code-to-pass-to-loc ou location :mode :eval :fix-offset-p t))))
         (eval-in-tcl (format nil "set w ~A; ~A" parent code))
-        ))))
+        )))
 
+(defun ldbg-edit-interpreted-frame-source-location (frame-id parent)
+  (let* ((dsl
+          (SB-C::%MAKE-DEFINITION-SOURCE-LOCATION
+           ; :NAMESTRING
+           "c:/yar/fb2/my-full-eval/interpreted-code-for-test.lisp"
+           ; :TOPLEVEL-FORM-NUMBER
+           2
+           ; :FORM-NUMBER
+           3
+           ))
+         (ds (convert-definition-source-location-to-definition-source dsl))
+         ;(pos (swank/sbcl::file-form-number-position ds))
+         (location (swank/sbcl::definition-source-file-location ds)))
+    (ldbg-edit-some-location location parent)))
+
+(defun convert-definition-source-location-to-definition-source (dsl)
+  "Я не смог найти, где в SBCL такое преобразование делается, поэтому попробую написать это руками. В SBCL как-то слегка помоечно - много
+  похожих структур, но связь между ними нелегко ищется"
+  (sb-introspect::make-definition-source
+   :pathname (pathname (sb-c:definition-source-location-namestring dsl))
+   :form-path (list (sb-c:definition-source-location-toplevel-form-number dsl))
+   :form-number (sb-c:definition-source-location-form-number dsl)))
+
+
+#|(defun ldbg-edit-interpreted-source (frame-id parent)
+  "Переходим к интерпретируемому коду (требуются патчи для sb-int::load-as-source)"
+  (swank::converting-errors-to-error-location
+    (swank/sbcl::code-location-source-location
+     (sb-di:frame-code-location (nth-frame index)))))
+
+  ) |#
 
 (defun open-url (url)
   #+windows

@@ -43,7 +43,17 @@ compile-file - тут вход в компиляцию
 
 Так что наша задача - создать sb-c::code-location из путей. Компилятор для этой цели пользуется
 
-SB-C::MAKE-DEFINITION-SOURCE-LOCATION - она читает *source-info* и *current-path*
+SB-C::MAKE-DEFINITION-SOURCE-LOCATION - читает *source-info* и *current-path*, но создаёт ДРУГОЙ объект, 
+source-location. А swank::frame-source-location использует sb-di::code-location. ПО счастью, у них совпадают поля:
+sb-di::code-location - %%tlf-offset и %form-number, 
+sb-c:DEFINITION-SOURCE-LOCATION - содержит 
+   :NAMESTRING "c:/yar/fb2/my-full-eval/interpreted-code-for-test.lisp"
+   :TOPLEVEL-FORM-NUMBER 2
+   :FORM-NUMBER 3
+
+Если нам повезёт, мы сможем подсунуть одно вместо другого. 
+
+
 
 
 
