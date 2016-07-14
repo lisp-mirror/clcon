@@ -1,79 +1,109 @@
 Здесь мы пытаемся разобраться в отладчике SBCL
 ===============================================
 
-;;; There is one per compiled file and one per function compiled at
-;;; toplevel or loaded from source.
-(defstruct debug-source)
+А именно, мы хотим показать исходный текст для функции, вычисляемой в my-eval. 
+В чём проблема?
 
-Не можем понять со стороны кода. Попробуем со стороны компилятора:
+1. Как технически мы найдём исходный текст? 
+(SB-INTROSPECT:FIND-DEFINITION-SOURCE функция) показывает исходный текст с точностью до toplevel-формы. 
+Внутри progn не показывает. Т.е. так мы можем найти функцию, в к-рой мы находимся, и не со 100% точностью. 
 
-defun sb!xc:compile-file - тут вход в компиляцию 
+2. Что ждёт нас при попытке найти форму? 
 
-source-info - структура, которая участвует в этом процессе. 
-
-ir1tran.lisp содержит то, что нам нужно:
-
-;;; *SOURCE-PATHS* is a hashtable from source code forms to the path
-;;; taken through the source to reach the form. This provides a way to
-;;; keep track of the location of original source forms, even when
-;;; macroexpansions and other arbitary permutations of the code
-;;; happen. This table is initialized by calling FIND-SOURCE-PATHS on
-;;; the original source.
-;;;
-;;; It is fairly useless to store symbols, characters, or fixnums in
-;;; this table, as 42 is EQ to 42 no matter where in the source it
-;;; appears. SB-C::GET-SOURCE-PATH and NOTE-SOURCE-PATH functions should be
-;;; always used to access this table.
-(declaim (hash-table *source-paths*))
-(defvar *source-paths*)
+2.1. Определение функции, хранимое для интерпретируемой функции, не совпадает с исходным текстом этой ф-ии. 
+Поэтому, даже если мы идентифицировали подформу внутри записанного определения, это нам ничего не даёт для
+отображения "настоящего" исходника в файле. В качестве костыля мы можем показать место не в настоящем исходнике, 
+а в том, который записан в определении интерпретируемой ф-ии. Как мы это сделаем? 
+- определим путь к форме (по образу и подобию SB-INT:LOAD-AS-SOURCE, с помощью переменной
+  sb-c::*source-info*) ЛИБО по мотивам компилятора, с помощью sb-c::*source-paths*. Причём, есть ощущение, 
+что только второй способ действительно позволит дойти до цели. 
+- напечатаем записанное определение во временный файл
+- покажем определение (видимо, по мотивам компилятора)
 
 
-;;; создаёт контекст для работы find-source-paths
-(defmacro sb-c::with-source-paths (&body forms))
+Как компилятор запоминает пути к эл-там исходного текста?
+---------------------------------------------------------
 
 
-;;; This function is called on freshly read forms to record the
-;;; initial location of each form (and subform.) Form is the form to
-;;; find the paths in, and TLF-NUM is the top level form number of the
-;;; truly top level form.
-(defun sb-c::find-source-paths (form tlf-num)
- <-- sub-sub-compile-file 
+compile-file - тут вход в компиляцию 
+  sb-c::sub-sub-compile-file
+    (do-forms-from-info ((form current-index) info
+                         'input-error-in-compile-file)
+      (sb-c::with-source-paths
+        (sb-c::find-source-paths form current-index)
+        ; вот здесь мы имеем доступ к информации о путях
+          (sb-c::process-toplevel-form ...)
+            (let *current-path* path - в *current-path* содержится путь к текущей подформе. 
 
-Общая идея. Система координат в формах - это номер формы в файле и путь внутри формы. SB-C::SUB-FIND-SOURCE-PATHS`отвечает за собственно сопоставление подформам путей. Она идёт по форме, заходит в car и cdr и меняет текущий путь. Текущий путь для каждой подформы записывается в хеш-таблицу *source-paths* .
+Система координат для идентификации формы - это номер свободной формы в файле и _НОМЕР_ подформы внутри свободной формы. 
 
-Почему же записывается не строка/колонка? Видимо, потому что так мы более-менее устойчивы к редактированию файла. Хотя вставка новой формы всё же должна сломать нашу работу, если мы действительно считаем именно порядковый номер в файле. 
+Однако пути устроены по-другому - это путь из car-ов и cdr-oв. 
 
-Как нам приделать это к нашему интерпретатору? 
+Структура sb-c::code-location содержит с-му координат для идентификации и используется swank-ом для поиска определения. 
+
+Так что наша задача - создать sb-c::code-location из путей. Компилятор для этой цели пользуется
+
+SB-C::MAKE-DEFINITION-SOURCE-LOCATION - она читает *source-info* и *current-path*
+
+
+
+
+
+
+
+
 load-as-source - тоже что-то пытается сделать на тему запоминания исходников. Но пока неясно, как оно может помочь нам. 
 
-Видимо, вот как:
-defun выполняется с помощью eval-tlf. eval-tlf запоминает 
-*eval-source-info* - оно непусто во время load. 
-
-Теперь задача - проассоциировать *eval-source-info* с функцией и у нас появится шанс!
-eval-tlf --> bind SB-IMPL::*EVAL-SOURCE-INFO* --> sb-impl::eval-in-lexenv --> 
-SB-EVAL:EVAL-IN-NATIVE-ENVIRONMENT --> ... --> %defun получает в качестве одного из параметров 
-definition-source-location, но далее его след теряется. 
-
-Т.е., если мы делаем load, то исходник показывается в top-level формах, например, если 
-мы напишем в файле (break) и будем его загружать, то из отладчика мы попадём в это место. 
-А вот если мы напишем (defun kaka () (break)) и загрузим load-ом эту функцию, то мы не увидим это 
-место в отладчике, вызвав функцию kaka. По той причине, что на стеке находится не сама интерпретируемая
-функция, а элементы интерпретатора. Однако 
-
-(sb-eval::INTERPRETED-FUNCTION-SOURCE-LOCATION #'kaka) при этом вернёт что-то. Значит, у нас всё не так уж и плохо. 
-
 План подключения нахождения исходника для интерп.ф-ии:
-- проверить, не сделано ли оно уже в SWANK? - нет. 
-- запоминать в %%eval, какую именно ф-ю мы выполняем. 
-- когда надо найти исходник, строим хеш-таблицу и пользуемся ей в мирных целях. 
+-------------------------------------------------------
+Как нам приделать это к нашему интерпретатору? См. "исследовательский код" ниже. 
 
-(и заодно - надо бы улучшить хождение по скомпилированному коду, но это другая работа). 
+Видимо, сделать свою ф-ю по мотивам compile-file, используя
+sb-c::with-source-paths. Сохранять путь к каждой подформе вместе с определением интерпретируемой ф-ии. 
+Пользоваться этой инф-ей. 
 
-а также надо подумать о лучшей поддержке макросов. 
+Далее, в определённых местах иметь локальные переменные, указывающие на текущую выполняемую ф-ю и текущую выполняемую форму. 
+Выполняя в кадре стека некую ф-ю, можем произвести скачок к месту исходника. Специальные переменные здесь не подходят, т.к.
+их значения не зависят от кадра стека (в SBCL). 
+
+Пока что делаем это только для block, т.к. каждая ф-я в себя его включает. 
+
+Что ещё может быть полезным?
+----------------------------
+
+Структура sb-c::debug-source: 
+
+;;; There is one per compiled file and one per function compiled at
+;;; toplevel or loaded from source.
+
+Как в среде работает команда "перейти к определению"?
+----------------
+c:/clcon/lp/clcon/lisp-debugger.ldbg.tcl
+ ::ldbg::EditFrameSource
+   clcon-server:ldbg-edit-frame-source-location
+     swank:frame-source-location -> c:/clcon/lp/slime/swank/sbcl.lisp
+       sb-di:frame-code-location -- читает из заранее записанной структуры. Где создаётся эта структура - неизвестно. 
 
 
+Ещё находки
+-----------
+### sb-c::make-compiler-error-context 
+В нём поля :file-position и :original-source-path
 
+### SB-C::MAKE-DEFINITION-SOURCE-LOCATION 
+Как работает и когда применяется - непонятно, но как-то работает (defclass, вложенный в progn, как-то находится). 
+
+### swank::find-source-location
+ссылается на SB-INTROSPECT:FIND-DEFINITION-SOURCE
+
+Исследовательский код
+---------------------
+
+c:/yar/fb2/my-full-eval/debug-eval.lisp - там создаётся ф-я (m::dot), Края выполняет тест.
+
+На данный момент он умеет (вроде бы) записывать и показывать исходник. Как поступим дальше? 
+Сделаем по аналогии с расширениями для asdf (показать текущий файл, показать текущую систему) - заведём
+macrolet-ы, к-рые в каждом кадре пытаются показать то, что надо. 
 
 
 
