@@ -106,7 +106,7 @@
       )
      (t
       (let* ((qLocation (cl-tk:tcl-escape (prin1-to-string loc)))
-             (message (format nil "Unable to locate to definition ~A" qLocation)))
+             (message (format nil "Не умею перейти к определению ~A" qLocation)))
         (ecase mode
           (:text 
            (print-just-line stream message))
@@ -180,26 +180,32 @@
 
 (defun ldbg-edit-some-location (location parent)
   "location - из EMACS. parent - widget отладчика (см. примеры). Если мы не можем попасть в исходник, мы сообщаем об этом, а видгет является родителем сообщения"
-  (when location
-    (let ((code (with-output-to-string (ou)
-                    (write-code-to-pass-to-loc ou location :mode :eval :fix-offset-p t))))
-        (eval-in-tcl (format nil "set w ~A; ~A" parent code))
-        )))
+  (let ((code (with-output-to-string (ou)
+                (write-code-to-pass-to-loc ou location :mode :eval :fix-offset-p t))))
+    (eval-in-tcl (format nil "set w ~A; ~A" parent code))
+    ))
 
 (defun ldbg-edit-interpreted-frame-source-location (frame-id parent)
-  (let* ((dsl
-          (SB-C::%MAKE-DEFINITION-SOURCE-LOCATION
-           ; :NAMESTRING
-           "c:/yar/fb2/my-full-eval/interpreted-code-for-test.lisp"
-           ; :TOPLEVEL-FORM-NUMBER
-           2
-           ; :FORM-NUMBER
-           3
-           ))
-         (ds (convert-definition-source-location-to-definition-source dsl))
-         ;(pos (swank/sbcl::file-form-number-position ds))
-         (location (swank/sbcl::definition-source-file-location ds)))
+  (let ((dsl (find-interpreted-frame-source-location frame-id))
+        ds
+        location)
+    (when dsl
+      (setq ds (convert-definition-source-location-to-definition-source dsl)
+            location (swank/sbcl::definition-source-file-location ds)))
     (ldbg-edit-some-location location parent)))
+
+(defun find-interpreted-frame-source-location (frame-id)
+  "Возвращает sb-c:definition-source-location или nil"
+  (the
+   (or sb-c:definition-source-location null)
+   (block function
+     (let ((cf 
+            (ignore-errors 
+             (swank::eval-in-frame 'm::current-form frame-id))))
+       (unless cf
+         (return-from function nil))
+       (gethash cf m::*my-locations-hash*)))))
+
 
 (defun convert-definition-source-location-to-definition-source (dsl)
   "Я не смог найти, где в SBCL такое преобразование делается, поэтому попробую написать это руками. В SBCL как-то слегка помоечно - много

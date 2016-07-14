@@ -51,7 +51,8 @@ sb-c:DEFINITION-SOURCE-LOCATION - содержит
    :TOPLEVEL-FORM-NUMBER 2
    :FORM-NUMBER 3
 
-Если нам повезёт, мы сможем подсунуть одно вместо другого. 
+Если нам повезёт, мы сможем подсунуть одно вместо другого. Вроде примерно это удалось с помощью 
+clco::convert-definition-source-location-to-definition-source . 
 
 
 
