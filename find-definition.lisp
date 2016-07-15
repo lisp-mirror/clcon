@@ -200,11 +200,14 @@
    (or sb-c:definition-source-location null)
    (block function
      (let ((cf 
-            (ignore-errors 
-             (swank::eval-in-frame 'm::current-form frame-id))))
+            (ignore-errors
+             (and
+              (find-package :full-eval-with-suspend)
+              (swank::eval-in-frame 'current-form frame-id)))))
        (unless cf
          (return-from function nil))
-       (gethash cf m::*my-locations-hash*)))))
+       ; здесь это ещё не defvar, им станет потом. 
+       (gethash cf (symbol-value '*my-locations-hash*))))))
 
 
 (defun convert-definition-source-location-to-definition-source (dsl)
