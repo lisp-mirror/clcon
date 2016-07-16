@@ -18,7 +18,15 @@
   (record-sources-to-my-locations-hash)
   (funcall original-fn original-exp tlf-index lexenv))
 
+;(decorate-function:portably-without-package-locks
+; (decorate-function:decorate-function 'sb-impl::eval-tlf 'decorated-eval-tlf))
+
+(defun decorated-find-source-paths (original-fn form tlf-num)
+  "Оригинал - в c:/clcon/sbcl/1.3.4/source/src/compiler/ir1tran.lisp"
+  (multiple-value-prog1 (funcall original-fn form tlf-num)
+    (record-sources-to-my-locations-hash)))
+
 (decorate-function:portably-without-package-locks
- (decorate-function:decorate-function 'sb-impl::eval-tlf 'decorated-eval-tlf))
+ (decorate-function:decorate-function 'sb-c::find-source-paths 'decorated-find-source-paths))
 
-
+  
