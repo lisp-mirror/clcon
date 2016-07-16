@@ -304,8 +304,8 @@ namespace eval ::ldbg {
 
 
     proc EditFrameSource {tbl RowName} {
-        set FrameNo [RowNameToFrameNo $RowName]
-        set TblForLisp [::tkcon::QuoteLispObjToString $tbl]
+        set FrameNo [RowNameToFrameNo $RowName]          
+        set TblForLisp [::tkcon::QuoteTclStringForLisp $tbl]
         ::tkcon::EvalInSwankAsync                                                   \
             "(clcon-server:ldbg-edit-frame-source-location $FrameNo $TblForLisp)"   \
             {} [GetDebuggerThreadId]
@@ -319,6 +319,21 @@ namespace eval ::ldbg {
             {} [GetDebuggerThreadId]
     }
 
+
+    proc НайтиИсходникИнтерпретируемогоКодаИлиЗначенияЛокальнойПеременной {tbl RowName} {
+        set ItemInfo [RowToItemInfo $tbl $RowName]
+        set type [lindex $ItemInfo 0]
+        switch -exact $type {
+            "Local" {
+                НайтиИсходникЗначенияЛокальнойПеременной $tbl $RowName
+            }
+            "Frame" {
+                EditInterpretedFrameSource $tbl $RowName
+            }
+        } 
+    }            
+
+# 111 
     proc RowDblClick {tbl RowName} {
         set ItemInfo [RowToItemInfo $tbl $RowName]
         set type [lindex $ItemInfo 0]
@@ -359,8 +374,8 @@ namespace eval ::ldbg {
             RowDblClick {
                 RowDblClick $tbl $RowName
             }
-            EditInterpretedFrameSource { 
-                EditInterpretedFrameSource $tbl $RowName
+            НайтиИсходникИнтерпретируемогоКодаИлиЗначенияЛокальнойПеременной { 
+                НайтиИсходникИнтерпретируемогоКодаИлиЗначенияЛокальнойПеременной $tbl $RowName
             }
             ReturnFromFrame {
                 ReturnFromFrame $RowName
@@ -515,8 +530,8 @@ namespace eval ::ldbg {
         set cmd "::ldbg::CellCmdForActiveCell $tbl RowDblClick"
         $m add command -label "Перейти к определению/инспектор локальной переменной" -accel "Return" -command $cmd
         #
-        set cmd "::ldbg::CellCmdForActiveCell $tbl EditInterpretedFrameSource"
-        $m add command -label "0.Перейти к текущему интерпретируемому коду, если мы интерпретируем" -underline 0 -command $cmd
+        set cmd "::ldbg::CellCmdForActiveCell $tbl НайтиИсходникИнтерпретируемогоКодаИлиЗначенияЛокальнойПеременной"
+        $m add command -label "0.Найти исходник интерпретируемого кода или значения локальной переменной" -underline 0 -command $cmd
 
         set cmd "::ldbg::InspectCurrentCondition"
         $m add command -label "1.Смотреть исключение в инспекторе" -underline 0 -command $cmd
@@ -667,6 +682,27 @@ namespace eval ::ldbg {
             "::insp::SwankInspect1 \$EventAsList"           \
             $thread
     }
+
+    # Ищет исходник выбранной переменной в clco:*MY-LOCATIONS-HASH* и открывает его
+    # Args: RowName of variable entry
+    proc НайтиИсходникЗначенияЛокальнойПеременной {tbl RowName} {
+        set ItemInfo [RowToItemInfo $tbl $RowName]
+        set type [lindex $ItemInfo 0]
+        if {$type ne "Local"} {
+            error "НайтиИсходникЗначенияЛокальнойПеременной: выбранный элемент стека - не локальная переменная"
+        }
+        set LocalNo [lindex $ItemInfo 1]
+        set LocalItem [lindex $ItemInfo 2]
+        set FrameItem [lindex $ItemInfo 3]
+        set FrameNo [dict get $FrameItem "FrameNo"]
+        set thread [GetDebuggerThreadId]
+        set TblForLisp [::tkcon::QuoteLispObjToString $tbl]
+        # 222
+        ::tkcon::EvalInSwankAsync                                                   \
+            "(clcon-server::ldbg-edit-local-var-source-location $FrameNo $LocalNo $TblForLisp)"   \
+            {} [GetDebuggerThreadId]
+    }
+
 
     proc InspectCurrentCondition {} {
         set thread [GetDebuggerThreadId]                    

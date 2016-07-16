@@ -176,39 +176,49 @@
 
 (defun ldbg-edit-frame-source-location (frame-id parent)
   "We have frame id. Make IDE to open that location. Parent is a widget. If we unable to locate to source, we will issue a message with this widget as a parent"
-  (ldbg-edit-some-location (swank:frame-source-location frame-id) parent))
+  (edit-swank-format-location (swank:frame-source-location frame-id) parent))
 
-(defun ldbg-edit-some-location (location parent)
+(defun edit-swank-format-location (location parent)
   "location - из EMACS. parent - widget отладчика (см. примеры). Если мы не можем попасть в исходник, мы сообщаем об этом, а видгет является родителем сообщения"
+  (assert (listp location))  
   (let ((code (with-output-to-string (ou)
                 (write-code-to-pass-to-loc ou location :mode :eval :fix-offset-p t))))
     (eval-in-tcl (format nil "set w ~A; ~A" parent code))
     ))
 
 (defun ldbg-edit-interpreted-frame-source-location (frame-id parent)
-  (let ((dsl (find-interpreted-frame-source-location frame-id))
-        ds
-        location)
+  (let ((data (find-data-representing-interpreted-frame-source frame-id)))
+    (edit-datas-source-location-or-err data parent)))
+
+(defun edit-datas-source-location-or-err (data parent)
+  (let ((dsl (get-definition-source-location-of-data data)))
+    (edit-definition-source-location-or-err dsl parent)))
+
+(defun edit-definition-source-location-or-err (dsl parent)
+  "parent нужен для ошибки"
+  (assert (typep dsl '(or null sb-c::definition-source-location)))
+  (let (ds swank-location) ; swank-location - то, что понятно swank (в виде s-выражения)
     (when dsl
       (setq ds (convert-definition-source-location-to-definition-source dsl)
-            location (swank/sbcl::definition-source-file-location ds)))
-    (ldbg-edit-some-location location parent)))
-
-(defun find-interpreted-frame-source-location (frame-id)
+            swank-location (swank/sbcl::definition-source-file-location ds)))
+    (edit-swank-format-location swank-location parent)))
+    
+(defun find-interpreted-frame-definition-source-location (frame-id)
   "Возвращает sb-c:definition-source-location или nil"
-  (the
-   (or sb-c:definition-source-location null)
-   (block function
-     (let ((cf 
-            (ignore-errors
-             (and
-              (find-package :full-eval-with-suspend)
-              (swank::eval-in-frame 'current-form frame-id)))))
-       (unless cf
-         (return-from function nil))
-       ; здесь это ещё не defvar, им станет потом. 
-       (gethash cf (symbol-value '*my-locations-hash*))))))
+  (get-definition-source-location-of-data
+   (find-data-representing-interpreted-frame-source frame-id)))
 
+(defun find-data-representing-interpreted-frame-source (frame-id)
+  "Возвращает исходник интерпретируемого кода, имея на входе frame-id"
+  (ignore-errors (swank::eval-in-frame 'current-form frame-id))
+  )
+
+(defun get-definition-source-location-of-data (data)
+  "Если чтение было пропатчено для записи в *my-locations-hash* в момент чтения данного исходника, возвращает definition-source-location"
+  (and data
+       (gethash data
+                ; здесь это ещё не defvar, им станет потом.
+                (symbol-value '*my-locations-hash*))))
 
 (defun convert-definition-source-location-to-definition-source (dsl)
   "Я не смог найти, где в SBCL такое преобразование делается, поэтому попробую написать это руками. В SBCL как-то слегка помоечно - много
@@ -218,6 +228,14 @@
    :form-path (list (sb-c:definition-source-location-toplevel-form-number dsl))
    :form-number (sb-c:definition-source-location-form-number dsl)))
 
+
+(defun ldbg-edit-local-var-source-location (frame-id local-no parent)
+  "Открывает редактор на исходнике данных из этого кадра"
+  (let* ((data (swank::frame-var-value frame-id local-no)))
+    (edit-datas-source-location-or-err data parent)))
+
+(defun inspector-goto-source (parent)
+  (edit-datas-source-location-or-err (swank::istate.object swank::*istate*) parent))
 
 #|(defun ldbg-edit-interpreted-source (frame-id parent)
   "Переходим к интерпретируемому коду (требуются патчи для sb-int::load-as-source)"

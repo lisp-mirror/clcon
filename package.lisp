@@ -23,6 +23,8 @@
            #:load-system-for-tcl ; can be removed at some point
            #:find-string-in-files ; can be removed
            #:files-by-glob-list   ; can be removed
+ 
+           #:inspector-goto-source
 
            #:current-form         ; для отладки интерпретируемого кода
            #:*my-locations-hash*  ; для отладки интерпретируемого кода

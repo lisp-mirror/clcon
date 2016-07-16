@@ -168,7 +168,11 @@ namespace eval ::insp {
         ::tkcon::EvalInSwankAsync "(swank:inspector-reinspect)" $OnReply t $ContId
     }
 
+    proc InspectorGotoSource { w } {
+        set wForLisp [::tkcon::QuoteTclStringForLisp $w]
 
+        ::tkcon::EvalInSwankAsync "(clco:inspector-goto-source $wForLisp)" {} t
+    }
 
     proc ShowSomethingNewInInspector { w EventAsList } {
         InsertDataToShowOrBeep $w $EventAsList   
@@ -282,6 +286,8 @@ namespace eval ::insp {
 
         $m add command -label "Вперёд" -accelerator <Alt-Key-Right> -command [list ::insp::InspectorNext $w]
         bind $w <Alt-Key-Right> [list ::insp::InspectorNext $w]
+
+        $m add command -label "0. Перейти к исходному тексту" -under 0 -command [list ::insp::InspectorGotoSource $w]
 
         $m add command -label "Обновить" -accelerator <F5> -command [list ::insp::InspectorReinspect $w]
         bind $w <F5> [list ::insp::InspectorReinspect $w]
