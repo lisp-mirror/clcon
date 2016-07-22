@@ -337,6 +337,10 @@ namespace eval ::edt {
         set cmd [list ::tkcon::TclFindDefinition [$btext RealText]]
         $m add command -label "Tcl: перейти к определению" -accel <Control-Key-F9> -command $cmd
         bind SingleMod$w <Control-Key-F9> "$cmd; break"
+
+        set cmd [list ::tkcon::ReturnPos]
+        $m add command -label "перейти назад" -accel <Alt-,> -command $cmd
+        bind SingleMod$w <Alt-,> "$cmd; break"
         
         ## Window Menu 
 

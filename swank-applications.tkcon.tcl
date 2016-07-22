@@ -96,6 +96,19 @@ proc ::tkcon::WritePassiveText {w text index} {
 }
 
 
+set PosStack [list]
+
+proc ::tkcon::ReturnPos {} {
+    variable PosStack
+    set last [lindex $PosStack end]
+    if {$last != ""} {
+        set PosStack [lrange $PosStack 0 end-1]
+        set pos [lindex $last 0]
+        set filename [lindex $last 1]
+        ::tkcon::EditFileAtOffset $filename $pos
+    }
+}
+
 # Opens file at that offset (in chars). See also ::tkcon::EditFileAtLine
 proc ::tkcon::EditFileAtOffset {filename offset} {
     variable OPT
@@ -152,6 +165,8 @@ proc ::tkcon::CallLispFunctionOnCurrentConsoleSymbol {text_widget lisp_fn tcl_co
 # See also: ::edt::FindSourceCommand ,  odu::find-source-command
 ## 
 proc ::tkcon::LispFindDefinition {w} {
+    variable PosStack
+    lappend PosStack [list [$w index insert] [[$w cget -opened_file] cget -filename]]
     CallLispFunctionOnCurrentConsoleSymbol $w "clcon-server:server-lookup-definition" "::tkcon::LispFindDefinitionInnerContinuation"
 }
 
@@ -171,10 +186,15 @@ proc ::tkcon::LispHyperdocLookup {w} {
 # See also: ::edt::FindSourceCommand
 ## 
 proc ::tkcon::TclFindDefinition {w} {
+    variable PosStack
     set str [GetTclNameAtInsert $w]
     if {$str eq {}} {
         tk_messageBox -parent $w -message "trying to edit empty definition"
     } else {
+        lappend PosStack [list [$w index insert] [[$w cget -opened_file] cget -filename]]
+#        tk_messageBox -parent $w -message [$w index insert]
+#        tk_messageBox -parent $w \
+#                      -message [[$w cget -opened_file] cget -filename]
         ::record_definition::EditProcedure $str
     }
 }
