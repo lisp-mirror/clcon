@@ -16,6 +16,7 @@
                (:file "decorated-eval-tlf-for-interpreted-code-debugging" :description "Меняет процесс загрузки, чтобы сохранять инфу о положении исходников, загружаемых как source") ; правмя это можно перенести намного выше, например, в :budden-tools
                (:file "swank-original-functions")
                (:file "swank-rpc-original-functions")
+               (:file "swank-sbcl-original-functions")
                (:file "find-definition")
                (:file "swank-patch")
                (:file "eval-in-tcl")

@@ -1,6 +1,8 @@
 ; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*- 
 (in-package :clco)
 
+(named-readtables::in-readtable nil)
+
 (defparameter *log-file* (make-pathname :name "swank-text-log" :type "log" :defaults *default-pathname-defaults*))
 
 (defun log-to-file (format &rest args)
@@ -146,3 +148,29 @@
 (def-patched-swank-fun swank::read-loop (connection)
   (let ((swank::*emacs-connection* connection))
     (swank::swank-original-read-loop connection)))
+
+
+(def-patched-swank-fun swank/sbcl::definition-source-file-location (definition-source)
+  (swank/sbcl::with-definition-source (pathname form-path character-offset plist
+                           file-write-date) definition-source
+    (let* ((namestring (namestring (translate-logical-pathname pathname)))
+           (pos (or (and form-path
+                         (or
+                          #+#.(swank/backend:with-symbol 'definition-source-form-number 'sb-introspect)
+                          (and (sb-introspect:definition-source-form-number definition-source)
+                               (ignore-errors (swank/sbcl::file-form-number-position definition-source)))
+                          (ignore-errors
+                           (swank/sbcl::source-file-position namestring file-write-date
+                                                 form-path))))
+                    character-offset
+                    0 ; здесь отличие - пусть хоть файл откроется
+                    ))
+           (snippet (swank/sbcl::source-hint-snippet namestring file-write-date pos)))
+      (swank/sbcl::make-location `(:file ,namestring)
+                     ;; /file positions/ in Common Lisp start from
+                     ;; 0, buffer positions in Emacs start from 1.
+                     `(:position ,(1+ pos))
+                     `(:snippet ,snippet)))))
+
+
+
