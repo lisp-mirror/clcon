@@ -148,6 +148,10 @@ namespace eval ::edt {
     # See also ::tkcon::LispFindDefinition
     proc FindSourceCommand {text} {
         set console [::tkcon::CurrentConsole]
+        variable ::tkcon::PosStack
+        set w [$text RealText]
+        lappend ::tkcon::PosStack [list [$w index insert] [[$w cget -opened_file] cget -filename]]
+
         ::clcon_text::CallOduvanchikFunction $text "odu::find-source-command nil" {{
             ::edt::FindSourceContinuation $clcon_text $EventAsList
         }}
