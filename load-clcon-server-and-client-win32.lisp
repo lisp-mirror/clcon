@@ -23,7 +23,7 @@
 ;;;;;;;;;;;;;;;;;; End of trying to send all tracing to SBCL console ;;;;;;;;;;;;
 
 ;; piece from my init.lisp
-(defparameter *clcon-root* #+win32 (pathname "c:/clcon/") #+unix (pathname "/s2/sw/"))
+(defparameter *clcon-root* #+win32 (pathname "c:/yar/") #+unix (pathname "/s2/sw/"))
 
 ;; Enable stepping everywhere else (this code is duplicated in .sbclrc)
 (proclaim '(optimize (debug 3) (compilation-speed 0) (speed 0) (space 0) (safety 3)))
@@ -89,8 +89,7 @@
 
 ; from budden-tools
 (asdf:load-system :decorate-function) 
-(load (compile-file (at-clcon-root "lp/budden-tools/asdf-3.1.4-tools.lisp")))
-
+(asdf::merge-pathnames "asdf-3.1.4-tools.lisp" (ql:where-is-system :budden-tools))
 (asdf:load-system :iterate-keywords)
 (asdf:load-system :alexandria)
 (asdf:load-system :cl-fad)
@@ -166,6 +165,6 @@
 ;;;;;;;;;;;;;;;;;; Starting editor frontend ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; CallBatFromGuiDetached.exe is used to bypass problems with run-program
-(let ((cmd (format nil "c:\\clcon\\bin\\util\\CallBatFromGuiDetached.exe c:\\clcon\\bin\\clcon-client.cmd -swank-port ~A" *clcon-swank-port*)))
+(let ((cmd (format nil "c:\\yar\\bin\\util\\CallBatFromGuiDetached.exe c:\\yar\\bin\\util\\clcon-client.cmd -swank-port ~A" *clcon-swank-port*)))
   (uiop/run-program:run-program cmd))
 
