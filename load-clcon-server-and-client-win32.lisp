@@ -89,7 +89,8 @@
 
 ; from budden-tools
 (asdf:load-system :decorate-function) 
-(asdf::merge-pathnames "asdf-3.1.4-tools.lisp" (ql:where-is-system :budden-tools))
+(load (compile-file (at-clcon-root "lp/budden-tools/asdf-3.1.4-tools.lisp")))
+
 (asdf:load-system :iterate-keywords)
 (asdf:load-system :alexandria)
 (asdf:load-system :cl-fad)
