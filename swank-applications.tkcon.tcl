@@ -189,7 +189,7 @@ proc ::tkcon::TclFindDefinition {w} {
     if {$str eq {}} {
         tk_messageBox -parent $w -message "trying to edit empty definition"
     } else {
-        lappend ::tkcon::PosStack [list [$w index insert] [[$w cget -opened_file] cget -filename]]
+        catch { lappend ::tkcon::PosStack [list [$w index insert] [[$w cget -opened_file] cget -filename]] }
         ::record_definition::EditProcedure $str
     }
 }
