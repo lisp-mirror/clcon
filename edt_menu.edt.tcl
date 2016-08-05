@@ -339,8 +339,8 @@ namespace eval ::edt {
         bind SingleMod$w <Control-Key-F9> "$cmd; break"
 
         set cmd [list ::tkcon::ReturnPos]
-        $m add command -label "перейти назад" -accel <Alt-,> -command $cmd
-        bind SingleMod$w <Alt-,> "$cmd; break"
+        $m add command -label "перейти назад" -accel <Alt-comma> -command $cmd
+        bind SingleMod$w <Alt-comma> "$cmd; break"
         
         ## Window Menu 
 

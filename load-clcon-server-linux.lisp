@@ -9,11 +9,19 @@
 
 (setf sb-impl::*default-external-format* :utf-8)
 
+#+quicklisp
+(error "Quicklisp уже загружен, так быть не должно. См. как запускать clcon/Яр/yar по инструкции")
+
 #-quicklisp
-(let ((quicklisp-init "~/ql.sbcl.l/setup.lisp"
+(let ((quicklisp-init "~/yar/quicklisp/setup.lisp"
         ))
-  (when (probe-file quicklisp-init)
-    (load quicklisp-init)))
+  (cond
+   ((probe-file quicklisp-init)
+    (load quicklisp-init))
+   (t
+    (error "Не найден setup.lisp из quicklisp"))))
+
+(setq ql:*local-project-directories* (list "~/yar/lp/"))
 
 
 ;;;;;;;;;;;;;;;;; Preliminary checks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -29,7 +37,7 @@
 ;;;;;;;;;;;;;;;;;; Starting SWANK ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when (find-package :swank)
-  (error "Clcon server unable to load: swank is loaded already. Your plan:
+  (error "Clcon не может загрузиться: уже загружен SWANK. Your plan:
  1. remove swank's fasls which are normally at ~A
  2. start sbcl with: 
  sbcl --no-userinit --load <this file>
@@ -43,6 +51,7 @@
 
 ;; Load SWANK
 ;; Note we currently need patched version of SLIME and NAMED-READTABLES, see doc/INSTALL.md
+(assert (ql:where-is-system :swank) () "Quicklisp не видит SWANK")
 
 (load (merge-pathnames "swank-loader.lisp" (ql:where-is-system :swank)))
 
@@ -73,7 +82,9 @@
 
 ;;;;;;;;;;;;;;;;;; Loading dependencies ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(asdf:load-system :budden-tools-asdf)
+;;(asdf:load-system :budden-tools-asdf)
+(asdf:load-system :decorate-function) 
+(load (compile-file (asdf::merge-pathnames "asdf-3.1.4-tools.lisp" (ql:where-is-system :budden-tools))))
 (ql:quickload :alexandria)
 (ql:quickload :split-sequence)
 (ql:quickload :cl-tk)
@@ -138,18 +149,19 @@
 
 (asdf:load-system :clcon-server)
 
-;;;;;;;;;;;;;;;;;; Starting editor backend ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-(clco:start-oduvanchik)
-
-
 ;;;;;;;;;;;;;;;;;; Starting server ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; This is clcon server. There is also aux server for EMACS, see above
 ;; Also when we are in EMACS, EMACS tries to load third server time,
 ;; I don't know the result of this effort
 (swank:create-server :port 4009 :dont-close t)
+
+;;;;;;;;;;;;;;;;;; Starting editor backend ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(clco:start-oduvanchik)
+
+
+
 
 
  
