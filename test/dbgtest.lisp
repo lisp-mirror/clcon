@@ -42,7 +42,6 @@ sb-c::STORE-CLOSURE-DEBUG-POINTER - что-то полезное (возможн
   "Outer function"
   (let ((y (budden-tools::keep-var-for-debug x))
         (z (+ x 1)))
-    (break)
     (+ (g y) (+ y z))))
 
 

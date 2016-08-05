@@ -45,8 +45,8 @@ Compiling file from editor
 At the console, open test/error-browser-sample-file.lisp file for editing.
 There are at least two ways to do that: via file open dialog (Control-O)
 or via console ed command:
-``.edit ~/ql.sbcl.l/local-projects/clcon/test/error-browser-sample-file.lisp`` or 
-``.edit c:/clcon/lp/clcon/test/error-browser-sample-file.lisp``
+``.edit ~/yar/lp/clcon/test/error-browser-sample-file.lisp`` or 
+``.edit c:/yar/lp/clcon/test/error-browser-sample-file.lisp``
 for Windows file release. While typing in filename, use Control-F3 for completion.
 
 File will open in the editor. From the menu, choose `Lisp/Compile and load`. Two new windows will pop up: list of compiler notes 
