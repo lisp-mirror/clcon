@@ -61,7 +61,21 @@
 ; :clcon-oduvan means clcon uses oduvan. 
 (pushnew :clcon-oduvan *features*)
 (pushnew :oduvanchik *features*)
+; If :oduvan-invisible set, we can build and start on MS Windows
+; If :oduvan-invisible is not set, we can run only on Linux, but
+; we also see normal Oduvanchik's GUI
+; I usually develop with :oduvan-invisible disabled
 (pushnew :oduvan-invisible *features*)
+ 
+; May be needed sometimes for the debugging. 
+; (pushnew :oduvan-use-sleep-in-dispatch *features*)
+ 
+;; For debugging editor with client-server communcation enabled for
+;; only single buffer. 
+;; (pushnew :use-oduvan-for-first-clcon_text-pathname-only *features*)
+;; if you are using trunk, you can also grep "buf1" in *.tcl to disable some debugging code in the editor.
+ 
+; comment next line if code highlight causes problems
 (pushnew :oduvan-enable-highlight *features*)
 (pushnew :clcon *features*)
 
@@ -104,7 +118,7 @@
 ;; as a template
 (asdf:load-system :budden-tools)
 
-(budden-tools:def-toplevel-progn "load winmerge-strings" ()
+#+win32 (budden-tools:def-toplevel-progn "load winmerge-strings" ()
   (load (at-clcon-root "lp/clcon/winmerge-strings.lisp")))
 
 (BUDDEN-TOOLS:def-toplevel-progn "load :see-packages system" ()
