@@ -175,6 +175,7 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
     # as any error in it likely means a spoiled image.
     TkconSourceHere util.tcl
     TkconSourceHere gui_util.tcl
+    TkconSourceHere fix_kp_in_linux.tcl
     TkconSourceHere ide_structure.tcl
     TkconSourceHere ro_outer_synonyms.ro_out.tcl
     TkconSourceHere text2odu.tcl

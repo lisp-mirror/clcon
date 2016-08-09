@@ -5,7 +5,7 @@ namespace eval  txt {
 
     proc keypress {A K} {
         global window current_window
-        set list_key {Alt_L Mode_switch Control_L Control_R Shift_R Shift_L Up Down Right Left End Home Insert Prior Next}
+        set list_key {Alt_L Mode_switch Control_L Control_R Shift_R Shift_L Up Down Right Left End Home Insert KP_Insert Prior KP_Prior Next KP_Next}
         if { [lsearch -exact $list_key $K] == -1} {
             set window($current_window,change) 1
             if {$window($current_window,echange)==0} {

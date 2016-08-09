@@ -295,6 +295,7 @@ namespace eval tkcon {
             }
         }
         bind TkConsole <Key-Home> [bind TkConsole <Control-a>]
+        bind TkConsole <Key-KP_Home> [bind TkConsole <Control-a>]
         bind TkConsole <Control-d> {
             if {[%W compare insert < limit]} break
             %W delete insert
@@ -365,8 +366,10 @@ namespace eval tkcon {
         }
         catch {bind TkConsole <Key-Page_Up>   { tk::TextScrollPages %W -1 }}
         catch {bind TkConsole <Key-Prior>     { tk::TextScrollPages %W -1 }}
+        catch {bind TkConsole <Key-KP_Prior>     { tk::TextScrollPages %W -1 }}
         catch {bind TkConsole <Key-Page_Down> { tk::TextScrollPages %W 1 }}
         catch {bind TkConsole <Key-Next>      { tk::TextScrollPages %W 1 }}
+        catch {bind TkConsole <Key-KP_Next>      { tk::TextScrollPages %W 1 }}
         bind TkConsole <Alt-d> {
             if {[%W compare insert >= limit]} {
                 %W delete insert {insert wordend}
