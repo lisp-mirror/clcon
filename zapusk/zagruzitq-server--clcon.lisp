@@ -157,3 +157,15 @@
 
 (asdf:load-system :clcon-server)
 ; (asdf:load-system :lime) ; enable it just to navigate through sources
+
+;;;;;;;;;; функция для запуска клиента ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun zapustitq-klienta--clcon ()
+  #-(or win32 linux) #.(error "Не умею запустить-клиента--clcon на этой платформе")
+  ;; CallBatFromGuiDetached.exe is used to bypass problems with run-program
+  (let ((cmd 
+        #+win32 (format nil "c:\\yar\\bin\\util\\CallBatFromGuiDetached.exe c:\\yar\\bin\\util\\clcon-client.cmd -swank-port ~A" *clcon-swank-port*)
+        #+linux (format nil "sh ~~/yar/bin/util/clcon-client.sh -swank-port ~A" *clcon-swank-port*)
+        ))
+  (uiop/run-program:run-program cmd)))
+
+
