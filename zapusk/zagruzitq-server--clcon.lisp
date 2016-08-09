@@ -22,10 +22,6 @@
 
 ;;;;;;;;;;;;;;;;;; End of trying to send all tracing to SBCL console ;;;;;;;;;;;;
 
-;; piece from my init.lisp
-(defparameter *yar-root* #+win32 (pathname "c:/yar/") #+unix (pathname "/yar/sw/"))
-(defparameter *clcon-root* *yar-root*) ; по-хорошему, это - неправда. 
-
 ;; Enable stepping everywhere else (this code is duplicated in .sbclrc)
 (proclaim '(optimize (debug 3) (compilation-speed 0) (speed 0) (space 0) (safety 3)))
 
@@ -39,13 +35,6 @@
 (map () 'load ;; loading asdf/defsystem is tricky
      (mapcar 'asdf:component-pathname
              (asdf::required-components :asdf/defsystem :keep-component 'asdf:cl-source-file)))
-
-(defun pred-dir (dir)
-  (make-pathname :defaults dir :directory (butlast (pathname-directory dir))))
-
-(defun at-clcon-root (path) "Path relative to *clcon-root*"
-  (merge-pathnames path *clcon-root*))
-
 
 (defun load-from-here (filename)  
   (let ((*default-pathname-defaults* *clcon-root*))
