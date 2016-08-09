@@ -50,9 +50,7 @@ namespace eval tkcon {
             <<TkCon_Tab>>		<Control-i>
             <<TkCon_Tab>>		<Alt-i>
             <<TkCon_Newline>>	<Shift-Key-Return>
-            <<TkCon_Newline>>	<Shift-Key-KP_Enter>
             <<TkCon_Eval>>		<Return>
-            <<TkCon_Eval>>		<KP_Enter>
             <<TkCon_Clear>>		<Control-l>
             <<TkCon_PreviousImmediate>>	<Control-p>
             <<TkCon_PreviousSearch>>	<Control-r>
@@ -61,8 +59,15 @@ namespace eval tkcon {
             <<TkCon_Transpose>>	<Control-t>
             <<TkCon_ClearLine>>	<Control-u>
             <<TkCon_CurrentPathAndFileName>> <Control-Key-Return>
+        }
+        
+        if {[tk windowingsystem] eq "x11"} {
+            lappend bindings                                         \
+            <<TkCon_Newline>>	<Shift-Key-KP_Enter>                 \
+            <<TkCon_Eval>>		<KP_Enter>                   \
             <<TkCon_CurrentPathAndFileName>> <Control-Key-KP_Enter>
         }
+
         if {$PRIV(AQUA)} {
             lappend bindings <<TkCon_Popup>> <Control-Button-1> \
                 <<TkCon_Popup>> <Button-2>
@@ -295,7 +300,9 @@ namespace eval tkcon {
             }
         }
         bind TkConsole <Key-Home> [bind TkConsole <Control-a>]
-        bind TkConsole <Key-KP_Home> [bind TkConsole <Control-a>]
+        if {[tk windowingsystem] eq "x11"} {
+            bind TkConsole <Key-KP_Home> [bind TkConsole <Control-a>]
+        }
         bind TkConsole <Control-d> {
             if {[%W compare insert < limit]} break
             %W delete insert
@@ -366,10 +373,12 @@ namespace eval tkcon {
         }
         catch {bind TkConsole <Key-Page_Up>   { tk::TextScrollPages %W -1 }}
         catch {bind TkConsole <Key-Prior>     { tk::TextScrollPages %W -1 }}
-        catch {bind TkConsole <Key-KP_Prior>     { tk::TextScrollPages %W -1 }}
         catch {bind TkConsole <Key-Page_Down> { tk::TextScrollPages %W 1 }}
         catch {bind TkConsole <Key-Next>      { tk::TextScrollPages %W 1 }}
-        catch {bind TkConsole <Key-KP_Next>      { tk::TextScrollPages %W 1 }}
+        if {[tk windowingsystem] eq "x11"} {
+            catch {bind TkConsole <Key-KP_Prior>     { tk::TextScrollPages %W -1 }}
+            catch {bind TkConsole <Key-KP_Next>      { tk::TextScrollPages %W 1 }}
+        }
         bind TkConsole <Alt-d> {
             if {[%W compare insert >= limit]} {
                 %W delete insert {insert wordend}

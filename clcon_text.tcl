@@ -565,7 +565,9 @@ namespace eval ::clcon_text {
    
     ## В Linux недоназначаются кнопки с KP_. Часть мы назначаем здесь. См. также fix_kp_in_linux.tcl 
     proc SetKPBindingsForText {} {
-       foreach { KP Norm } { \
+       if {[tk windowingsystem] eq "x11"} {
+
+           foreach { KP Norm } { \
                               <KP_Prior> <Prior> <KP_Next> <Next> \ 
                               <KP_Delete> <Delete> <KP_Insert> <Insert> \
 #                             <KP_Home> <Home> <KP_End> <End> \
@@ -576,36 +578,38 @@ namespace eval ::clcon_text {
                              <Control-Key-KP_Prior> <Control-Key-Prior> \
                              <Control-Key-KP_Next> <Control-Key-Next> \
                                      } {
-          ::clcon_key::b bind Text $KP [ bind Text $Norm ]
-       }
+              ::clcon_key::b bind Text $KP [ bind Text $Norm ]
+           }
 
     ## Это скопировано из исходников text.tcl. Почему его пришлось сюда писать - я не знаю. Возможно, оно где-то стирается?
-       bind Text <Control-Home> {
-          tk::TextSetCursor %W 1.0
-       }
-       bind Text <Control-Shift-Home> {
-          tk::TextKeySelect %W 1.0 
-       }
-       bind Text <Control-End> {
-          tk::TextSetCursor %W {end - 1 indices}
-       }
-       bind Text <Control-Shift-End> {
-          tk::TextKeySelect %W {end - 1 indices}
-       }
-       # И дублируем для KP
-       bind Text <Control-KP_Home> {
-          tk::TextSetCursor %W 1.0
-       }
-       bind Text <Control-Shift-KP_Home> {
-          tk::TextKeySelect %W 1.0 
-       }
-       bind Text <Control-KP_End> {
-          tk::TextSetCursor %W {end - 1 indices}
-       }
-       bind Text <Control-Shift-KP_End> {
-          tk::TextKeySelect %W {end - 1 indices}
+           bind Text <Control-Home> {
+              tk::TextSetCursor %W 1.0
+           }
+           bind Text <Control-Shift-Home> {
+              tk::TextKeySelect %W 1.0 
+           }
+           bind Text <Control-End> {
+             tk::TextSetCursor %W {end - 1 indices}
+           }
+           bind Text <Control-Shift-End> {
+              tk::TextKeySelect %W {end - 1 indices} 
+           }
+           # И дублируем для KP
+           bind Text <Control-KP_Home> {
+              tk::TextSetCursor %W 1.0
+           }
+           bind Text <Control-Shift-KP_Home> {
+              tk::TextKeySelect %W 1.0 
+           }
+           bind Text <Control-KP_End> {
+              tk::TextSetCursor %W {end - 1 indices}
+           }
+           bind Text <Control-Shift-KP_End> {
+              tk::TextKeySelect %W {end - 1 indices}
+           }
        }
     }
+    
 
     proc SetCyrBindingsForText {} {
         bind Text <Control-Key-Z> {}

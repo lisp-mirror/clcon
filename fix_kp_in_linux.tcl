@@ -2,6 +2,8 @@
 
 # Кусок из /home/den73/yar/tcl-8.6.4/lib/tk8.6/tk.tcl
 
+if {[tk windowingsystem] eq "x11"} {
+
 	event add <<NextChar>>		<KP_Right>
 	event add <<SelectNextChar>>	<Shift-KP_Right>
 	event add <<PrevChar>>		<KP_Left>
@@ -22,3 +24,5 @@
 	event add <<NextPara>>		<Control-KP_Down>
 	event add <<SelectPrevPara>>	<Control-Shift-KP_Up>
 	event add <<SelectNextPara>>	<Control-Shift-KP_Down>
+
+}
