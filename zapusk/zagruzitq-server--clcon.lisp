@@ -1,12 +1,12 @@
 ;; -*- Encoding: utf-8; Coding: utf-8 ; -*-
-;; Script to build clcon image. SBCL specific. Don't mind that lispworks is mentioned.
+;; Скрипт сборки образа - windows32 - загружает clcon, но не запускает
 ;; (C) Denis Budyak 2015
 ;; MIT License
 
 (in-package :cl-user)
 
 (eval-when (:compile-toplevel)
-  (error "Your must not compile ~S, just load it as a source" *compile-file-truename*))
+  (error "Не компилируй ~S, загружай его с помощью LOAD" *compile-file-truename*))
 
 
 ;;;;;;;;;;;;;;;;;; Trying to send all tracing to SBCL console ;;;;;;;;;;;;
@@ -23,7 +23,8 @@
 ;;;;;;;;;;;;;;;;;; End of trying to send all tracing to SBCL console ;;;;;;;;;;;;
 
 ;; piece from my init.lisp
-(defparameter *clcon-root* #+win32 (pathname "c:/yar/") #+unix (pathname "/s2/sw/"))
+(defparameter *yar-root* #+win32 (pathname "c:/yar/") #+unix (pathname "/yar/sw/"))
+(defparameter *clcon-root* *yar-root*) ; по-хорошему, это - неправда. 
 
 ;; Enable stepping everywhere else (this code is duplicated in .sbclrc)
 (proclaim '(optimize (debug 3) (compilation-speed 0) (speed 0) (space 0) (safety 3)))
@@ -40,7 +41,7 @@
              (asdf::required-components :asdf/defsystem :keep-component 'asdf:cl-source-file)))
 
 (defun pred-dir (dir)
-  (make-pathname :defaults dir :directory (butlast (pathname-directory *clcon-root*))))
+  (make-pathname :defaults dir :directory (butlast (pathname-directory dir))))
 
 (defun at-clcon-root (path) "Path relative to *clcon-root*"
   (merge-pathnames path *clcon-root*))
@@ -126,13 +127,13 @@
   (asdf:load-system :editor-budden-tools)   
   )
 
+;; Нужность закомментаренного кода неочевидна
+;;(defun test-defpackage-l2 ()
+;;  (assert
+;;   (budden-tools::packages-seen-p (named-readtables:find-readtable :buddens-readtable-a)))
+;;  (load (compile-file (at-clcon-root "lp/budden-tools/defpackage-l2-test.lisp"))))
 
-(defun test-defpackage-l2 ()
-  (assert
-   (budden-tools::packages-seen-p (named-readtables:find-readtable :buddens-readtable-a)))
-  (load (compile-file (at-clcon-root "lp/budden-tools/defpackage-l2-test.lisp"))))
-
-(test-defpackage-l2)
+;; (test-defpackage-l2)
 
 ;;;;;;;;;;;;;;;;;; Setting print-pretty to t  ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -148,24 +149,8 @@
    #-oduvan-invisible :oduvanchik.clx
    ))
 
+
 ;;;;;;;;;;;;;;;;;; Loading server ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (asdf:load-system :clcon-server)
 ; (asdf:load-system :lime) ; enable it just to navigate through sources
-
-;;;;;;;;;;;;;;;;;; Starting server ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; note this is already second swank server
-; first was created in .sbclrc to be able to connect to from EMACS
-(swank:create-server :port *clcon-swank-port* :dont-close t)
-
-;;;;;;;;;;;;;;;;;; Starting editor backend ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(clco:start-oduvanchik)
-
-;;;;;;;;;;;;;;;;;; Starting editor frontend ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; CallBatFromGuiDetached.exe is used to bypass problems with run-program
-(let ((cmd (format nil "c:\\yar\\bin\\util\\CallBatFromGuiDetached.exe c:\\yar\\bin\\util\\clcon-client.cmd -swank-port ~A" *clcon-swank-port*)))
-  (uiop/run-program:run-program cmd))
-
