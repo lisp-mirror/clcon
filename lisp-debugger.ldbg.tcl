@@ -333,7 +333,6 @@ namespace eval ::ldbg {
         } 
     }            
 
-# 111 
     proc RowDblClick {tbl RowName} {
         set ItemInfo [RowToItemInfo $tbl $RowName]
         set type [lindex $ItemInfo 0]
@@ -391,6 +390,10 @@ namespace eval ::ldbg {
             }
             EnableStepping {
                 EnableStepping
+            }
+            НапечататьСтекВКонсоли {
+                # Решение уровня "тяп-ляп". Нужно написать спец.функцию для этого
+                EvalInFrameGivenExpressionPrettyPrint $RowName "(let ((*print-circle* nil) (*print-length* (or *print-length* 502)) (*print-level* (or *print-level* 502))) (progn (print (swank::debugger-info-for-emacs 0 499) *trace-output*) :Смотри-стек-в-консоли-сервера))" 
             }
             #SwitchToNativeDebugger {
             #    SwitchToNativeDebugger $RowName
@@ -549,7 +552,10 @@ namespace eval ::ldbg {
         $m add command -label "5.Выполнить в кадре и лепо вывести..." -underline 0 -command $cmd
 
         set cmd [list ::ldbg::CellCmdForActiveCell $tbl EnableStepping]
-        $m add command -label "6.Перейти в режим ходьбы" -underline 0 -command $cmd        
+        $m add command -label "6.Перейти в режим ходьбы" -underline 0 -command $cmd   
+
+        set cmd "::ldbg::CellCmdForActiveCell $tbl НапечататьСтекВКонсоли"
+        $m add command -label "7.Напечатать первые 500 кадров стека в консоли" -underline 0 -command $cmd
     }
     
     proc MakeMainWindowEditMenu {w menu} {
@@ -697,7 +703,6 @@ namespace eval ::ldbg {
         set FrameNo [dict get $FrameItem "FrameNo"]
         set thread [GetDebuggerThreadId]
         set TblForLisp [::tkcon::QuoteLispObjToString $tbl]
-        # 222
         ::tkcon::EvalInSwankAsync                                                   \
             "(clcon-server::ldbg-edit-local-var-source-location $FrameNo $LocalNo $TblForLisp)"   \
             {} [GetDebuggerThreadId]
@@ -711,6 +716,7 @@ namespace eval ::ldbg {
             "::insp::SwankInspect1 \$EventAsList"           \
             $thread
     }
+
 
     proc EnableStepping {} {
         set thread [GetDebuggerThreadId]                    
@@ -807,40 +813,52 @@ namespace eval ::ldbg {
 #  25)
 
     proc EvalInFrame {RowName} {
-        EvalInFrameInner $RowName 0
+        EvalInFrameInner $RowName 0 {}
     }
 
     proc EvalInFramePrettyPrint {RowName} {
-        EvalInFrameInner $RowName 1
+        EvalInFrameInner $RowName 1 {}
     }
 
-    proc EvalInFrameInner {RowName PrettyPrint} {
+    proc EvalInFrameGivenExpressionPrettyPrint {RowName StringToQuoteForLisp} {
+        EvalInFrameInner $RowName 2 $StringToQuoteForLisp
+    }
+
+    # 0 - запросить выражение, вычислить, напечатать (пакет из текущего кадра, StringToQuoteForLisp игнорируется)
+    # 1 - запросить, вычислить, лепо напечатать (то же)
+    # 2 - вычислить без запроса выражение StringToQuoteForLisp
+    proc EvalInFrameInner {RowName Mode StringToQuoteForLisp} {
         set FrameNo [RowNameToFrameNo $RowName]
         ::tkcon::EvalInSwankAsync                                 \
             "(swank:frame-package-name $FrameNo)"                 \
             [subst -nocommand {
-                ::ldbg::EvalInFrameC1 $FrameNo $PrettyPrint \$EventAsList
+                ::ldbg::EvalInFrameC1 $FrameNo $Mode [list $StringToQuoteForLisp] \$EventAsList
             }] [GetDebuggerThreadId]
     }
 
-    proc EvalInFrameC1 {FrameNo PrettyPrint EventAsList} {
+    proc EvalInFrameC1 {FrameNo Mode StringToQuoteForLisp EventAsList} {
         variable MainWindow
         set package [::mprs::ParseReturnOk $EventAsList]
         set qPackage [::tkcon::QuoteLispObjToString $package]
 
         #set level [GetDebuggerLevel]
-        foreach {isok code}                                      \
-            [LameAskForLispExpression $MainWindow                \
-                 "Выполнить в кадре (shift-enter=новая строка)$package>" \
-                ] break
-        if {$isok ne "ok"} {
-            return
+        
+        if {$Mode != 2} {
+            foreach {isok code}                                      \
+                [LameAskForLispExpression $MainWindow                \
+                     "Выполнить в кадре (shift-enter=новая строка)$package>" \
+                    ] break
+            if {$isok ne "ok"} {
+                return
+            }
+        } else {
+           set code $StringToQuoteForLisp
         }
         puts ";;Выполняю в кадре $FrameNo:"
         puts ";;$package> $code"
         set qCode [::tkcon::QuoteLispObjToString $code]
         set thread [GetDebuggerThreadId]
-        if {$PrettyPrint} {
+        if {$Mode != 0} {
             set LispFn "swank:pprint-eval-string-in-frame"
         } else {
             set LispFn "swank:eval-string-in-frame"
