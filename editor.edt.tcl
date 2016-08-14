@@ -119,7 +119,9 @@ namespace eval ::edt {
             file	{
 
                 if {$type eq "file"} {
-                    set filemtime [file mtime $word]
+                if {[catch {set filemtime [file mtime $word]}]} {
+                    set filemtime {}
+                }
                 } else {
                     set filemtime {}
                 }
@@ -128,7 +130,7 @@ namespace eval ::edt {
                 
                 ::clcon_text::ConstructBackendBuffer $w.text
                 
-                if {$type eq "file"} {
+            if {[expr {$type eq "file"}] && [expr {$filemtime ne {}}]} {
                     $w.text insert 1.0 [::edt::ReadFileIntoString $word 0]
                 
                     after idle [list ::tkcon::Highlight $w.text \
@@ -146,7 +148,18 @@ namespace eval ::edt {
             }
         }
         $w.text edit reset
-        $w.text edit modified 0
+        # puts "Load type $type"
+        if {$type eq "file"} {
+            if {$filemtime eq {}} {
+                $w.text edit modified 1
+            } else {
+                $w.text edit modified 0
+            }
+        } elseif {$type eq "newfile"} {
+            $w.text edit modified 1
+        } else {
+            $w.text edit modified 0
+        }
         $w.text mark set insert 1.0
     }
 
