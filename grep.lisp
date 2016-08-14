@@ -105,17 +105,45 @@
          matches))
       )))
   
+(defparameter |*поддиректории-яра-не-содержащие-исходников-яра*|
+  '("quicklisp/" "tcl-8.6.4/" "sbcl/" "log/" ".hg/" "пляж/"))
+
+(defparameter |*типы-файлов-исходников-яра*| 
+  '("md" "lisp" "asd" "tcl"))
+
+(defun |ранг-исходного-файла-яра-для-сортировки| (p)
+  (list
+   (position (pathname-type p) |*типы-файлов-исходников-яра*| :test 'string=)
+   (pathname-name p)))
+
+(defun |сравнить-исходные-файлы-яра-для-упорядочивания-при-поиске| (p1 p2)
+   (uiop/utility:lexicographic<
+    (lambda (x y)
+      (etypecase x
+        (null y) ; если x - nil, то будет меньше, если y не nil
+        (integer (< x y))
+        (string (string< x y))))
+    (|ранг-исходного-файла-яра-для-сортировки| p1)
+    (|ранг-исходного-файла-яра-для-сортировки| p2)
+    ))
 
 (defun clcon-sources ()
-  "Returns an approximate list of clcon source files"
-  (let ((filelist nil))
-    (dolist (mask '("**/*.lisp" "**/*.tcl" "**/*.asd" "**/*.md" "../oduvanchik/**/*.lisp" "../oduvanchik/*.asd"))
-      (dolist (file (directory (merge-pathnames mask *clcon-source-directory*)))
-        (unless
-            (or (member "xlam" (pathname-directory file) :test 'equalp)
-                (member (pathname-name file) '("rather-big-file" "very-big-file") :test 'equalp))
-          (push file filelist))))
-    (nreverse filelist)))
+  "Возвращает примерный список исходников Яра и clcon"
+  (let ((filelist nil)
+        (|запретные-директории|
+         (mapcar 'cl-user::putq-otnositelqno-kornya-yara |*поддиректории-яра-не-содержащие-исходников-яра*|)))
+    (budden-tools:map-dir
+      (lambda (x) (push x filelist))
+     cl-user::*yar-root*
+     :subdirs :recurse
+     :dir-test (lambda (p) (not (member p |запретные-директории| :test 'equal)))
+     :file-test (lambda (p)
+                  (and (member (pathname-type p) |*типы-файлов-исходников-яра*| :test 'string=)
+                       (not (equal p #p"c:/yar/lp/budden-tools/866.lisp")) ; этот путь всегда выдаёт ошибку, нечего ему быть в поиске
+                       )))
+    ; filelist
+    (sort filelist '|сравнить-исходные-файлы-яра-для-упорядочивания-при-поиске|)
+    ))
 
 
 (defun files-by-glob-list (&rest glob-list)
@@ -181,7 +209,7 @@
   (clco::present-text-filtering-results
    (clco::filter-many-files (clco::clcon-sources) string)
    :title
-   (format nil "Поиск в исходниках clcon: ~A" string)))
+   (format nil "Поиск в исходниках Яра и clcon: ~A" string)))
 
 (defun find-string-in-files (string file-list &key regexp case-sensitive secondary-string)
   "For each string in file-list, calls directory. Then searches string in all of the files. See also clco:files-by-glob-list. Example is in the source"
