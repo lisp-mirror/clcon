@@ -33,7 +33,6 @@ namespace eval ::edt {
         clipboard append $FileName
     }
 
-
     # Types in buffer pathname to console. See also ::tkcon::PasteAsLinuxFilename
     proc CurrentPathAndFileNameToConsole {ignore} {
         variable ::tkcon::PRIV
@@ -230,7 +229,7 @@ namespace eval ::edt {
         ::gui_util::ClearMenu $m
 
         set cmd ::edt::EditNewFile 
-        $m add command -label "1.Создать" -command $cmd
+        $m add command -label "Создать" -command $cmd
 
         set initialdir ""
         catch { ::clcon_text::PathToAFile $btext } initialdir
@@ -253,14 +252,19 @@ namespace eval ::edt {
         $m add separator
 
         set cmd {::edt::CurrentBufferPathnameToClipboard "unix"}
-        $m add command -label "2.Копир.имя файла в буфер обмена (стиль unix)" \
+        $m add command -label "1.Копир.имя файла в буфер обмена (стиль unix)" \
             -underline 0 -command $cmd
 
         set cmd {::edt::CurrentBufferPathnameToClipboard "windows"}
-        $m add command -label "3.Копир.имя файла в буфер обмена (стиль windows)" \
+        $m add command -label "2.Копир.имя файла в буфер обмена (стиль windows)" \
             -underline 0 -command $cmd
 
         $m add separator
+
+        set cmd [wesppt [list ::edt::EditFileNameUnderCursorCommand $btext]]
+        $m add command -label "3.Редактировать файл, имя которого под курсором" -underline 0 -command $cmd
+        
+        $m add separator    
 
         $m add command -label "4.Перезагрузить часть исходных текстов ИСР (IDE)" -underline 0 \
 	    -command ::tkcon::ReloadSomeIDESources

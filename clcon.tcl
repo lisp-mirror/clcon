@@ -1230,14 +1230,14 @@ proc ::tkcon::InitMenus {w title} {
                    [menu $w.pop.файл -disabledforeground $COLOR(disabled)]] {
         
         set cmd ::edt::EditNewFile
-        $m add command -label "1.Создать и редактировать файл" -underline 0 -command $cmd
+        $m add command -label "Создать и редактировать файл" -underline 0 -command $cmd
 
         set cmd [list ::tkcon::OpenForEdit $w "" ""]
 	$m add command -label "Открыть для редактирования" -command $cmd -accel "Control-O"
         ::clcon_key::b bind TkConsoleTextOverrides <Control-Key-o> "$cmd; break"
         
-	$m add command -label "2.Выполнить файл Tcl" -underline 0 -command ::tkcon::Load
-	$m add cascade -label "3.Сохранить поток консоли..."  -underline 0 -menu $m.save
+	$m add command -label "Выполнить файл Tcl" -underline 0 -command ::tkcon::Load
+	$m add cascade -label "Сохранить поток консоли..."  -underline 0 -menu $m.save
 
 	$m add separator
 

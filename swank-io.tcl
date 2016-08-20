@@ -162,6 +162,8 @@ proc ::mprs::ExtractSyncEventFromQueueIfExists {} {
 
 # Parses (:return (:ok x)) event to message or errs.
 # Returns unleashed x if all ok
+# Если в событии пришёл nil, то мы безсильны. Если нужно проверить на nil, разбирайте событие заново
+# или пишите ф-ю, к-рая не будет делать Unleash
 proc ::mprs::ParseReturnOk { EventAsList } {
     set EventHead [lindex $EventAsList 0]
     if { $EventHead ne {:return} } {

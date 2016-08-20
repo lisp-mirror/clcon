@@ -145,6 +145,8 @@ namespace eval ::edt {
         $clcon_text Unfreeze
           
     }
+
+
     # See also ::tkcon::LispFindDefinition
     proc FindSourceCommand {text} {
         set console [::tkcon::CurrentConsole]
@@ -164,6 +166,29 @@ namespace eval ::edt {
             ::edt::FindSymbolContinuation $clcon_text $EventAsList
         }}
     }    
+
+    proc EditFileNameUnderCursorCommand {text} {
+        set console [::tkcon::CurrentConsole]
+        ::clcon_text::CallOduvanchikFunction $text "odu::edit-file-name-under-cursor-command nil" {{
+            ::edt::EditFileNameUnderCursorContinuation $clcon_text $EventAsList
+        }}
+    }
+        
+    proc EditFileNameUnderCursorContinuation {clcon_text EventAsList} {
+        set V1 [ ::mprs::ParseReturnOk $EventAsList ]
+        set Priznak [ ::mprs::Unleash [ lindex $V1 0 ]]
+        if {$Priznak == 0} {
+            puts "Нет имени файла под курсором"
+        } else {
+            set FileName [::mprs::Unleash [lindex $V1 1]]
+            if {$Priznak == 1} {
+                puts "Файл не существует: $FileName"
+            } else {
+                ::edt::edit -type file -- $FileName
+            }
+        }
+        $clcon_text Unfreeze
+    }
 
 
     # See also ::tkcon::LispHyperdocLookup

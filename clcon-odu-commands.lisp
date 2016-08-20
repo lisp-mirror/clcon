@@ -130,7 +130,11 @@
        ((find #\: (format nil "~s" symbol2)) (format nil "~s" symbol2))
        (t (format nil "~a:~s" (package-name (symbol-package symbol2)) symbol2))))))
 
-
+(defcommand "Edit File Name Under Cursor" (p)
+  ""
+  ""
+  (let ((result (РАСПОЗНАТЬ-ИМЯ-ФАЙЛА-В-ТЕКУЩЕЙ-ТОЧКЕ-РЕДАКТОРА-ИЛИ-ПЕРЕД-НЕЙ #p"c:/tmp/a.b")))
+    result))
 
 (defcommand "Hyperdoc Lookup" (p)
     "Hyperdoc lookup"
