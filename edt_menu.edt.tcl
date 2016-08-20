@@ -311,10 +311,8 @@ namespace eval ::edt {
         # Следующие команды работают для всех режимов, поэтому помещаем их в меню "Правка"
 
         set cmd [list ::tkcon::ReturnPos]
-        $m add command -label "перейти назад" -accel <Alt-comma> -command $cmd
-        # Здесь нет смысла делать двуязычие - проблема в том, что запятая
-        # находится в разных местах.        
-        bind SingleMod$w <Alt-comma> "$cmd; break"
+        $m add command -label "перейти назад" -accel <Alt-,> -command $cmd
+        ::clcon_key::b bind SingleMod$w <Alt-comma> "$cmd; break"
 
         set cmd [list ::edt::FindCurrentFileDeclarations $btext]
         $m add command -label "Определения в текущем файле (без сохранения файла!)" \
