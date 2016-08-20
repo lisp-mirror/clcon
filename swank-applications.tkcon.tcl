@@ -200,7 +200,15 @@ proc ::tkcon::PasteAsLinuxFilename {w} {
     variable ::tkcon::PRIV
     set con $PRIV(console)
     set ClipText [clipboard get]
-    set UnixFilename [::WindowsFileNameToUnix $ClipText]
+    set x [::WindowsFileNameToUnix $ClipText]
+    set x [::tcl::string::trim $x]
+    # Быстрогрязное решение - если в файле уже есть кавычки, то квотим
+    if {![string match {*"*} $x]} { 
+        set x [::tkcon::QuoteTclStringForLisp $x]
+    }
+    set UnixFilename $x
     $con insert insert $UnixFilename
 }
+# " балансируем для раскраски лиспа
+
     

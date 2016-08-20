@@ -3,8 +3,9 @@
 (in-package :oduvanchik)
 (named-readtables::in-readtable :oduvanchik-ext-readtable)
 
-(defun where-is-mark-relative-to-symbol (p1)
-  "0 - mark is just after the end of symbol string
+(defun where-is-mark-relative-to-symbol (p1 &key (ПРЕДИКАТ 'editor-budden-tools::char-can-be-in-symbol))
+  "ПРЕДИКАТ - функция от буквы. Истина, если буква может быть внутри символа.
+   0 - mark is just after the end of symbol string
    1 - mark is inside or just after the end of symbol string
    2 - mark is at the beginning of symbol string
    3 - mark is not in symbol string. Syntax info is ignored, we look
@@ -14,11 +15,11 @@
    (let prev-char (odu::previous-character p1))
    (let prev-in-symbol
          (and prev-char
-              (editor-budden-tools::char-can-be-in-symbol prev-char)))
+              (funcall ПРЕДИКАТ prev-char)))
    (let next-char (odu::next-character p1))
    (let next-in-symbol
          (and next-char
-              (editor-budden-tools::char-can-be-in-symbol next-char)))
+              (funcall ПРЕДИКАТ next-char)))
    (cond
     ((and (not prev-in-symbol) (not next-in-symbol))
      3)

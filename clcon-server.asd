@@ -40,6 +40,7 @@
                (:file "clcon-odu-commands-infrastructure" :description "Infrastructure for oduvanchik commands"
                       )
                (:file "lisp-symbol-at-odu-point" :description "Operating lisp symbol at point")
+               (:file "filename-at-odu-point" :description "Извлекает имя файла в текущей точке или перед ней")
                (:file "clcon-odu-commands" :description "Our lisp mode and other application-level oduvanchik commands for clcon"
                       )
                )
