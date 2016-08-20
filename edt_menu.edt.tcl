@@ -308,7 +308,14 @@ namespace eval ::edt {
         ::clcon_key::b bind SingleMod$w <Control-Key-h> "$cmd; break"
 
         $m add separator
-        # this command works for both lisp and tcl so we put it at edit menu
+        # Следующие команды работают для всех режимов, поэтому помещаем их в меню "Правка"
+
+        set cmd [list ::tkcon::ReturnPos]
+        $m add command -label "перейти назад" -accel <Alt-comma> -command $cmd
+        # Здесь нет смысла делать двуязычие - проблема в том, что запятая
+        # находится в разных местах.        
+        bind SingleMod$w <Alt-comma> "$cmd; break"
+
         set cmd [list ::edt::FindCurrentFileDeclarations $btext]
         $m add command -label "Определения в текущем файле (без сохранения файла!)" \
             -command $cmd -accel "F12"
@@ -338,10 +345,7 @@ namespace eval ::edt {
         $m add command -label "Tcl: перейти к определению" -accel <Control-Key-F9> -command $cmd
         bind SingleMod$w <Control-Key-F9> "$cmd; break"
 
-        set cmd [list ::tkcon::ReturnPos]
-        $m add command -label "перейти назад" -accel <Alt-comma> -command $cmd
-        bind SingleMod$w <Alt-comma> "$cmd; break"
-        
+       
         ## Window Menu 
 
         ## Так же как с меню "недавние", нам нужно удалить данное меню, псокольку 
