@@ -77,6 +77,7 @@
          (my-tcl-form y ou (+ level 1)))
        (format ou "} "))
       (t
+       ; break здесь ставить нельзя
        (format ou "sERROR-IN-LISP--MY-TCL-FORM"
        )))))
 
