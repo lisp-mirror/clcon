@@ -134,6 +134,7 @@
          (file-name (clco::text2odu-event-string e)))
     (delete-old-buffer buffer-name)
     (let* ((b (make-buffer buffer-name)))
+      (setf (buffer-pathname b) (pathname file-name))
       (change-to-buffer b)
       (oduvanchik-interface:defhvar "Swank Connection" "Ugugu" :buffer b)
       (auto-save-mode-command 0)

@@ -133,7 +133,7 @@
 (defcommand "Edit File Name Under Cursor" (p)
   ""
   ""
-  (let ((result (РАСПОЗНАТЬ-ИМЯ-ФАЙЛА-В-ТЕКУЩЕЙ-ТОЧКЕ-РЕДАКТОРА-ИЛИ-ПЕРЕД-НЕЙ #p"c:/tmp/a.b")))
+  (let ((result (РАСПОЗНАТЬ-ИМЯ-ФАЙЛА-В-ТЕКУЩЕЙ-ТОЧКЕ-РЕДАКТОРА-ИЛИ-ПЕРЕД-НЕЙ)))
     result))
 
 (defcommand "Hyperdoc Lookup" (p)
