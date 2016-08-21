@@ -150,10 +150,10 @@ namespace eval ::edt {
     # See also ::tkcon::LispFindDefinition
     proc FindSourceCommand {text} {
         set console [::tkcon::CurrentConsole]
-        variable ::tkcon::PosStack
         set w [$text RealText]
-        lappend ::tkcon::PosStack [list [$w index insert] [[$w cget -opened_file] cget -filename]]
 
+        ::tkcon::ПоложитьТекущуюПозициюНаPosStack $w
+        
         ::clcon_text::CallOduvanchikFunction $text "odu::find-source-command nil" {{
             ::edt::FindSourceContinuation $clcon_text $EventAsList
         }}
@@ -167,9 +167,10 @@ namespace eval ::edt {
         }}
     }    
 
-    proc EditFileNameUnderCursorCommand {text} {
+    proc EditFileNameUnderCursorCommand {btext} {
         set console [::tkcon::CurrentConsole]
-        ::clcon_text::CallOduvanchikFunction $text "odu::edit-file-name-under-cursor-command nil" {{
+        ::tkcon::ПоложитьТекущуюПозициюНаPosStack [$btext RealText]
+        ::clcon_text::CallOduvanchikFunction $btext "odu::edit-file-name-under-cursor-command nil" {{
             ::edt::EditFileNameUnderCursorContinuation $clcon_text $EventAsList
         }}
     }
@@ -182,7 +183,7 @@ namespace eval ::edt {
         } else {
             set FileName [::mprs::Unleash [lindex $V1 1]]
             if {$Priznak == 1} {
-                puts "Файл не существует: $FileName"
+                puts "Файл не существует. Для создания подайте команду .edit $FileName"
             } else {
                 ::edt::edit -type file -- $FileName
             }

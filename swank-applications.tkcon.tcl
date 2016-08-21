@@ -95,8 +95,16 @@ proc ::tkcon::WritePassiveText {w text index} {
     ::ro_out::I $w $index $text\n [list stdout $tag]
 }
 
+namespace eval tkcon {
+    variable PosStack [list]
+}
 
-global ::tkcon::PosStack [list]
+
+proc ::tkcon::ПоложитьТекущуюПозициюНаPosStack {text_widget} {
+    variable ::tkcon::PosStack
+    catch { lappend ::tkcon::PosStack [list [$text_widget index insert] [[$text_widget cget -opened_file] cget -filename]] }
+}
+
 
 proc ::tkcon::ReturnPos {} {
     variable ::tkcon::PosStack
@@ -106,6 +114,8 @@ proc ::tkcon::ReturnPos {} {
         set pos [lindex $last 0]
         set filename [lindex $last 1]
         ::tkcon::EditFileAtOffset $filename $pos
+    } else {
+        puts "Нет запомненных мест"
     }
 }
 
@@ -184,12 +194,11 @@ proc ::tkcon::LispHyperdocLookup {w} {
 # See also: ::edt::FindSourceCommand
 ## 
 proc ::tkcon::TclFindDefinition {w} {
-    variable ::tkcon::PosStack
     set str [GetTclNameAtInsert $w]
     if {$str eq {}} {
         tk_messageBox -parent $w -message "trying to edit empty definition"
     } else {
-        catch { lappend ::tkcon::PosStack [list [$w index insert] [[$w cget -opened_file] cget -filename]] }
+        ::tkcon::ПоложитьТекущуюПозициюНаPosStack $w
         ::record_definition::EditProcedure $str
     }
 }
