@@ -109,7 +109,7 @@
        (region-end odu::*open-paren-font-marks*) 
        (oi::smart-insert-font-mark (region-start odu::*open-paren-font-marks*)
                                    marks))
-      marks))
+      (copy-list marks)))
 
 (defun line-effective-marks (line)
   "Marks of the line plus marks of odu::*open-paren-font-marks*"
