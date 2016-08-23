@@ -235,6 +235,7 @@ proc ::mprs::EvalInTclSync {EventAsList} {
 }
 
 # this is an async event received from swank. Process it. E.g. call a continuation
+# Я точно не помню, но похоже, что swank отправляет его через swank::send-to-emacs 
 proc ::mprs::ProcessAsyncEvent {EventAsList} {
     set ContinuationId [ExtractContinuationId $EventAsList]
     # we don't need to Unleash keywords

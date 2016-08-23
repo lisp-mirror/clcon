@@ -19,6 +19,7 @@
                (:file "swank-sbcl-original-functions")
                (:file "find-definition")
                (:file "swank-patch")
+               (:file "sbcl--debug--patch" :description "Патчим отладчик для лучшей поддержки отладки в my-eval")
                (:file "eval-in-tcl")
                (:file "swank-inspector" :description "inspector backend pieces")
                (:file "stepper-support")

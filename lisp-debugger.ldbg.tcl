@@ -448,7 +448,7 @@ namespace eval ::ldbg {
         $DebuggerMenuBar entryconfigure [StepperMenuTitle] -state $state
     }
     
-    # This is a contiuation assigned on reply on initialization request 
+    # Точка входа в отладчик - продолжение назначенное на ответ на запрос об инициализации
     proc StartDebugging { EventAsList } {
         variable DebugEvent
         variable Restarts
