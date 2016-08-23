@@ -249,7 +249,7 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
     } elseif { $Head eq  ":eval"} {
         EvalInTclSync $EventAsList
     } elseif { $Head eq ":debug" } {
-        ::ldbg::ldbg $EventAsList
+        ::ldbg::StartDebugging $EventAsList
     } elseif { $Head eq ":debug-activate" } {
         ::ldbg::DebugActivate $EventAsList
     } elseif { $Head eq ":debug-return" } {

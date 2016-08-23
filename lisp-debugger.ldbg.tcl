@@ -449,7 +449,7 @@ namespace eval ::ldbg {
     }
     
     # This is a contiuation assigned on reply on initialization request 
-    proc ldbg { EventAsList } {
+    proc StartDebugging { EventAsList } {
         variable DebugEvent
         variable Restarts
         variable StepperMode
