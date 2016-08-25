@@ -271,16 +271,16 @@ namespace eval ::insp {
 
     proc EditMenu {w menu text} {
         set m [menu [::tkcon::MenuButton $menu "2.Правка" edit]]
-        $m add command -label "Копировать"  -under 0 \
+        $m add command -label "Копировать"  \
             -command [list tk_textCopy $text]
         $m add separator
 
-        $m add command -label "Найти" -under 0 \
+        $m add command -label "Найти" \
             -command [list ::fndrpl::OpenFindBox $text "text" "find" {}]
         ::clcon_key::b bind $w <Control-Key-f>             [list ::tkcon::Findbox $text]
         $m add separator
 
-        $m add command -label "Результат в *" -under 0 \
+        $m add command -label "1. Результат в *" -under 0 \
             -command [list ::insp::SaveResult]
     }    
 
