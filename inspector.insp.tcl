@@ -135,6 +135,10 @@ namespace eval ::insp {
         PrepareGui2 $w
     }
 
+    proc SaveResult {} {
+        ::tkcon::SendEventToSwank "(setf * (swank::istate.object swank::*istate*))" {}
+    }
+
     ## insp::InspectNthPart
     # Args: Id
     # Returns: Don't matter
@@ -274,6 +278,10 @@ namespace eval ::insp {
         $m add command -label "Найти" -under 0 \
             -command [list ::fndrpl::OpenFindBox $text "text" "find" {}]
         ::clcon_key::b bind $w <Control-Key-f>             [list ::tkcon::Findbox $text]
+        $m add separator
+
+        $m add command -label "Результат в *" -under 0 \
+            -command [list ::insp::SaveResult]
     }    
 
 
