@@ -28,6 +28,7 @@
 
            #:current-form         ; для отладки интерпретируемого кода
            #:*my-locations-hash*  ; для отладки интерпретируемого кода
+           #:get-definition-source-location-of-data ; то же
            )
   )
 

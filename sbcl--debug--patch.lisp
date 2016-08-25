@@ -1,5 +1,5 @@
 ; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server -*- 
-;;;; Патч отладчика SBCL
+;;;; Патч отладчика SBCL. Связан с c:/yar/src/my-full-eval/otladchik-sbcl.lisp
 
 (in-package :sb-debug)
 
@@ -34,7 +34,7 @@
        (let ((fn (ew-symbol "CONVERT-SBCL-DEBUGGER-FRAME-FOR-EW")))
          (when fn
            (multiple-value-setq (name args)
-             (funcall fn name args)))))
+             (funcall fn frame name args)))))
      (pprint-logical-block (stream nil :prefix "(" :suffix ")")
                            (let ((*print-pretty* nil)
                                  (*print-circle* t))
