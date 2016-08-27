@@ -119,14 +119,18 @@ namespace eval ::edt {
             file	{
 
                 if {$type eq "file"} {
-                if {[catch {set filemtime [file mtime $word]}]} {
-                    set filemtime {}
-                }
+                    if {[catch {set filemtime [file mtime $word]}]} {
+                        set filemtime {}
+                    }
                 } else {
                     set filemtime {}
                 }
                 
-                [$w.text cget -opened_file] configure -filename $word -filemtime $filemtime
+                if {$type eq "file"} {
+                    [$w.text cget -opened_file] configure -filename $word -filemtime $filemtime
+                } else {
+                    [$w.text cget -opened_file] configure -filename {} -filemtime $filemtime
+                }
                 
                 ::clcon_text::ConstructBackendBuffer $w.text
                 
