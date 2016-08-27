@@ -124,6 +124,9 @@ namespace eval ::window_menu {
         CalcEnabledForOneItem $thatWindow 0
         $m add command -label "Список ошибок" -accel "Control-Shift-r" \
             -command $cmd -state $state
+
+        $m add command -label "Потоки" -accel "Control-Shift-t" \
+            -command ::inspthrd::ShowThreads
     }
     
 }

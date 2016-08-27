@@ -192,6 +192,7 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
     TkconSourceHere findbox.fndrpl.tcl
     TkconSourceHere recent.tcl
     TkconSourceHere window_menu.tcl
+    TkconSourceHere inspthrd.tcl
 }    
 
 
