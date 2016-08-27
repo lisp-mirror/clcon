@@ -874,6 +874,12 @@ namespace eval ::ldbg {
 
     proc EvalInFrameC1 {FrameNo Mode StringToQuoteForLisp EventAsList} {
         variable MainWindow
+        if { [lindex $EventAsList 0] eq {:return} } {
+            if {[lindex [::mprs::Unleash [lindex $EventAsList 1]] 0] eq {:abort}} {
+                return
+            }
+        }
+        
         set package [::mprs::ParseReturnOk $EventAsList]
         set qPackage [::tkcon::QuoteLispObjToString $package]
 
@@ -906,6 +912,11 @@ namespace eval ::ldbg {
         
 
     proc EvalInFrameC2 {EventAsList} {
+        if { [lindex $EventAsList 0] eq {:return} } {
+            if {[lindex [::mprs::Unleash [lindex $EventAsList 1]] 0] eq {:abort}} {
+                return
+            }
+        }
         set result [::mprs::ParseReturnOk $EventAsList]
         ::tkcon::FocusConsole
         puts $result
