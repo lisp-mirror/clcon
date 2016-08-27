@@ -29,6 +29,9 @@ namespace eval ::ldbg {
     # dictionary $FrameNo -> Item, see 
     variable StackFrameHeaders
 
+    variable FramesRead
+    set FramesRead 20
+
     # dictionary of StackFrameHeaders being filled.
     # dictionary $FrameNo -> [list of continuation bodies to call after filling]
     variable StackFrameHeadersBeingFilled 
@@ -556,6 +559,39 @@ namespace eval ::ldbg {
 
         set cmd "::ldbg::CellCmdForActiveCell $tbl НапечататьСтекВКонсоли"
         $m add command -label "7.Напечатать первые 500 кадров стека в консоли" -underline 0 -command $cmd
+
+        set cmd "::ldbg::GetNext20"
+        $m add command -label "8.Получить ещё 20 кадров стека" -underline 0 -command $cmd
+    }
+
+    proc GetNext20 {} {
+        variable FramesRead
+        if { $FramesRead > 0 } {
+            set thread [GetDebuggerThreadId]
+            set Last [expr $FramesRead + 19]
+            ::tkcon::EvalInSwankAsync                           \
+                "(swank::debugger-info-for-emacs $FramesRead $Last)" \
+                "::ldbg::GetNext20Cont \$EventAsList"           \
+                $thread
+        }
+    }
+
+    proc GetNext20Cont {EventAsList} {
+#        tk_messageBox -message [::mprs::ParseReturnOk $EventAsList]
+        variable FramesRead
+        set n [expr $FramesRead + 20]
+        set FramesRead 0 
+        if { [lindex $EventAsList 0] eq {:return} } {
+            set SwankReply [::mprs::Unleash [lindex $EventAsList 1]]
+            set HeadSwankReply [lindex $SwankReply 0]
+            if {$HeadSwankReply eq {:ok}} {
+                set frames [lindex [::mprs::Unleash [lindex $SwankReply 1]] 2]
+                InsertSeveralFramesIntoTree $frames
+                if { [llength $frames] == 21 } {
+                    set FramesRead $n
+                }
+            }
+        }
     }
     
     proc MakeMainWindowEditMenu {w menu} {
