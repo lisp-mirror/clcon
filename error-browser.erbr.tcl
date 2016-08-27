@@ -367,6 +367,13 @@ namespace eval ::erbr {
         bind $w <Escape> [list destroy $w]
 
         ::gui_util::frame_clcon_text_and_vertical_scrollbar $w.body {-readonly 1}
+
+        set menu [menu $w.mbar]
+        $w configure -menu $menu
+
+        FileMenu $w $menu $w.body.text
+        EditMenu $w $menu $w.body.text
+        TitleListWindowMenu $w $menu
         
         pack $w.body -fill both -expand 1
 
@@ -375,6 +382,30 @@ namespace eval ::erbr {
         return
 
     }
+
+    proc FileMenu {w menu text} {
+        set m [menu [::tkcon::MenuButton $menu "1.Файл" file]]
+        $m add command -label "Сохранить как..."  -underline 0 \
+            -command [list ::tkcon::Save {} widget $text]
+        $m add command -label "Добавить к..."  -underline 0 \
+            -command [list ::tkcon::Save {} widget $text a+]
+        $m add separator
+        $m add command -label "Закрыть" -underline 0 -accel "Control-w" \
+            -command [list destroy $w]
+        ::clcon_key::b bind $w <Control-Key-w>		[list destroy $w]
+    }
+
+    proc EditMenu {w menu text} {
+        set m [menu [::tkcon::MenuButton $menu "2.Правка" edit]]
+        $m add command -label "Копировать"  \
+            -command [list tk_textCopy $text]
+        $m add separator
+
+        $m add command -label "Найти" \
+            -command [list ::fndrpl::OpenFindBox $text "text" "find" {}]
+        ::clcon_key::b bind $w <Control-Key-f>             [list ::tkcon::Findbox $text]
+    }    
+
 
     # It is reasonable to sort by severity first, then by number
     # How do we transform severity to number? -sortmode , -sortcommand for column

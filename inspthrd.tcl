@@ -73,13 +73,13 @@ namespace eval ::inspthrd {
 
         # ----------------------------------- menu -------------------
         
-#        set menu [menu $w.mbar]
-#        $w configure -menu $menu
+        set menu [menu $w.mbar]
+        $w configure -menu $menu
         
-#        FileMenu $w $menu $w.body.text
-#        EditMenu $w $menu $w.body.text
+        FileMenu $w $menu $w.body.text
+        EditMenu $w $menu $w.body.text
 #        InspectMenu $w $menu $w.body.text
-#        WindowMenu $w $menu $w.body.text
+        WindowMenu $w $menu $w.body.text
 
         grid $w.body.text - $w.body.sy -sticky news
         grid $w.body.sx - -sticky ew
@@ -94,5 +94,40 @@ namespace eval ::inspthrd {
 
     proc BreakNthThread {n} {
         ::tkcon::SendEventToSwank "(swank:debug-nth-thread $n)" {} 0
+    }
+    
+    proc FileMenu {w menu text} {
+        set m [menu [::tkcon::MenuButton $menu "1.Файл" file]]
+        $m add command -label "Сохранить как..."  -underline 0 \
+            -command [list ::tkcon::Save {} widget $text]
+        $m add command -label "Добавить к..."  -underline 0 \
+            -command [list ::tkcon::Save {} widget $text a+]
+        $m add separator
+        $m add command -label "Закрыть" -underline 0 -accel "Control-w" \
+            -command [list destroy $w]
+        ::clcon_key::b bind $w <Control-Key-w>		[list destroy $w]
+    }
+
+    proc EditMenu {w menu text} {
+        set m [menu [::tkcon::MenuButton $menu "2.Правка" edit]]
+        $m add command -label "Копировать"  \
+            -command [list tk_textCopy $text]
+        $m add separator
+
+        $m add command -label "Найти" \
+            -command [list ::fndrpl::OpenFindBox $text "text" "find" {}]
+        ::clcon_key::b bind $w <Control-Key-f>             [list ::tkcon::Findbox $text]
     }    
+
+
+    # text is ignored
+    proc WindowMenu {w menu text} {
+        variable ::tkcon::COLOR
+        set m [::tkcon::MenuButton $menu "7.Окно" window]
+
+	menu $m -disabledforeground $COLOR(disabled) \
+		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]
+
+        ::window_menu::WindowMenuKeyBindings $w $w $w
+    }
 }
