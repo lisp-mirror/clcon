@@ -47,7 +47,7 @@ namespace eval ::inspthrd {
 #        tk_messageBox -message [::mprs::Unleash [lindex $Reply 0]]
         set b $w.body.text
         set n -1
-        $b RoInsert end "Щёлкните по потоку для его остановки\n"
+        $b RoInsert end "Щёлкните по потоку для его отладки\n"
         foreach s $Reply {
             if {$n == -1} {
                 $b RoInsert end [::mprs::Unleash [lindex $s 0]]
