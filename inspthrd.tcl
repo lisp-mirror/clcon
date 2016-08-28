@@ -9,6 +9,18 @@ namespace eval ::inspthrd {
         PrepareGui1 $Reply
     }
 
+    # Имя потока, отладка которого нас убъёт
+    proc ОпасноеИмяПотока {threadName} {
+        variable ::tkcon::OPT
+        if {[lsearch -exact [list reader-thread control-thread {Swank Sentinel}] $threadName] != -1 \
+             || $threadName eq "Swank $OPT(swank-port)"} {
+            return 1
+        } else {
+            return 0
+        }
+    }
+    
+
     proc PrepareGui1 {Reply} {
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
@@ -49,22 +61,30 @@ namespace eval ::inspthrd {
         set n -1
         $b RoInsert end "Щёлкните по потоку для его отладки\n"
         foreach s $Reply {
+            set us [::mprs::Unleash $s]
+            set threadName [::mprs::Unleash [lindex $us 1]]
             if {$n == -1} {
-                $b RoInsert end [::mprs::Unleash [lindex $s 0]]
+                $b RoInsert end [::mprs::Unleash [lindex $us 0]]
                 $b RoInsert end "\t" 
-                $b RoInsert end [::mprs::Unleash [lindex $s 1]]
-                $b RoInsert end "\t\t\t" 
-                $b RoInsert end [::mprs::Unleash [lindex $s 2]]
+                $b RoInsert end $threadName
+                $b RoInsert end "\t\t\t\t\t" 
+                $b RoInsert end [::mprs::Unleash [lindex $us 2]]
                 $b RoInsert end "\n" 
             } else {
-                $b RoInsert end [::mprs::Unleash [lindex $s 0]]
+                $b RoInsert end [::mprs::Unleash [lindex $us 0]]
                 $b RoInsert end "\t" 
+                if {[ОпасноеИмяПотока $threadName]} {
+                    set ZnakOpasnosti "⚠" 
+                } else {
+                    set ZnakOpasnosti " "
+                }
+                $b RoInsert end $ZnakOpasnosti
                 ::tkcon::WriteActiveText $b \
-                     [::mprs::Unleash [lindex $s 1]] \
+                     $threadName \
                      end \
                      [list inspthrd::BreakNthThread $n]
-                $b RoInsert end "\t\t\t" 
-                $b RoInsert end [::mprs::Unleash [lindex $s 2]]
+                $b RoInsert end "\t\t\t\t\t" 
+                $b RoInsert end [::mprs::Unleash [lindex $us 2]]
                 $b RoInsert end "\n" 
             }
             set n [expr $n + 1]
