@@ -304,3 +304,20 @@ libraries support online help too. To learn which ones do support, try
 symbols in some packages. For theese packages, there is a probability to
 get help via pressing f1. 
 
+Фильтрация кадров при отладке
+-----------------------------
+Если надо видеть не все кадры отладки, можно определить переменную clco::*filter-frames*. Она должна содержать функцию одного аргумента. Аргумент -- фрейм.
+Результат -- истина, если надо фрейм показывать, иначе ложь.
+
+Например, чтобы скрыть фреймы функции ew::mlt-do-jmp
+
+```
+(setf clco::*filter-frames* 
+  (lambda (x) 
+    (let ((r t)) 
+      (ignore-errors 
+        (when (eq (sb-di::debug-fun-name (sb-di::frame-debug-fun x)) 
+                  (intern "MLT-DO-JMP" 'ew)) 
+          (setf r nil))) 
+      r)))
+```
