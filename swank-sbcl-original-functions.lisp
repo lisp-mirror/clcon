@@ -25,3 +25,7 @@
                      `(:position ,(1+ pos))
                      `(:snippet ,snippet)))))
 
+(defun swank/sbcl-original-nth-frame (index)
+  (do ((frame *sldb-stack-top* (sb-di:frame-down frame))
+       (i index (1- i)))
+      ((zerop i) frame)))
