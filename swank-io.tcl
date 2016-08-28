@@ -548,6 +548,11 @@ proc ::tkcon::AttachSwank {name continuation} {
         
         ::tkcon::SetupSwankConnection $sock $PRIV(console) [list ::tkcon::AttachSwankTail $continuation]
 
+        # Для запуска файлов из командной строки
+        if {[info proc ::AttachSwankHook] != {}} {
+            ::AttachSwankHook
+            }    
+
         return
 
     } elseif { $con(state) eq "initialized" } {
@@ -558,7 +563,6 @@ proc ::tkcon::AttachSwank {name continuation} {
         myerror "Unexpected state $con(state)"
     }
 
-    
     ::tkcon::AttachSwankTail $continuation
 }
 

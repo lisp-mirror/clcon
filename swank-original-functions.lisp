@@ -40,15 +40,30 @@ frame."
         (list* i (frame-to-string frame)
                (ecase (frame-restartable-p frame)
                  ((nil) nil)
-                 ((t) `((:restartable t)))))))(defslimefun swank-original-backtrace (start end)
-  "Return a list ((I FRAME PLIST) ...) of frames from START to END.
-
-I is an integer, and can be used to reference the corresponding frame
-from Emacs; FRAME is a string representation of an implementation's
-frame."
-  (loop for frame in (compute-backtrace start end)
-        for i from start collect 
-        (list* i (frame-to-string frame)
-               (ecase (frame-restartable-p frame)
-                 ((nil) nil)
                  ((t) `((:restartable t)))))))
+
+
+(defslimefun swank-original-ed-in-emacs (&optional what)
+  "Edit WHAT in Emacs.
+
+WHAT can be:
+  A pathname or a string,
+  A list (PATHNAME-OR-STRING &key LINE COLUMN POSITION),
+  A function name (symbol or cons),
+  NIL. "
+  (flet ((canonicalize-filename (filename)
+           (pathname-to-filename (or (probe-file filename) filename))))
+    (let ((target 
+           (etypecase what
+             (null nil)
+             ((or string pathname) 
+              `(:filename ,(canonicalize-filename what)))
+             ((cons (or string pathname) *)
+              `(:filename ,(canonicalize-filename (car what)) ,@(cdr what)))
+             ((or symbol cons)
+              `(:function-name ,(prin1-to-string what))))))
+      (cond (*emacs-connection* (send-oob-to-emacs `(:ed ,target)))
+            ((default-connection)
+             (with-connection ((default-connection))
+               (send-oob-to-emacs `(:ed ,target))))
+            (t (error "No connection"))))))

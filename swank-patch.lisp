@@ -195,3 +195,46 @@ frame."
                (ecase (swank::frame-restartable-p frame)
                  ((nil) nil)
                  ((t) `((:restartable t)))))))
+
+
+(def-patched-swank-fun swank::ed-in-emacs (&optional what (in-which-connection :default))
+  "Edit WHAT in Emacs.
+
+WHAT can be:
+  A pathname or a string,
+  A list (PATHNAME-OR-STRING &key LINE COLUMN POSITION),
+  A function name (symbol or cons),
+  NIL. 
+
+  in-which-connection может быть либо :default, тогда в (default-connection, 
+  либо :first-but-not-this, тогда выбирается самая ранняя, но не текущая сессия связи с клиентом 
+"
+  (flet ((canonicalize-filename (filename)
+           (swank::pathname-to-filename (or (probe-file filename) filename))))
+    (let ((target 
+           (etypecase what
+             (null nil)
+             ((or string pathname) 
+              `(:filename ,(canonicalize-filename what)))
+             ((cons (or string pathname) *)
+              `(:filename ,(canonicalize-filename (car what)) ,@(cdr what)))
+             ((or symbol cons)
+              `(:function-name ,(prin1-to-string what)))))
+          (connection
+           (ecase in-which-connection
+             (:default
+              (or swank::*emacs-connection*
+                  (swank::default-connection)
+                  (error "Нет связи с клиентом SWANK")))
+             (:first-but-not-this
+              (cond
+               (swank::*emacs-connection*
+                (find-if (lambda (conn) (not (eq conn swank::*emacs-connection*))) swank::*connections*))
+               (swank::*connections*
+                (first swank::*connections*))
+               (t (error "Нет подходящего соединения с клиентом SWANK"))))))
+          )
+      (cond ((eq connection swank::*emacs-connection*) (swank::send-oob-to-emacs `(:ed ,target)))
+            (t
+             (swank::with-connection (connection)
+               (swank::send-oob-to-emacs `(:ed ,target))))))))
