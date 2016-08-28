@@ -40,4 +40,15 @@ frame."
         (list* i (frame-to-string frame)
                (ecase (frame-restartable-p frame)
                  ((nil) nil)
+                 ((t) `((:restartable t)))))))(defslimefun swank-original-backtrace (start end)
+  "Return a list ((I FRAME PLIST) ...) of frames from START to END.
+
+I is an integer, and can be used to reference the corresponding frame
+from Emacs; FRAME is a string representation of an implementation's
+frame."
+  (loop for frame in (compute-backtrace start end)
+        for i from start collect 
+        (list* i (frame-to-string frame)
+               (ecase (frame-restartable-p frame)
+                 ((nil) nil)
                  ((t) `((:restartable t)))))))
