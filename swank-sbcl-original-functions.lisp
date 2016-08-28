@@ -1,6 +1,6 @@
 ; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server -*- 
 (in-package :swank/sbcl)
-
+(named-readtables:in-readtable nil)
 ;; there are functions we patch. Their copies with swank/sbcl-original- prefix are given here
 ;; we could also use decorate-function
 
@@ -25,10 +25,6 @@
                      `(:position ,(1+ pos))
                      `(:snippet ,snippet)))))
 
-(defun swank/sbcl-original-nth-frame (index)
-  (do ((frame *sldb-stack-top* (sb-di:frame-down frame))
-       (i index (1- i)))
-      ((zerop i) frame)))
 (defun swank/sbcl-original-nth-frame (index)
   (do ((frame *sldb-stack-top* (sb-di:frame-down frame))
        (i index (1- i)))
