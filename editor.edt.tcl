@@ -407,6 +407,14 @@ namespace eval ::edt {
         return $btext
     }
 
+
+    proc OtkrytqFajjlVDrugomEHkzemplyareIVyjjti {filename} {
+        set uImyaFajjla [::WindowsFileNameToUnix $filename]
+        set qImyaFajjla [::tkcon::QuoteTclStringForLisp $uImyaFajjla]
+        set ComandaLispu "(swank::ed-in-emacs $qImyaFajjla :first-but-not-this)"
+        ::tkcon::EvalInSwankAsync $ComandaLispu {exit} t
+    }
+
     proc oImplementation {commandNameWoPrefix} {
         set fn [string cat "odu::" $commandNameWoPrefix "-command"]
         set w [CurrentlyVisibleBuffer]
