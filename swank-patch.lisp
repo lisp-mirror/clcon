@@ -175,3 +175,7 @@
 
 
 
+(defun swank/sbcl::nth-frame (index)
+  (do ((frame swank/sbcl::*sldb-stack-top* (and frame (sb-di:frame-down frame)))
+       (i index (1- i)))
+      ((zerop i) frame)))
