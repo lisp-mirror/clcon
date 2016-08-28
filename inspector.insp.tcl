@@ -69,6 +69,44 @@ namespace eval ::insp {
         InitInspector $LispExpr
     }
 
+    proc NextPart {w begin end} {
+        ::tkcon::EvalInSwankAsync "(swank:inspector-range $begin $end)" "::insp::NextPartCont $w \$EventAsList" :repl-thread     
+    }
+
+    proc NextPartCont { w EventAsList } {
+        set InspectedContentU [::insp::ParseReturnOk $EventAsList]
+        set InspectedData [::mprs::Unleash [lindex $InspectedContentU 0]]
+        set InspectedMagicNumbers [lmap x [lrange $InspectedContentU 1 end] {::mprs::Unleash $x} ]
+        putd $InspectedMagicNumbers
+        set ObjectTooLarge [expr { [lindex $InspectedMagicNumbers 0] > [lindex $InspectedMagicNumbers 2] } ]
+
+        # bind var for convenience
+        set b [BodyTextOfInspector $w]
+                
+        foreach s $InspectedData {
+            if {[::mprs::Consp $s] == 1} {
+                set item [::mprs::Unleash $s]
+                if {[lindex $item 0] eq {:value}} {
+                    ::tkcon::WriteActiveText $b \
+                        [::mprs::Unleash [lindex $item 1]] \
+                        end \
+                        "insp::InspectNthPart $w [::mprs::Unleash [lindex $item 2]]"
+                } else {
+                    $b RoInsert end "Я не знаю, что такое $s"
+                }
+            } else {
+                $b RoInsert end [::mprs::Unleash $s]
+            }
+        }
+        if { $ObjectTooLarge } {
+#            set tag [::tkcon::UniqueTag $b]
+#            $b tag configure $tag -foreground Red
+#            $b RoInsert end {[ Object too large to inspect ]} $tag
+             NextPart $w [lindex $InspectedMagicNumbers 2] [lindex $InspectedMagicNumbers 0]
+        }
+
+    }
+
     proc ParseReturnOk { EventAsList } {
         ::mprs::ParseReturnOk $EventAsList
     }
@@ -102,9 +140,9 @@ namespace eval ::insp {
         [TitleOfInspector $w] RoInsert 1.0 "$InspectedTitle\nВолшебные числа: $InspectedMagicNumbers"
 
         if { $ObjectTooLarge } {
-            set tag [::tkcon::UniqueTag $b]
-            $b tag configure $tag -foreground Red
-            $b RoInsert end {[ Object too large to inspect ]} $tag
+#            set tag [::tkcon::UniqueTag $b]
+#            $b tag configure $tag -foreground Red
+#            $b RoInsert end {[ Object too large to inspect ]} $tag
         }
         foreach s $InspectedData {
             if {[::mprs::Consp $s] == 1} {
@@ -122,9 +160,7 @@ namespace eval ::insp {
             }
         }
         if { $ObjectTooLarge } {
-            set tag [::tkcon::UniqueTag $b]
-            $b tag configure $tag -foreground Red
-            $b RoInsert end {[ Object too large to inspect ]} $tag
+             NextPart $w [lindex $InspectedMagicNumbers 2] [lindex $InspectedMagicNumbers 0]
         }
     }
 
