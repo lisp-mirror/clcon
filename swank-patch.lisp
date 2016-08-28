@@ -179,3 +179,19 @@
   (do ((frame swank/sbcl::*sldb-stack-top* (and frame (sb-di:frame-down frame)))
        (i index (1- i)))
       ((zerop i) frame)))
+
+(defvar *filter-frames* nil)
+
+(def-patched-swank-fun swank::backtrace (start end)
+  "Return a list ((I FRAME PLIST) ...) of frames from START to END.
+
+I is an integer, and can be used to reference the corresponding frame
+from Emacs; FRAME is a string representation of an implementation's
+frame."
+  (loop for frame in (swank::compute-backtrace start end)
+        for i from start
+        when (or (not *filter-frames*) (funcall *filter-frames* frame))
+        collect (list* i (swank::frame-to-string frame)
+               (ecase (swank::frame-restartable-p frame)
+                 ((nil) nil)
+                 ((t) `((:restartable t)))))))
