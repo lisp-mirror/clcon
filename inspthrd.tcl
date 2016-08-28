@@ -1,7 +1,7 @@
 namespace eval ::inspthrd {
 
     proc ShowThreads {} {
-        ::tkcon::EvalInSwankAsync "(swank:list-threads)" "::inspthrd::ShowThreadsCont \$EventAsList" :repl-thread                         
+        ::tkcon::EvalInSwankAsync "(swank:list-threads)" "::inspthrd::ShowThreadsCont \$EventAsList" t                        
     }
 
     proc ShowThreadsCont {EventAsList} {
