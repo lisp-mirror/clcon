@@ -82,6 +82,8 @@ namespace eval ::insp {
 
         # bind var for convenience
         set b [BodyTextOfInspector $w]
+        # 20 -- длина "Продолжить загрузку" + 1
+        $b RoDelete {end - 20 chars} end 
                 
         foreach s $InspectedData {
             if {[::mprs::Consp $s] == 1} {
@@ -99,10 +101,10 @@ namespace eval ::insp {
             }
         }
         if { $ObjectTooLarge } {
-#            set tag [::tkcon::UniqueTag $b]
-#            $b tag configure $tag -foreground Red
-#            $b RoInsert end {[ Object too large to inspect ]} $tag
-             NextPart $w [lindex $InspectedMagicNumbers 2] [lindex $InspectedMagicNumbers 0]
+             ::tkcon::WriteActiveText $b \
+             "Продолжить загрузку" \
+             end \
+             "insp::NextPart $w [lindex $InspectedMagicNumbers 2] [lindex $InspectedMagicNumbers 0]"
         }
 
     }
@@ -139,11 +141,6 @@ namespace eval ::insp {
         
         [TitleOfInspector $w] RoInsert 1.0 "$InspectedTitle\nВолшебные числа: $InspectedMagicNumbers"
 
-        if { $ObjectTooLarge } {
-#            set tag [::tkcon::UniqueTag $b]
-#            $b tag configure $tag -foreground Red
-#            $b RoInsert end {[ Object too large to inspect ]} $tag
-        }
         foreach s $InspectedData {
             if {[::mprs::Consp $s] == 1} {
                 set item [::mprs::Unleash $s]
@@ -160,7 +157,10 @@ namespace eval ::insp {
             }
         }
         if { $ObjectTooLarge } {
-             NextPart $w [lindex $InspectedMagicNumbers 2] [lindex $InspectedMagicNumbers 0]
+             ::tkcon::WriteActiveText $b \
+             "Продолжить загрузку" \
+             end \
+             "insp::NextPart $w [lindex $InspectedMagicNumbers 2] [lindex $InspectedMagicNumbers 0]"
         }
     }
 
