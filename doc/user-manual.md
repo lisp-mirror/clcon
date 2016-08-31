@@ -310,7 +310,7 @@ get help via pressing f1.
 ```
 (setf clco::*filter-frames* 
   (lambda (x) 
-    (let ((r t)) 
+    (let* ((*break-on-signals* nil)(r t)) 
       (ignore-errors 
         (when (eq (sb-di::debug-fun-name (sb-di::frame-debug-fun x)) 
                   (intern "MLT-DO-JMP" 'ew)) 
