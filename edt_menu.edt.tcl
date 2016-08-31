@@ -373,7 +373,7 @@ namespace eval ::edt {
         set cmd [list $btext ResetBackendBuffer]
         $m add command -label "Разморозить буфер в tcl/tk и пересоздать буфер одуванчика" -command $cmd
 
-        set cmd [list ::tkcon::EvalInSwankAsync "(clco::compare-clcon_text-and-oduvanchik-buffer-contents \"$btext\")" {} {:find-existing}]
+        set cmd [list ::tkcon::EvalInSwankAsync "(clco::compare-clcon_text-and-oduvanchik-buffer-contents \"$btext\")" {} ${::tkcon::find-existing}]
         $m add command -label "Проверить совпадение буфера одуванчика и tcl/tk" -accel "F8" -command $cmd
         bind NoMod$w <F8> $cmd
 

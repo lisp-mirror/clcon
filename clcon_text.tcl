@@ -485,7 +485,7 @@ namespace eval ::clcon_text {
                 -1 $clcon_text $UseGlobalPendingText2OduEventCounter
         }]
         # putd "632017 MaybeSendToLisp: about to send $lispCmd with cont $continuation"
-        ::tkcon::EvalInSwankAsync $lispCmd $continuation {:find-existing}
+        ::tkcon::EvalInSwankAsync $lispCmd $continuation ${::tkcon::find-existing}
     }
 
     # This is "static" protection. And what if script calls function which returns code?

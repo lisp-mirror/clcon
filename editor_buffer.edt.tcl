@@ -88,7 +88,7 @@ namespace eval ::edt {
         ::edt::Save $Bi $clcon_text 0
         set form "(clco::compile-file-for-tcl \"$clcon_text\" $qFileName)"
         ::tkcon::FocusConsole
-        ::tkcon::SendEventToSwank $form {} 1 {:find-existing}
+        ::tkcon::SendEventToSwank $form {} 1 ${::tkcon::find-existing}
     }
 
     # Note we do not save file and 
@@ -97,7 +97,7 @@ namespace eval ::edt {
         set FileName [$opened_file cget -filename]
         set qFileName [::tkcon::QuoteLispObjToString $FileName]
         set form "(clco::find-current-file-declarations $qFileName)"
-        ::tkcon::SendEventToSwank $form {} 1 {:find-existing}
+        ::tkcon::SendEventToSwank $form {} 1 ${::tkcon::find-existing}
     }
 
 

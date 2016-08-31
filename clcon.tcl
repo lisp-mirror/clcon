@@ -31,6 +31,10 @@ encoding system utf-8
 namespace eval ::tkcon {
     variable ScriptDirectory 
     set ScriptDirectory [file dirname [info script]]
+    # it was :find-existing
+    variable find-existing 
+    set find-existing :post-message-thread
+    # Никогда не будем использовать :find-existing, т.к. он не для того создан. Пока ставим t вместо него.
 }
 
 

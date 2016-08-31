@@ -238,3 +238,24 @@ WHAT can be:
             (t
              (swank::with-connection (connection)
                (swank::send-oob-to-emacs `(:ed ,target))))))))
+
+(defvar *post-message-thread* nil "Процесс специально для раздачи сообщений в очереди. Некое подобие пула тредов из одного треда. Подразумевается, что будем вызывать из ::tkcon::EvalInSwankAsync c идентификатором треда {:post-message-thread}, и каждое сообщение будет быстренько класть сообщение в ту или иную очередь")
+
+(defun ensure-post-message-thread (connection)
+  "По образцу swank::post-message-thread"
+  (or *post-message-thread*
+      (setf *post-message-thread*
+            (swank::spawn (lambda ()
+                            (post-message-thread-function connection))
+                          :name "post-message-thread"))))
+
+(defun post-message-thread-function (connection)
+  (swank::with-bindings
+   swank::*default-worker-thread-bindings*
+   (swank::with-top-level-restart (connection nil)
+    (loop
+      (apply #'swank::eval-for-emacs 
+             (cdr (swank::wait-for-event `(:emacs-rex-rt . _))))))))
+
+(defmethod swank::thread-for-evaluation ((connection swank::multithreaded-connection) (id (eql :post-message-thread)))
+  (ensure-post-message-thread connection))

@@ -283,7 +283,7 @@ namespace eval ::erbr {
         puts "Force loading $faslfile..."
         # ::tkcon::EvalInSwankAsync 
         ::tkcon::SendEventToSwank "(common-lisp:load $qFaslfile)" \
-            {::erbr::CloseErrorBrowser} 1 {:find-existing}
+            {::erbr::CloseErrorBrowser} 1 ${::tkcon::find-existing}
     }
     
     proc FillHeaderText { clcon_text } {

@@ -20,7 +20,7 @@ namespace eval ::clconcmd_inner {
   (clco:FILES-BY-GLOB-LIST $lisp_globs))"
        
         ::tkcon::FocusConsole
-        ::tkcon::SendEventToSwank $lisp_cmd {puts ""} 1 {:find-existing}
+        ::tkcon::SendEventToSwank $lisp_cmd {puts ""} 1 ${::tkcon::find-existing}
     }
 }
 
