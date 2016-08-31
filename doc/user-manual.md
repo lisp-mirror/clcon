@@ -286,15 +286,11 @@ Read issues
 
 Список нитей (тредов, потоков исполнения) и отладка потоков
 ------------------
-We have no GUI to debug threads. But we can get list of threads with 
-`(swank:list-threads)`, and then debug thread by its number in a list (not by thread id)
-with `(swank:debug-nth-thread <N>)` . Numbers are zero-based (not counting header). 
+Ctrl-Shift-T. 
  
 Подсветка синтаксиса
 ------------------
-Code highlighting is now rather humble. Поддерживается lisp и tcl. По умолчанию фалы красятся в лисп. 
-Also we have basic paren highlighting - when you stand after closing paren, editor highlights
-appropriate opening paren. 
+Поддерживается lisp и tcl. По умолчанию файлы красятся в лисп. Также у нас есть подсветка открывающей скобки для данной закрывающей в лиспе. 
 
 Справка по лисповым символам
 ----------------------------
@@ -319,5 +315,14 @@ get help via pressing f1.
         (when (eq (sb-di::debug-fun-name (sb-di::frame-debug-fun x)) 
                   (intern "MLT-DO-JMP" 'ew)) 
           (setf r nil))) 
-      r)))
+      r))
 ```
+
+Запуск команд ОС
+----------------
+(uiop/run-program:run-program "dir" :output t :external-format :cp866)
+
+Открыть URL
+-----------
+(clco::open-url "http:/ya.ru")
+
