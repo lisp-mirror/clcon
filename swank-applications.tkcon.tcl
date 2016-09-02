@@ -47,7 +47,7 @@ proc ::tkcon::ExpandLispSymbol {w str tmp} {
     set PackageName [QuoteLispObjToString $PRIV(CurrentPackageDisplayName)]
     set LispCmd "(swank:completions $Quoted '$PackageName)"
     set OnReply [concat ::tkcon::ExpandLispSymbolC1 [list $w $str $tmp] "\$EventAsList"]]
-    EvalInSwankAsync $LispCmd $OnReply ${::tkcon::find-existing}
+    EvalInSwankAsync $LispCmd $OnReply t
     return -code 12120374 ""
 }
 

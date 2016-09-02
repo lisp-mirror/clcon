@@ -63,7 +63,7 @@ Currently defined commands are: "
         set qStr [::tkcon::QuoteLispObjToString $str]
         set form "(cl:apropos $qStr)" 
         ::tkcon::FocusConsole
-        ::tkcon::SendEventToSwank $form {puts ""} 1 ${::tkcon::find-existing}
+        ::tkcon::SendEventToSwank $form {puts ""} 1 t
     }
 
     # Find in clcon sources 
@@ -71,7 +71,7 @@ Currently defined commands are: "
         set qStr [::tkcon::QuoteLispObjToString $str]
         set form "(clco::find-in-clcon-sources $qStr)" 
         ::tkcon::FocusConsole
-        ::tkcon::SendEventToSwank $form {puts ""} 1 ${::tkcon::find-existing}
+        ::tkcon::SendEventToSwank $form {puts ""} 1 t
     }
 
     # 
