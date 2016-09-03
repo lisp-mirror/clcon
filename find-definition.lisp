@@ -41,14 +41,96 @@
       (swank::find-definitions symbol))))
 
 
+(defun yar-name (pathname)
+  (let ((name (namestring pathname)))
+    (parse-namestring (subseq name  0 (- (length name) 5)))))
+;  (translate-pathname pathname "*.lisp" "*"))
+
+(defun get-yar-proc (file procname)
+ (let* ((search (format nil "функция ~a(" procname))
+        (l (length search))
+        (n 0))
+   (with-open-file (in file :direction :input)
+     (loop
+       (let* ((str (read-line in))
+              (ls (length str)))
+         (setf n (+ n ls))
+         (when (and (> ls l)
+                    (string= (subseq str 0 l) search))
+           (return-from get-yar-proc n)))))))
+
+(defun fix-offset-2 (pathname offset)
+  "Имеется числовой offset, к-рый вернул file-position. Давайте попробуем превратить его в 
+  row-col-offset. См. также BUDDEN-TOOLS::input-stream-position-in-chars"
+  #|(with-open-file (stream pathname)
+    (let ((map (budden-tools::ensure-file-position-to-char-position-for-stream stream)))
+       (budden-tools::file-position-and-map-to-char-position offset map)))|#
+    (let ((row 1)
+          (col 0)
+          (procname nil)
+          (shift nil)
+          (buf "")
+          (state nil)
+          (b-offset 0)) ; = f-offset
+      (with-open-file (in pathname :direction :input)
+        (loop
+          (let ((char (read-char in nil nil)))
+            (when (>= (file-position in) offset)
+              (return-from fix-offset-2 
+                           (if (and procname shift)
+                               (let ((yarname (yar-name pathname)))
+                                 (values yarname
+                                         (+ (get-yar-proc yarname procname) 
+                                            shift 1)))
+                               (values pathname (1+ b-offset)))))
+            (etypecase char
+              (null
+               (warn "fix-offset-2: approached EOF")
+               (return-from fix-offset-2 0))
+              (character
+               (case char 
+                 (#\Newline
+                  (incf row)
+                  (incf b-offset)
+                  (setf col 0)
+                  (when (eq state 'l-2)
+                    (setf shift (parse-integer buf :junk-allowed t)))
+                  (setf state nil buf ""))
+                 (#\Return
+                  (warn "fix-offset-2: got Return character!"))
+                 (t
+                  (cond
+                   ((and (eq state nil) (char= char #\()) (setf state 'defyarfun-0))
+                   ((and (eq state 'defyarfun-0) (char= char #\d)) (setf state 'defyarfun-1))
+                   ((and (eq state 'defyarfun-1) (char= char #\e)) (setf state 'defyarfun-2))
+                   ((and (eq state 'defyarfun-2) (char= char #\f)) (setf state 'defyarfun-3))
+                   ((and (eq state 'defyarfun-3) (char= char #\y)) (setf state 'defyarfun-4))
+                   ((and (eq state 'defyarfun-4) (char= char #\a)) (setf state 'defyarfun-5))
+                   ((and (eq state 'defyarfun-5) (char= char #\r)) (setf state 'defyarfun-6))
+                   ((and (eq state 'defyarfun-6) (char= char #\f)) (setf state 'defyarfun-7))
+                   ((and (eq state 'defyarfun-7) (char= char #\u)) (setf state 'defyarfun-8))
+                   ((and (eq state 'defyarfun-8) (char= char #\n)) (setf state 'defyarfun-9))
+                   ((and (eq state 'defyarfun-9) (char= char #\space)) (setf state 'defyarfun-10))
+                   ((eq state 'defyarfun-10) (if (char= char #\space)
+                                                 (setf procname buf buf "" state nil)
+                                                 (setf buf (concatenate 'string buf (list char)))))
+                   ((and (eq state nil) (char= char #\;)) (setf state 'l-0))
+                   ((and (eq state 'l-0) (char= char #\l)) (setf state 'l-1))
+                   ((and (eq state 'l-1) (char= char #\space)) (setf state 'l-2))
+                   ((eq state 'l-2) (if (char= char #\space)
+                                        (setf state nil shift (parse-integer buf :junk-allowed t) buf "")
+                                        (setf buf (concatenate 'string buf (list char))))))
+                  (incf b-offset)
+                  (incf col))))))))))
+  
 (defun edit-file-at-offset-code (file offset fix-offset-p)
+  (when fix-offset-p
+    (multiple-value-bind (newfile offset-15) (fix-offset-2 file offset)
+      (setf file newfile offset offset-15)))
   (let* ((escaped-file (tcl-escape-filename file))
-         (offset-15
-          (if fix-offset-p
-              (editor-budden-tools::fix-offset-2 file offset)
-              offset))
+;              (editor-budden-tools::fix-offset-2 file offset)
          (offset-2 (format nil "{1.0+ ~A chars}"
-                           offset-15
+                           offset
                            )))
     (format nil "::tkcon::EditFileAtOffset ~A ~A" escaped-file offset-2)))
 
