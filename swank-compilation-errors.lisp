@@ -69,7 +69,7 @@
   (declare (ignore load-p options))
   (let* ((q-pathname (clco::tcl-escape-filename filename)))
     (format t "~%Loading ~A into tcl...~%" q-pathname)
-    (eval-in-tcl (format nil "source ~A" q-pathname)
+    (eval-in-tcl (format nil "namespace eval :: source ~A" q-pathname)
                  )))
 
 

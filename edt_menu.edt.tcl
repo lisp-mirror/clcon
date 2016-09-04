@@ -332,7 +332,7 @@ namespace eval ::edt {
         set m [cMenuBar .tcl]
         ::gui_util::ClearMenu $m
         
-        set SendToSlave [wesppt "puts {Если вы редактируете файл, рекомендуется вместо данной команды использовать команду 'Сохранить, компилировать и загрузить этот файл', чтобы была возможность переходить к определениям процедур\nЗагружаю ваш буфер...}; ::tkcon::EvalSlave eval \[$btext get 1.0 end-1c\]; puts Done"]
+        set SendToSlave [wesppt "puts {Если вы редактируете файл, рекомендуется вместо данной команды использовать команду 'Сохранить, компилировать и загрузить этот файл', чтобы была возможность переходить к определениям процедур\nЗагружаю ваш буфер...}; ::tkcon::EvalSlave namespace eval :: \[$btext get 1.0 end-1c\]; puts Done"]
         $m add command -label "1. Отправить текст в подчинённый интерпретатор" \
             -underline 0 -command $SendToSlave
 
