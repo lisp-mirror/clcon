@@ -234,6 +234,47 @@ proc ::mprs::EvalInTclSync {EventAsList} {
     return     
 }
 
+proc ::mprs::DoReadString {EventAsList} {
+    set ThreadId [Unleash [lindex $EventAsList 1]]
+    set Tag [Unleash [lindex $EventAsList 2]]
+
+    set _ok ""
+    set t ".inputString"
+    if {[winfo exists $t]} {
+        ::tkcon::SendEventToSwank "(:emacs-return-string $ThreadId $Tag \"\")" {} 2        
+        destroy $t
+        return
+    }
+    toplevel $t
+    wm title . "Введите строку"
+    wm protocol $t WM_DELETE_WINDOW "set _ok 0"
+    set f1 [frame $t.f1]
+    set f2 [frame $t.f2]
+    pack $f1 -side top -expand 1 -fill both
+    pack $f2 -side top -expand 1 -fill both
+
+    set f [frame $f1.f]
+    entry $f.e
+    pack $f -side top -expand 1 -fill both
+    pack $f.e -side left -expand 1 -fill both
+
+    button $f2.bOk -text "OK" -command "set _ok 1"
+    button $f2.bCancel -text "Отмена" -command "set _ok 0"
+
+    pack $f2.bOk $f2.bCancel -side left
+    focus $f1.f.e
+
+    #wait for button
+    vwait _ok
+    if {$_ok==0} {
+        destroy $t
+        set tmp ""
+    } else {
+        set tmp [$f1.f.e get]
+    }
+    ::tkcon::SendEventToSwank "(:emacs-return-string $ThreadId $Tag \"$tmp\")" {} 2
+}
+
 # this is an async event received from swank. Process it. E.g. call a continuation
 # Я точно не помню, но похоже, что swank отправляет его через swank::send-to-emacs 
 proc ::mprs::ProcessAsyncEvent {EventAsList} {
@@ -265,6 +306,8 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
         ::edt::ProcessEdRequest $EventAsList
     } elseif { $Head eq ":ping" } {
         ::swcnn::Pong $EventAsList
+    } elseif { $Head eq ":read-string" } {
+        ::mprs::DoReadString $EventAsList
     } elseif { [ContinuationExistsP $ContinuationId ] == 1 && [lsearch -exact [list ":return"] $Head] >= 0 } {
         # we should have generated event which would evaluate continuation later.
         # but what we will do with sync events then?
