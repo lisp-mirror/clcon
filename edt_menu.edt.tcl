@@ -199,6 +199,9 @@ namespace eval ::edt {
         set cmd [wesppt [list ::edt::FindSymbolCommand $btext]]
         $m add command -label "Скопировать идентф-р в буфер обмена" -accel "Key-F2" -command $cmd
         ::clcon_key::b bind SingleMod$w <Key-F2> $cmd
+
+        set cmd [wesppt [list ::edt::FindPackage $btext]]
+        $m add command -label "Перейти к определению пакета" -command $cmd
     }
 
     proc EnableDisableMenuItems {} {

@@ -117,6 +117,13 @@
                                            (odu::readtable-at-point))))
       code)))
 
+(defcommand "Find Package" (p)
+    "Find package source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
+    ""
+  (clco:server-lookup-definition (odu::package-at-point)
+                                 (odu::package-at-point)
+                                 (odu::readtable-at-point)))
+
 (defcommand "Find Symbol" (p)
     "Find symbol with swank machinery."
     ""
