@@ -148,7 +148,7 @@
     (unwind-protect
          (when (and (bt:threadp *highlight-dispatcher-thread*)
                     (bt:thread-alive-p *highlight-dispatcher-thread*))
-           (post-oduvan-event
+           (post-highlight-event
             (make-highlight-event
              :kind 'shutdown-highlight-dispatcher
              ))
