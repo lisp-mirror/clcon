@@ -1,4 +1,4 @@
-#!/bin/sh
+﻿#!/bin/sh
 # -*- tcl -*-
 # \
 exec wish "$0" ${1+"$@"}
@@ -119,6 +119,8 @@ namespace eval ::tkcon {
     set PRIV(AQUA) [expr {$::tcl_version >= 8.4 && [tk windowingsystem] == "aqua"}]
     set PRIV(CTRL) [expr {$PRIV(AQUA) ? "Command-" : "Control-"}]
     set PRIV(ACC) [expr {$PRIV(AQUA) ? "Command-" : "Ctrl+"}]
+
+    set PRIV(OstanovitqServerSwank) 0
 
     variable EXPECT 0
     # 1 - enable unknown from tkcon, 0 - disable. Processed at startup only (I guess)
@@ -1269,10 +1271,11 @@ proc ::tkcon::InitMenus {w title} {
         ## Recent menu
         set s $m.recent
         menu $s -disabledforeground $COLOR(disabled) -postcommand [list ::recent::RecentMenu $m]
- 	$m add cascade -label "5.Открыть недавний..." -underline 0 -underline 0 -menu $s
+ 	$m add cascade -label "5.Открыть недавний..." -underline 0 -menu $s
 
 	$m add separator
-	$m add command -label "Выход" -command ::tkcon::Destroy -accel "Control-W"
+	$m add command -label "Выход из сервера и клиента" -command ::tkcon::Destroy -accel "Control-W"
+	$m add command -label "6.Выход из клиента" -command "::tkcon::Destroy 0" -underline 0
     }
         
     ## Console Menu
@@ -1283,6 +1286,8 @@ proc ::tkcon::InitMenus {w title} {
 
         $m add command -label "1.Подключиться к текстовому лисп-серверу SWANK" -underline 0 -command "::tkcon::OuterNewSwank"
         $m add command -label "2.Отключиться от текстового лисп-сервера SWANK" -underline 0 -command "::tkcon::DisconnectFromSwank"
+        $m add command -label "3.Принудительно остановить подключенный лисп-сервер SWANK" -command "::tkcon::ПринудительноОстановитьСерверТекущегоПодключенияSwank 0"
+
         set WarnOnClear {"Я не знаю, находимся ли мы сейчас в состоянии вычисления.\
  Я напечатаю для вас подсказку, но если ваш текстовый лисп-сервер SWANK не отвечает,\
  то эта подсказка не заставить его работать снова. В этом случае попытайтесь\
@@ -1290,7 +1295,7 @@ proc ::tkcon::InitMenus {w title} {
 
         # This is a FIXME. Best way to fix is not to print prompt at all and to just collect all characters which user prints. Completion and other context-dependent actions will be disbled until prompt occurs.
         
-	$m add command -label "3.Очистить консоль" \
+	$m add command -label "4.Очистить консоль" \
             -underline 0 \
             -command "\
   clear; \
@@ -2209,45 +2214,8 @@ proc ::tkcon::MainInit {} {
 	return $interp
     }
 
-    ## ::tkcon::New - create new console window
-    ## Creates a slave interpreter and sources in this script.
-    ## All other interpreters also get a command to eval function in the
-    ## new interpreter.
-    ## 
-    proc ::tkcon::New {} {
-	variable PRIV
-	global argv0 argc argv
-
-	set tmp [GetSlave]
-	lappend PRIV(slaves) $tmp
-	load {} Tk $tmp
-	# If we have tbcload, then that should be autoloaded into slaves.
-	set idx [lsearch [info loaded] "* Tbcload"]
-	if {$idx != -1} { catch {load {} Tbcload $tmp} }
-	lappend PRIV(interps) [$tmp eval [list tk appname \
-		"[tk appname] $tmp"]]
-	if {[info exists argv0]} {$tmp eval [list set argv0 $argv0]}
-	if {[info exists argc]}  {$tmp eval [list set argc $argc]}
-	if {[info exists argv]}  {$tmp eval [list set argv $argv]}
-	$tmp eval [list namespace eval ::tkcon {}]
-	$tmp eval [list set ::tkcon::PRIV(name) $tmp]
-	$tmp eval [list set ::tkcon::PRIV(SCRIPT) $::tkcon::PRIV(SCRIPT)]
-	$tmp alias exit				::tkcon::Exit $tmp
-	$tmp alias ::tkcon::Destroy		::tkcon::Destroy $tmp
-	$tmp alias ::tkcon::New			::tkcon::New
-	$tmp alias ::tkcon::GetSlave		::tkcon::GetSlave $tmp
-	$tmp alias ::tkcon::Main		::tkcon::InterpEval Main
-	$tmp alias ::tkcon::Slave		::tkcon::InterpEval
-	$tmp alias ::tkcon::Interps		::tkcon::Interps
-	$tmp alias ::tkcon::NewDisplay		::tkcon::NewDisplay
-	$tmp alias ::tkcon::Display		::tkcon::Display
-	$tmp eval {
-	    if [catch {source -rsrc tkcon}] { source $::tkcon::PRIV(SCRIPT) }
-	}
-	return $tmp
-    }
-
     ## ::tkcon::Exit - full exit OR destroy slave console
+    ## Не факт, что эта ф-я ещё нужна
     ## This proc should only be called in the main interpreter from a slave.
     ## The master determines whether we do a full exit or just kill the slave.
     ## 
@@ -2278,37 +2246,39 @@ proc ::tkcon::MainInit {} {
     }
     
     ## ::tkcon::Destroy - destroy console window
+    ## Это описание явно устарело - у нас явно сломаны вспомогательные консольные окна. Эта функция у нас выходит из clcon. 
     ## This proc should only be called by the main interpreter.  If it is
     ## called from there, it will ask before exiting tkcon.  All others
     ## (slaves) will just have their slave interpreter deleted, closing them.
     ## 
-    proc ::tkcon::Destroy {{slave {}}} {
+    proc ::tkcon::Destroy {{OstanovitqServerSwank 1}} {
 	variable PRIV
 
         if {![::tkcon::CheckIfEditorAllowsToExitAndSayToUser]} {
             return
         }
         
-	# Just close on the last one
-	if {[llength $PRIV(interps)] == 1} { exit }
+	# Мы умеем только закрывать последний интерпретатор
+	if {[llength $PRIV(interps)] != 1} { 
+            error "В прошлом мы понимали, как работать с несколькими интерпретаторами TCL, но эти времена прошли. Если это нужно, см. исходники tkcon"
+        }
         
-	if {"" == $slave} {
-	    ## Main interpreter close request
-	    if {[tk_messageBox -parent $PRIV(root) -title "Выйти из clcon?" \
-		     -message "Закрыть все окна и выйти из clcon?" \
-		     -icon question -type yesno] == "yes"} { exit }
-	    return
-	} elseif {$slave == $::tkcon::OPT(exec)} {
-	    set name  [tk appname]
-	    set slave "Main"
-	} else {
-	    ## Slave interpreter close request
-	    set name [InterpEval $slave]
-	    interp delete $slave
-	}
-	set PRIV(interps) [lremove $PRIV(interps) [list $name]]
-	set PRIV(slaves)  [lremove $PRIV(slaves) [list $slave]]
-	StateCleanup $slave
+        if {$OstanovitqServerSwank == 1} {
+            set msg "Закрыть все окна, остановить сервер SWANK и выйти из клиентской части clcon?"
+        } else {
+            set msg "Закрыть все окна и выйти из клиентской части clcon?"
+        }
+
+        if {[tk_messageBox -parent $PRIV(root) -title "Выйти из clcon?" \
+            -message $msg \
+            -icon question -type yesno] == "no"} { 
+            return 
+        }
+
+        set PRIV(OstanovitqServerSwank) $OstanovitqServerSwank
+        
+        exit        
+
     }
 
     if {$OPT(overrideexit)} {
@@ -2339,6 +2309,9 @@ proc ::tkcon::MainInit {} {
 		    close $fid
 		}
 	    }
+            if {$::tkcon::PRIV(OstanovitqServerSwank) == 1} {            
+                ::tkcon::ПринудительноОстановитьСерверТекущегоПодключенияSwank
+            }
 	    uplevel 1 ::tkcon::FinalExit $args
 	}
     }

@@ -549,6 +549,21 @@ proc ::tkcon::DisconnectFromSwank {} {
 }             
 
 
+proc ::tkcon::ПринудительноОстановитьСерверТекущегоПодключенияSwank {{molcha 1}} { 
+    set name $::swcnn::CurrentSwankConnection
+    if {$name eq {}} {
+        if {$molcha != 1} {
+            error "Нет текущего подключения Swank"
+        }
+    } else {
+        if {$molcha != 1} {
+            puts "Пытаемся остановить SBCL, обслуживающий подключение Swank, отправив в SBCL вызов (sb-ext:exit :abort t). Удастся ли это? Всё зависит от того, насколько сломан текущий сервер Swank, образ SBCL и связь с сервером"
+        }
+        ::tkcon::EvalInSwankAsync "(sb-ext:exit :abort t)" {} t 
+    }
+}    
+
+
 ## ::tkcon::AttachSwank - called to setup SWANK connection
 # ARGS:	
 #  name         - swank connection name  
