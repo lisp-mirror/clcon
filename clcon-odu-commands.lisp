@@ -156,10 +156,11 @@
     "Find system (.asd) source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
     ""
   (format t "~a~%" (current-buffer))
-  (let ((system (get-system-from-file-options (current-buffer))))
-    (clco:server-lookup-definition system
-                                   system
-                                   (odu::readtable-at-point))))
+  (let* ((system (get-system-from-file-options (current-buffer)))
+         (system-file (ASDF/SYSTEM::system-source-file 
+                       (asdf:find-system system))))
+    (format nil "~A; " 
+            (clco::edit-file-at-offset-code system-file 1 nil))))
 
 (defcommand "Find Symbol" (p)
     "Find symbol with swank machinery."
