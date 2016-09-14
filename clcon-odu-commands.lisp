@@ -152,15 +152,38 @@
                   (return-from do-file-options (trim-subseq string (1+ colon) semi)))
                 (when (= semi end) (return nil))))))))))
 
+(defun server-lookup-system-definition (name-or-symbol package-name readtable-name)
+  "name-or-symbol is a name of a lisp object or object itself which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
+  (let* ((dspecs-and-locations
+          (remove-if-not (lambda (x) (eq (caar x) 'defconstant)) 
+            (clco::swank-find-definitions-for-clcon name-or-symbol :package-name package-name :readtable-name readtable-name)))
+         (l (length dspecs-and-locations)))
+    (with-output-to-string (ou)
+      (case l
+        (0 (clco::print-just-line ou (format nil "No definitions found for ~A" name-or-symbol)))
+        (t
+         (when (> l 1)
+           (clco::write-code-to-show-console ou))
+         (dolist (dal dspecs-and-locations)
+           (destructuring-bind (dspec loc) dal
+             (cond
+               ((= l 1)
+                (clco::write-code-to-pass-to-loc ou loc :fix-offset-p t))
+               (t
+                (let ((link-text (prin1-to-string dspec)))
+                  (clco::write-one-dspec-and-location link-text loc ou :fix-offset-p t))))))
+         (when (> l 1)
+           (clco::write-code-to-see-console-end ou))
+         )))))
+
 (defcommand "Find System" (p)
     "Find system (.asd) source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
     ""
-  (format t "~a~%" (current-buffer))
-  (let* ((system (get-system-from-file-options (current-buffer)))
-         (system-file (ASDF/SYSTEM::system-source-file 
-                       (asdf:find-system system))))
-    (format nil "~A; " 
-            (clco::edit-file-at-offset-code system-file 1 nil))))
+  (let* ((system (format nil ":~a"
+                         (get-system-from-file-options (current-buffer)))))
+    (server-lookup-system-definition system
+                                     (odu::package-at-point)
+                                     (odu::readtable-at-point))))
 
 (defcommand "Find Symbol" (p)
     "Find symbol with swank machinery."
