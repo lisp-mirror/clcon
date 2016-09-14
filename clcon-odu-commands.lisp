@@ -124,6 +124,43 @@
                                  (odu::package-at-point)
                                  (odu::readtable-at-point)))
 
+(defun get-system-from-file-options (buffer)
+  "Get system name from first line"
+  (let* ((string
+          (line-string (mark-line (buffer-start-mark buffer))))
+         (found (search "-*-" string)))
+    (declare (simple-string string))
+    (when found
+      (block do-file-options
+        (let* ((start (+ found 3))
+               (end (search "-*-" string :start2 start)))
+          (unless end
+            (loud-message "No closing \"-*-\".  Aborting file options.")
+            (return-from do-file-options))
+          (when (find #\: string :start start :end end)
+            (do ((opt-start start (1+ semi)) colon semi)
+                (nil)
+              (setq colon (position #\: string :start opt-start :end end))
+              (unless colon
+                (loud-message "Missing \":\".  Aborting file options.")
+                (return-from do-file-options))
+              (setq semi (or (position #\; string :start colon :end end) end))
+              (let* ((option (nstring-downcase
+                              (trim-subseq string opt-start colon))))
+                (declare (simple-string option))
+                (when (string= option "system")
+                  (return-from do-file-options (trim-subseq string (1+ colon) semi)))
+                (when (= semi end) (return nil))))))))))
+
+(defcommand "Find System" (p)
+    "Find system (.asd) source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
+    ""
+  (format t "~a~%" (current-buffer))
+  (let ((system (get-system-from-file-options (current-buffer))))
+    (clco:server-lookup-definition system
+                                   system
+                                   (odu::readtable-at-point))))
+
 (defcommand "Find Symbol" (p)
     "Find symbol with swank machinery."
     ""

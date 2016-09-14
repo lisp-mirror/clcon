@@ -170,6 +170,17 @@ namespace eval ::edt {
         }}
     }
 
+    proc FindSystem {text} {
+        set console [::tkcon::CurrentConsole]
+        set w [$text RealText]
+
+        ::tkcon::ПоложитьТекущуюПозициюНаPosStack $w
+        
+        ::clcon_text::CallOduvanchikFunction $text "odu::find-system-command nil" {{
+            ::edt::FindSourceContinuation $clcon_text $EventAsList
+        }}
+    }
+
     # See also ::tkcon::LispFindDefinition
     proc FindSymbolCommand {text} {
         set console [::tkcon::CurrentConsole]
