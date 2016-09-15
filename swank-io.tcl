@@ -239,14 +239,9 @@ proc ::mprs::DoReadString {EventAsList} {
     set Tag [Unleash [lindex $EventAsList 2]]
 
     set _ok ""
-    set t ".inputString"
-    if {[winfo exists $t]} {
-        ::tkcon::SendEventToSwank "(:emacs-return-string $ThreadId $Tag \"\")" {} 2        
-        destroy $t
-        return
-    }
+    set t ".inputString$Tag"
     toplevel $t
-    wm title . "Введите строку"
+    wm title $t "Введите строку"
     wm protocol $t WM_DELETE_WINDOW "set _ok 0"
     set f1 [frame $t.f1]
     set f2 [frame $t.f2]
@@ -272,7 +267,10 @@ proc ::mprs::DoReadString {EventAsList} {
     } else {
         set tmp [$f1.f.e get]
     }
-    ::tkcon::SendEventToSwank "(:emacs-return-string $ThreadId $Tag \"$tmp\")" {} 2
+    ::tkcon::SendEventToSwank "(:emacs-return-string $ThreadId $Tag \"$tmp\n\")" {} 2
+    if {[winfo exists $t]} {
+        destroy $t
+    }
 }
 
 # this is an async event received from swank. Process it. E.g. call a continuation
