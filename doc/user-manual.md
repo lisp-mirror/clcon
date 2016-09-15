@@ -94,22 +94,27 @@ Example of searching string in files specified by globs (superseded by `.finf`)
 
 Подключение к/отключение от SWANK
 --------------------------------------
+
 Use two items on Console menubar item
 
 Зелёные и подчёркнутые фрагменты текста - это гиперссылки
 ---------------------------------
+
 Some of output is in green. Green regions are clickable (sorry, some of them are only clickable with mouse now). 
 
 Переключение между окнами
 -----------------------
+
 Most of the tools are equipped with "Window" menu which allows to switch between tools. Current keyboard shortcuts:
 
 - `Ctrl-F12` - switch to buffer list
 - `Ctrl-.` - switch to console
 - `Ctrl-Shift-E` - switch to editor
+- `Ctrl-Shift-T` - переключиться в список нитей (тредов)
 
 Команды среды разработки IDE (ИСР)
 ------------
+
 Place dot (.) in the first position of the command to invoke named IDE command. Currently there are only a few commands:
 
 ```.insp*``` call inspector to inspect ```*``` (result of previous REPL evaluation)
@@ -326,3 +331,18 @@ get help via pressing f1.
 -----------
 (clco::open-url "http:/ya.ru")
 
+Загрузка систем asdf
+--------------------
+
+clcon+Яр настроен искать системы asdf во всех поддиректориях директории установки Яр. Если есть две одноимённые системы, то я надеюсь, что имеет приоритет та, у которой более короткий путь к файлу (не проверял, но это похоже на правду, судя по виду файла system-index.txt, к-рый составляет quicklisp). 
+
+Если открыть файл asd, то команда редактора Файл/Сохранить, компилировать и загрузить этот файл  загрузит данную систему. 
+
+Имя системы угадывается по имени файла. Загрузка системы происходит через функцию clco:load-system-for-tcl, которая собирает сообщения и поэтому может работать медленно. Если вас это не устраивает, загружайте систему из консоли, как обычно, asdf:load-system . 
+
+Если asdf не видит систему, на это могут быть следующие причины:
+
+* вы только что создали файл системы и ещё её не загружали. В этом случае нужно стереть все файлы system-index.txt в `*yar-root*` и поддиректориях.
+* в файле asd имя системы задано с ошибкой.
+* файл не находится внутри *yar-root*. Пример проверки: `(budden-tools:subdir-p "c:/yar/lp/budden-tools/budden-tools.asd" *yar-root*)` Для настройки asdf для этого случая см. руководство asdf или quicklisp.
+* уж и не знаю. Можно проверить, видит ли asdf вашу систему: `(ql:where-is-system :my-system)`
