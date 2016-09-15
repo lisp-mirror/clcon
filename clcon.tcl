@@ -30,7 +30,9 @@ encoding system utf-8
 # source locations
 namespace eval ::tkcon {
     variable ScriptDirectory 
+    variable YarRoot 
     set ScriptDirectory [file dirname [info script]]
+    set YarRoot [file normalize "$ScriptDirectory/../.."]
     # it was :find-existing
     variable find-existing 
     set find-existing :post-message-thread
@@ -1204,6 +1206,7 @@ proc ::tkcon::InitMenus {w title} {
     variable OPT
     variable PRIV
     variable COLOR
+    variable YarRoot
     global tcl_platform
 
     if {[catch {menu $w.pop}]} {
@@ -1461,6 +1464,8 @@ proc ::tkcon::InitMenus {w title} {
     foreach m [list [menu $w.справка] [menu $w.pop.справка]] {
         $m add command -label "О программе" -command ::tkcon::About
         $m add command -label "Поиск идентификатора в Common Lisp Hyperdoc" -command "event generate <<TkCon_LispHyperdocLookup>>" -accel "<Key-F1>"
+        $m add command -label "1.Руководство clcon" -command "::edt::edit $YarRoot/lp/clcon/doc/user-manual.md" -underline 0
+        $m add command -label "2.Описание языка Яр" -command "::edt::edit $YarRoot/doc/описание-языка/оя.asd" -underline 0
     }
 }
 
