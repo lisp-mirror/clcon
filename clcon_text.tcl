@@ -52,7 +52,7 @@ proc CheckIfKeyPressIsNotReturn {a} {
 #	putd [string cat <<< %A >>>]
 #	putd [string length %A]
 
-# This is a modification of original binding from tk8.6/text.tcl 
+# Мы поменяли исходное сообщение из $YarRoot/tcl-8.6.4/lib/tk8.6/text.tcl 
 bind Text <KeyPress> {
 	CheckIfKeyPressIsNotReturn %A
 	tk::TextInsert %W %A
