@@ -13,6 +13,7 @@
 
 ;; It is useful for debugging 
 (defvar *initial-standard-output* *standard-output*)
+(defvar *initial-standard-input* *standard-input*)
 
 (defun redirect-trace-output-to-inferior-lisp (c)
   (setf (slot-value c 'swank::trace-output) *initial-standard-output*))
