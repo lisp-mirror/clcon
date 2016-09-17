@@ -81,8 +81,8 @@ proc ::tkcon::WriteActiveText {w text index code} {
     $w tag configure $tag -foreground ForestGreen
     # $w insert output $text [list stdout $tag] \n stdout
     ::ro_out::I $w $index $text $tag  
-    $w tag bind $tag <Enter> [list $w tag configure $tag -under 1]
-    $w tag bind $tag <Leave> [list $w tag configure $tag -under 0]
+    $w tag bind $tag <Enter> [list $w tag configure $tag -underline 1]
+    $w tag bind $tag <Leave> [list $w tag configure $tag -underline 0]
     $w tag bind $tag <ButtonRelease-1> $code
 }
 

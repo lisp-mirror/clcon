@@ -125,9 +125,9 @@ namespace eval ::tkcon {
                         set tag [UniqueTag $w]
                         $w insert output $res [list stderr $tag] \n$trailer stderr
                         $w tag bind $tag <Enter> \
-			    [list $w tag configure $tag -under 1]
+			    [list $w tag configure $tag -underline 1]
                         $w tag bind $tag <Leave> \
-			    [list $w tag configure $tag -under 0]
+			    [list $w tag configure $tag -underline 0]
                         $w tag bind $tag <ButtonRelease-1> \
 			    "if {!\[info exists tk::Priv(mouseMoved)\] || !\$tk::Priv(mouseMoved)} \
 			    {[list $OPT(edit) -attach [Attach] -type error -- $PRIV(errorInfo)]}"

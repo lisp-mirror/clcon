@@ -1,4 +1,4 @@
-﻿;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
 ;; backend for grep-browser.grbr.tcl
 ;; and toplevel search functions, e.g. clco::find-in-clcon-sources
 

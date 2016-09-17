@@ -297,16 +297,16 @@ namespace eval ::edt {
         set m [cMenuBar .edit]
         ::gui_util::ClearMenu $m
 
-        $m add command -label "Вырезать"   -under 2 \
+        $m add command -label "Вырезать"   -underline 2 \
             -command [wesppt [list tk_textCut $btext]]
-        $m add command -label "Копировать"  -under 0 \
+        $m add command -label "Копировать"  -underline 0 \
             -command [wesppt [list tk_textCopy $btext]]
-        $m add command -label "Вставить" -under 0 \
+        $m add command -label "Вставить" -underline 0 \
             -command [wesppt [list tk_textPaste $btext]]
         ##
         $m add separator
 	set cmd [wesppt [list ::fndrpl::OpenFindBox $btext "text" "find" {}]]
-        $m add command -label "Искать" -under 0 -command $cmd -accel "Control-F"
+        $m add command -label "Искать" -underline 0 -command $cmd -accel "Control-F"
         ::clcon_key::b bind SingleMod$w <Control-Key-f> $cmd
 
         set cmd [list ::fndrpl::FindIt $btext]
