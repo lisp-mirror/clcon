@@ -3065,6 +3065,8 @@ proc tkcon {cmd args} {
 ##
 # ARGS:	same as usual	
 # Outputs:	the string with a color-coded text tag
+#  Вызывает update idletasks для потоков stdout и stderr.
+#  Для остальных потоков - не вызывает.
 ## 
 proc tkcon_puts args {
     set len [llength $args]
