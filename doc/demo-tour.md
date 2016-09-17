@@ -1,4 +1,4 @@
-Clcon 0.3.8 - Демонстрационный сеанс
+Clcon 0.3.7 - Демонстрационный сеанс
 ===============
 
 Clcon находится в состоянии "альфа" и не всё в нём хорошо работает. То, что работает хорошо, можно увидеть в данном сеансе. Также есть [видео](https://www.youtube.com/watch?v=nMhwvZ56jHU) по мотивам демонстрационного сеанса. 
@@ -46,8 +46,8 @@ At the console, open test/error-browser-sample-file.lisp file for editing.
 There are at least two ways to do that: via file open dialog (Control-O)
 or via console ed command:
 ``.edit ~/yar/lp/clcon/test/error-browser-sample-file.lisp`` or 
-``.edit c:/yar/lp/clcon/test/error-browser-sample-file.lisp``
-for Windows file release. While typing in filename, use Control-F3 for completion.
+``.edit $::tkcon::YarRoot/lp/clcon/test/error-browser-sample-file.lisp``
+for Windows file release. If Linux, while typing in filename, use Control-F3 for completion.
 
 File will open in the editor. From the menu, choose `Lisp/Compile and load`. Two new windows will pop up: list of compiler notes 
 and error details. Also there will be some text above list of compiler notes. It will state that compilation is failed, 
@@ -77,11 +77,11 @@ will be printed there. Press `Control-Shift-d` to return to the debugger.
 
 Also we have "Restarts" menu at menubar. We could call either of them.
 Or we could just close debugger window with cross or with closing command of your Window Manager (e.g. Alt-F4),
-to call default restart, marked by asterik in restarts menu. Let's invoke "continue" restart and watch result of `f` (19) at the console. 
+to call default restart, marked by asterik in restarts menu. Let's invoke "continue" restart and watch result of `f` (20) at the console. 
 
 Now let's try stepper. 
 
-Warning! To make stepper work correctly, you need to load swank with stepper support disabled. This is true with windows release, but it depends on your initialization file on Linux. Try following installation instructions. Also there are problems in stepper backend when you step out of the frame where you turned stepping mode on. Press "continue" if stepper shows up unexpectedly. Submit bug to SBCL tracker :) 
+Warning! There are problems in stepper backend when you step out of the frame where you turned stepping mode on. Press "continue" if stepper shows up unexpectedly. Submit bug to SBCL tracker :) 
 
 With `Control-Up` at the console, bring up last command `(f 5)` to the prompt, and press `Return` to call it again. As debugger occurs, position windows so that
 you can see debugger and the editor at the same time. Choose `Stack/Switch to stepping mode` from menu bar. Editor window will pop up and current source will be highlighted. Press "F10" (Step next, or "Step over") watch how execution proceeds. Also note that stack and locals are shown in the debugger window. Press "f10" one more time, watch how execution proceeds. Then press "F5" (Continue, or resume to normal execution) to quit stepper mode. 
@@ -129,8 +129,8 @@ Also widget's design is not that perfect. At least I use it sometimes and found 
 
 Дополнительные команды навигации: пакет, система, файл под курсором
 ----------------------------------------
-Наберите в консоли `clco::r-h-e-q` и нажмите Tab. Символ расширится в 
-`clco::reset-highlight-event-queue`. Перейдите к определению с помощью `Alt-.`. Теперь из меню "лисп" редактора выберите "перейти к определению пакета" - попадете в определение пакета, 
+Наберите в консоли `clco:s-l-d` и нажмите Tab. Символ расширится в 
+`clco:server-lookup-definition`. Перейдите к определению с помощью `Alt-.`. Теперь из меню "лисп" редактора выберите "перейти к определению пакета" - попадете в определение пакета, 
 указанного в форме in-package этого файла. вернитесь назад (`Alt-,`). Из меню "лисп" редактора выберите "перейти к определению системы" - попадете в определение asd системы. Название системы берётся из первой строки файла, которая может иметь следующий вид:
 `;; -*- system :clcon-server ; -*-` . Среда не проверяет, что этот файл действительно относится к этой системе. В определении системы встаньте на любое имя файла, например, на букву t в слове `"utils"`, и выберите в меню редактора Файл/Редактировать файл, имя которого под курсором (`Alt-1 3`). Откроется файл utils.lisp (при нахождении внутри файла asd среда подразумевает расширение .lisp). 
 
