@@ -1,4 +1,4 @@
-;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+﻿;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
 ;; backend for grep-browser.grbr.tcl
 ;; and toplevel search functions, e.g. clco::find-in-clcon-sources
 
@@ -106,7 +106,7 @@
       )))
   
 (defparameter |*поддиректории-яра-не-содержащие-исходников-яра*|
-  '("quicklisp/" "tcl-8.6.4/" "sbcl/" "log/" ".hg/" "пляж/"))
+  '("quicklisp/" "tcl-8.6.6/" "sbcl/" "log/" ".hg/" "пляж/"))
 
 (defparameter |*типы-файлов-исходников-яра*| 
   '("md" "lisp" "asd" "tcl"))
