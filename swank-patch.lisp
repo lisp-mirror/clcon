@@ -242,7 +242,7 @@ WHAT can be:
 (defvar *post-message-thread* nil "Процесс специально для раздачи сообщений в очереди. Некое подобие пула тредов из одного треда. Подразумевается, что будем вызывать из ::tkcon::EvalInSwankAsync c идентификатором треда {:post-message-thread}, и каждое сообщение будет быстренько класть сообщение в ту или иную очередь")
 
 (defun ensure-post-message-thread (connection)
-  "По образцу swank::post-message-thread"
+  "По образцу swank::spawn-worker-thread"
   (or *post-message-thread*
       (setf *post-message-thread*
             (swank::spawn (lambda ()
@@ -259,3 +259,39 @@ WHAT can be:
 
 (defmethod swank::thread-for-evaluation ((connection swank::multithreaded-connection) (id (eql :post-message-thread)))
   (ensure-post-message-thread connection))
+
+(defvar *globally-disable-sldb* nil "Полностью отключить SLDB и отлаживаться текстом")
+
+;;; 
+
+(defmacro with-redirection-to-black-console (&body body)
+  `(let ((*standard-input* cl-user::*initial-standard-input*)
+         (*standard-output* cl-user::*initial-standard-output*)
+         (*error-output* cl-user::*initial-standard-output*)
+         (*trace-output* cl-user::*initial-standard-output*)
+         (*debug-io* cl-user::*initial-terminal-io*)
+         (*query-io* cl-user::*initial-terminal-io*)
+         (*terminal-io* cl-user::*initial-terminal-io*))
+     ,@body))
+
+;;;FIXME ПРАВЬМЯ - скопировать исходную ф-ю куда надо
+(DEFUN SWANK::DEBUG-IN-EMACS (CONDITION)
+      (if *globally-disable-sldb*
+          (with-redirection-to-black-console 
+           (swank::invoke-default-debugger condition))
+          (LET ((SWANK::*SWANK-DEBUGGER-CONDITION* CONDITION)
+                (SWANK::*SLDB-RESTARTS* (COMPUTE-RESTARTS CONDITION))
+                (*SLDB-QUIT-RESTART*
+                 (AND *SLDB-QUIT-RESTART* (FIND-RESTART *SLDB-QUIT-RESTART*)))
+                (*PACKAGE*
+                 (OR
+                  (AND (BOUNDP 'SWANK::*BUFFER-PACKAGE*)
+                       (SYMBOL-VALUE 'SWANK::*BUFFER-PACKAGE*))
+                  *PACKAGE*))
+                (SWANK::*SLDB-LEVEL* (1+ SWANK::*SLDB-LEVEL*))
+                (SWANK::*SLDB-STEPPING-P* NIL))
+            (SWANK::FORCE-USER-OUTPUT)
+            (SWANK/BACKEND:CALL-WITH-DEBUGGING-ENVIRONMENT
+             (LAMBDA () (SWANK::SLDB-LOOP SWANK::*SLDB-LEVEL*))))))
+
+

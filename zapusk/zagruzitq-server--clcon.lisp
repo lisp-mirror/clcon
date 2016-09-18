@@ -14,6 +14,7 @@
 ;; It is useful for debugging 
 (defvar *initial-standard-output* *standard-output*)
 (defvar *initial-standard-input* *standard-input*)
+(defvar *initial-terminal-io* *terminal-io*)
 
 (defun redirect-trace-output-to-inferior-lisp (c)
   (setf (slot-value c 'swank::trace-output) *initial-standard-output*))
@@ -36,6 +37,7 @@
 (map () 'load ;; loading asdf/defsystem is tricky
      (mapcar 'asdf:component-pathname
              (asdf::required-components :asdf/defsystem :keep-component 'asdf:cl-source-file)))
+
 
 (defun load-from-here (filename)  
   (let ((*default-pathname-defaults* *clcon-root*))

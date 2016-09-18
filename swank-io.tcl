@@ -256,6 +256,8 @@ proc ::mprs::DoReadString {EventAsList} {
     button $f2.bOk -text "OK" -command "set _ok 1"
     button $f2.bCancel -text "Отмена" -command "set _ok 0"
 
+    bind $t <Return> "set _ok 1"
+
     pack $f2.bOk $f2.bCancel -side left
     focus $f1.f.e
 
