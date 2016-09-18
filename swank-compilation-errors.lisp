@@ -79,6 +79,17 @@
 
 (defun compile-file-for-tcl (clcon_text filename)
   "Backend for ::edt::CompileAndLoadTheFile . Rather untraditional c-s dialog. We normally do such things in tcl. It can be sometimes more convenient to edit though as we're in Lisp"
+  (let ((l (length filename)))
+    (when (string= (subseq filename (- l 3) l) "asd")
+      (let* ((system-name 
+              (subseq filename 
+                      (+ 1 (position #\/ filename :from-end t)) 
+                      (- l 4)))
+             (system (ignore-errors (asdf:find-system system-name))))
+        (if system 
+            (clco:load-system-for-tcl system)      
+            (format t "for ~a system ~a not found~%" filename system)))
+      (return-from compile-file-for-tcl nil)))
   (let* ((buffer (oi::clcon_text-to-buffer clcon_text))
          (mode (first (oi::buffer-modes buffer)))
          (fn (oduvanchik-interface:variable-value 'oduvanchik::compile-and-load-buffer-file-function :mode mode)))
