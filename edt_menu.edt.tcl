@@ -205,6 +205,9 @@ namespace eval ::edt {
 
         set cmd [wesppt [list ::edt::FindSystem $btext]]
         $m add command -label "Перейти к определению системы" -command $cmd
+
+        set cmd [wesppt [list ::edt::CompileSystem $btext]]
+        $m add command -label "Скомпилировать и загрузить систему" -command $cmd
     }
 
     proc EnableDisableMenuItems {} {

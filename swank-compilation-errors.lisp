@@ -88,12 +88,13 @@
              (system (ignore-errors (asdf:find-system system-name))))
         (if system 
             (clco:load-system-for-tcl system)      
-            (format t "for ~a system ~a not found~%" filename system)))
+            (format t "for ~a system ~a not found~%" filename system-name)))
       (return-from compile-file-for-tcl nil)))
   (let* ((buffer (oi::clcon_text-to-buffer clcon_text))
          (mode (first (oi::buffer-modes buffer)))
          (fn (oduvanchik-interface:variable-value 'oduvanchik::compile-and-load-buffer-file-function :mode mode)))
     (funcall fn filename t)))
+
 
 (defun load-system-for-tcl (system-name &rest options)
   ""

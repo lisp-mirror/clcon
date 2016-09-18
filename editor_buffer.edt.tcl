@@ -91,6 +91,15 @@ namespace eval ::edt {
         ::tkcon::SendEventToSwank $form {} 1 t
     }
 
+    proc CompileSystem {text} {
+        set console [::tkcon::CurrentConsole]
+        set w [$text RealText]
+
+        ::tkcon::ПоложитьТекущуюПозициюНаPosStack $w
+        
+        ::clcon_text::CallOduvanchikFunction $text "odu::compile-system-command nil" {}
+    }
+
     # Note we do not save file and 
     proc FindCurrentFileDeclarations {clcon_text} {
         set opened_file [$clcon_text cget -opened_file]

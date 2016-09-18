@@ -185,6 +185,15 @@
                                      (odu::package-at-point)
                                      (odu::readtable-at-point))))
 
+(defcommand "Compile System" (p)
+    "Find system (.asd) source with swank machinery and compile it. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
+    ""
+  (let* ((system-name (get-system-from-file-options (current-buffer)))
+         (system (ignore-errors (asdf:find-system system-name))))
+    (if system 
+        (clco:load-system-for-tcl system)      
+        (format t "system ~a not found~%" system-name))))
+
 (defcommand "Find Symbol" (p)
     "Find symbol with swank machinery."
     ""
