@@ -39,5 +39,9 @@ debugger invoked on a DIVISION-BY-ZERO in thread
 (sb-thread:interrupt-thread aaa (clco::make-caller-releasing-foreground 'break))
 “огда после выхода из отладчика *repl-thread* восстановитс€ автоматически.
 
+Ќу и наконец, собираем всЄ вместе:
+(clco::break-thread-in-black-console интересующий тред)
+хот€ тут странно, что нужно много раз нажимать Enter, пока он соизволит что-то показать. 
+»ли это с каждым новым condition-ом скапливаютс€ нужные нажати€. 
 
 
