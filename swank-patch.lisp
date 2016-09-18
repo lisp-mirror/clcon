@@ -260,7 +260,14 @@ WHAT can be:
 (defmethod swank::thread-for-evaluation ((connection swank::multithreaded-connection) (id (eql :post-message-thread)))
   (ensure-post-message-thread connection))
 
-(defvar *globally-disable-sldb* nil "Полностью отключить SLDB и отлаживаться текстом")
+(defvar *globally-disable-sldb* nil "Полностью отключить SLDB и отлаживаться текстом. На самом деле переменная не глобальная и можно связывать её в отдельных потоках")
+
+(defun make-caller-releasing-foreground (fn)
+  "Для вызова консольного отладчика"
+  (lambda ()
+    (unwind-protect
+        (funcall fn)
+      (sb-thread:release-foreground))))
 
 ;;; 
 
@@ -294,4 +301,15 @@ WHAT can be:
             (SWANK/BACKEND:CALL-WITH-DEBUGGING-ENVIRONMENT
              (LAMBDA () (SWANK::SLDB-LOOP SWANK::*SLDB-LEVEL*))))))
 
+
+(defun break-thread-in-black-console (thread)
+  (sb-thread:interrupt-thread (sb-thread:main-thread)
+                              (lambda ()
+                                (sb-thread:release-foreground thread)))
+  (sb-thread:interrupt-thread thread 
+                              (lambda ()
+                                (unwind-protect
+                                    (let ((*globally-disable-sldb* t))
+                                      (break))
+                                  (sb-thread:release-foreground)))))
 
