@@ -91,7 +91,8 @@
          ((not (string= (namestring (asdf:system-definition-pathname system)) filename))
           (format t "Вы пытаетесь загрузить систему ~A (из файла ~S), но asdf нашёл её в файле ~S" system-name filename (namestring (asdf:system-definition-pathname system))))
          (t 
-            (clco:load-system-for-tcl system))))
+          (format t "Вы пытаетесь загрузить систему ~A (из файла ~S)" system-name filename)
+          (clco:load-system-for-tcl system))))
       (return-from compile-file-for-tcl nil)))
   (let* ((buffer (oi::clcon_text-to-buffer clcon_text))
          (mode (first (oi::buffer-modes buffer)))
