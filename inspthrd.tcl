@@ -12,12 +12,20 @@ namespace eval ::inspthrd {
     # Имя потока, отладка которого нас убъёт
     proc ОпасноеИмяПотока {threadName} {
         variable ::tkcon::OPT
+        set OpasnoKonsolb 0 
+        set OpasnoGPI 0 
+
+        if {$threadName eq "main thread"} {
+            set OpasnoKonsolb 1
+        }
+
         if {[lsearch -exact [list reader-thread control-thread {Swank Sentinel}] $threadName] != -1 \
              || $threadName eq "Swank $OPT(swank-port)"} {
-            return 1
-        } else {
-            return 0
+            set OpasnoGPI 1
         }
+     
+        return [list $OpasnoKonsolb $OpasnoGPI]
+        
     }
     
 
@@ -25,9 +33,10 @@ namespace eval ::inspthrd {
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
         set w $PRIV(base).__inspthreads
-        set i 0
-        while {[winfo exists $w[incr i]]} {}
-        append w $i
+        # set i 0
+        if {[winfo exists $w]} {
+            destroy $w
+        }
         toplevel $w
         wm withdraw $w
 
@@ -64,31 +73,26 @@ namespace eval ::inspthrd {
             set us [::mprs::Unleash $s]
             set threadName [::mprs::Unleash [lindex $us 1]]
             if {$n == -1} {
-                $b RoInsert end [::mprs::Unleash [lindex $us 0]]
-                $b RoInsert end "\t" 
-                $b RoInsert end $threadName
-                $b RoInsert end "\t\t\t\t\t" 
-                $b RoInsert end [::mprs::Unleash [lindex $us 2]]
-                $b RoInsert end "\n" 
+                $b RoInsert end "№\tСтатус\tИмя\t\t\tОтладить в консоли SBCL\t\tОтл.в ГПИ\n"
             } else {
                 $b RoInsert end [::mprs::Unleash [lindex $us 0]]
                 $b RoInsert end "\t" 
-                if {[ОпасноеИмяПотока $threadName]} {
-                    set ZnakOpasnosti "⚠" 
-                } else {
-                    set ZnakOpasnosti " "
-                }
-                $b RoInsert end $ZnakOpasnosti
-                ::tkcon::WriteActiveText $b \
-                     $threadName \
-                     end \
-                     [list inspthrd::BreakNthThread $n]
-                $b RoInsert end "\t\t\t\t\t" 
                 $b RoInsert end [::mprs::Unleash [lindex $us 2]]
+                $b RoInsert end "\t" 
+                $b RoInsert end $threadName
+                $b RoInsert end "\t\t\t\t\t" 
+                foreach {OpasnoKonsolb OpasnoGPI} [ОпасноеИмяПотока $threadName] {}
+                if {$OpasnoKonsolb} { set ZK "⚠" } else { set ZK " " }
+                if {$OpasnoGPI} { set ZG "⚠" } else { set ZG " " }             
+                ::tkcon::WriteActiveText $b [string cat $ZK "жми"] end [list ::inspthrd::BreakNthThreadInBlackConsole $n]
+                $b RoInsert end "\t" 
+                ::tkcon::WriteActiveText $b [string cat $ZG "жми"] end [list ::inspthrd::BreakNthThread $n]
                 $b RoInsert end "\n" 
             }
             set n [expr $n + 1]
         }
+        $b RoInsert end "\nДля отладки в консоли SBCL нужно после появления сообщения со списком перезапусков (restart-ов) много раз нажать Enter, пока не появится подсказка отладчика. Если вы уже отлаживаете один поток в консоли, второй не пытайтесь начинать отлаживать"
+
         # ::ro_out::I $w end $Reply
 
         # ----------------------------------- menu -------------------
@@ -113,9 +117,13 @@ namespace eval ::inspthrd {
     }
 
     proc BreakNthThread {n} {
-        ::tkcon::SendEventToSwank "(swank:debug-nth-thread $n)" {} 0
+        ::tkcon::EvalInSwankAsync "(swank:debug-nth-thread $n)" {} t
     }
     
+    proc BreakNthThreadInBlackConsole {n} {
+        ::tkcon::EvalInSwankAsync "(clco:otladitq--n--jj-potok-v-chjornojj-konsoli $n)" {} t
+    }
+
     proc FileMenu {w menu text} {
         set m [menu [::tkcon::MenuButton $menu "1.Файл" file]]
         $m add command -label "Сохранить как..."  -underline 0 \

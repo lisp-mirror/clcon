@@ -255,7 +255,7 @@ WHAT can be:
    (swank::with-top-level-restart (connection nil)
     (loop
       (apply #'swank::eval-for-emacs 
-             (cdr (swank::wait-for-event `(:emacs-rex-rt . _))))))))
+             (cdr (swank::wait-for-event `(:emacs-rex-rt . swank::_))))))))
 
 (defmethod swank::thread-for-evaluation ((connection swank::multithreaded-connection) (id (eql :post-message-thread)))
   (ensure-post-message-thread connection))
@@ -313,3 +313,6 @@ WHAT can be:
                                       (break))
                                   (sb-thread:release-foreground)))))
 
+(defun otladitq--n--jj-potok-v-chjornojj-konsoli (n)
+  (let ((thread (swank::nth-thread n)))
+    (break-thread-in-black-console thread)))

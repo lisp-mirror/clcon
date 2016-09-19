@@ -31,6 +31,7 @@
            #:get-definition-source-location-of-data ; то же
 
            #:*globally-disable-sldb*
+           #:otladitq--n--jj-potok-v-chjornojj-konsoli
            )
   )
 
