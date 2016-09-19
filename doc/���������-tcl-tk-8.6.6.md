@@ -15,7 +15,7 @@ http://download.microsoft.com/download/E/8/E/E8EEB394-7F42-4963-A2D8-29559B73829
 cmd
 cd /d c:\yar\tcl-8.6.6\build\tcl8.6.6\win
 "c:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars32.bat"
-nmake /f makevile.vc
+nmake /f makefile.vc
 nmake /f makefile.vc INSTALLDIR=c:\yar\tcl-8.6.6 install
 
 УРА! Теперь tk
@@ -52,6 +52,23 @@ tkcon font oemfixed 12
 Предыдущая деятельность
 =======================================
 Деятельность по установке 8.6.4 описана в building_tcl_tk.md
+
+Пытаемся собрать отладочную версию
+==================================
+Делаем резервную копию всей директории tcl-8.6.6
+cmd
+cd /d c:\yar\tcl-8.6.6\build\tcl8.6.6\win
+"c:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars32.bat"
+nmake /f makefile.vc clea
+nmake /f makefile.vc OPTS=symbols
+nmake /f makefile.vc OPTS=symbols INSTALLDIR=c:\yar\tcl-8.6.6 install
+
+cd /d c:\yar\tcl-8.6.6\build\tk8.6.6\win
+nmake /f makefile.vc OPTS=symbols TCLDIR=c:\yar\tcl-8.6.6\build\tcl8.6.6 
+nmake /f makefile.vc OPTS=symbols INSTALLDIR=c:\yar\tcl-8.6.6 install
+
+Меняем скрипт запуска клиента: 
+
 
 НЕУДАЧНАЯ попытка сборки MinGW
 =================================
