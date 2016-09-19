@@ -86,9 +86,12 @@
                       (+ 1 (position #\/ filename :from-end t)) 
                       (- l 4)))
              (system (ignore-errors (asdf:find-system system-name))))
-        (if system 
-            (clco:load-system-for-tcl system)      
-            (format t "for ~a system ~a not found~%" filename system-name)))
+        (cond
+         ((not system) (format t "Вы пытаетесь загрузить систему ~A (из файла ~S), но asdf не нашёл такой системы. См. руководство clcon.~%" system-name filename))
+         ((not (string= (namestring (asdf:system-definition-pathname system)) filename))
+          (format t "Вы пытаетесь загрузить систему ~A (из файла ~S), но asdf нашёл её в файле ~S" system-name filename (namestring (asdf:system-definition-pathname system))))
+         (t 
+            (clco:load-system-for-tcl system))))
       (return-from compile-file-for-tcl nil)))
   (let* ((buffer (oi::clcon_text-to-buffer clcon_text))
          (mode (first (oi::buffer-modes buffer)))
