@@ -68,7 +68,7 @@ nmake /f makefile.vc OPTS=symbols TCLDIR=c:\yar\tcl-8.6.6\build\tcl8.6.6
 nmake /f makefile.vc OPTS=symbols INSTALLDIR=c:\yar\tcl-8.6.6 install
 
 Меняем скрипт запуска клиента: 
-
+Заменяем wish86t.exe на wish86tg.exe
 
 НЕУДАЧНАЯ попытка сборки MinGW
 =================================

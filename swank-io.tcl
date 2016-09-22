@@ -387,7 +387,7 @@ proc ::tkcon::SwankChannelReadable {sock} {
     set Event [SwankReadMessageString]
 
     # just for debugging 
-    putd "217901 message from socket: $Event"
+    # putd "217901 message from socket: $Event"
 
     if { [string index $Event 0] eq "(" } {
         puts stderr "Skipping lisp-formed event $Event"
