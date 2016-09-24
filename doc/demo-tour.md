@@ -1,7 +1,5 @@
-Clcon 0.3.7 - Демонстрационный сеанс
+Clcon 0.3.8 - Демонстрационный сеанс
 ===============
-
-ТЕКУЩАЯ СБОРКА НЕ ПРОХОДИТ ДАННЫЙ ДЕМОНСТРАЦИОННЫЙ СЕАНС, ИНЫМИ СЛОВАМИ, ОНА НЕРАБОТОСПОСОБНА. ЖДИТЕ ИСПРАВЛЕННЫЙ РЕЛИЗ. 
 
 Clcon находится в состоянии "альфа" и не всё в нём хорошо работает. То, что работает хорошо, можно увидеть в данном сеансе. Также есть [видео](https://www.youtube.com/watch?v=nMhwvZ56jHU) по мотивам демонстрационного сеанса. 
 
@@ -21,7 +19,7 @@ Keyboard accelerators are shown in "Edit" menu.
 ### Lisp
 At the console, enter `.apr -lookup-` to list all symbols containing "-lookup-" substring in their name. 
 At the console, type in `clco:s-l-d` and press `Tab`. Name will expand to clco:server-lookup-definition with the help of compound completion algorithm (swank-c-p-c contrib). Now press `Alt-.` Editor window will pop up and source of function you typed will be seen. You can press Alt-. at
-any lisp definition in the editor and jump to its source. If there are more then one definition (e.g. for FORMAT function), list of "hyperlinks"
+any lisp definition in the editor and jump to its source. If there are more then one definition (e.g. for PRINT function), list of "hyperlinks"
 will show up at the console. Click on either of them with mouse to open an appropriate source. In the editor, completion works in similar way. Note that if there is no constituent character under cursor, Tab works as indent-line-command. 
 
 Finally set the cursor at the word `defun` and press `f1`. Web browser should open with hyperspec article about `defun`.  
