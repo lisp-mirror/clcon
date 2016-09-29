@@ -1463,10 +1463,11 @@ proc ::tkcon::InitMenus {w title} {
     ##
     foreach m [list [menu $w.справка] [menu $w.pop.справка]] {
         $m add command -label "О программе" -command ::tkcon::About
-        $m add command -label "Поиск идентификатора в Common Lisp Hyperdoc" -command "event generate <<TkCon_LispHyperdocLookup>>" -accel "<Key-F1>"
+        $m add command -label "Поиск идентификатора в Common Lisp Hyperdoc" -command "event generate $w <<TkCon_LispHyperdocLookup>>" -accel "<Key-F1>"
         $m add command -label "1.Руководство clcon" -command "::edt::edit $YarRoot/lp/clcon/doc/user-manual.md" -underline 0
         $m add command -label "2.Описание языка Яр" -command "::edt::edit $YarRoot/doc/описание-языка/оя.asd" -underline 0
-    }
+        $m add command -label "3.Индекс перевода cltl-2 от Михаила Филоненко" -command {::tkcon::EvalInSwankAsync {(CLCO::OPEN-URL "http://filonenko-mikhail.github.io/cltl2-doc/ru/symbols.html#x200-39600030.2.8")} {} t} -underline 0
+   }
 }
 
 ## ::tkcon::HistoryMenu - dynamically build the menu for attached interpreters
