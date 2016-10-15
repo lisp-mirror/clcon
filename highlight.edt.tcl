@@ -12,7 +12,7 @@ namespace eval ::edt {
     # No error having two "light coral" - s - one of them has other background
     set ColorTable [ExtractValuesFromNumberedInitializator {
        0 black
-       1 rosybrown     
+       1 "saddle brown"
        2 firebrick     
        3 gold
        4 forestgreen   
