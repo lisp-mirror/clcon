@@ -23,12 +23,6 @@
                 (entry-types current))))))
     (nreverse result)))
       
-                          
-;        (princ (second line))
-;        (when (stringp (fourth line))
-;            (princ (fourth line)))
-;        (print ""))))))
-
 (defun make-name (part1 part2)
   (if (stringp part2)
       (concatenate 'string part1 part2)
