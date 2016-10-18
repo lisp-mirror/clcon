@@ -13,11 +13,14 @@
        ((not (listp line)) t)
        ((eq (second (car (third line))) :id) 
         (when current (push current result))
-        (setf current (make-entry :expression (make-name (second line) 
-                                                         (fourth line)))))
+        (setf current 
+              (make-entry :expression 
+                          (string-trim '(#\Space #\Tab #\NO-BREAK_SPACE) 
+                                       (make-name (second line) 
+                                                  (fourth line))))))
        ((eq (second (car (third line))) :href)
         (when current
-          (push (make-entry-line :name (string-trim '(#\Space #\Tab) 
+          (push (make-entry-line :name (string-trim '(#\Space #\Tab #\NO-BREAK_SPACE #\,) 
                                                     (second line))
                                  :links (get-links (cddr line)))
                 (entry-types current))))))
