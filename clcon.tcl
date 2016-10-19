@@ -1467,6 +1467,9 @@ proc ::tkcon::InitMenus {w title} {
         $m add command -label "1.Руководство clcon" -command "::edt::edit $YarRoot/lp/clcon/doc/user-manual.md" -underline 0
         $m add command -label "2.Описание языка Яр" -command "::edt::edit $YarRoot/doc/описание-языка/оя.asd" -underline 0
         $m add command -label "3.Индекс перевода cltl-2 от Михаила Филоненко" -command {::tkcon::EvalInSwankAsync {(CLCO::OPEN-URL "http://filonenko-mikhail.github.io/cltl2-doc/ru/symbols.html#x200-39600030.2.8")} {} t} -underline 0
+        $m add separator
+        $m add command -label "4.Перевод документации по tcl/tk 8.0 (устар.)" -command {::tkcon::EvalInSwankAsync "(CLCO::OPEN-URL \"file:///$::tkcon::YarRoot/doc/книги/tcl-tk/i_gu10.html\")" {} t} -underline 0
+        $m add command -label "5.Сайт по tcl/tk (англ)" -command {::tkcon::EvalInSwankAsync {(CLCO::OPEN-URL "http://tcl.tk")} {} t} -underline 0
    }
 }
 
