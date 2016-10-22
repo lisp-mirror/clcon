@@ -245,6 +245,47 @@
            (write-code-to-see-console-end ou))
          )))))
 
+(defun print-one-hyperlink-tcl-source-for-describe (stream text file offset &key (index "output") fix-offset-p)
+  "Generates tcl code which prints out one hyperlink"
+  (let* ((escaped-text (cl-tk:tcl-escape text))
+         (edit-file-code (edit-file-at-offset-code file offset fix-offset-p)))
+    (format stream "::tkcon::WriteActiveText $b ~A ~A {~A}; $b RoInsert ~A \\\n; "
+            escaped-text
+            index
+            edit-file-code
+            index)))
+
+(defun print-just-line-for-describe (stream text)
+  (format stream "$b RoInsert end ~A; $b insert end \\\n; " (cl-tk:tcl-escape text)))
+
+
+(defun write-one-dspec-and-location-for-describe (link-text location stream &key (index "end") fix-offset-p)
+  "It is also used by compilation-error browse, some arbitrary string is passed instead of dspec. Beware! 
+  fix-offset-p - magic boolean value, set experimentally
+  "
+  (let ((printed-dspec link-text))
+    (multiple-value-bind (file position)
+        (parse-location-into-file-and-pos location)
+      (cond
+        ((and file position)
+         (print-one-hyperlink-tcl-source-for-describe stream printed-dspec file position :index index :fix-offset-p fix-offset-p))
+        (t ; something wrong with location
+         (print-just-line stream printed-dspec :index index))))))
+
+(defun server-lookup-definition-as-list (name-or-symbol &optional (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*)))
+  "name-or-symbol is a name of a lisp object or object itself which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
+  (let* ((dspecs-and-locations
+          (swank-find-definitions-for-clcon name-or-symbol :package-name package-name :readtable-name readtable-name))
+         (l (length dspecs-and-locations)))
+    (with-output-to-string (ou)
+      (case l
+        (0 (print-just-line-for-describe ou (format nil "No definitions found for ~A" name-or-symbol)))
+        (t (dolist (dal dspecs-and-locations)
+           (destructuring-bind (dspec loc) dal
+             (let ((link-text (prin1-to-string dspec)))
+               (write-one-dspec-and-location-for-describe link-text loc ou :fix-offset-p t)))))))))
+         
+
 ;; (:location (:file "/home/denis/setup/sbcl-1.2.7/src/code/eval.lisp")
 ;;  (:position 4849)
 ;;  (:snippet "(defun simple-eval-in-lexenv (original-exp lexenv)

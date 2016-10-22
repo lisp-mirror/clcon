@@ -192,7 +192,7 @@ namespace eval ::edt {
         ::clcon_key::b bind SingleMod$w <Alt-period> $cmd
 
         $m add separator
-        set cmd [wesppt [list ::edt::LispHyperdocLookupCommand $btext]]
+        set cmd [wesppt [list ::edt::LispDescribeAllCommand $btext]]
         $m add command -label "Справка по идентиф-ру" -accel "Key-F1" -command $cmd
         ::clcon_key::b bind SingleMod$w <Key-F1> $cmd
 

@@ -228,6 +228,94 @@ namespace eval ::edt {
         set console [::tkcon::CurrentConsole]
         ::clcon_text::CallOduvanchikFunction $text "odu::hyperdoc-lookup-command nil" ""
     }    
+
+    proc LispDescribeAllCommand {text} {
+        ::clcon_text::CallOduvanchikFunction $text "odu::describe-all-command nil" {{
+            ::edt::LispDescribeAllContinuation $clcon_text $EventAsList
+        }}
+    }
+
+    proc OpenUrl {text} {
+        ::tkcon::EvalInSwankAsync "(clco::open-url \"$text\")" {} t
+    }
+
+    proc LispDescribeAllContinuation {clcon_text EventAsList} {
+        set V1 [ ::mprs::ParseReturnOk $EventAsList ]
+        set text [ ::mprs::Unleash [ lindex $V1 0 ]]
+        if {[llength $V1] == 1} {
+            tk_messageBox -parent $clcon_text -message "$text - это не символ"
+        } else {
+            variable ::tkcon::PRIV
+            # Create unique edit window toplevel
+            set w $PRIV(base).__describe
+            # set i 0
+            if {[winfo exists $w]} {
+                destroy $w
+            }
+            toplevel $w
+            wm withdraw $w
+
+            # title 
+            set word "Описание символа"
+            if {[string length $word] > 20} {
+                wm title $w "[string range $word 0 16]... - tkcon Edit"
+            } else {
+                wm title $w "$word - tkcon Edit"
+            }
+
+            # make body frame    
+            frame $w.body
+            ::clcon_text::clcon_text $w.body.text -readonly 1
+
+            ::gui_util::ConfigureTextFonts $w.body.text
+            $w.body.text configure \
+                -xscrollcommand [list $w.body.sx set] \
+                -yscrollcommand [list $w.body.sy set] 
+            catch {
+                # 8.5+ stuff
+                set tabsp [expr {$OPT(tabspace) * [font measure $OPT(font) 0]}]
+                $w.body.text configure -tabs [list $tabsp left] -tabstyle wordprocessor
+            }
+
+            scrollbar $w.body.sx -orient h -command [list $w.body.text xview]
+            scrollbar $w.body.sy -orient v -command [list $w.body.text yview]
+
+            set b $w.body.text
+
+            set argSwank [ ::mprs::Unleash [ lindex $V1 1 ]]
+            set Links [ ::mprs::Unleash [ lindex $V1 2 ]]
+            set Describe [ ::mprs::Unleash [ lindex $V1 3 ]]
+            set Defuns [ ::mprs::Unleash [ lindex $V1 4 ]]
+            $b RoInsert end "Символ: $text\n"
+            $b RoInsert end "Параметры: "
+            $b RoInsert end $argSwank
+            $b RoInsert end "\n"
+            $b RoInsert end "Документация:\n"
+            if {$Links ne "COMMON-LISP:NIL" } {
+                $b RoInsert end "CLTL2: "
+                foreach Link $Links {
+                    eval [ ::mprs::Unleash $Link ]
+                    $b RoInsert end "\n"
+                }
+            }
+            ::tkcon::WriteActiveText $b "Hyperdoc" end "::edt::LispHyperdocLookupCommand $clcon_text"
+            $b RoInsert end "\n\n"
+            $b RoInsert end "Описание: \n"
+            $b RoInsert end $Describe 
+            $b RoInsert end "\nОпределение: \n"
+            puts $Defuns
+            eval $Defuns
+            grid $w.body.text - $w.body.sy -sticky news
+            grid $w.body.sx - -sticky ew
+            grid columnconfigure $w.body 0 -weight 1 
+            grid columnconfigure $w.body 1 -weight 1
+            grid rowconfigure $w.body 0 -weight 1 
+            pack $w.body -fill both -expand 1
+            wm deiconify $w
+        }
+        $clcon_text Unfreeze
+    }
+    
     
     proc ReadFileIntoString {word {RemoveLastNewline 0}} {
         set obj [string cat "__tkcon" [GenNamedCounter "ReadFileObj"]]

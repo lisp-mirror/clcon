@@ -223,6 +223,59 @@
                                         (odu::readtable-at-point))))
       code)))
 
+(defcommand "Describe All" (p)
+    "Describe All"
+    ""
+  (multiple-value-bind (string symbol) (get-symbol-from-current-point)
+    (multiple-value-bind (symbol2 found)
+        (clco::parse-name-or-symbol-to-symbol (or symbol string)
+                                              :package-name (odu::package-at-point) 
+                                              :readtable-name (odu::readtable-at-point))
+      (if found (cons string (describe-all symbol2)) (list string)))))
+
+(defcommand "Open Url" (p)
+    "Open Url"
+    ""
+    (clco::open-url p))
+
+(defvar *table-cltl2* nil)
+
+(defun tcl-links (l)
+  (let ((n 0) res)
+    (dolist (x l)
+      (incf n)
+      (push (format nil "::tkcon::WriteActiveText $b \"~a \" end \"::edt::OpenUrl http://filonenko-mikhail.github.io/cltl2-doc/ru/~a\";" n x) res))
+    (apply #'concatenate 'string (reverse res))))
+
+(defun describe-all (symbol)
+  (unless *table-cltl2*
+    (setf 
+     *table-cltl2* 
+     (parser-cltl2-ru::parse 
+      (cl-html-parse:parse-html 
+       (drakma:http-request 
+        "http://filonenko-mikhail.github.io/cltl2-doc/ru/symbols.html")))))
+  (list (format nil "~a" (ignore-errors (swank::arglist symbol)))
+        (when (eq (symbol-package symbol) (find-package :cl))
+          (let ((entry (find-if 
+                        (lambda (x) 
+                          (string= 
+                           (parser-cltl2-ru::entry-expression x) 
+                           (string-downcase (symbol-name symbol)))) 
+                        *table-cltl2*)))
+            (when entry
+              (mapcar (lambda (x) (concatenate 'string 
+                                               (format nil "$b RoInsert end \"~a \";" (parser-cltl2-ru::entry-line-name x))
+                                               (tcl-links 
+                                                (parser-cltl2-ru::entry-line-links x))))
+                      (parser-cltl2-ru::entry-types entry)))))
+        (with-output-to-string (s) 
+          (let ((*standard-output* s)) 
+            (describe symbol)))
+        (clco::server-lookup-definition-as-list symbol)))
+              
+                
+        
 
 (defcommand "Sync Cursor" (p)
     "Debug-time command to sync cursor. There were no need to make it a command"
