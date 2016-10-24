@@ -9,7 +9,7 @@
   :depends-on (:cl-tk :swank
                       #+(and :clcon-oduvan (not :oduvan-invisible)) :oduvanchik.clx
                       #+(and :clcon-oduvan :oduvan-invisible) :oduvanchik.tty
-                      :bordeaux-threads :budden-tools :editor-budden-tools :split-sequence :hyperdoc)
+                      :bordeaux-threads :budden-tools :editor-budden-tools :split-sequence :hyperdoc :parser-cltl2-ru)
   :serial t
   :components ((:file "package")
                (:file "utils")
