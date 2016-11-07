@@ -344,7 +344,7 @@ namespace eval ::fndrpl {
             $text tag remove sel 1.0 end
 
             if {$SearchDir == "forwards"} {
-                tkTextSetCursor $text "$SearchPos+$leng char"        
+                tkTextSetCursor $text "$SearchPos+$reng char"        
             } else { tkTextSetCursor $text $SearchPos }
 
             $text tag add sel $SearchPos  "$SearchPos+$leng char"
@@ -376,6 +376,7 @@ namespace eval ::fndrpl {
         dict set $SearchState -ReplaceCanceled 0
 
         set leng [string length $SearchString]
+		set reng [string length $ReplaceString]
         set found [FindItInner $text] 
 
         set SearchPos [dict get $SearchState -startFrom]
