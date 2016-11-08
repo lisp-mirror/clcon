@@ -344,7 +344,7 @@ namespace eval ::fndrpl {
             $text tag remove sel 1.0 end
 
             if {$SearchDir == "forwards"} {
-                tkTextSetCursor $text "$SearchPos+$reng char"        
+                tkTextSetCursor $text "$SearchPos+$leng char"        
             } else { tkTextSetCursor $text $SearchPos }
 
             $text tag add sel $SearchPos  "$SearchPos+$leng char"
@@ -416,9 +416,9 @@ namespace eval ::fndrpl {
             
 
         if {$SearchDir == "forwards"} {
-            tkTextSetCursor $text "$SearchPos+$leng char"        
-        } else {
-            tkTextSetCursor $text $SearchPos 
+            tkTextSetCursor $text "$SearchPos+$reng char"        
+        } else {			
+            tkTextSetCursor $text $SearchPos 			
         }
         return 1
     }
