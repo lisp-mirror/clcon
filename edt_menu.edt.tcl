@@ -306,19 +306,21 @@ namespace eval ::edt {
             -command [wesppt [list tk_textCopy $btext]]
         $m add command -label "Вставить" -underline 0 \
             -command [wesppt [list tk_textPaste $btext]]
-        ##
+        
         $m add separator
 	set cmd [wesppt [list ::fndrpl::OpenFindBox $btext "text" "find" {}]]
-        $m add command -label "Искать" -underline 0 -command $cmd -accel "Control-F"
-        ::clcon_key::b bind SingleMod$w <Control-Key-f> $cmd
+        $m add command -label "Искать" -underline 0 -command $cmd -accel "Control-F(А)"
+        ::clcon_key::b bind SingleMod$w <Control-Key-f> $cmd		
+		::clcon_key::b bind SingleMod$w <Control-Key-agrave> $cmd
 
         set cmd [list ::fndrpl::FindIt $btext]
-	$m add command -label "Найти далее"  -underline 0 -accel "F3" -command $cmd 
+		$m add command -label "Найти далее"  -underline 0 -accel "F3" -command $cmd 
         bind NoMod$w <F3> $cmd
 
 	set cmd [wesppt [list ::fndrpl::OpenFindBox $btext "text" "replace" {}]]
-        $m add command -label "Найти и заменить" -under 0 -command $cmd -accel "Control-h"
+        $m add command -label "Найти и заменить" -under 0 -command $cmd -accel "Control-h(р)"
         ::clcon_key::b bind SingleMod$w <Control-Key-h> "$cmd; break"
+		::clcon_key::b bind SingleMod$w <Control-Key-eth> "$cmd; break"
 
         $m add separator
         # Следующие команды работают для всех режимов, поэтому помещаем их в меню "Правка"
