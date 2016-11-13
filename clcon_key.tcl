@@ -22,7 +22,6 @@ proc ::clcon_key::FillLetterMapWin32 {} {
         set Russian [lindex [lindex $Russians $i] 1]
         set CapitalRussian [string toupper $Russian 0 0]
         lappend Bucket $Russian $CapitalRussian
-
         dict set LetterMap $o $Bucket
         incr i
     }
@@ -126,7 +125,6 @@ proc ::clcon_key::FillLetterMapX {} {
         set RussianJustLetter [lindex [split $Russian _] 1]
         set CapitalRussian [string cat Cyrillic_ [string toupper $RussianJustLetter]]
         lappend Bucket $Russian $CapitalRussian
-
         dict set LetterMap $o $Bucket
         incr i
     }
@@ -171,7 +169,7 @@ proc ::clcon_key::AlternateKeys {EnglishKey} {
 # We assume key ends with some key designator
 proc ::clcon_key::b {bind_bareword tag EnglishKey command} {
     ::mprs::AssertEq $bind_bareword "bind"
-    foreach key [AlternateKeys $EnglishKey] {
+    foreach key [::clcon_key::AlternateKeys $EnglishKey] {
         $bind_bareword $tag $key $command
     }
 }
