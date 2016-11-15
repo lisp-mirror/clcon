@@ -169,8 +169,9 @@ proc ::clcon_key::AlternateKeys {EnglishKey} {
 # We assume key ends with some key designator
 proc ::clcon_key::b {bind_bareword tag EnglishKey command} {
     ::mprs::AssertEq $bind_bareword "bind"
+	set kV "<Control-Key-V>"
     foreach key [::clcon_key::AlternateKeys $EnglishKey] {
-        $bind_bareword $tag $key $command
+	 $bind_bareword $tag $key $command
     }
 }
 
