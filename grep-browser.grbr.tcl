@@ -220,8 +220,8 @@ namespace eval ::grbr {
 
         set cmd [list ::fndrpl::OpenFindBox $tbl "tablelist" "find" {}]
         $m add command -label "2.Поиск" -under 0 -command $cmd -accel "Control-F" 
-        bind $w <Control-Key-f> $cmd
-        bind $w <Control-Key-agrave> $cmd
+        ::clcon_key::b bind $w <Control-Key-f> $cmd
+
         bind $w <Control-Key-Cyrillic_a> $cmd
 
         $m add separator
