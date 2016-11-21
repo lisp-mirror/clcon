@@ -301,15 +301,16 @@ namespace eval ::edt {
         ::gui_util::ClearMenu $m
         set cmd [wesppt [list tk_textCut $btext]]
         $m add command -label "Вырезать"   -underline 2 \
-            -command cmd
+            -command $cmd
         set cmd [wesppt [list tk_textCopy $btext]]
         $m add command -label "Копировать"  -underline 0 \
-            -command cmd -accel "Control-C"           
-           ::clcon_key::b bind SingleMod$w <Control-Key-C> $cmd 
-           set cmd [wesppt [list tk_textPaste $btext]]
+            -command $cmd -accel "Control-C"           
+        ::clcon_key::b bind SingleMod$w <Control-Key-C> $cmd 
+        set cmd [wesppt [list tk_textPaste $btext]]
         $m add command -label "Вставить" -underline 0 \
-            -command cmd -accel "Control-V"
-           ::clcon_key::b bind SingleMod$w <Control-Key-v> $cmd
+            -command $cmd -accel "Control-V"
+        ::clcon_key::b bind SingleMod$w <Control-Key-igrave> $cmd
+        ::clcon_key::b bind SingleMod$w <Control-Key-Igrave> $cmd
            
         ##
         $m add separator

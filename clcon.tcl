@@ -2300,7 +2300,7 @@ proc ::tkcon::MainInit {} {
 		if {[catch {open $::tkcon::PRIV(histfile) w} fid]} {
 		    puts stderr "Не могу сохранить файл истории:\n$fid"
 		    # pause a moment, because we are about to die finally...
-		    after 1000
+		    after 7000
 		} else {
 		    set max [::tkcon::EvalSlave history nextid]
 		    set id [expr {$max - $::tkcon::OPT(history)}]
