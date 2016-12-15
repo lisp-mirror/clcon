@@ -54,16 +54,14 @@ proc ::tkcon::ClassifyTclEscapes { form } {
         foreach {number NumLength} [scan $FormWoPrefix "%d%n"] {break}
         if {$NumLength == [string length $FormWoPrefix]} {
             # it is a history reference
-           #return [list "history" $FormWoPrefix]
-           set f  [string range $form 1 end]
-           set f "history $f"
-         return $f
+            set f  [string range $form 1 end]
+            set f "history $f"
+            return $f
         } else {
             return [list 1 $FormWoPrefix]
         }
     }
 }
-
 
 # Args: FormWoPrefix : form w/o dots, we know that it is a history substitution
 # Returns: If this form is a number, returns history event from that number
@@ -74,7 +72,7 @@ proc ::tkcon::ExpandFormFromHistory {FormWoPrefix form} {
         error "Internal error 75474"
     }
     set result [EvalSlave history event $number]
-    #
+   
     #Protect from recursion
     foreach {kind2 FormWoPrefix2} [ClassifyTclEscapes $result] {break}
     if {$kind2 eq {history}} {
@@ -157,6 +155,7 @@ proc ::tkcon::EndProcessingOfNonLispCommandOrError {w cmd code res} {
 proc ::tkcon::EvalKnownCommand { w cmd } {
     variable OPT
     variable PRIV
+
     if {$cmd eq ""} {
         return
     }
@@ -171,33 +170,25 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
 
     # we don't know what command we have
     set result [ClassifyTclEscapes $cmd]
-
-       set cms [ClassifyTclEscapes $cmd]
-
+    set cms [ClassifyTclEscapes $cmd]
     set code 0
     set cm [string range $cms 0 6]
-
     if {$cm eq "history"} {
-    set code 1
+     set code 1
     }
     if {$code} {  
-    
-              set cms [string range $cms 7 end]
-
-              variable PRIV
-              set w $PRIV(console)
-              set     nextid [EvalSlave history nextid]
-              set a [expr   -$cms + $nextid]
-
-            DoAfterCommand
-            set i 0;
-    
-            while {0<[expr $a - $i]} {
-             set res [::tkcon::Event -1]
-             incr i;          
-            }
-
-              return $res
+     set cms [string range $cms 7 end]
+     variable PRIV
+     set w $PRIV(console)
+     set nextid [EvalSlave history nextid]
+     set a [expr   -$cms + $nextid]
+     DoAfterCommand
+     set i 0;
+     while {0<[expr $a - $i]} {
+       set res [::tkcon::Event -1]
+       incr i; 		 
+     }
+     return $res
     } 
 
     set code [catch {ClassifyTclEscapes $cmd} ClassifiedCommand]  
@@ -206,7 +197,6 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
         EndProcessingOfNonLispCommandOrError $w $cmd $code $ClassifiedCommand
         return {}
     }
-    
     
     foreach {TclEscapeKind RealForm} $ClassifiedCommand {break}
 
@@ -218,7 +208,6 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
             }
             $w insert output $ffh\n stdin
             set res [EvalKnownCommand $w $ffh]
-
             return $res
         } elseif { $TclEscapeKind ne 0 } {
             set res [EvalTclEscape $w $TclEscapeKind $RealForm $cmd]
@@ -255,8 +244,8 @@ proc ::tkcon::EvalInSwankFromConsole { w } {
     #Code from EvalCmd follows
 
     $w mark set output end
-    set res [EvalKnownCommand $w $cmd]
-    return $res
+
+    return [EvalKnownCommand $w $cmd]
 }
 
 
