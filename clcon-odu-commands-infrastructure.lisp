@@ -97,14 +97,14 @@
                 (economy-lines (remove nil (remove-duplicates lines))))
            (when (every 'oi::line-tag-valid-p economy-lines)
              (dolist (line economy-lines)
-;               (format t "~a~%" (line-tag line))
+;               (format t "~a~%" (oi::line-number line))
                (oi::maybe-send-line-highlight-to-clcon line)))))
         (t
          (oduvan-invisible-kill-open-paren-font-marks)
          )))))
 
-(defun augment-with-parens (marks)
-  (if odu::*open-paren-font-marks*
+(defun augment-with-parens (marks line)
+  (if (and odu::*open-paren-font-marks* (eq (mark-line (region-start odu::*open-paren-font-marks*)) line))
       (oi::smart-insert-font-mark 
        (region-end odu::*open-paren-font-marks*) 
        (oi::smart-insert-font-mark (region-start odu::*open-paren-font-marks*)
@@ -120,7 +120,7 @@
           (oi::sy-font-marks syntax-info)
           ;(oi::line-marks line) ; this ceased to work before. 
            )
-         (sorted-marks (sort (augment-with-parens marks) '< :key 'oi::mark-charpos)))
+         (sorted-marks (sort (augment-with-parens marks line) '< :key 'oi::mark-charpos)))
     (declare (ignorable syntax-info))
     ;(dolist (mark sorted-marks) 
     ;  (typecase mark
