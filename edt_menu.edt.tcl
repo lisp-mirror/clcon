@@ -193,21 +193,24 @@ namespace eval ::edt {
 
         $m add separator
         set cmd [wesppt [list ::edt::LispDescribeAllCommand $btext]]
-        $m add command -label "Справка по идентиф-ру" -accel "Key-F1" -command $cmd
+        $m add command -label "Справка по идентиф-ру" -accel "F1" -command $cmd
         ::clcon_key::b bind SingleMod$w <Key-F1> $cmd
 
         set cmd [wesppt [list ::edt::FindSymbolCommand $btext]]
-        $m add command -label "Скопировать идентф-р в буфер обмена" -accel "Key-F2" -command $cmd
+        $m add command -label "Скопировать идентф-р в буфер обмена" -accel "F2" -command $cmd
         ::clcon_key::b bind SingleMod$w <Key-F2> $cmd
 
         set cmd [wesppt [list ::edt::FindPackage $btext]]
-        $m add command -label "Перейти к определению пакета" -command $cmd
+        $m add command -label "1.Перейти к определению пакета" -command $cmd -underline 0
 
         set cmd [wesppt [list ::edt::FindSystem $btext]]
-        $m add command -label "Перейти к определению системы" -command $cmd
+        $m add command -label "2.Перейти к определению системы" -command $cmd -underline 0
 
         set cmd [wesppt [list ::edt::CompileSystem $btext]]
-        $m add command -label "Скомпилировать и загрузить систему" -command $cmd
+        $m add command -label "3.Скомпилировать и загрузить систему" -command $cmd -underline 0
+
+        set cmd [wesppt [list ::edt::udalitq-fajjly-rezulqtata-sborki-sistemy $btext]]
+        $m add command -label "4.Удалить файлы результата сборки системы" -command $cmd -underline 0
     }
 
     proc EnableDisableMenuItems {} {

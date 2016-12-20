@@ -180,13 +180,19 @@ namespace eval ::edt {
     }
 
     proc FindSystem {text} {
-        set console [::tkcon::CurrentConsole]
+        # Удали это set console [::tkcon::CurrentConsole]
         set w [$text RealText]
 
         ::tkcon::ПоложитьТекущуюПозициюНаPosStack $w
         
         ::clcon_text::CallOduvanchikFunction $text "odu::find-system-command nil" {{
             ::edt::FindSourceContinuation $clcon_text $EventAsList
+        }}
+    }
+
+    proc udalitq-fajjly-rezulqtata-sborki-sistemy {text} {
+        ::clcon_text::CallOduvanchikFunction $text "odu::udalitq-fajjly-rezulqtata-sborki-sistemy-command nil" {{
+            ::tkcon::FocusConsole
         }}
     }
 

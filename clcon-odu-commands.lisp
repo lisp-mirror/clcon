@@ -125,7 +125,8 @@
                                  (odu::readtable-at-point)))
 
 (defun get-system-from-file-options (buffer)
-  "Get system name from first line"
+  "Get system name from first line" ; ПРАВМЯ - не совсем ясно, зачем здесь продублирована реализация odu::process-file-options, 
+    ; по идее это buffer-variable или что-то вроде этого
   (let* ((string
           (line-string (mark-line (buffer-start-mark buffer))))
          (found (search "-*-" string)))
@@ -149,8 +150,14 @@
                               (trim-subseq string opt-start colon))))
                 (declare (simple-string option))
                 (when (string= option "system")
-                  (return-from do-file-options (trim-subseq string (1+ colon) semi)))
+                  (return-from do-file-options (identity ; не это string-downcase ; он нам здесь нужен, чтобы прийти в соответствие с действиями asdf:coerce-name 
+                                                (trim-subseq string (1+ colon) semi))))
                 (when (= semi end) (return nil))))))))))
+
+(defun get-system-name-as-symbol-from-file-options (buffer)
+  ; ПРАВЬМЯ включить сюда кусок из compile-file-for-tcl , чтобы все команды системы работали и из файла самой системы.
+  (let ((nm (get-system-from-file-options buffer)))
+    (and nm (intern nm :keyword))))
 
 (defun server-lookup-system-definition (name-or-symbol package-name readtable-name)
   "name-or-symbol is a name of a lisp object or object itself which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
@@ -179,20 +186,30 @@
 (defcommand "Find System" (p)
     "Find system (.asd) source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
     ""
-  (let* ((system (format nil ":~a"
-                         (get-system-from-file-options (current-buffer)))))
-    (server-lookup-system-definition system
-                                     (odu::package-at-point)
-                                     (odu::readtable-at-point))))
+  (let* ((system-name-as-symbol (get-system-name-as-symbol-from-file-options (current-buffer))))
+    (cond
+     (system-name-as-symbol
+      (server-lookup-system-definition system-name-as-symbol
+                                       (odu::package-at-point)
+                                       (odu::readtable-at-point)))
+     (t
+      (format *error-output* "~&Система ~S не найдена. ~%asdf приводит имена систем к нижнему регистру, но SBCL запоминает места опр-я для символов, а не для строк" system-name-as-symbol)))))
+
+(defcommand "Udalitq fajjly rezulqtata sborki sistemy" (p)
+  "Удалить файлы результата сборки системы" ""
+  (let* ((system-name (get-system-name-as-symbol-from-file-options (current-buffer))))
+    (format t "~&~A~%" (swank:delete-system-fasls system-name))
+    ;; неизвестно, насколько это правильный способ вычислить что-то в tcl, вроде обычно используется continuation. Но в данном случае нет особой проблемы,
+    ;; т.к. данная печать неважно в каком порядке производится по отношению к основной деятельности данной команды
+    ))
 
 (defcommand "Compile System" (p)
     "Find system (.asd) source with swank machinery and compile it. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
     ""
-  (let* ((system-name (get-system-from-file-options (current-buffer)))
-         (system (ignore-errors (asdf:find-system system-name))))
-    (if system 
-        (clco:load-system-for-tcl system)      
-        (format t "system ~a not found~%" system-name))))
+  (let* ((system-name (get-system-name-as-symbol-from-file-options (current-buffer))))
+    (if system-name 
+        (clco:load-system-for-tcl system-name)      
+        (format t "Система ~a не найдена~%" system-name))))
 
 (defcommand "Find Symbol" (p)
     "Find symbol with swank machinery."
