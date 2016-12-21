@@ -154,10 +154,27 @@
                                                 (trim-subseq string (1+ colon) semi))))
                 (when (= semi end) (return nil))))))))))
 
-(defun get-system-name-as-symbol-from-file-options (buffer)
-  ; ПРАВЬМЯ включить сюда кусок из compile-file-for-tcl , чтобы все команды системы работали и из файла самой системы.
-  (let ((nm (get-system-from-file-options buffer)))
-    (and nm (intern nm :keyword))))
+(defun |Найти-имя-системы-из-имени-файла-или-переменных-буфера-либо-сообщение| (buffer)
+  "Находим имя системы из имени файла или из переменных в первой строчке. Если не нашли, выдаём осмысленное сообщение"
+  (let* ((pathname (oduvanchik-interface:buffer-pathname buffer))
+         (system-name
+          (cond
+           ((string-equal (pathname-type pathname) "asd")
+            (pathname-name pathname))
+           (t
+            (get-system-from-file-options buffer)))))
+    ;; Регистры имён файлов в windows игнорируются, а 
+    ;; символы в лиспе обычно в верхнем регистре. Поэтому вот такое преобразование,
+    ;; вопреки тому, что имена систем нормализуются к нижнему регистру
+    (cond
+     ((or (not system-name)
+          (string= system-name ""))
+      (format *error-output* "~&Имя системы в редакторе определено, если текущий файл редактора имеет расширение .asd или когда система задана в первой строчке текущего файла, например, так: 
+;; -*- Encoding: utf-8; System :decorate-function -*-
+Сейчас имя не определено~%")
+      nil)
+     (t
+      (intern (russian-budden-tools:string-upcase-cyr system-name) :keyword)))))
 
 (defun server-lookup-system-definition (name-or-symbol package-name readtable-name)
   "name-or-symbol is a name of a lisp object or object itself which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
@@ -186,27 +203,26 @@
 (defcommand "Find System" (p)
     "Find system (.asd) source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
     ""
-  (let* ((system-name-as-symbol (get-system-name-as-symbol-from-file-options (current-buffer))))
+  (let* ((system-name-as-symbol (|Найти-имя-системы-из-имени-файла-или-переменных-буфера-либо-сообщение| (current-buffer))))
     (cond
      (system-name-as-symbol
       (server-lookup-system-definition system-name-as-symbol
                                        (odu::package-at-point)
                                        (odu::readtable-at-point)))
      (t
-      (format *error-output* "~&Система ~S не найдена. ~%asdf приводит имена систем к нижнему регистру, но SBCL запоминает места опр-я для символов, а не для строк" system-name-as-symbol)))))
+      "::ProcedureNop"))))
 
 (defcommand "Udalitq fajjly rezulqtata sborki sistemy" (p)
   "Удалить файлы результата сборки системы" ""
-  (let* ((system-name (get-system-name-as-symbol-from-file-options (current-buffer))))
-    (format t "~&~A~%" (swank:delete-system-fasls system-name))
-    ;; неизвестно, насколько это правильный способ вычислить что-то в tcl, вроде обычно используется continuation. Но в данном случае нет особой проблемы,
-    ;; т.к. данная печать неважно в каком порядке производится по отношению к основной деятельности данной команды
+  (let* ((system-name (|Найти-имя-системы-из-имени-файла-или-переменных-буфера-либо-сообщение| (current-buffer))))
+    (when system-name
+      (format t "~&~A~%" (swank:delete-system-fasls system-name)))
     ))
 
 (defcommand "Compile System" (p)
     "Find system (.asd) source with swank machinery and compile it. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
     ""
-  (let* ((system-name (get-system-name-as-symbol-from-file-options (current-buffer))))
+  (let* ((system-name (|Найти-имя-системы-из-имени-файла-или-переменных-буфера-либо-сообщение| (current-buffer))))
     (if system-name 
         (clco:load-system-for-tcl system-name)      
         (format t "Система ~a не найдена~%" system-name))))

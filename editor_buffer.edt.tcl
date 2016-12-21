@@ -192,7 +192,9 @@ namespace eval ::edt {
 
     proc udalitq-fajjly-rezulqtata-sborki-sistemy {text} {
         ::clcon_text::CallOduvanchikFunction $text "odu::udalitq-fajjly-rezulqtata-sborki-sistemy-command nil" {{
+            $clcon_text Unfreeze
             ::tkcon::FocusConsole
+
         }}
     }
 
