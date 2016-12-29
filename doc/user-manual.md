@@ -38,7 +38,7 @@ Linux: ~/.clconrc
 
 Автодополнение, продолжение и автоподстановка
 ---------------------------
-Completion of lisp symbols works in console, use **Tab** to complete lisp symbol prefix (may contain package or part of package name).
+Completion of lisp symbols works in console, use **Ctrl-Space** to complete lisp symbol prefix (may contain package or part of package name).
 
 Use **Ctrl-F3** to complete filename (Unix-style, names containing space may not work). 
 

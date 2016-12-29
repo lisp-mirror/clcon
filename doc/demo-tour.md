@@ -18,9 +18,9 @@ Keyboard accelerators are shown in "Edit" menu.
 
 ### Lisp
 At the console, enter `.apr -lookup-` to list all symbols containing "-lookup-" substring in their name. 
-At the console, type in `clco:s-l-d` and press `Tab`. Name will expand to clco:server-lookup-definition with the help of compound completion algorithm (swank-c-p-c contrib). Now press `Alt-.` Editor window will pop up and source of function you typed will be seen. You can press Alt-. at
+At the console, type in `clco:s-l-d` and press `Ctrl-Space`. Name will expand to clco:server-lookup-definition with the help of compound completion algorithm (swank-c-p-c contrib). Now press `Alt-.` Editor window will pop up and source of function you typed will be seen. You can press Alt-. at
 any lisp definition in the editor and jump to its source. If there are more then one definition (e.g. for PRINT function), list of "hyperlinks"
-will show up at the console. Click on either of them with mouse to open an appropriate source. In the editor, completion works in similar way. Note that if there is no constituent character under cursor, Tab works as indent-line-command. 
+will show up at the console. Click on either of them with mouse to open an appropriate source. In the editor, completion works in similar way. 
 
 Finally set the cursor at the word `defun` and press `f1`. Web browser should open with hyperspec article about `defun`.  
 
@@ -105,7 +105,7 @@ All files are now highlighted according to lisp mode, and you can even edit them
 
 When the file is modified, its tab is marked with asterik. Also asterik is shown in the buffer list (invoked by `Control-F12`).  
 
-Interesting commands while editing lisp are "indent" (`Tab` key) and "indent new line"  (`Shift-Return`). Also you can note highlight of opening paren when you stay at closing one. Also we have "Lisp" menu with several lisp mode commands (not currently bound to keyboard, but should work). 
+Interesting commands while editing lisp are "indent" (`Ctrl-Space` key) and "indent new line"  (`Shift-Return`). Also you can note highlight of opening paren when you stay at closing one. Also we have "Lisp" menu with several lisp mode commands (not currently bound to keyboard, but should work). 
 
 Also we have rather lame tcl indentation. It is invoked with `Control-Return`. Tcl find source in the editor ignores current namespace, so it is of limited use. 
 
@@ -129,7 +129,7 @@ Also widget's design is not that perfect. At least I use it sometimes and found 
 
 Дополнительные команды навигации: пакет, система, файл под курсором
 ----------------------------------------
-Наберите в консоли `clco:s-l-d` и нажмите Tab. Символ расширится в 
+Наберите в консоли `clco:s-l-d` и нажмите Ctrl-Пробел. Символ расширится в 
 `clco:server-lookup-definition`. Перейдите к определению с помощью `Alt-.`. Теперь из меню "лисп" редактора выберите "перейти к определению пакета" - попадете в определение пакета, 
 указанного в форме in-package этого файла. вернитесь назад (`Alt-,`). Из меню "лисп" редактора выберите "перейти к определению системы" - попадете в определение asd системы. Название системы берётся из первой строки файла, которая может иметь следующий вид:
 `;; -*- system :clcon-server ; -*-` . Среда не проверяет, что этот файл действительно относится к этой системе. В определении системы встаньте на любое имя файла, например, на букву t в слове `"utils"`, и выберите в меню редактора Файл/Редактировать файл, имя которого под курсором (`Alt-1 3`). Откроется файл utils.lisp (при нахождении внутри файла asd среда подразумевает расширение .lisp). 
