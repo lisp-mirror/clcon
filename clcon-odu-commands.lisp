@@ -321,17 +321,20 @@
      )
     ))
 
-(defcommand "Indent or Complete Symbol With Budden Tools"
+(defcommand "Complete Symbol With Budden Tools"
      (p) "Complete Symbol With Local Package Nicknames and advanced readtable-case"
          "Complete Symbol With Local Package Nicknames and advanced readtable-case"
   (declare (ignorable p))
   ;; получаем исходный текст, который нужно завершить
-  (let* ((str (get-symbol-from-current-point :previous 2))
+  (let* ((str (get-symbol-from-current-point :previous 2 :return-symbol-too nil))
          (str-len (length str)))
-    (cond
+    (budden-tools:show-exprt `(Строка-после-разбора ,str))
+    (cond ; ВЕВЕРСИИ:|*версия*|
      ((= str-len 0)
-      (indent-command nil)
-      (beginning-of-line-command nil))
+      (beep)
+      ;(indent-command nil)
+      ;(beginning-of-line-command nil)
+      )
      (t
       (complete-symbol-with-budden-tools-inner str str-len)
       ))))
