@@ -41,7 +41,7 @@ namespace eval tkcon {
             <<TkCon_Close>>		<$PRIV(CTRL)-w>
             <<TkCon_Find>>		<$PRIV(CTRL)F>
             <<TkCon_ExpandFile>>	<Control-Key-F3>
-            <<TkCon_ExpandTcl>>	        <Control-Alt-Key-u>
+            <<TkCon_ExpandTcl>>	        <Tab>
             <<TkCon_ExpandLisp>>	<Control-Alt-Key-i>
             <<TkCon_ExpandLisp>>	<Key-Tab>
             <<TkCon_LispFindDefinition>> <Alt-period>
