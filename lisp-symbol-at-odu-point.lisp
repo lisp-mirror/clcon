@@ -117,22 +117,12 @@
      (odu::character-offset lookup-end 1)
      (incf lookup-end-count -1))
    (let ss (clco::string-between-marks symbol-beginning lookup-end))
-   (let this-is-a-package-prefix
-     (or (alexandria:ends-with-subseq ":" ss)
-         (alexandria:ends-with-subseq "::" ss)))
-   (budden-tools:show-exprt this-is-a-package-prefix)
-   (cond
-    ((and this-is-a-package-prefix
-          (not return-symbol-too)
-          (not create-new))
-     (values ss nil))
-    (t
-     (let package (or
-                   (find-package package-designator)
-                   (progn
-                     (warn "Не могу понять пакет в ~S. Предполагаю :CL-USER" point)
-                     (find-package :cl-user))))
-     (get-symbol-from-current-point-part-3 ss package readtable our-readtable return-symbol-too create-new)))))
+   (let package (or
+                 (find-package package-designator)
+                 (progn
+                   (warn "Не могу понять пакет в ~S. Предполагаю :CL-USER" point)
+                   (find-package :cl-user))))
+   (get-symbol-from-current-point-part-3 ss package readtable our-readtable return-symbol-too create-new)))
 
 (defun get-symbol-from-current-point-part-3 (ss package readtable our-readtable return-symbol-too create-new)
   (perga-implementation:perga

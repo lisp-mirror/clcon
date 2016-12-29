@@ -328,8 +328,7 @@
   ;; получаем исходный текст, который нужно завершить
   (let* ((str (get-symbol-from-current-point :previous 2 :return-symbol-too nil))
          (str-len (length str)))
-    (budden-tools:show-exprt `(Строка-после-разбора ,str))
-    (cond ; ВЕВЕРСИИ:|*версия*|
+    (cond 
      ((= str-len 0)
       (beep)
       ;(indent-command nil)
@@ -344,11 +343,6 @@
          ;(package (or (find-package package-name) :cl-user))
          (rt-name (readtable-at-point))
          (rt (named-readtables:find-readtable rt-name))
-         #|(res (budden-tools::do-complete-symbol-with-budden-tools
-                 str
-                 package
-                 #'error
-                 (lambda (show-list) (call-scrollable-menu show-list nil))))|#
          (completions
           (let ((*readtable* rt))
             (swank:completions str package-name)))

@@ -43,7 +43,7 @@ namespace eval tkcon {
             <<TkCon_ExpandFile>>	<Control-Key-F3>
             <<TkCon_ExpandTcl>>	        <Tab>
             <<TkCon_ExpandLisp>>	<Control-Alt-Key-i>
-            <<TkCon_ExpandLisp>>	<Key-Tab>
+            <<TkCon_ExpandLisp>>	<Control-Key-space>
             <<TkCon_LispFindDefinition>> <Alt-period>
             <<TkCon_LispHyperdocLookup>> <Key-F1>
             <<TkCon_TclFindDefinition>> <Control-Key-F9>
