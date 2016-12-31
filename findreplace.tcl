@@ -373,7 +373,7 @@ namespace eval ::fndrpl {
         variable rconfirm
         variable SearchState
 
-        dict set $SearchState -ReplaceCanceled 0
+        dict set SearchState -ReplaceCanceled 0
 
         set leng [string length $SearchString]
 		set reng [string length $ReplaceString]
@@ -405,7 +405,7 @@ namespace eval ::fndrpl {
                 }
                 cancel {
                     $text tag remove sel $SearchPos
-                    dict set $SearchState -ReplaceCanceled 1
+                    dict set SearchState -ReplaceCanceled 1
                     return 0
                 }
             }
