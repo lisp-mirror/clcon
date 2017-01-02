@@ -305,7 +305,7 @@ namespace eval ::fndrpl {
         set findcase [dict get $SearchState -findcase]
 
         if {$SearchString eq ""} {
-            # dict set $SearchState -NoMoreMatches 1
+            # dict set SearchState -NoMoreMatches 1
             return -1
         }
         if {$findcase=="1"} {
@@ -355,7 +355,7 @@ namespace eval ::fndrpl {
             return 1
 
         } else {
-            # dict set $SearchState -NoMoreMatches 1
+            # dict set SearchState -NoMoreMatches 1
             return 0
         }
 
