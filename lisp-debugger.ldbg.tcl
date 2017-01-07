@@ -632,6 +632,9 @@ namespace eval ::ldbg {
     proc ParseRestarts {} {
         variable DebugEvent
         set RestartsL [lindex $DebugEvent 4]
+        if {[::mprs::Null $RestartsL]} {
+            return [list "" 0]
+        }
         if {![::mprs::Consp $RestartsL]} {
             error "Ожидался конс: $RestartsL"
         }
