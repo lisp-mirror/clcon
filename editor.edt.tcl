@@ -224,7 +224,7 @@ namespace eval ::edt {
         set tab_name [dict get $MRUWinListEntry name]
         set btext [Bi2btext $Bi]
         set asterik [BooleanToAsterik [$btext edit modified]]
-        string cat $tab_name $asterik        
+        string cat $asterik $tab_name
     }
 
     # Init buffer GUI when it is first created 
