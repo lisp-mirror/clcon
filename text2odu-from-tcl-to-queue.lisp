@@ -179,6 +179,7 @@
 
 (defun order-call-oduvanchik-from-itself (fn-and-args)
   "See oduvanchik::eval-order-call-oduvanchik-from-itself. Called from lisp only"
+  ;(sb-debug:print-backtrace :count 5)
   (post-oduvan-event
    (make-text2odu-event
     :kind 'call-oduvanchik-from-itself

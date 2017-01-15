@@ -248,26 +248,23 @@
 
 
 (defmethod oi::recompute-tags-up-to (end-line (background (eql t)))
-  "We always recompute everything to the end of file. end-line is required to know buffer only"
+  "В этом методе (в отличие от метода с background nil), we always recompute everything to the end of file. end-line is required to know buffer only. Вызывающая сторона должна была сбросить номер волны раскраски"
   (oi::check-something-ok)
   (let* ((buffer (line-buffer end-line))
          (dummy1 (assert buffer))
          (buffer-end (oi::buffer-end-mark buffer))
          (dummy2 (assert buffer-end))
-         (real-end-line (mark-line buffer-end))
-         (new-highlight-wave-id (reset-background-highlight-process buffer))
-         (level (oi::buffer-tag-line-number buffer))
-         (start-line
-          (iter (for line initially real-end-line then prev)
-                (for prev = (line-previous line))
-                (let ((validp (< (oi::line-number line) level)))
-                  (finding line such-that (or validp (null prev)))))))
+         ;(real-end-line (mark-line buffer-end))
+         ;(level (oi::buffer-tag-line-number buffer))
+         (start-line (oi::НАЙТИ-ПЕРВУЮ-СТРОЧКУ-С-УСТАРЕВШИМ-ТЕГОМ end-line)))
     (declare (ignore dummy1 dummy2))
-    (oi::check-something-ok)
-    (clco::order-call-oduvanchik-from-itself
-     (list 'recompute-line-tags-starting-from-line-background
-           buffer start-line new-highlight-wave-id))
-    ))
+    (assert start-line () "Упустили случай пустого буфера? Странно, а где тогда живёт end-line?")
+    (let ((new-highlight-wave-id (reset-background-highlight-process buffer)))
+      (oi::check-something-ok)
+      (clco::order-call-oduvanchik-from-itself
+       (list 'recompute-line-tags-starting-from-line-background
+             buffer start-line new-highlight-wave-id))
+      )))
 
 (defun recompute-line-tags-starting-from-line-background (buffer start-line highlight-wave-id)
   (assert-we-are-in-oduvanchik-thread)
@@ -281,7 +278,11 @@
       (t 
        (oi::check-something-ok)
        (when start-line
-         (oi::recompute-line-tag start-line)
+         (let ((prev (line-previous start-line)))
+           (when prev
+             (assert (oi::line-tag-valid-p prev) () "Ожидалось, что предыдущая строка уже раскрашена")))
+         ;; line-tag вызывается ради попбочного эффекта. Поскольку мы уже утвердили, что предыдущая строчка раскрашена (или мы стоим на первой строчке), это не приведёт к большим затратам времени
+         (line-tag start-line)
          (let ((next (oi::line-next start-line)))
            (when next
              (clco::order-call-oduvanchik-from-itself
