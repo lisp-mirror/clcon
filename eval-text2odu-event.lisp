@@ -122,8 +122,6 @@
          (existing (find-buffer-by-name name))
          (result (or existing (make-buffer name))))
     (change-to-buffer result)
-    (unless existing
-      (auto-save-mode-command 0))
     ))
 
 (defhvar "Swank connection" "Always nil (hopefully)")
@@ -137,7 +135,6 @@
       (setf (buffer-pathname b) (pathname file-name))
       (change-to-buffer b)
       (oduvanchik-interface:defhvar "Swank Connection" "Ugugu" :buffer b)
-      (auto-save-mode-command 0)
       ;(lisp-mode-command nil)
 
       ; borrowed from odu::read-buffer-file
@@ -288,11 +285,6 @@
        )))
   (check-something-ok)
   )
-
-(defun assert-we-are-in-oduvanchik-thread ()
-  (assert (string= 
-           (bt:thread-name (bt:current-thread))
-           "Oduvanchik")))
 
 (defun eval-pending-text2odu-events (&key (hang t))
   (assert-we-are-in-oduvanchik-thread)

@@ -9,8 +9,7 @@
 
 oi::line-tag -> ... -> oi::recompute-syntax-marks -> clco::notify-highlight-single-line -> кладёт в очередь
 
-вызывается из: oi::line-syntax-info, odu::package-at-point, oi::sync-dis-line-tag -
-из них sync-dis-line-tag отключил (и ещё что-то отключил).
+вызывается из: oi::line-syntax-info, odu::package-at-point  - из них что-то отключил.
 
 #### Package-at-point
 Мы должны синхронно докрасить до этой точки - odu::package-at-point -> oi::line-tag 
