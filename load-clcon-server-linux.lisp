@@ -13,7 +13,7 @@
 (error "Quicklisp уже загружен, так быть не должно. См. как запускать clcon/Яр/yar по инструкции")
 
 #-quicklisp
-(let ((quicklisp-init "~/yar/quicklisp/setup.lisp"
+(let ((quicklisp-init "/y/d/yar/quicklisp/setup.lisp"
         ))
   (cond
    ((probe-file quicklisp-init)
@@ -21,7 +21,7 @@
    (t
     (error "Не найден setup.lisp из quicklisp"))))
 
-(setq ql:*local-project-directories* (list "~/yar/lp/"))
+(setq ql:*local-project-directories* (list "/y/d/yar/lp/"))
 
 
 ;;;;;;;;;;;;;;;;; Preliminary checks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
