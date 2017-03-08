@@ -167,7 +167,7 @@
   ;; CallBatFromGuiDetached.exe is used to bypass problems with run-program
   (let ((cmd 
         #+win32 (format nil "c:\\yar\\bin\\util\\CallBatFromGuiDetached.exe c:\\yar\\bin\\util\\clcon-client.cmd -swank-port ~A" *clcon-swank-port*)
-        #+linux (format nil "sh ~~/yar/bin/util/clcon-client.sh -swank-port ~A" *clcon-swank-port*)
+        #+linux (format nil "sh /y/d/yar/bin/util/clcon-client.sh -swank-port ~A" *clcon-swank-port*)
         ))
   (uiop/run-program:run-program cmd)))
 
