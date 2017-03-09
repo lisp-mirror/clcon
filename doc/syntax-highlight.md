@@ -6,10 +6,41 @@
 
 ### Текущее использование раскраски
 
+oi::update-tag-line-number  говорит о том, что эта и следующие строки требуют перевычисления. 
 
-oi::line-tag -> ... -> oi::recompute-syntax-marks -> clco::notify-highlight-single-line -> кладёт в очередь
+Получение тега - oi::line-tag, к-рый вызывает последовательность явлений:
 
-вызывается из: oi::line-syntax-info, odu::package-at-point  - из них что-то отключил.
+````
+oi::line-tag 
+  Если тег устарел, то:
+  oi::recompute-tags-up-to * nil (синхронно)
+    в цикле:
+    oi::recompute-line-tag
+      oi::recompute-line-tag-inner-1
+        oi::recompute-syntax-marks 
+          oi::recompute-font-marks-fn-for-line
+            oduvanchik::recompute-syntax-marks-function 
+              значение переменной "Recompute Syntax Marks Function" в режиме. 
+              это - ф-я, к-рая перевычисляет тег для данной строки и возвращает истину, если что-то поменялось. На входе и выходе - состояние лексера. 
+          - возвращает истину, если что-то поменялось, и тогда вызывается
+        clco::notify-highlight-single-line -> кладёт в очередь событий, откуда уже хода назад нет. 
+      oi::recompute-tags-up-to * t
+    oi::ПЕРЕРАСКРАСИТЬ-БУФЕР
+      oi::recompute-tags-up-to * t (асинхронно)
+        в цикле, проходящем через очередь: 
+        oduvanchik::recompute-line-tags-starting-from-line-background
+          oi::line-tag
+````
+### А как хотим переделать?
+В принципе надо бы не отправлять повторно, если строка мигнула, но сейчас не до этого. 
+Поэтому для буфера Яра:
+-- update-tag-line-number обнуляет весь буфер 
+-- recompute-syntax-marks всегда возвращает истину, как будто раскраска поменялась. При этом, вычисление делается только в том случае, если буфер помечен как нераскрашенный. Запускается лексер и парсер. 
+
+ ИТАК. 
+1. Определить, буфер устарел ли?
+2. Сделать полную раскраску. 
+
 
 #### Package-at-point
 Мы должны синхронно докрасить до этой точки - odu::package-at-point -> oi::line-tag 

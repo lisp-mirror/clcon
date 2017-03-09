@@ -267,6 +267,7 @@
       )))
 
 (defun recompute-line-tags-starting-from-line-background (buffer start-line highlight-wave-id)
+  "Создаёт подобие фоновой задачи для раскраски строк до конца файла. Фоновость имитируется через цепочку событий, каждое из которых кладёт событие-продолжение. Смысл состоит в том, чтобы, не отвлекаясь от другой работы, не спеша вычислить, а главное, отправить в tcl раскраску всех строк до конца файла"
   (assert-we-are-in-oduvanchik-thread)
   (let ((check-the-buffer (line-buffer start-line)))
     (cond
