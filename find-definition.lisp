@@ -372,7 +372,7 @@
   #+windows
   (budden0::cmd-c "start ~A" url)
   #-windows
-  (print "Sorry, clco::open-url can not (yet) automatically open~%~A~%Please send me a patch~%" url)
+  (warn "Sorry, clco::open-url can not (yet) automatically open~%~A~%Please send me a patch~%" url)
   nil)
 
 ;get-token-prefix
