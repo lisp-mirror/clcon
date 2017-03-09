@@ -204,9 +204,9 @@ namespace eval tkcon {
         event delete <<Paste>> <$PRIV(CTRL)V>
         ::tkcon::ClipboardKeysyms <Copy> <Cut> <Paste>
 
-        bind TkConsole <Insert> {
-            catch { ::tkcon::Insert %W [::tkcon::GetSelection %W] }
-        }
+        #bind TkConsole <Insert> {
+        #    catch { ::tkcon::Insert %W [::tkcon::GetSelection %W] }
+        #}
 
         bind TkConsole <Triple-1> {+
             catch {

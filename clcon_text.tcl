@@ -560,7 +560,7 @@ namespace eval ::clcon_text {
 
            foreach { KP Norm } { \
                               <KP_Prior> <Prior> <KP_Next> <Next> \ 
-                              <KP_Delete> <Delete> <KP_Insert> <Insert> \
+#                              <KP_Delete> <Delete> <KP_Insert> <Insert> \
 #                             <KP_Home> <Home> <KP_End> <End> \
 #                             <KP_Up> <Up> <KP_Down> <Down> \
 #                             <KP_Left> <Left> <KP_Right> <Right> \ 
