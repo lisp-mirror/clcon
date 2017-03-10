@@ -111,11 +111,6 @@
 ; May be needed sometimes for the debugging. 
 ; (pushnew :oduvan-use-sleep-in-dispatch *features*)
  
-;; For debugging editor with client-server communcation enabled for
-;; only single buffer. 
-;; (pushnew :use-oduvan-for-first-clcon_text-pathname-only *features*)
-;; if you are using trunk, you can also grep "buf1" in *.tcl to disable some debugging code in the editor.
- 
 ; comment next line if code highlight causes problems
 (pushnew :oduvan-enable-highlight *features*)
 

@@ -83,22 +83,10 @@
    
     ))
 
-; for debugging only. We only work for 
-#+use-oduvan-for-first-clcon_text-pathname-only
-(defvar *first-clcon_text-pathname* nil)
-
 ;  :clcon-server
 (defun post-oduvan-event (event)
   "Can be invoked in any thread"
-  #+use-oduvan-for-first-clcon_text-pathname-only
-  (let ((clcon_text
-         (text2odu-event-clcon_text-pathname event)))
-    (cond
-      ((null *first-clcon_text-pathname*)
-       (setf *first-clcon_text-pathname* clcon_text))
-      ((not (string= *first-clcon_text-pathname* clcon_text))
-       (return-from post-oduvan-event nil))
-      ))
+  ;(assert (TEXT2ODU-EVENT-SWANK-CONNECTION event))
   #-clcon-oduvan (print `(post-oduvan-event ,event))
   #+clcon-oduvan
   (bt:with-lock-held (*text2odu-event-queue-lock*)
