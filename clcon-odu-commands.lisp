@@ -350,8 +350,9 @@
          ; (longest-completion (second completions))
          )
     (flet ((replace-str-with (res)
-      (delete-previous-character-command str-len)
-      (insert-string (current-point) res)))
+      (oi::modifying-buffer (oi::current-buffer)
+        (delete-previous-character-command str-len)
+        (insert-string (current-point) res))))
     (cond
      ((null completion-list)
       (bell-with-tcl))
