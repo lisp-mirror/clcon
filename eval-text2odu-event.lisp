@@ -1,7 +1,7 @@
 ;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
 ;; evaluation of text2odu events. Takes place in editor thread.
 ;; see doc/text2odu.md
-(in-package :oduvanchik)
+(in-package :oduvanchik) 
 
 
 (defun check-mark-is-at-row-and-col (mark row col)
@@ -76,12 +76,16 @@
             (buffer (oi::clcon_text-to-buffer clcon_text)))
        (assert buffer)
        (use-buffer buffer 
-         (odu::check-something-ok)
-         (with-mark-in-row-col (beg (clcon-server::text2odu-event-beg e))
-           (insert-string beg (clcon-server::text2odu-event-string e))
-           (odu::check-something-ok beg))))))
-  nil
-  )
+         (oi::invoke-modifying-buffer 
+           (alexandria:named-lambda
+            eval-before-tcl-text-insert-synchronized-part
+            ()
+            (odu::check-something-ok)
+            (with-mark-in-row-col (beg (clcon-server::text2odu-event-beg e))
+              (insert-string beg (clcon-server::text2odu-event-string e))
+              (odu::check-something-ok beg)))
+           buffer)))))
+  nil)
 
 (defun eval-before-tcl-text-delete (e)
   "See clco::notify-oduvan-tcl-text-delete"
@@ -92,17 +96,24 @@
             (clcon_text (clcon-server::text2odu-event-clcon_text-pathname e))
             (buffer (oi::clcon_text-to-buffer clcon_text)))
        (assert buffer)
-       (use-buffer buffer
-         (with-mark-in-row-col (beg ebeg)
+       (use-buffer
+        buffer
+        (oi::invoke-modifying-buffer 
+         (alexandria:named-lambda
+          eval-before-tcl-text-insert-synchronized-part
+          ()
+          (with-mark-in-row-col
+           (beg ebeg)
            (cond
-             (eend
-              (with-mark-in-row-col (end eend)
-                (delete-characters-between-marks beg end)))
-             (t
-              (delete-characters beg 1)
-              ))
-           (check-something-ok beg)
-           )))))
+            (eend
+             (with-mark-in-row-col
+              (end eend)
+              (delete-characters-between-marks beg end)))
+            (t
+             (delete-characters beg 1)
+             ))
+           (check-something-ok beg)))
+         buffer)))))
   t)
 
 (defun find-buffer-by-name (buffer-name)
@@ -297,12 +308,12 @@
 
 
 (oduvanchik::defcommand "evaltext2oduevent" (p)
-    "Get and eval single clcon event"
+     "Get and eval single  clcon event"
     "Get and eval single clcon event"
   (check-something-ok)
   (eval-pending-text2odu-events :hang p)
   (check-something-ok)
-  ;(oduvanchik.x11::kick-oduvanchik)
+  ;(oduvanchik.x11::kick-oduvanchik )
   )
 
 
