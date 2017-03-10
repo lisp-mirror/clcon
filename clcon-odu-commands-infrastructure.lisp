@@ -111,25 +111,97 @@
                                    marks))
       (copy-list marks)))
 
+(defun НАЙТИ-ПОСЛЕДНИЙ-ШРИФТ-В-СТРОКЕ (line default)
+  "Если не найдено, ищет в предыдущих строках. Если и там не найдено, возвращает умолчание. См. примечание к НАЙТИ-ШРИФТ-ДЛЯ-НАЧАЛА-СТРОКИ"
+  (loop 
+    (let* ((tag (line-tag-no-recalc line))
+           (syntax-info (oi::tag-syntax-info tag))
+           (copy-marks (copy-list (oi::sy-font-marks syntax-info)))
+           (sorted-marks (sort copy-marks '< :key 'oi::mark-charpos))
+           (ВОЗМОЖНО-ПОСЛЕДНЯЯ-МАРКА (car (last sorted-marks)))
+           (ПРЕД-СТРОКА (line-previous line)))
+      (cond
+       (ВОЗМОЖНО-ПОСЛЕДНЯЯ-МАРКА
+        (return (oi::font-mark-font ВОЗМОЖНО-ПОСЛЕДНЯЯ-МАРКА)))
+       (ПРЕД-СТРОКА (setf line ПРЕД-СТРОКА))
+       (t (return default))))))
+
+(defun НАЙТИ-ШРИФТ-ДЛЯ-НАЧАЛА-СТРОКИ (line)
+  "Если шрифт не указан в начале строки, ищем его в предыдущих строках. 
+Это может понадобиться только при раскраске лексером Яра многострочных структур.
+После завершения раскраски отсутствие марки в начале строки означает, что начало строки имеет шрифт 0"
+  (let* ((tag (line-tag-no-recalc line))
+         (default 0)
+         (syntax-info (oi::tag-syntax-info tag))
+         (copy-marks (copy-list (oi::sy-font-marks syntax-info)))
+         (sorted-marks (sort copy-marks '< :key 'oi::mark-charpos))
+         (ВОЗМОЖНО-ПЕРВАЯ-МАРКА (first sorted-marks))
+         (ПРЕД-СТРОКА (line-previous line))
+         (ЕСТЬ-МАРКА-В-НАЧАЛЕ-СТРОКИ
+          (and ВОЗМОЖНО-ПЕРВАЯ-МАРКА (= 0 (oi:mark-charpos ВОЗМОЖНО-ПЕРВАЯ-МАРКА)))))
+    (cond
+     (ЕСТЬ-МАРКА-В-НАЧАЛЕ-СТРОКИ
+      (oi::font-mark-font ВОЗМОЖНО-ПЕРВАЯ-МАРКА))
+     (ПРЕД-СТРОКА
+      (НАЙТИ-ПОСЛЕДНИЙ-ШРИФТ-В-СТРОКЕ ПРЕД-СТРОКА default))
+     (t
+      default))))
+
+(defun line-sy-font-marks (line)
+  (oi::sy-font-marks (oi::tag-syntax-info (line-tag-no-recalc line))))  
+
+(defun ПЕРЕНЕСТИ-ШРИФТ-С-ПРОШЛЫХ-СТРОК (line new-mark-pos)
+  "new-mark-pos - это позиция в строке марки, к-рую мы собираемся вставить в эту строку после возврата из данной ф-ии. 
+В Одуванчике принято, что строка начинается с нулевого шрифта. Если она должна начинаться с другого шрифта, то должна быть вставлена марка. А лексер Яра ничего об этом не знает и просто вызывает smart-insert-font-mark! для каждого начала лексемы. Данная функция смотрит на line и все предыдущие строки, у которых пока нет марок, ищет последнюю лексему (где-то в прошлом) и, если её шрифт - не 0, вставляет во всех предшествующих строках соответствующий шрифт. Если new-mark-pos <> 0, то вставляет и в эту строчку. "
+  (let ((ШРИФТ-ПО-УМОЛЧАНИЮ 0)
+        ;; для начала найдём самую раннюю строчку, к-рую надлежит менять
+        (САМАЯ-РАННЯЯ-СТРОКА-БЕЗ-МАРОК 
+         (let* ((cur line)
+                ; следующая по файлу, но предыдущая по итерациям
+                (following nil))
+           (loop
+             (unless cur
+               ;; дошли до начала и нигде ничего нет. Однако поставим здесь 0
+               (return line))
+             (when (line-sy-font-marks cur)
+               (return following))
+             (setf following cur)
+             (setf cur (line-previous cur))))))
+    ;; если ничего не надо менять, то выходим
+    (unless САМАЯ-РАННЯЯ-СТРОКА-БЕЗ-МАРОК
+      (return-from ПЕРЕНЕСТИ-ШРИФТ-С-ПРОШЛЫХ-СТРОК nil))
+    ;; определили шрифт
+    (let* ((ШРИФТ (НАЙТИ-ШРИФТ-ДЛЯ-НАЧАЛА-СТРОКИ САМАЯ-РАННЯЯ-СТРОКА-БЕЗ-МАРОК)))
+      (let ((cur САМАЯ-РАННЯЯ-СТРОКА-БЕЗ-МАРОК))
+        ;; теперь идём по строчкам вперёд и вписываем этот шрифт.
+        ;; Если у нас будет большой кусок
+        ;; без марок, то мы будем всё время на нём тормозить, 
+        ;; поэтому вписываем его безусловно (даже если шрифт по умолчанию).
+        (loop
+          (cond
+           ((null cur)
+            (error "Куда-то пропала строчка..."))
+           ((line-sy-font-marks cur)
+            (error "Ошибка в алгоритме раскраски"))
+           ((or
+             (and (eq line cur)
+                  (not (= new-mark-pos 0)))
+             (not (eq line cur)))              
+            (oi::smart-insert-font-mark!
+             (oi::font-mark cur 0 ШРИФТ) cur
+             :send-highlight nil)))
+          ;; Проверяем условие возврата и переходим к следующей итерации
+          (when (eq cur line)
+            (return))
+          (setf cur (line-next cur)))))))
+
 (defun line-effective-marks (line)
-  "Marks of the line plus marks of odu::*open-paren-font-marks*"
+  "Список, состоящий из шрифта в начале строки (он может быть унаследован с прошлой строки), Marks of the line plus marks of odu::*open-paren-font-marks*.Первый элемент списка - всегда число (шрифт), а остальные - марки!"
   (oi::check-something-ok)
   (let* ((tag (line-tag-no-recalc line))
          (syntax-info (oi::tag-syntax-info tag))
-         (marks ; this worked 
-          (oi::sy-font-marks syntax-info)
-          ;(oi::line-marks line) ; this ceased to work before. 
-           )
+         (marks (oi::sy-font-marks syntax-info))
          (sorted-marks (sort (augment-with-parens marks line) '< :key 'oi::mark-charpos)))
-    (declare (ignorable syntax-info))
-    ;(dolist (mark sorted-marks) 
-    ;  (typecase mark
-    ;    (oi:font-mark
-    ;      (format t "~a: ~a~%" mark (oi::font-mark-font mark)))))
-    ;(if odu::*open-paren-font-marks*
-    ;    (format t "parens: ~a ~a~%" (region-start odu::*open-paren-font-marks*)
-    ;        (region-end odu::*open-paren-font-marks*))
-    ;(format t "parens: nil~%"))
     (oi::check-something-ok)
     sorted-marks
     ))
