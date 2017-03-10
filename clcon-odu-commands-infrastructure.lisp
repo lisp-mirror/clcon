@@ -248,7 +248,9 @@
 
 
 (defmethod oi::recompute-tags-up-to (end-line (background (eql t)))
-  "В этом методе (в отличие от метода с background nil), we always recompute everything to the end of file. end-line is required to know buffer only. Вызывающая сторона должна была сбросить номер волны раскраски"
+  "В этом методе (в отличие от метода с background nil), we always recompute everything to the end of file. end-line is required to know buffer only. Вызывающая сторона должна была сбросить номер волны раскраски. Родственная функция - oduvanchik::start-background-repaint-after-recomputing-entire-buffer"
+  (assert-we-are-in-oduvanchik-thread)
+  (assert (sb-thread:holding-mutex-p *invoke-modifying-buffer-lock*))
   (oi::check-something-ok)
   (let* ((buffer (line-buffer end-line))
          (dummy1 (assert buffer))
@@ -256,7 +258,12 @@
          (dummy2 (assert buffer-end))
          ;(real-end-line (mark-line buffer-end))
          ;(level (oi::buffer-tag-line-number buffer))
-         (start-line (oi::НАЙТИ-ПЕРВУЮ-СТРОЧКУ-С-УСТАРЕВШИМ-ТЕГОМ end-line)))
+         (start-line 
+          (ecase (oi::syntax-highlight-mode buffer)
+            (:send-highlight-after-recomputing-entire-buffer
+             (oi::first-line-of-buffer buffer))
+            (:send-highlight-from-recompute-line-tag
+             (oi::НАЙТИ-ПЕРВУЮ-СТРОЧКУ-С-УСТАРЕВШИМ-ТЕГОМ end-line)))))
     (declare (ignore dummy1 dummy2))
     (assert start-line () "Упустили случай пустого буфера? Странно, а где тогда живёт end-line?")
     (let ((new-highlight-wave-id (reset-background-highlight-process buffer)))
@@ -266,8 +273,38 @@
              buffer start-line new-highlight-wave-id))
       )))
 
+(defun start-background-repaint-after-recomputing-entire-buffer (buffer)
+  (assert-we-are-in-oduvanchik-thread)
+  (assert (sb-thread:holding-mutex-p *invoke-modifying-buffer-lock*))
+  (oi::check-something-ok)
+  (let* ((start-line (oi::first-line-of-buffer buffer))
+         (new-highlight-wave-id (reset-background-highlight-process buffer)))
+    (when start-line
+      (clco::order-call-oduvanchik-from-itself
+       (list 'background-repaint-after-recomputing-entire-buffer
+             buffer start-line new-highlight-wave-id))
+      )))
+
+      
+
+(defun background-repaint-after-recomputing-entire-buffer (buffer start-line highlight-wave-id)
+  "Мы перекрасили буфер целиком. Запустим процесс фоновой раскраски. Примерная копия с recompute-line-tags-starting-from-line-background "
+  (assert-we-are-in-oduvanchik-thread)
+  (cond
+    ((not (= highlight-wave-id (oi::buffer-highlight-wave-id buffer)))
+     ;; We're obsolete. Die.
+     (return-from background-repaint-after-recomputing-entire-buffer nil))
+    (t 
+     (oi::check-something-ok)
+     (oi::maybe-send-line-highlight-to-clcon start-line)
+     (let ((next (oi::line-next start-line)))
+      (when next
+        (clco::order-call-oduvanchik-from-itself
+          (list 'background-repaint-after-recomputing-entire-buffer
+              buffer next highlight-wave-id)))))))
+
 (defun recompute-line-tags-starting-from-line-background (buffer start-line highlight-wave-id)
-  "Создаёт подобие фоновой задачи для раскраски строк до конца файла. Фоновость имитируется через цепочку событий, каждое из которых кладёт событие-продолжение. Смысл состоит в том, чтобы, не отвлекаясь от другой работы, не спеша вычислить, а главное, отправить в tcl раскраску всех строк до конца файла"
+  "Создаёт подобие фоновой задачи для раскраски строк до конца файла. Фоновость имитируется через цепочку событий, каждое из которых кладёт событие-продолжение. Смысл состоит в том, чтобы, не отвлекаясь от другой работы, не спеша вычислить, а главное, отправить в tcl раскраску всех строк до конца файла. Родственная функция - background-repaint-after-recomputing-entire-buffer"
   (assert-we-are-in-oduvanchik-thread)
   (let ((check-the-buffer (line-buffer start-line)))
     (cond
@@ -284,6 +321,10 @@
              (assert (oi::line-tag-valid-p prev) () "Ожидалось, что предыдущая строка уже раскрашена")))
          ;; line-tag вызывается ради попбочного эффекта. Поскольку мы уже утвердили, что предыдущая строчка раскрашена (или мы стоим на первой строчке), это не приведёт к большим затратам времени
          (line-tag start-line)
+         (when (eq (oi::syntax-highlight-mode buffer) :send-highlight-after-recomputing-entire-buffer)
+           ;; В этом режиме мы отключили отправку раскраски непосредственно из тега, т.к. при этом забилась бы очередь отправляемых раскрасок. 
+           ;; Поэтому нам приходится отправлять раскраску явно. 
+           (oi::maybe-send-line-highlight-to-clcon start-line))
          (let ((next (oi::line-next start-line)))
            (when next
              (clco::order-call-oduvanchik-from-itself
