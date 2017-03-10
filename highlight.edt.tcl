@@ -88,9 +88,11 @@ namespace eval ::edt {
     }
 
     proc ApplyHighlightToLine {clcon_text s} {
-        variable NumberOfPendingHighlights
-        incr NumberOfPendingHighlights
-        after idle [list ::edt::DoApplyHighlightToLine $clcon_text $s]
+        if {[winfo exists $clcon_text]} {
+            variable NumberOfPendingHighlights
+            incr NumberOfPendingHighlights
+            after idle [list ::edt::DoApplyHighlightToLine $clcon_text $s]
+        }
     }
 
     # Display change of current package in a status bar
@@ -128,7 +130,7 @@ namespace eval ::edt {
 
     proc DoApplyHighlightToLine {clcon_text s} {
         # text could disappear
-        catch {
+        if {[winfo exists $clcon_text]} {
             DoApplyHighlightToLineInner $clcon_text $s
         }
         incr NumberOfPendingHighlights -1
