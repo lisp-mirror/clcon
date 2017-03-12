@@ -606,11 +606,6 @@ proc ::tkcon::AttachSwank {name continuation} {
         
         ::tkcon::SetupSwankConnection $sock $PRIV(console) [list ::tkcon::AttachSwankTail $continuation]
 
-        # Для запуска файлов из командной строки
-        if {[info proc ::AttachSwankHook] != {}} {
-            ::AttachSwankHook
-            }    
-
         return
 
     } elseif { $con(state) eq "initialized" } {
@@ -630,6 +625,13 @@ proc ::tkcon::AttachSwankTail {continuation} {
     variable ATTACH
     ::mprs::AssertEq $PRIV(SwankReplReady) 1
     WritePassiveText $PRIV(console) "Connected to swank" output
+
+
+    # Для запуска файлов из командной строки
+    if {[info proc ::AttachSwankHook] != {}} {
+       ::AttachSwankHook
+    }    
+
     Prompt
     eval $continuation
 }

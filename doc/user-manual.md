@@ -36,6 +36,17 @@ Linux: ~/.clconrc
 Можно попробовать фонт, не перегружая программу, если написать в консоли
 ```.. tkcon font "Courier New" 10```
 
+
+### Действия при соединении со SWANK
+
+Процедура ::AttachSwankHook вызывается, если она определена, после соединения с сервером swank.
+
+```
+proc ::AttachSwankHook {} {
+   ::tkcon::SendEventToSwank "(named-readtables:in-readtable :buddens-readtable-a)" {}
+}
+```
+
 Автодополнение, продолжение и автоподстановка
 ---------------------------
 Completion of lisp symbols works in console, use **Ctrl-Space** to complete lisp symbol prefix (may contain package or part of package name).
