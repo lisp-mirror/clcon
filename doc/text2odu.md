@@ -120,7 +120,6 @@ MaybeSendToLisp понимает:
 Удаление текста переводи в clco:notify-oduvan-tcl-text-delete
 
 Создание и удаление буфера: ConstructBackendBuffer и DestroyBackendBuffer
-(FIXME DestroyBackendBuffer игнорируется лиспом)
 (FIXME не хватает ResyncBackendBuffer после перезапуска одуванчика, но не совсем ясно, как сделать)
 
 CallOduvanchikFunction - передаёт событие clco:call-oduvanchik-function-with-clcon_text - переход в режим ведущего одуванчика, выполнение кода

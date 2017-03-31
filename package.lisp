@@ -32,6 +32,7 @@
 
            #:*globally-disable-sldb*
            #:otladitq--n--jj-potok-v-chjornojj-konsoli
+           "Выпасть-в-ред"
            )
   )
 
