@@ -280,32 +280,43 @@
       (push (format nil "::tkcon::WriteActiveText $b \"~a \" end \"::edt::OpenUrl http://filonenko-mikhail.github.io/cltl2-doc/ru/~a\";" n x) res))
     (apply #'concatenate 'string (reverse res))))
 
+(defun ensure-table-cltl2 ()
+  (cond
+   (*table-cltl2* *table-cltl2*)
+   (t
+    (multiple-value-bind (result error)
+      (ignore-errors
+       (parser-cltl2-ru::parse 
+        (cl-html-parse:parse-html 
+         (drakma:http-request 
+          "http://filonenko-mikhail.github.io/cltl2-doc/ru/symbols.html"))))
+      (cond
+       (result
+        (setf *table-cltl2* result))
+       (error
+        (format *error-output* "~&Ошибка при получении индекса cltl2: ~S~%" error)
+        nil))))))
+
 (defun describe-all (symbol)
-  (unless *table-cltl2*
-    (setf 
-     *table-cltl2* 
-     (parser-cltl2-ru::parse 
-      (cl-html-parse:parse-html 
-       (drakma:http-request 
-        "http://filonenko-mikhail.github.io/cltl2-doc/ru/symbols.html")))))
+  (ensure-table-cltl2)
   (list (format nil "~a" (ignore-errors (swank::arglist symbol)))
-        (when (eq (symbol-package symbol) (find-package :cl))
-          (let ((entry (find-if 
-                        (lambda (x) 
-                          (string= 
-                           (parser-cltl2-ru::entry-expression x) 
-                           (string-downcase (symbol-name symbol)))) 
-                        *table-cltl2*)))
-            (when entry
-              (mapcar (lambda (x) (concatenate 'string 
-                                               (format nil "$b RoInsert end \"~a \";" (parser-cltl2-ru::entry-line-name x))
-                                               (tcl-links 
-                                                (parser-cltl2-ru::entry-line-links x))))
-                      (parser-cltl2-ru::entry-types entry)))))
-        (with-output-to-string (s) 
-          (let ((*standard-output* s)) 
-            (describe symbol)))
-        (clco::server-lookup-definition-as-list symbol)))
+          (when (and *table-cltl2* (eq (symbol-package symbol) (find-package :cl)))
+            (let ((entry (find-if 
+                          (lambda (x) 
+                            (string= 
+                             (parser-cltl2-ru::entry-expression x) 
+                             (string-downcase (symbol-name symbol)))) 
+                          *table-cltl2*)))
+              (when entry
+                (mapcar (lambda (x) (concatenate 'string 
+                                                 (format nil "$b RoInsert end \"~a \";" (parser-cltl2-ru::entry-line-name x))
+                                                 (tcl-links 
+                                                  (parser-cltl2-ru::entry-line-links x))))
+                        (parser-cltl2-ru::entry-types entry)))))
+          (with-output-to-string (s) 
+            (let ((*standard-output* s)) 
+              (describe symbol)))
+          (clco::server-lookup-definition-as-list symbol)))
               
                 
         
