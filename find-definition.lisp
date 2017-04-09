@@ -206,6 +206,19 @@
          (command (format nil "tkcon::EditFileAtOffset ~A ~A.~A" escaped-file row col)))
     (eval-in-tcl command :nowait nil)))
 
+
+(defun edit-string-at-row-and-col (string &key (row 1) (col 0) (prefix "edit-string-at-offset.") (type "txt"))
+  "Сохраняет строку в файл и редактирует его. Файл удаляется после открытия - не факт, что это не вызовет проблем" 
+  (perga-implementation:perga
+   (check-type row integer)
+   (check-type col integer)
+   (let filename (uiop/stream::get-temporary-file :prefix (budden-tools:|Закодировать-строку-в-имя-файла| prefix) :type type)) ; не экспортировано... ждём проблем...
+   ;; Здесь есть состояние гонки с другим экземпляром clco? ПРАВЬМЯ
+   (budden-tools:save-string-to-file string filename)
+   (editor-budden-tools:goto-xy filename row col)
+   (delete-file filename)
+   filename))
+
 (defun write-code-to-pass-to-file-line-char (stream file line char)
   "Writes code which would pass to file at line and char. Lines start from 1, chars start from 0. See also write-code-to-pass-to-loc 
 "

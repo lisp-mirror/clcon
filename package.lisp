@@ -33,6 +33,7 @@
            #:*globally-disable-sldb*
            #:otladitq--n--jj-potok-v-chjornojj-konsoli
            "Выпасть-в-ред"
+           #:edit-string-at-row-and-col
            )
   )
 
