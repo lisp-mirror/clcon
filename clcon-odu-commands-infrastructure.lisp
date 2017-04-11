@@ -223,13 +223,13 @@
     (oi::check-something-ok)
     ))
 
-(defun numbered-line-of-buffer-by-clcon (clcon_text number)
+(defun numbered-line-of-buffer (buffer number)
   "Number starts from 1. See also oi::mark-row-and-col"
   (let* ((first-line 
           (slot-value
            (slot-value
             (slot-value
-             (oi::clcon_text-to-buffer clcon_text)
+             buffer
              'oi::%region)
             'oi::start)
            'oi::line))
@@ -237,10 +237,14 @@
          (i 1))
     (assert (> number 0))
     (loop
-       (when (= number i)
-         (return line))
-       (setf line (oi::line-next line))
-       (incf i))))
+      (when (= number i)
+        (return line))
+      (setf line (oi::line-next line))
+      (incf i))))
+
+(defun numbered-line-of-buffer-by-clcon (clcon_text number)
+  "Number starts from 1. See also oi::mark-row-and-col"
+  (numbered-line-of-buffer (oi::clcon_text-to-buffer clcon_text) number))
        
     
 
