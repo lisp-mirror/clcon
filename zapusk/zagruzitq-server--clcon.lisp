@@ -159,11 +159,15 @@
 ;;;;;;;;;; функция для запуска клиента ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun zapustitq-klienta--clcon ()
   #-(or win32 linux) #.(error "Не умею запустить-клиента--clcon на этой платформе")
-  ;; CallBatFromGuiDetached.exe is used to bypass problems with run-program
-  (let ((cmd 
-        #+win32 (format nil "c:\\yar\\bin\\util\\CallBatFromGuiDetached.exe c:\\yar\\bin\\util\\clcon-client.cmd -swank-port ~A" *clcon-swank-port*)
-        #+linux (format nil "sh /y/d/yar/bin/util/clcon-client.sh -swank-port ~A" *clcon-swank-port*)
-        ))
+  (let* ((util-directory
+          (uiop/filesystem:native-namestring
+           (putq-otnositelqno-kornya-yara "bin/util")))
+         (cmd
+          #+win32 
+          (format nil "~A\\CallBatFromGuiDetached.exe ~A\\clcon-client.cmd -swank-port ~A" util-directory util-directory *clcon-swank-port*)
+          #+linux
+          (format nil "sh ~A/clcon-client.sh -swank-port ~A"
+                  util-directory *clcon-swank-port*)))
   (uiop/run-program:run-program cmd)))
 
 
