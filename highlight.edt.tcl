@@ -6,6 +6,7 @@ namespace eval ::edt {
 
     # See also odu::*open-paren-highlight-font*
     variable OpenParenHighlightFont 10
+    variable SHriftLeksicheskikhOshibok 15
 
 
     # see oi::state-font . To show pallette, call ::edt::DisplayTestTextInColor red
@@ -58,14 +59,16 @@ namespace eval ::edt {
     proc CreateHighlightTags {text} {
         variable ColorTable
         variable OpenParenHighlightFont
+        variable SHriftLeksicheskikhOshibok
         set i 0
         foreach e $ColorTable {
             set TagName [HighlightTagName $i]
             $text tag configure $TagName -foreground $e
             incr i
         }
-        # Opening paren will be on special backgroun
+        # Некоторые шрифты имеют ещё и фон... 
         $text tag configure [HighlightTagName $OpenParenHighlightFont] -background green
+        $text tag configure [HighlightTagName $SHriftLeksicheskikhOshibok] -background forestgreen
     }
 
     proc ApplyHighlightToLineSegment {text OldCharPos CharPos OldFont LineNumber} {
