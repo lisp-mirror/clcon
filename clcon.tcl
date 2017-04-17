@@ -251,7 +251,7 @@ proc ::tkcon::Init {args} {
 
     if {![info exists OPT(font)]} {
         if {$tcl_platform(platform) == "windows"} {
-            set OPT(font) {{Lucida Console} 14}
+            set OPT(font) {{Courier New} 12}
         } 
     }
     
@@ -1228,13 +1228,13 @@ proc ::tkcon::InitMenus {w title} {
 	eval [list $PRIV(popup).[string tolower $m] entryconfigure $l] $args
     }
 
-    foreach m [list 1.Файл 2.Консоль 3.Правка 4.Tcl 5.Настройка 6.История 7.Окно 8.Справка] {
+    foreach m [list 1.Файл 2.Консоль 3.Правка 4.Настройка 5.История 6.Избранное 7.Окно 8.Справка] {
  	set l [string tolower [string range $m 2 end]]
  	MenuButton $w $m $l
  	$w.pop add cascade -label $m -underline 0 -menu $w.pop.$l
     }
 
-    ## File Menu
+    ## 1.Файл
     ##
     foreach m [list [menu $w.файл -disabledforeground $COLOR(disabled)] \
                    [menu $w.pop.файл -disabledforeground $COLOR(disabled)]] {
@@ -1246,7 +1246,13 @@ proc ::tkcon::InitMenus {w title} {
 	$m add command -label "Открыть для редактирования" -command $cmd -accel "Control-O"
         ::clcon_key::b bind TkConsoleTextOverrides <Control-Key-o> "$cmd; break"
         
+        $m add separator
 	$m add command -label "Выполнить файл Tcl" -underline 0 -command ::tkcon::Load
+        
+        foreach {tcl_app tcl_type} [Attach] break
+        $m add command -label "Показать последнюю ошибку Tcl" \
+	    -command [list tkcon error $tcl_app $tcl_type]
+
 	$m add cascade -label "Сохранить поток консоли..."  -underline 0 -menu $m.save
 
 	$m add separator
@@ -1281,7 +1287,7 @@ proc ::tkcon::InitMenus {w title} {
 	$m add command -label "6.Выход из клиента" -command "::tkcon::Destroy 0" -underline 0
     }
         
-    ## Console Menu
+    ## 2.Консоль
     ##
     foreach m [list [menu $w.консоль -disabledfore $COLOR(disabled)] \
 	    [menu $w.pop.консоль -disabledfore $COLOR(disabled)]] {
@@ -1352,7 +1358,7 @@ proc ::tkcon::InitMenus {w title} {
 	#}
     }
 
-    ## Edit Menu
+    ## 3.Правка
     ##
     set text $PRIV(console)
     foreach m [list [menu $w.правка] [menu $w.pop.правка]] {
@@ -1395,14 +1401,7 @@ proc ::tkcon::InitMenus {w title} {
 
     }
 
-    ## Tcl Menu
-    ##
-    foreach m [list $w.tcl $w.pop.tcl] {
-	menu $m -disabledforeground $COLOR(disabled) \
-            -postcommand [list ::tkcon::InterpMenu $m]
-    }
-
-    ## Prefs Menu
+    ## 4. Настройка
     ##
     foreach m [list [menu $w.настройка] [menu $w.pop.настройка]] {
 
@@ -1439,14 +1438,21 @@ proc ::tkcon::InitMenus {w title} {
 		-command { grid configure $::tkcon::PRIV(scrolly) -column 2 }
     }
 
-    ## History Menu
+    ## 5.История
     ##
     foreach m [list $w.история $w.pop.история] {
 	menu $m -disabledforeground $COLOR(disabled) \
 		-postcommand [list ::tkcon::HistoryMenu $m]
     }
 
-    ## Window Menu
+    ## 5.Избранное
+    ##
+    foreach m [list $w.избранное $w.pop.избранное] {
+	menu $m -disabledforeground $COLOR(disabled) \
+		-postcommand [list ::tkcon::IzbrannoeMenu $m]
+    }
+
+    ## 7. Окно
     ##
     set m $w.окно
     menu $m -disabledforeground $COLOR(disabled) \
@@ -1459,7 +1465,7 @@ proc ::tkcon::InitMenus {w title} {
     set rr $PRIV(root)
     ::window_menu::WindowMenuKeyBindings $rr $rr $rr
     
-    ## Help Menu
+    ## 8. Справка
     ##
     foreach m [list [menu $w.справка] [menu $w.pop.справка]] {
         $m add command -label "О программе" -command ::tkcon::About
@@ -1497,165 +1503,34 @@ proc ::tkcon::HistoryMenu m {
     }
 }
 
-## ::tkcon::InterpMenu - dynamically build the menu for attached interpreters
+## ::tkcon::IzbrannoeMenu - динамически строим меню из переменной
 ##
-# ARGS:	w	- menu widget
+# ARGS:	m	- menu widget
 ##
-proc ::tkcon::InterpMenu w {
-    variable OPT
+proc ::tkcon::IzbrannoeMenu m {
     variable PRIV
-    variable COLOR
+    variable OPT 
+    # 111
 
-    if {![winfo exists $w]} return
-    $w delete 0 end
+    if {![winfo exists $m]} return
+    $m delete 0 end
 
-    $w add command -label "Это меню не работает!!!" -state disabled
+    if {![info exists OPT(Izbrannoe)]} {
+        puts "Не заданы элементы для меню 'Избранное'. См. Справка/руководство clcon/Файл инициализации/Избранное"
+        return
+    } 
+    
 
-    foreach {app type} [Attach] break
-    $w add command -label "[string toupper $type]: $app" -state disabled
-    if {($OPT(nontcl) && $type eq "interp") || $PRIV(deadapp)} {
-	$w add separator
-	$w add command -state disabled -label "Communication disabled to"
-	$w add command -state disabled -label "dead or non-Tcl interps"
-	return
+    foreach {title action} $OPT(Izbrannoe) {
+
+        $m add command -underline 0 -label "$title" -command "
+        $::tkcon::PRIV(console) delete limit end
+        $::tkcon::PRIV(console) insert limit [list $action]
+        $::tkcon::PRIV(console) see end
+        ::tkcon::Eval $::tkcon::PRIV(console)"
     }
-   
-    ## Show Last Error
-    ##
-    $w add separator
-    $w add command -label "Показать последнюю ошибку" \
-	    -command [list tkcon error $app $type]
-
-    ## Packages Cascaded Menu
-    ##
-    $w add separator
-    $w add command -label "Управление пакетами Tcl" -underline 0 \
-	-command [list ::tkcon::InterpPkgs $app $type] \
-        -state disabled
-    # state disabled added by budden
-
-    ## Init Interp
-    ##
-    $w add separator
-    $w add command -label "Отправить команды tkcon" \
-        -command [list ::tkcon::InitInterp $app $type] \
-        -state disabled
-    # state disabled added by budden
 }
 
-## ::tkcon::PkgMenu - fill in  in the applications sub-menu
-## with a list of all the applications that currently exist.
-##
-proc ::tkcon::InterpPkgs {app type} {
-    variable PRIV
-
-    set t $PRIV(base).interppkgs
-    if {![winfo exists $t]} {
-	toplevel $t
-	wm withdraw $t
-	wm title $t "$app Packages"
-	wm transient $t $PRIV(root)
-	wm group $t $PRIV(root)
-	catch {wm attributes $t -type dialog}
-	bind $t <Escape> [list destroy $t]
-
-	label $t.ll -text "Loadable:" -anchor w
-	label $t.lr -text "Loaded:" -anchor w
-	listbox $t.loadable -font tkconfixed -background white -borderwidth 1 \
-	    -yscrollcommand [list $t.llsy set] -selectmode extended
-	listbox $t.loaded -font tkconfixed -background white -borderwidth 1 \
-	    -yscrollcommand [list $t.lrsy set]
-	scrollbar $t.llsy -command [list $t.loadable yview]
-	scrollbar $t.lrsy -command [list $t.loaded yview]
-	button $t.load -borderwidth 1 -text ">>" \
-	    -command [list ::tkcon::InterpPkgLoad $app $type $t.loadable]
-	if {$::tcl_version >= 8.4} {
-	    $t.load configure -relief flat -overrelief raised
-	}
-
-	set f [frame $t.btns]
-	button $f.refresh -width 8 -text "Refresh" -command [info level 0]
-	button $f.dismiss -width 8 -text "Dismiss" -command [list destroy $t]
-	grid $f.refresh $f.dismiss -padx 4 -pady 3 -sticky ew
-	if {$PRIV(AQUA)} { # corner resize control space
-	    grid columnconfigure $f [lindex [grid size $f] 0] -minsize 16
-	}
-
-	grid $t.ll x x $t.lr x -sticky ew
-	grid $t.loadable $t.llsy $t.load $t.loaded $t.lrsy -sticky news
-	grid $t.btns -sticky e -columnspan 5
-	grid columnconfigure $t {0 3} -weight 1
-	grid rowconfigure $t 1 -weight 1
-	grid configure $t.load -sticky ""
-
-	bind $t.loadable <Double-1> "[list $t.load invoke]; break"
-    }
-    $t.loaded delete 0 end
-    $t.loadable delete 0 end
-
-    # just in case stuff has been added to the auto_path
-    # we have to make sure that the errorInfo doesn't get screwed up
-    EvalAttached {
-	set __tkcon_error $errorInfo
-	catch {package require bogus-package-name}
-	set errorInfo ${__tkcon_error}
-	unset __tkcon_error
-    }
-    # get all packages loaded into current interp
-    foreach pkg [EvalAttached [list info loaded {}]] {
-	set pkg [lindex $pkg 1]
-	set loaded($pkg) [package provide $pkg]
-    }
-    # get all package names currently visible
-    foreach pkg [lremove [EvalAttached {package names}] Tcl] {
-	set version [EvalAttached [list package provide $pkg]]
-	if {$version ne ""} {
-	    set loaded($pkg) $version
-	} elseif {![info exists loaded($pkg)]} {
-	    set loadable($pkg) package
-	}
-    }
-    # get packages that are loaded in any interp
-    foreach pkg [EvalAttached {info loaded}] {
-	set pkg [lindex $pkg 1]
-	if {![info exists loaded($pkg)] && ![info exists loadable($pkg)]} {
-	    set loadable($pkg) load
-	}
-    }
-    foreach pkg [lsort -dictionary [array names loadable]] {
-	foreach v [EvalAttached [list package version $pkg]] {
-	    $t.loadable insert end [list $pkg $v "($loadable($pkg))"]
-	}
-    }
-    foreach pkg [lsort -dictionary [array names loaded]] {
-	$t.loaded insert end [list $pkg $loaded($pkg)]
-    }
-
-    wm deiconify $t
-    raise $t
-}
-
-proc ::tkcon::InterpPkgLoad {app type lb} {
-    # load the lb entry items into the interp
-    foreach sel [$lb curselection] {
-	foreach {pkg ver method} [$lb get $sel] { break }
-	if {$method == "(package)"} {
-	    set code [catch {::tkcon::EvalOther $app $type \
-				 package require $pkg $ver} msg]
-	} elseif {$method == "(load)"} {
-	    set code [catch {::tkcon::EvalOther $app $type load {} $pkg} msg]
-	} else {
-	    set code 1
-	    set msg "Incorrect entry in Loadable selection"
-	}
-	if {$code} {
-	    tk_messageBox -icon error -title "Error requiring $pkg" -type ok \
-		-message "Error requiring $pkg $ver:\n$msg\n$::errorInfo"
-	}
-    }
-    # refresh package list
-    InterpPkgs $app $type
-}
 
 ## ::tkcon::AttachMenu - fill in  in the applications sub-menu
 ## with a list of all the applications that currently exist.

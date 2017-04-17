@@ -47,6 +47,18 @@ proc ::AttachSwankHook {} {
 }
 ```
 
+### Избранное
+
+Добавьте в инициализационный файл данные для построения меню, например: 
+```
+set ::tkcon::OPT(Izbrannoe) {
+  "1.Привет" {..puts "Hello"} 
+  "2.Редактировать мой файл" {.edit "c:/my-file.lisp"}
+}
+```
+Нечётные элементы - это заголовки (будет подчёркнута первая буква для ускоренного запуска Alt-6 Подчёркнутая-буква ), чётные - это команды, как
+они вводятся в консоли. 
+
 Автодополнение, продолжение и автоподстановка
 ---------------------------
 Completion of lisp symbols works in console, use **Ctrl-Space** to complete lisp symbol prefix (may contain package or part of package name).
