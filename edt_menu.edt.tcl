@@ -33,13 +33,12 @@ namespace eval ::edt {
         clipboard append $FileName
     }
 
-    ## Работает только под Windows, редактор прибит гвоздями
+    ## Работает только под Windows, редактор должен быть относительно корня, а он прибит к месту.
     proc OtkrytqEhtotFajjlDrugimRedaktorom {} { 
         set clcon_text [c_btext]
         set FileNameUnix [[$clcon_text cget -opened_file] cget -filename]
         set FileName [::UnixFileNameToWindows $FileNameUnix]
-        # after idle exec -- "cmd" "/c" "start" {"c:\Program Files\Notepad2\Notepad2.exe"} $FileNameUnix
-        ::exec -- "c:/yar/bin/util/drugojj-redaktor.bat" $FileNameUnix
+        ::exec -- "c:/yar/bin/util/drugojj-redaktor.cmd" $FileNameUnix &
     }
         
 
