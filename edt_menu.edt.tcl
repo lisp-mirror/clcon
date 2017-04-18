@@ -33,6 +33,16 @@ namespace eval ::edt {
         clipboard append $FileName
     }
 
+    ## Работает только под Windows, редактор прибит гвоздями
+    proc OtkrytqEhtotFajjlDrugimRedaktorom {} { 
+        set clcon_text [c_btext]
+        set FileNameUnix [[$clcon_text cget -opened_file] cget -filename]
+        set FileName [::UnixFileNameToWindows $FileNameUnix]
+        # after idle exec -- "cmd" "/c" "start" {"c:\Program Files\Notepad2\Notepad2.exe"} $FileNameUnix
+        ::exec -- "c:/yar/bin/util/drugojj-redaktor.bat" $FileNameUnix
+    }
+        
+
     # Types in buffer pathname to console. See also ::tkcon::PasteAsLinuxFilename
     proc CurrentPathAndFileNameToConsole {ignore} {
         variable ::tkcon::PRIV
@@ -291,6 +301,13 @@ namespace eval ::edt {
  	$m add cascade -label "5.Открыть недавний..." -underline 0 -underline 0 -menu $s
 
         $m add separator
+
+        set cmd {::edt::OtkrytqEhtotFajjlDrugimRedaktorom}
+        $m add command -label "6.Открыть этот файл другим редактором" \
+            -underline 0 -command $cmd
+
+        $m add separator
+
         set CloseFile [wesppt [list ::edt::EditCloseFile $Bi]]
         $m add command -label "Закрыть" -accel "Control-w" -command $CloseFile
         ::clcon_key::b bind SingleMod$w <Control-Key-w> $CloseFile
