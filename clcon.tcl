@@ -1386,7 +1386,7 @@ proc ::tkcon::InitMenus {w title} {
         $m add separator
         
         set cmd "event generate $text <<TkCon_ExpandLisp>>; break"
-        $m add command -label "Лисп: автодополнение" -accel "Tab, Control-Alt-i" -command $cmd
+        $m add command -label "Лисп: автодополнение" -accel "Control-Пробел, Control-Alt-ш" -command $cmd
 
         set cmd "event generate $text <<TkCon_LispFindDefinition>>; break"
         $m add command -label "Лисп: перейти к определению" -accel "Control-." -command $cmd
@@ -1394,7 +1394,7 @@ proc ::tkcon::InitMenus {w title} {
         $m add separator
         
         set cmd "event generate $text  <<TkCon_ExpandTcl>>; break"
-        $m add command -label "Tcl: автодополнение" -accel "Control-Alt-u" -command $cmd
+        $m add command -label "Tcl: автодополнение" -accel "Tab" -command $cmd
 
         set cmd "event generate $text <<TkCon_TclFindDefinition>>; break"
         $m add command -label "Tcl: перейти к определению" -accel "Control-F9" -command $cmd

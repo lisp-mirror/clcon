@@ -145,8 +145,10 @@ namespace eval ::edt {
         set h2 [::mprs::Unleash [lindex $l2 0]]
         if {$h2 eq ":ok"} {
             set code [::mprs::Unleash [lindex $l2 1]]
-            #tk_messageBox -message $code
+            # tk_messageBox -message $code
             clipboard clear
+            # clipboard append $code - было, но неправильно работало
+            clipboard append $l2
             clipboard append $code
         } else {
             tk_messageBox -parent $clcon_text -message "Команда SkopirovatqIdentVBuferObmena завершилась ненормально"
