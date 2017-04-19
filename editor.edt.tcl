@@ -67,8 +67,8 @@ namespace eval ::edt {
             return 1
         }
     }
-        
-    proc MaybeAddToRecentWhenClosing {Bi} {
+
+    proc MaybeAddToRecentWhenClosingOrSwitching {Bi} {
         set clcon_text [Bi2btext $Bi]
         set opened_file [$clcon_text cget -opened_file]
         set FileName [$opened_file cget -filename]
@@ -83,7 +83,7 @@ namespace eval ::edt {
             return
         }
         RemoveWindowFromLists $Bi
-        MaybeAddToRecentWhenClosing $Bi
+        MaybeAddToRecentWhenClosingOrSwitching $Bi
         # UpdateMRUAndBufferList {}
         set newBi [AnyBufferBi]
         if {$newBi eq {}} {

@@ -283,6 +283,7 @@ namespace eval ::edt {
             # its action will be "", that is, "focus"
             [theNotebook] select [Bi2W $Bi]
         }
+        ::edt::MaybeAddToRecentWhenClosingOrSwitching $Bi
     }
 
     ## event generate [theNotebook] <???> -data string
