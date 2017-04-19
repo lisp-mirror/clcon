@@ -138,7 +138,7 @@ namespace eval ::edt {
           
     }
 
-    proc FindSymbolContinuation {clcon_text EventAsList} {
+    proc SkopirovatqIdentVBuferObmenaProdolzhenie {clcon_text EventAsList} {
         set Head [::mprs::Unleash [lindex $EventAsList 0]]
         ::mprs::AssertEq $Head ":return"
         set l2 [::mprs::Unleash [lindex $EventAsList 1]]
@@ -149,7 +149,7 @@ namespace eval ::edt {
             clipboard clear
             clipboard append $code
         } else {
-            tk_messageBox -parent $clcon_text -message "Команда FindSymbol завершилась ненормально"
+            tk_messageBox -parent $clcon_text -message "Команда SkopirovatqIdentVBuferObmena завершилась ненормально"
         }
         $clcon_text Unfreeze
           
@@ -199,10 +199,10 @@ namespace eval ::edt {
     }
 
     # See also ::tkcon::LispFindDefinition
-    proc FindSymbolCommand {text} {
+    proc SkopirovatqIdentVBuferObmena {text} {
         set console [::tkcon::CurrentConsole]
         ::clcon_text::CallOduvanchikFunction $text "odu::find-symbol-command nil" {{
-            ::edt::FindSymbolContinuation $clcon_text $EventAsList
+            ::edt::SkopirovatqIdentVBuferObmenaProdolzhenie $clcon_text $EventAsList
         }}
     }    
 

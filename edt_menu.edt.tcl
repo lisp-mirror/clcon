@@ -205,7 +205,7 @@ namespace eval ::edt {
         $m add command -label "Справка по идентиф-ру" -accel "F1" -command $cmd
         ::clcon_key::b bind SingleMod$w <Key-F1> $cmd
 
-        set cmd [wesppt [list ::edt::FindSymbolCommand $btext]]
+        set cmd [wesppt [list ::edt::SkopirovatqIdentVBuferObmena $btext]]
         $m add command -label "Скопировать идентф-р в буфер обмена" -accel "F2" -command $cmd
         ::clcon_key::b bind SingleMod$w <Key-F2> $cmd
 
