@@ -201,14 +201,30 @@
 
 (defun line-effective-marks (line)
   "Список, состоящий из шрифта в начале строки (он может быть унаследован с прошлой строки), Marks of the line plus marks of odu::*open-paren-font-marks*.Первый элемент списка - всегда число (шрифт), а остальные - марки!"
+  ;; ПРАВЬМЯ. Есть версия, что для вычисления нужных марок достаточно отфильтровать (oi::line-marks line)
   (oi::check-something-ok)
-  (let* ((tag (line-tag-no-recalc line))
+  #|(let* ((tag (line-tag-no-recalc line))
          (syntax-info (oi::tag-syntax-info tag))
          (marks (oi::sy-font-marks syntax-info))
          (sorted-marks (sort (augment-with-parens marks line) '< :key 'oi::mark-charpos)))
     (oi::check-something-ok)
     sorted-marks
-    ))
+    )|#
+
+  ;; Новый алгоритм не лезет в синтаксис, потому что эти марки доступны и через простой oi::line-marks.
+  ;; Однако оба алгоритма некорректны: в строке ("В") , если встать за скобкой, оказывается две марки в одном месте, 
+  ;; поэтому строка "В" обезцвечивается (хотя это и трудно заметить из-за её цвета). Более видимо в случае (;ff\n)
+  ;; Т.е. в данном алгоритме корректное сложение слоёв отсутствует. Теперь надо поставить CMU CL и посмотреть, как там дела обстоят
+  (let* ((marks (oi::line-marks line))
+         (filtered-marks
+          (let ((res nil))
+            (dolist (m marks)
+              (when (and (oi::font-mark-p m) (not (oi::mark-deleted-p m)))
+                (push m res)))
+            res))
+         (sorted-marks (sort filtered-marks '< :key 'oi::mark-charpos)))
+    (budden-tools:show-expr marks)
+    sorted-marks))
 
 (defun encode-marks-for-line (line stream)
   "{linenumber {charpos0 font0} {charpos1 font1} ...} 
