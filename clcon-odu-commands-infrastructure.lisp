@@ -1,6 +1,7 @@
 ;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
 ;; Infrastructe for oduvanchik-clcon interaction. Patches to oduvanchik
 ;; which are more convenient to keep here to avoid rebuilding of oduvanchik
+;; См. также ../../src/yar/clcon--режим-яр.lisp - там ссылки на остальные связанные файлы. 
 
 (in-package :oduvanchik)
 (named-readtables::in-readtable :oduvanchik-ext-readtable)
@@ -201,8 +202,8 @@
 
 (defun line-effective-marks (line)
   "Список, состоящий из шрифта в начале строки (он может быть унаследован с прошлой строки), Marks of the line plus marks of odu::*open-paren-font-marks*.Первый элемент списка - всегда число (шрифт), а остальные - марки!"
-  ;; ПРАВЬМЯ. Есть версия, что для вычисления нужных марок достаточно отфильтровать (oi::line-marks line)
   (oi::check-something-ok)
+  ;; Закомментаренный вариант интересен тем, что он показывает способ сложения слоёв раскраски. Правда, способ кривой :) 
   #|(let* ((tag (line-tag-no-recalc line))
          (syntax-info (oi::tag-syntax-info tag))
          (marks (oi::sy-font-marks syntax-info))
@@ -223,7 +224,6 @@
                 (push m res)))
             res))
          (sorted-marks (sort filtered-marks '< :key 'oi::mark-charpos)))
-    (budden-tools:show-expr marks)
     sorted-marks))
 
 (defun encode-marks-for-line (line stream)
