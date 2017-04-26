@@ -41,7 +41,8 @@
 
 (deftype highlight-event-kind ()
   '(member
-    highlight-single-line
+    highlight-single-line ; старая раскраска - испольузется в лиспе
+    highlight-3 ; :РАСКРАСКА-3
     cancel-highlighting
     package-change ; we entered into a place where we have another package in the same buffer, or we obtained or lost information of it
     readtable-change
@@ -51,11 +52,11 @@
 
 (defstruct highlight-event
   (kind (budden-tools:mandatory-slot 'kind) :type highlight-event-kind)
-  (clcon_text-pathname nil :type (or null string)) 
-  (string nil :type (or null string)) ; encoded-marks
+  (clcon_text-pathname nil :type (nullable string)) 
+  (string nil :type (nullable string)) ; encoded-marks
   (change-id 0 :type integer) ; identifies state of the buffer as of odu::buffer-change-id
   (end-line-no 0 :type integer) ; last line no to which this event corresponds. If something is edited at this line or before, event is to be canceled
-  (swank-connection nil :type (or null swank::multithreaded-connection) ) ; can be omitted for shutdown event
+  (swank-connection nil :type (nullable swank::multithreaded-connection) ) ; can be omitted for shutdown event
   )
 
 (defun post-highlight-event (event)
@@ -79,11 +80,22 @@
     :kind 'highlight-single-line
     :clcon_text-pathname clcon_text-pathname
     :string encoded-marks
-    :change-id change-id
-    :end-line-no line-no
+    :change-id change-id ; не используется  
+    :end-line-no line-no ; не используется
     :swank-connection (oi::variable-value 'odu::swank-connection :buffer buffer)
     )))
 
+(defun notify-highlight-3 (clcon_text-pathname encoded-marks buffer)
+  "Для объекта РАСКРАСКА-3:Отправитель-раскраски.
+   См. также notify-highlight-single-line, eval-highlight-3"
+  (assert (equal clcon_text-pathname (oi::buffer-to-clcon_text buffer)))
+  (post-highlight-event
+   (make-highlight-event
+    :kind 'highlight-3
+    :clcon_text-pathname clcon_text-pathname
+    :string encoded-marks
+    :swank-connection (oi::variable-value 'odu::swank-connection :buffer buffer)
+    )))
 
 (defun encode-last-package-name-sent-to-tcl-type (x)
   "Encodes value of oi::last-package-name-sent-to-tcl-type to be sent to lisp"

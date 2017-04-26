@@ -35,7 +35,8 @@
            "Выпасть-в-ред"
            #:edit-string-at-row-and-col
            )
-  )
+  (:import-from :budden-tools
+               budden-tools:nullable))
 
 
 (defpackage :clco-oduvanchik-key-bindings
