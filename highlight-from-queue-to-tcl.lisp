@@ -19,7 +19,7 @@
 
 
 (defun eval-highlight-single-line (e)
-  "See also clco::notify-highlight-single-line"
+  "See also clco::notify-highlight-single-line, eval-highlight-3"
   (let* ((cmd (format nil "::edt::ApplyHighlightToLine ~A ~A"
                       (highlight-event-clcon_text-pathname e)
                       (--> e string))
@@ -31,6 +31,15 @@
       ;; не успевает сползти, а если и успевает, мы её сразу правим. 
       (clco:eval-in-tcl cmd :nowait nil))))
 
+(defun eval-highlight-3 (e)
+  "See also clco::notify-highlight-3, eval-highlight-single-line"
+  (let* ((cmd (format nil "::edt::ApplyHighlight3 ~A ~A ~A"
+                      (highlight-event-clcon_text-pathname e)
+                      (|HIGHLIGHT-EVENT-Код-слоя-раскраски| e)
+                      (--> e string))
+           ))
+    (swank::with-connection ((--> e swank-connection))
+      (clco:eval-in-tcl cmd :nowait nil))))
 
 (defun eval-package-change (e)
   "See also clco::notify-package-change, eval-readtable-change"
@@ -75,6 +84,8 @@
            (highlight-single-line
             (eval-highlight-single-line e)
             )
+           (highlight-3
+            (eval-highlight-3 e))
            (package-change
             (eval-package-change e))
            (readtable-change

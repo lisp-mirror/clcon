@@ -98,6 +98,10 @@ namespace eval ::edt {
         }
     }
 
+    proc ApplyHighlight3 {clcon_text Slojj s} {
+        puts "$clcon_text $Slojj $s"
+    }
+
     # Display change of current package in a status bar
     # see also ::tkcon::ChangeCurrentPackageA, ::edt::CurrentReadtableChange
     proc CurrentPackageChange {clcon_text data} {
