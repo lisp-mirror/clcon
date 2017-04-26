@@ -147,9 +147,7 @@ namespace eval ::edt {
             set code [::mprs::Unleash [lindex $l2 1]]
             # tk_messageBox -message $code
             clipboard clear
-            # clipboard append $code - было, но неправильно работало
-            clipboard append $l2
-            clipboard append $code
+            clipboard append $code 
         } else {
             tk_messageBox -parent $clcon_text -message "Команда SkopirovatqIdentVBuferObmena завершилась ненормально"
         }
