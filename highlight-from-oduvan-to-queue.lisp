@@ -57,6 +57,7 @@
   (change-id 0 :type integer) ; identifies state of the buffer as of odu::buffer-change-id
   (end-line-no 0 :type integer) ; last line no to which this event corresponds. If something is edited at this line or before, event is to be canceled
   (swank-connection nil :type (nullable swank::multithreaded-connection) ) ; can be omitted for shutdown event
+  (|Код-слоя-раскраски| 0 :type integer) ; см. :РАСКРАСКА-3
   )
 
 (defun post-highlight-event (event)
@@ -87,6 +88,7 @@
 
 (defun notify-highlight-3 (clcon_text-pathname encoded-marks buffer)
   "Для объекта РАСКРАСКА-3:Отправитель-раскраски.
+   ПРАВЬМЯ реализовать eval-highlight-3 и организовать её вызов по диспетчеризации
    См. также notify-highlight-single-line, eval-highlight-3"
   (assert (equal clcon_text-pathname (oi::buffer-to-clcon_text buffer)))
   (post-highlight-event
