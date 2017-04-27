@@ -1368,6 +1368,7 @@ proc ::tkcon::InitMenus {w title} {
 		-command [list ::tkcon::Copy $text]
 	$m add command -label "Вставить" -underline 0 -accel $PRIV(ACC)v \
 		 -command [list ::tkcon::Paste $text]
+        # Клавиши назначаются в bindings.tkcon.tcl
 
         set cmd "event generate $text <<TkCon_PasteAsLinuxFilename>>; break"
         $m add command -label "Вставить как имя файла Linux" -command $cmd

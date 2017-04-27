@@ -29,6 +29,8 @@ proc ::clcon_key::FillLetterMapWin32 {} {
     dict set LetterMap z {Z ydiaeresis ssharp}
 }
 
+## Сочетания получены с помощью 
+## util/keytest-for-clcon.tcl , к-рый надо открыть и далее Меню/Tcl/Отправить текст в подчинённый интерпретатор
 proc ::clcon_key::aux1win32 {} {return {
     {а agrave
     } {б aacute

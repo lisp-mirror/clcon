@@ -141,16 +141,28 @@ namespace eval tkcon {
         # This procedure is invoked to identify the keys that correspond to
         # the copy, cut, and paste functions for the clipboard.
         #
-        # Arguments:
-        # copy -	Name of the key (keysym name plus modifiers, if any,
-        #		such as "Meta-y") used for the copy operation.
-        # cut -		Name of the key used for the cut operation.
-        # paste -	Name of the key used for the paste operation.
 
-        proc ::tkcon::ClipboardKeysyms {copy cut paste} {
-            bind TkConsole <$copy>	{::tkcon::Copy %W}
-            bind TkConsole <$cut>	{::tkcon::Cut %W}
-            bind TkConsole <$paste>	{::tkcon::Paste %W}
+        proc ::tkcon::ClipboardKeysyms {} {
+            variable PRIV
+            set ws [tk windowingsystem]
+            event delete <<Paste>> <$PRIV(CTRL)V>
+            ## Я так и не смог найти, где определены эти <Copy>, <Cut> и <Paste>
+            bind TkConsole <<Copy>>	{::tkcon::Copy %W}
+            bind TkConsole <<Cut>>	{::tkcon::Cut %W}
+            bind TkConsole <<Paste>>	{::tkcon::Paste %W}
+            ## Расписываем вручную содержание ClipboardKeysyms для наших кнопок. 
+            ::clcon_key::b bind TkConsole <Control-Key-c> {::tkcon::Copy %W}
+            ::clcon_key::b bind TkConsole <Control-Key-v> {::tkcon::Paste %W}
+        
+            if {$ws eq "win32"} {
+                bind TkConsole <Control-Key-x> {::tkcon::Cut %W}
+                bind TkConsole <Control-Key-X> {::tkcon::Cut %W}
+                bind TkConsole <Control-Key-division> {::tkcon::Cut %W}
+                bind TkConsole <Control-Key-multiply> {::tkcon::Cut %W}
+            } else {
+                ::clcon_key::b bind TkConsole <Control-Key-x> {::tkcon::Cut %W}
+            }
+
         }
 
         proc ::tkcon::GetSelection {w} {
@@ -201,8 +213,7 @@ namespace eval tkcon {
 
         ## Redefine for TkConsole what we need
         ##
-        event delete <<Paste>> <$PRIV(CTRL)V>
-        ::tkcon::ClipboardKeysyms <Copy> <Cut> <Paste>
+        ::tkcon::ClipboardKeysyms
 
         #bind TkConsole <Insert> {
         #    catch { ::tkcon::Insert %W [::tkcon::GetSelection %W] }
