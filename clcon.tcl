@@ -21,7 +21,7 @@ exec wish "$0" ${1+"$@"}
 ## source standard_disclaimer.tcl
 ## source bourbon_ware.tcl
 ## 
-## Copyright (c) Denis Budyak 2015
+## Copyright (c) Denis Budyak 2015-2017
 ## 
 
 encoding system utf-8
@@ -1255,13 +1255,11 @@ proc ::tkcon::InitMenus {w title} {
 
 	$m add cascade -label "Сохранить поток консоли..."  -underline 0 -menu $m.save
 
-	$m add separator
-
         set cmd ::tkcon::ReloadSomeIDESources
 	$m add command -label "4.Перезагрузить часть исходных текстов ИСР (IDE)" -underline 0 \
 	    -command $cmd
 
-	## Save Menu
+	## Подменю "Файл/сохранить поток консоли"
 	##
 	set s $m.save
 	menu $s -disabledforeground $COLOR(disabled)
@@ -1277,7 +1275,14 @@ proc ::tkcon::InitMenus {w title} {
             -command {::tkcon::Save {} stderr}
 
 
-        ## Recent menu
+	$m add separator
+	
+	set cmd ::tkcon::Udatlitq_SystemIndex_txt
+	$m add command -label "Очистить кеш систем asd" -underline 0 \
+	    -command $cmd
+
+
+        ## Подменю "Файл/Открыть недавний"
         set s $m.recent
         menu $s -disabledforeground $COLOR(disabled) -postcommand [list ::recent::RecentMenu $m]
  	$m add cascade -label "5.Открыть недавний..." -underline 0 -menu $s
@@ -1504,6 +1509,16 @@ proc ::tkcon::HistoryMenu m {
     }
 }
 
+
+proc ::tkcon::VstavitqVKonsolqKakBudtoPolzovatelqNapechatalIVypolnitq {command} {
+    variable PRIV
+    $::tkcon::PRIV(console) delete limit end
+    $::tkcon::PRIV(console) insert limit $command
+    $::tkcon::PRIV(console) see end
+    ::tkcon::Eval $::tkcon::PRIV(console)
+}
+
+
 ## ::tkcon::IzbrannoeMenu - динамически строим меню из переменной
 ##
 # ARGS:	m	- menu widget
@@ -1524,11 +1539,8 @@ proc ::tkcon::IzbrannoeMenu m {
 
     foreach {title action} $OPT(Izbrannoe) {
 
-        $m add command -underline 0 -label "$title" -command "
-        $::tkcon::PRIV(console) delete limit end
-        $::tkcon::PRIV(console) insert limit [list $action]
-        $::tkcon::PRIV(console) see end
-        ::tkcon::Eval $::tkcon::PRIV(console)"
+        $m add command -underline 0 -label "$title" -command \
+        "::tkcon::VstavitqVKonsolqKakBudtoPolzovatelqNapechatalIVypolnitq [list $action]"
     }
 }
 
@@ -4645,6 +4657,11 @@ proc ::tkcon::ReloadSomeIDESources {} {
     ReloadSomeIDESources2
     ReloadSomeIDESources3
     ReloadSomeIDESources4
+}
+
+
+proc ::tkcon::Udatlitq_SystemIndex_txt {} {
+    ::tkcon::VstavitqVKonsolqKakBudtoPolzovatelqNapechatalIVypolnitq {(delete-file (putq-otnositelqno-kornya-yara "system-index.txt")) ; Меню/Файл/Очистить кеш систем asd}
 }
 
 package provide tkcon $::tkcon::VERSION
