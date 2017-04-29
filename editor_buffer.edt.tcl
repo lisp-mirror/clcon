@@ -37,7 +37,7 @@ namespace eval ::edt {
 
         set args [lindex $args 0]
         
-        set opts [dict create -find {} -type {} -attach {} -wrap {none} -offset {}]             
+        set opts [dict create -find {} -type {} -attach {} -wrap {char} -offset {}]             
         while {[string match -* [lindex $args 0]]} {
             switch -glob -- [lindex $args 0] {
                 -f*	{ dict set opts -find [lindex $args 1] }
