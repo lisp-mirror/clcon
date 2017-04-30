@@ -98,6 +98,7 @@ namespace eval ::edt {
         }
     }
 
+    # см. clco::eval-highlight-3
     proc ApplyHighlight3 {clcon_text Slojj s} {
         puts "$clcon_text $Slojj $s"
     }
