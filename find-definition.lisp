@@ -62,9 +62,10 @@
 (defun fix-offset-2 (pathname offset)
   "Имеется числовой offset, к-рый вернул file-position. Давайте попробуем превратить его в 
   row-col-offset. См. также BUDDEN-TOOLS::input-stream-position-in-chars"
+  (warn "Ты уверен, что нужно вызывать clco::fix-offset-2 после того, как мы научились определять encoding?")
   #|(with-open-file (stream pathname)
     (let ((map (budden-tools::ensure-file-position-to-char-position-for-stream stream)))
-       (budden-tools::file-position-and-map-to-char-position offset map)))|#
+       (budden-tools::file-position-and-map-to-char-position offset map)))|#
     (let ((row 1)
           (col 0)
           (procname nil)
@@ -318,7 +319,7 @@
   "location - из EMACS. parent - widget отладчика (см. примеры). Если мы не можем попасть в исходник, мы сообщаем об этом, а видгет является родителем сообщения"
   (assert (listp location))  
   (let ((code (with-output-to-string (ou)
-                (write-code-to-pass-to-loc ou location :mode :eval :fix-offset-p t))))
+                (write-code-to-pass-to-loc ou location :mode :eval #| :fix-offset-p t |#))))
     (eval-in-tcl (format nil "set w ~A; ~A" parent code))
     ))
 
