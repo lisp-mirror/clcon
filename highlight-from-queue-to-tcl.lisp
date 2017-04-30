@@ -1,5 +1,4 @@
-; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
-
+; -*- coding: utf-8 ; system :clcon-server ; -*-
 
 (in-package :clco)
 
@@ -32,14 +31,13 @@
       (clco:eval-in-tcl cmd :nowait nil))))
 
 (defun eval-highlight-3 (e)
-  "See also clco::notify-highlight-3, eval-highlight-single-line"
-  (let* ((cmd (format nil "::edt::ApplyHighlight3 ~A ~A ~A"
+  "See also clco::notify-highlight-3, eval-highlight-single-line. Но надо оптимизировать и раскрашивать сразу много лексем за один вызов"
+  (let* ((cmd (format nil "::edt::ApplyHighlight3 ~A ~A {~A}"
                       (highlight-event-clcon_text-pathname e)
                       (|HIGHLIGHT-EVENT-Код-слоя-раскраски| e)
-                      (--> e string))
-           ))
+                      (--> e string))))
     (swank::with-connection ((--> e swank-connection))
-      (clco:eval-in-tcl cmd :nowait nil))))
+                            (clco:eval-in-tcl cmd :nowait nil))))
 
 (defun eval-package-change (e)
   "See also clco::notify-package-change, eval-readtable-change"

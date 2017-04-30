@@ -90,6 +90,8 @@ namespace eval ::edt {
         }
     }
 
+    # "старая" раскраска, для лиспа.
+    # ::edt::ApplyHighlight3 - "новая" раскраска, для Яра
     proc ApplyHighlightToLine {clcon_text s} {
         if {[winfo exists $clcon_text]} {
             variable NumberOfPendingHighlights
@@ -99,6 +101,7 @@ namespace eval ::edt {
     }
 
     # см. clco::eval-highlight-3
+    # см. также ::edt::ApplyHighlightToLine - "старая" раскраска, для Яра
     proc ApplyHighlight3 {clcon_text Slojj s} {
         puts "$clcon_text $Slojj $s"
     }
