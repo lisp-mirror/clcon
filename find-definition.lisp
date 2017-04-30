@@ -251,10 +251,10 @@
            (destructuring-bind (dspec loc) dal
              (cond
                ((= l 1)
-                (write-code-to-pass-to-loc ou loc :fix-offset-p t))
+                (write-code-to-pass-to-loc ou loc #| :fix-offset-p t |#))
                (t
                 (let ((link-text (prin1-to-string dspec)))
-                  (write-one-dspec-and-location link-text loc ou :fix-offset-p t))))))
+                  (write-one-dspec-and-location link-text loc ou #| :fix-offset-p t |#))))))
          (when (> l 1)
            (write-code-to-see-console-end ou))
          )))))
