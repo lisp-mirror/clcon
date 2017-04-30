@@ -645,6 +645,7 @@ namespace eval ::clcon_text {
     # Elements of list are passed to funcall. 
     # Options is a dict of options. Current known options are:
     # send_selection : if 1, selection is sent to odu at the beginning of command
+    # См. также "vyzvatq funkciyu zpt opredelyonnuyu ne v pakete oduvanchika"
     proc CallOduvanchikFunction {clcon_text OduvanchikFunctionNameAndArgs {UserContBody {}} {Options {}}} {
         variable ::tkcon::OPT
         if {![$clcon_text UsesLispP]} {
