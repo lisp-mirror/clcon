@@ -1478,10 +1478,11 @@ proc ::tkcon::InitMenus {w title} {
         $m add command -label "Поиск идентификатора в Common Lisp Hyperdoc" -command "event generate $w <<TkCon_LispHyperdocLookup>>" -accel "<Key-F1>"
         $m add command -label "1.Руководство clcon" -command "::edt::edit $YarRoot/lp/clcon/doc/user-manual.md" -underline 0
         $m add command -label "2.Описание языка Яр" -command "::edt::edit $YarRoot/doc/описание-языка/оя.asd" -underline 0
-        $m add command -label "3.Индекс перевода cltl-2 от Михаила Филоненко" -command {::tkcon::EvalInSwankAsync {(CLCO::OPEN-URL "http://filonenko-mikhail.github.io/cltl2-doc/ru/symbols.html#x200-39600030.2.8")} {} t} -underline 0
+        $m add command -label "3.Англо-русский словарь терминов Яра" -command {::tkcon::EvalInSwankAsync {(CLCO::OPEN-URL "https://docs.google.com/spreadsheets/d/1HfIih8us8A5OwnMB1JKTu9SM-n8zN2b9J09bo2GEAMY/edit")} {} t} -underline 0
+        $m add command -label "4.Индекс перевода cltl-2 от Михаила Филоненко" -command {::tkcon::EvalInSwankAsync {(CLCO::OPEN-URL "http://filonenko-mikhail.github.io/cltl2-doc/ru/symbols.html#x200-39600030.2.8")} {} t} -underline 0
         $m add separator
-        $m add command -label "4.Перевод документации по tcl/tk 8.0 (устар.)" -command {::tkcon::EvalInSwankAsync "(CLCO::OPEN-URL \"file:///$::tkcon::YarRoot/doc/книги/tcl-tk/i_gu10.html\")" {} t} -underline 0
-        $m add command -label "5.Сайт по tcl/tk (англ)" -command {::tkcon::EvalInSwankAsync {(CLCO::OPEN-URL "http://tcl.tk")} {} t} -underline 0
+        $m add command -label "5.Перевод документации по tcl/tk 8.0 (устар.)" -command {::tkcon::EvalInSwankAsync "(CLCO::OPEN-URL \"file:///$::tkcon::YarRoot/doc/книги/tcl-tk/i_gu10.html\")" {} t} -underline 0
+        $m add command -label "6.Сайт по tcl/tk (англ)" -command {::tkcon::EvalInSwankAsync {(CLCO::OPEN-URL "http://tcl.tk")} {} t} -underline 0
    }
 }
 
