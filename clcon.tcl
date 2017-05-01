@@ -3047,6 +3047,7 @@ proc ::tkcon::ReloadSomeIDESources2 {} {
     TkconSourceHere edt_menu.edt.tcl
     TkconSourceHere editor.edt.tcl
     TkconSourceHere highlight.edt.tcl
+    TkconSourceHere highlight-3.edt.tcl
     TkconSourceHere inspector.insp.tcl
     TkconSourceHere save.edt.tcl
     TkconSourceHere completions_menu.tcl

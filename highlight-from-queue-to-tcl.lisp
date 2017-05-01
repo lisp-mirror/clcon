@@ -32,9 +32,9 @@
 
 (defun eval-highlight-3 (e)
   "See also clco::notify-highlight-3, eval-highlight-single-line. Но надо оптимизировать и раскрашивать сразу много лексем за один вызов"
-  (let* ((cmd (format nil "::edt::ApplyHighlight3 ~A ~A {~A}"
+  (let* ((cmd (format nil "::edt::ApplyHighlight3 ~A {~A}"
                       (highlight-event-clcon_text-pathname e)
-                      (|HIGHLIGHT-EVENT-Код-слоя-раскраски| e)
+                      ;(|HIGHLIGHT-EVENT-Код-слоя-раскраски| e)
                       (--> e string))))
     (swank::with-connection ((--> e swank-connection))
                             (clco:eval-in-tcl cmd :nowait nil))))

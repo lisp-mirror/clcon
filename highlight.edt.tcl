@@ -100,12 +100,6 @@ namespace eval ::edt {
         }
     }
 
-    # см. clco::eval-highlight-3
-    # см. также ::edt::ApplyHighlightToLine - "старая" раскраска, для Яра
-    proc ApplyHighlight3 {clcon_text Slojj s} {
-        puts "$clcon_text $Slojj $s"
-    }
-
     # Display change of current package in a status bar
     # see also ::tkcon::ChangeCurrentPackageA, ::edt::CurrentReadtableChange
     proc CurrentPackageChange {clcon_text data} {
@@ -168,4 +162,6 @@ namespace eval ::edt {
         }
         ApplyHighlightToLineSegment $clcon_text $PrevCharPos "end" $PrevFont $LineNumber
     }
-}
+
+
+

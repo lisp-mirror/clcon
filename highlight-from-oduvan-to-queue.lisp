@@ -89,7 +89,8 @@
 (defun notify-highlight-3 (clcon_text-pathname encoded-marks buffer)
   "Для объекта РАСКРАСКА-3::|Отправитель-раскраски| .
    ПРАВЬМЯ реализовать eval-highlight-3 и организовать её вызов по диспетчеризации
-   См. также notify-highlight-single-line, eval-highlight-3"
+   См. также notify-highlight-single-line, eval-highlight-3 . 
+   РАСКРАСКА-3::|Закодировать-один-мазок| "
   (assert (equal clcon_text-pathname (oi::buffer-to-clcon_text buffer)))
   (post-highlight-event
    (make-highlight-event
