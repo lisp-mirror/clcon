@@ -162,6 +162,6 @@ namespace eval ::edt {
         }
         ApplyHighlightToLineSegment $clcon_text $PrevCharPos "end" $PrevFont $LineNumber
     }
-
+}
 
 
