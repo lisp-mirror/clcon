@@ -1,4 +1,4 @@
-; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server ; -*-
 ; see also text2odu.tcl, text2odu-from-tcl-to-queue.lisp
 
 ; this file is only built if :clcon-oduvan feature present

@@ -1,4 +1,4 @@
-;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+;; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server ; -*-
 ;; Commands which oduvanchik calls back into tcl
 (in-package :oduvanchik)
 (named-readtables::in-readtable :oduvanchik-ext-readtable)

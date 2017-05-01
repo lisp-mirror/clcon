@@ -1,4 +1,4 @@
-;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+;; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server ; -*-
 ;; stepper support
 (in-package :clco)
 

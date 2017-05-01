@@ -1,4 +1,4 @@
-; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server -*- 
+; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server -*- 
 (in-package :swank/rpc)
 
 ;; there are functions we patch. Their copies with swank-original- prefix are given here

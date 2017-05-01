@@ -1,4 +1,4 @@
-;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+;; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server ; -*-
 ;; Backend of compilation error browser, see also error-browser.erbr.tcl
 (in-package :clco)
 

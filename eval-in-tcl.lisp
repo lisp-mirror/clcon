@@ -1,4 +1,4 @@
-; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server ; -*-
 
 ; We don't want write all code in tcl. 
 ; here we introduce some security risk where

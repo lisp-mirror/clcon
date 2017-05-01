@@ -1,4 +1,4 @@
-;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+;; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server ; -*-
 ;; evaluation of text2odu events. Takes place in editor thread.
 ;; see doc/text2odu.md
 (in-package :oduvanchik) 

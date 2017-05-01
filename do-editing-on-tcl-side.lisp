@@ -1,4 +1,4 @@
-;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+;; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server ; -*-
 ;; File related to sending editing primitives to tcl. 
 (in-package :oduvanchik-internals)
 

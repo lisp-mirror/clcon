@@ -1,4 +1,4 @@
-;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+;; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server ; -*-
 ;; Infrastructe for oduvanchik-clcon interaction. Patches to oduvanchik
 ;; which are more convenient to keep here to avoid rebuilding of oduvanchik
 ;; См. также ../../src/yar/clcon--режим-яр.lisp - там ссылки на остальные связанные файлы. 

@@ -1,4 +1,4 @@
-;; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+;; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server ; -*-
 ;; see also text2odu.tcl, clcon_text.tcl, doc/text2odu.md
 
 ;; Acception of text2odu events from tcl and putting them onto *text2odu-event-queue*

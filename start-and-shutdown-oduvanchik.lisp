@@ -1,4 +1,4 @@
-; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server ; -*-
 ; clco:start-oduvanchik, clco::shutdown-oduvanchik-via-keyboard-buffer
 
 (in-package :clco)

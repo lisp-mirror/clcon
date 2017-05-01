@@ -1,4 +1,4 @@
-; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server -*- 
+; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server -*- 
 ;;;; Патч отладчика SBCL. Связан с c:/yar/src/my-full-eval/otladchik-sbcl.lisp
 
 (in-package :sb-debug)

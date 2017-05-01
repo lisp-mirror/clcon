@@ -1,4 +1,4 @@
-; -*- coding : utf-8 ; Encoding : utf-8 ; system :clcon-server ; -*-
+; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server ; -*-
 
 (in-package :clco-oduvanchik-key-bindings)
 (named-readtables::in-readtable :oduvanchik-ext-readtable)
