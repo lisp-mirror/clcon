@@ -34,6 +34,7 @@
            #:otladitq--n--jj-potok-v-chjornojj-konsoli
            "Выпасть-в-ред"
            #:edit-string-at-row-and-col
+           #:order-call-oduvanchik-from-itself
            )
   (:import-from :budden-tools
                budden-tools:nullable))
