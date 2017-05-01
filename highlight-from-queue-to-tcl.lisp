@@ -31,7 +31,7 @@
       (clco:eval-in-tcl cmd :nowait nil))))
 
 (defun eval-highlight-3 (e)
-  "See also clco::notify-highlight-3, eval-highlight-single-line. Но надо оптимизировать и раскрашивать сразу много лексем за один вызов"
+  "See also clco::notify-highlight-3, eval-highlight-single-line. Но надо оптимизировать и раскрашивать сразу много лексем за один вызов. Важно, что здесь нельзя менять статус мазков - это можно делать только в треде одуванчика!"
   (let* ((cmd (format nil "::edt::ApplyHighlight3 ~A {~A}"
                       (highlight-event-clcon_text-pathname e)
                       ;(|HIGHLIGHT-EVENT-Код-слоя-раскраски| e)

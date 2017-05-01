@@ -253,7 +253,7 @@
         ))))
 
 (defun eval-order-call-oduvanchik-from-itself (e)
-  "See clco::order-call-oduvanchik-from-itself"
+  "See clco::order-call-oduvanchik-from-itself "
   (let* ((fn-funcall-list (clco::text2odu-event-fn-and-args e))
          (fn (car fn-funcall-list)))
     (check-something-ok)

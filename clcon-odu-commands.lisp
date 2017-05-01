@@ -377,7 +377,7 @@
       )))))
 
 
-(defcommand "vyzvatq funkciyu zpt opredelyonnuyu ne v pakete oduvanchika" (imya &rest argumenty) "Вызывает функцию,созданную в пакете, отличном от пакета одуванчика, это позволяет избежать создания слишком большого количества команд. Например, это нужно для тестовых сценариев. С другой стороны, это угроза безопасности. imya - обозначение (designator) функции. См. также ::clcon_text::CallOduvanchikFunction" "ODUVANCHIK::VYZVATQ-FUNKCIYU-ZPT-OPREDELYONNUYU-NE-V-PAKETE-ODUVANCHIKA-COMMAND"
+(defcommand "vyzvatq funkciyu zpt opredelyonnuyu ne v pakete oduvanchika" (imya &rest argumenty) "Вызывает функцию,созданную в пакете, отличном от пакета одуванчика, это позволяет избежать создания слишком большого количества команд. Например, это нужно для тестовых сценариев. С другой стороны, это угроза безопасности. imya - обозначение (designator) функции. См. также ::clcon_text::CallOduvanchikFunction, CLCO:ORDER-CALL-ODUVANCHIK-FROM-ITSELF" "ODUVANCHIK::VYZVATQ-FUNKCIYU-ZPT-OPREDELYONNUYU-NE-V-PAKETE-ODUVANCHIKA-COMMAND"
   (apply imya argumenty))
 
 

@@ -166,7 +166,8 @@
 
 
 (defun order-call-oduvanchik-from-itself (fn-and-args)
-  "See oduvanchik::eval-order-call-oduvanchik-from-itself. Called from lisp only"
+  "See oduvanchik::eval-order-call-oduvanchik-from-itself . Called from lisp only. 
+  См. также команду ODUVANCHIK::VYZVATQ-FUNKCIYU-ZPT-OPREDELYONNUYU-NE-V-PAKETE-ODUVANCHIKA-COMMAND"
   ;(sb-debug:print-backtrace :count 5)
   (post-oduvan-event
    (make-text2odu-event
