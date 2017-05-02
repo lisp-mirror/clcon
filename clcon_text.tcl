@@ -79,6 +79,8 @@ namespace eval ::clcon_text {
         option -private_pending_sent_modifications 0
         option -private_pending_far_tcl_continuations 0
         option -opened_file {}
+        # PRIVATE. Глобальный счётчик изменений
+        option -tick_count 0
         constructor {args} {
             installhull using btext
             $self configure -opened_file [opened_file $self.opened_file]
@@ -103,6 +105,7 @@ namespace eval ::clcon_text {
             set $self.StatusBarInfo(Package) {CL-USER}
             set $self.StatusBarInfo(Readtable) {NIL}
             set $self.StatusBarInfo(ConnectionStatus) {?}
+            set $self.StatusBarInfo(Tick_count) {0}
         }
         destructor {
             $options(-opened_file) destroy
@@ -121,34 +124,46 @@ namespace eval ::clcon_text {
         method RealText {} {
             return $self.t
         }
+
+        method incr_tick_count {} {
+            global $self.StatusBarInfo
+            $self configure -tick_count [expr $options(-tick_count) + 1 ]
+            puts $options(-tick_count)
+            # incr $options(-tick_count)
+            set $self.StatusBarInfo(Tick_count) $options(-tick_count)
+        }
         
         # Enable synonyms, so the program can operate on readonly text
         method RoInsert {args} {
             putd "RoInsert $args"
+            # Хороший вопрос - менять счётчик до или после отправки в лисп?
+            $self incr_tick_count
             MaybeSendToLisp $self i $args
             set result [$hull insert {*}$args]
             return $result
         }
         method RoDelete {args} {
             putd "RoDelete $args"
+            $self incr_tick_count
             MaybeSendToLisp $self d $args
             set result [$hull delete {*}$args]
             return $result
         }
         method RoReplace {args} {
-            MaybeSendToLisp $self r $args
-            set result [$hull replace {*}$args]
-            return $result
+            error "До сих пор команда RoReplace была не нужна - что-то не так!"
         }
         
         # NSL stands for "not send to lisp". Specially for oduvanchik commands which
         # do text editings, see do-editing-on-tcl-side.lisp
+        # Однако номер состояния они увеличивают!
         method RoInsertNSL {args} {
             putd "RoInsertNSL $args"
+            $self incr_tick_count
             $hull insert {*}$args
         }
         method RoDeleteNSL {args} {
             putd "RoDeleteNSL $args"
+            $self incr_tick_count
             $hull delete {*}$args
         }
         # It looks like we don't need Replace at all
@@ -171,11 +186,11 @@ namespace eval ::clcon_text {
             set old $options(-private_freezed)
             switch -exact $old {
                 0 {
-                    #putd "Called Freeze from 0. Will freeze"
+                    putd "Called Freeze from 0. Will freeze"
                 }
                 1 { error "We need multi-level freezing" }
                 2 {
-                    #putd "I guess we called Freeze from Unfreeze. Lets freeze again"
+                    putd "I guess we called Freeze from Unfreeze. Lets freeze again"
                 }
             }
             $self configure \
@@ -203,7 +218,7 @@ namespace eval ::clcon_text {
         
         method ResetBackendBuffer {} {
             if {![$self UsesLispP]} {
-                tk_messageBox -message "$self does not UsesLispP. Unable to recreate backend buffer"
+                tk_messageBox -message "$self не использует UsesLispP. Не могу пересоздать буфер одуванчика"
                 return 
             }
             DestroyBackendBuffer $self 
@@ -215,7 +230,7 @@ namespace eval ::clcon_text {
         }
 
         method Unfreeze {} {
-            #putd "Entering Unfreeze"
+            putd "Entering Unfreeze"
             if {!$options(-send_to_lisp)} {
                 return
             }
@@ -372,6 +387,7 @@ namespace eval ::clcon_text {
     # Args
     # clcon_text - pathname of clcon_text widget
     # type - type of event, "i", "d", "ConstructBackendBuffer", "DestroyBackendBuffer"
+    # tick_count - значение опции -tick_count (число изменений с момента создания буфера)
     # arglist - list of arguments of event (see code)
     # UseGlobalPendingText2OduEventCounter - if 1, this is not buffer-specific event
     # (destroy event in fact)
@@ -400,10 +416,11 @@ namespace eval ::clcon_text {
                 if {[$clcon_text cget -private_freezed]} {
                     return
                 }
+                set tick_count [$clcon_text cget -tick_count]
                 set index [lindex $arglist 0]
                 set qIndex [::text2odu::CoerceIndex $clcon_text $index]
                 set qText [lq [lindex $arglist 1]]
-                set lispCmd "(clco:nti $qId $qIndex $qText)"
+                set lispCmd "(clco:nti $qId $tick_count $qIndex $qText)"
             }
             d {
                 if {![$clcon_text UsesLispP]} {
@@ -412,20 +429,22 @@ namespace eval ::clcon_text {
                 if {[$clcon_text cget -private_freezed]} {
                     return
                 }
+                set tick_count [$clcon_text cget -tick_count]
                 set b [lindex $arglist 0]
                 set qB [::text2odu::CoerceIndex $clcon_text $b]
                 set e [lindex $arglist 1]
                 set qE [::text2odu::CoerceIndex $clcon_text $e]
-                set lispCmd "(clco:notify-oduvan-tcl-text-delete $qId $qB $qE)"
+                set lispCmd "(clco:notify-oduvan-tcl-text-delete $qId $tick_count $qB $qE)"
             }
             ResendEntireTextToReconstructedBackendBuffer {
                 if {![$clcon_text UsesLispP]} {
                     return
                 }
+                set tick_count [$clcon_text cget -tick_count]
                 set qIndex [::text2odu::CoerceIndex $clcon_text 1.0]
                 # I forgot this magic with end-1c. ::edt::DoSaveFile can spill the light...
                 set qText [lq [$clcon_text get 1.0 end-1c]]
-                set lispCmd "(clco:nti $qId $qIndex $qText)"
+                set lispCmd "(clco:nti $qId $tick_count $qIndex $qText)"
             }
             ConstructBackendBuffer {
                 if {![$clcon_text UsesLispP]} {
@@ -433,8 +452,9 @@ namespace eval ::clcon_text {
                 }
                 # FIXME clcon_text_to_file_name must be in this namespace. 
                 lassign [::edt::clcon_text_to_file_name $clcon_text] FileName Reason
+                set tick_count [$clcon_text cget -tick_count]
                 set qFileName [lq $FileName]
-                set lispCmd "(clco:notify-oduvan-construct-backend-buffer $qId $qFileName)"
+                set lispCmd "(clco:notify-oduvan-construct-backend-buffer $qId $tick_count $qFileName)"
             }
             DestroyBackendBuffer {
                 # We don't check if current buffer uses lisp, as it can not exist now already. But we at least should check is we have lisp at all.
@@ -448,6 +468,7 @@ namespace eval ::clcon_text {
                     event generate $clcon_text <<UpdateFreezeIndicator>>
                     return
                 }
+                set tick_count [$clcon_text cget -tick_count]
                 set qB [::text2odu::CoerceIndex $clcon_text insert]
                 set FnAndArgs [lindex $arglist 0]
                 set qOptions [::tkcon::QuoteTclListOfStringsForLisp [lindex $arglist 1]] 
@@ -463,7 +484,7 @@ namespace eval ::clcon_text {
                 # set qC [lq $far_tcl_continuation_body]
                 set far_tcl_cont_id [::tkcon::GenContinuationCounter]
                 ::mprs::EnqueueContinuation $far_tcl_cont_id $far_tcl_continuation_body
-                set lispCmd "(clco:call-oduvanchik-function-with-clcon_text $qId $qB $far_tcl_cont_id '($FnAndArgs) '($qOptions))"
+                set lispCmd "(clco:call-oduvanchik-function-with-clcon_text $qId $tick_count $qB $far_tcl_cont_id '($FnAndArgs) '($qOptions))"
             }
             default {
                 error "Hurray! We found replace command $type with args $clcon_text $type $arglist!"
@@ -658,7 +679,7 @@ namespace eval ::clcon_text {
             set ContBody [subst -nocommand {$clcon_text Unfreeze}]
         }
         showVarPutd ContBody
-        MaybeSendToLisp $clcon_text CallOduvanchikFunction [list $OduvanchikFunctionNameAndArgs $Options] $ContBody
+        MaybeSendToLisp $clcon_text CallOduvanchikFunction [$clcon_text cget -tick_count] [list $OduvanchikFunctionNameAndArgs $Options] $ContBody
     }
 
     # Send cursor position to oduvanchik. This is for display purposes only, e.g. for
@@ -675,7 +696,7 @@ namespace eval ::clcon_text {
         }
         global $clcon_text.StatusBarInfo
         set $clcon_text.StatusBarInfo(CursorPos) [$clcon_text index insert]
-        MaybeSendToLisp $clcon_text n {}
+        MaybeSendToLisp $clcon_text n [$clcon_text cget -tick_count] {}
     }
 
     # # To be called from oi::delete-region

@@ -72,6 +72,7 @@
   (end nil :type (or null row-col))   ; end index
   (far_tcl_cont_id nil :type (or null integer)) ; tcl continuation id to eval after event's action is processed
   (swank-connection nil :type (or null swank::multithreaded-connection)) ; can be omitted for several event types
+  (tick_count 0 :type integer)
   )
 
 (defun parse-row-col (tcl-index)
@@ -99,7 +100,7 @@
   nil
   )
 
-(defun notify-oduvan-construct-backend-buffer (clcon_text-pathname filename)
+(defun notify-oduvan-construct-backend-buffer (clcon_text-pathname tick_count filename)
   "Called from tcl when text is created, from arbitrary thread. See also oduvanchik::eval-construct-backend-buffer; ::clcon_text::MaybeSendToLisp"
   (post-oduvan-event
    (make-text2odu-event
@@ -107,6 +108,7 @@
     :clcon_text-pathname clcon_text-pathname
     :string filename
     :swank-connection swank::*emacs-connection*
+    :tick_count tick_count
     )))
 
 (defun ncm (clcon_text-pathname pos)
@@ -119,7 +121,7 @@
     :swank-connection swank::*emacs-connection*
     )))
 
-(defun nti  (clcon_text-pathname index string)
+(defun nti  (clcon_text-pathname tick_count index string)
   "notify-oduvan-tcl-text-insert . Called from RoInsert. See oduvanchik::eval-before-tcl-text-insert, ::clcon_text::MaybeSendToLisp"
   (post-oduvan-event
    (make-text2odu-event
@@ -128,9 +130,10 @@
     :beg (parse-row-col index)
     :string string
     :swank-connection swank::*emacs-connection*
+    :tick_count tick_count
     )))
 
-(defun call-oduvanchik-function-with-clcon_text (clcon_text-pathname insert-index far_tcl_cont_id oduvanchik-function-name-and-args options)
+(defun call-oduvanchik-function-with-clcon_text (clcon_text-pathname tick_count insert-index far_tcl_cont_id oduvanchik-function-name-and-args options)
   "Send call-oduvanchik-function-with-clcon_text event to oduvanchik. See oduvanchik::eval-call-oduvanchik-function-with-clcon_text, ::clcon_text::MaybeSendToLisp"
   (post-oduvan-event
    (make-text2odu-event
@@ -141,9 +144,10 @@
     :beg (parse-row-col insert-index) ; likely to be unused
     :far_tcl_cont_id far_tcl_cont_id
     :swank-connection swank::*emacs-connection*
+    :tick_count tick_count
     )))
 
-(defun notify-oduvan-tcl-text-delete (clcon_text-pathname beg end)
+(defun notify-oduvan-tcl-text-delete (clcon_text-pathname tick_count beg end)
   "Called from RoDelete before really deleting text, see ::clcon_text::MaybeSendToLisp"
   (post-oduvan-event
    (make-text2odu-event
@@ -152,6 +156,7 @@
     :beg (parse-row-col beg)
     :end (if (equal end "") nil (parse-row-col end))
     :swank-connection swank::*emacs-connection*
+    :tick_count tick_count
     )))
 
 
