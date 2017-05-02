@@ -56,6 +56,7 @@
      (let* ((clcon_text (clcon-server::text2odu-event-clcon_text-pathname e))
             (buffer (oi::clcon_text-to-buffer clcon_text)))
        (assert buffer)
+       (update-buffers-tick_count-from-event buffer e)
        (use-buffer buffer 
          (with-mark-in-row-col (cursor-point (clcon-server::text2odu-event-beg e))
            (move-mark (current-point) cursor-point)
@@ -68,13 +69,20 @@
            )))))
   nil)
 
+(defun update-buffers-tick_count-from-event (buffer e)
+  (let ((tick_count (clcon-server::text2odu-event-tick_count e)))
+    (when tick_count
+      (assert (not (> (oduvanchik-internals::buffer-tcl_tick_count buffer) tick_count)) () "Пытаемся установить устаревший tick_count в буфер. Что-то произошло у нас за спиной. Видимо, наше предположение о том, что ничего не может произойти, наивно")
+      (setf (oduvanchik-internals::buffer-tcl_tick_count buffer) tick_count))))
+
 (defun eval-before-tcl-text-insert (e)
-  "See clco::nti"  
+  "See clco::nti"
   (etypecase e
     (clcon-server::text2odu-event
      (let* ((clcon_text (clcon-server::text2odu-event-clcon_text-pathname e))
             (buffer (oi::clcon_text-to-buffer clcon_text)))
        (assert buffer)
+       (update-buffers-tick_count-from-event buffer e)
        (use-buffer buffer 
          (oi::invoke-modifying-buffer 
            (alexandria:named-lambda
@@ -84,7 +92,8 @@
             (with-mark-in-row-col (beg (clcon-server::text2odu-event-beg e))
               (insert-string beg (clcon-server::text2odu-event-string e))
               (odu::check-something-ok beg)))
-           buffer)))))
+           buffer))
+       )))
   nil)
 
 (defun eval-before-tcl-text-delete (e)
@@ -96,6 +105,7 @@
             (clcon_text (clcon-server::text2odu-event-clcon_text-pathname e))
             (buffer (oi::clcon_text-to-buffer clcon_text)))
        (assert buffer)
+       (update-buffers-tick_count-from-event buffer e)
        (use-buffer
         buffer
         (oi::invoke-modifying-buffer 
@@ -145,6 +155,7 @@
     (let* ((b (make-buffer buffer-name)))
       (setf (buffer-pathname b) (pathname file-name))
       (change-to-buffer b)
+      (update-buffers-tick_count-from-event b e)
       (oduvanchik-interface:defhvar "Swank Connection" "Ugugu" :buffer b)
       ;(lisp-mode-command nil)
 
@@ -242,6 +253,7 @@
                (fboundp fn)) () "Symbol ~S funbound or have home-package different from :oduvanchik" fn)
 
       (use-buffer buffer
+        (update-buffers-tick_count-from-event buffer e)          
         (odu::set-mark-to-row-and-col (current-point)
                                       (clco::row-col-row cur-row-col)
                                       (clco::row-col-col cur-row-col))
@@ -269,6 +281,7 @@
 ; for single chars, use (oduvanchik-ext:char-key-event #\x)
 (defun eval-text2odu-event (e)
   "This code is executed inside a command. Transform text2odu events to oduvanchik function calls"
+  (assert-we-are-in-oduvanchik-thread)
   (check-something-ok)
   (etypecase e
     (clcon-server::text2odu-event

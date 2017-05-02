@@ -111,7 +111,7 @@
     :tick_count tick_count
     )))
 
-(defun ncm (clcon_text-pathname pos)
+(defun ncm (clcon_text-pathname tick_count pos)
   "notify-oduvan-cursor-moved. See oduvanchik::eval-notify-oduvan-cursor-moved, ::clcon_text::MaybeSendToLisp"
   (post-oduvan-event
    (make-text2odu-event
@@ -119,6 +119,7 @@
     :clcon_text-pathname clcon_text-pathname
     :beg (parse-row-col pos)
     :swank-connection swank::*emacs-connection*
+    :tick_count tick_count
     )))
 
 (defun nti  (clcon_text-pathname tick_count index string)
@@ -134,7 +135,9 @@
     )))
 
 (defun call-oduvanchik-function-with-clcon_text (clcon_text-pathname tick_count insert-index far_tcl_cont_id oduvanchik-function-name-and-args options)
-  "Send call-oduvanchik-function-with-clcon_text event to oduvanchik. See oduvanchik::eval-call-oduvanchik-function-with-clcon_text, ::clcon_text::MaybeSendToLisp"
+  "Send call-oduvanchik-function-with-clcon_text event to oduvanchik. See oduvanchik::eval-call-oduvanchik-function-with-clcon_text, ::clcon_text::MaybeSendToLisp. 
+Передача tick_count здесь недостаточна, поскольку в ходе выполнения функции состояние буфера tk изменится и нужно будет заново получить её. Мы получим её после разморозки
+вместе с позицией курсора, но некий временной лаг всё же возникнет, а можно было бы его избежать. Впрочем, в общем случае невозможно без заморозки tk гарантировать синхронность, поэтому временная рассинхронизация не должна иметь значения"
   (post-oduvan-event
    (make-text2odu-event
     :kind 'call-oduvanchik-function-with-clcon_text

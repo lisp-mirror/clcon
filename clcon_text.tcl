@@ -405,8 +405,9 @@ namespace eval ::clcon_text {
                 if {[$clcon_text cget -private_freezed]} {
                     return
                 }
+                set tick_count [$clcon_text cget -tick_count]
                 set qIndex [::text2odu::CoerceIndex $clcon_text insert]
-                set lispCmd "(clco:ncm $qId $qIndex)"
+                set lispCmd "(clco:ncm $qId $tick_count $qIndex)"
             }
             i {
                 if {![$clcon_text UsesLispP]} {
@@ -695,7 +696,7 @@ namespace eval ::clcon_text {
         }
         global $clcon_text.StatusBarInfo
         set $clcon_text.StatusBarInfo(CursorPos) [$clcon_text index insert]
-        MaybeSendToLisp $clcon_text n [$clcon_text cget -tick_count] {}
+        MaybeSendToLisp $clcon_text n {}
     }
 
     # # To be called from oi::delete-region
