@@ -86,24 +86,25 @@
  It looks like working with parens is independent of buffer highlighting. So we don't
  bother ourselves with redrawing"
   (check-something-ok)
-  (when (value highlight-open-parens)
-    (multiple-value-bind (start end)
-        (funcall (value open-paren-finder-function)
-                 (current-point))
-      (cond
-        ((and start end)
-         (oduvan-invisible-kill-open-paren-font-marks)
-         (set-open-paren-font-marks start end)
-         (let* ((lines (mapcar #'mark-line (list start end)))
-                (economy-lines (remove nil (remove-duplicates lines))))
-           (when (every 'oi::line-tag-valid-p economy-lines)
-             (dolist (line economy-lines)
-;               (format t "~a~%" (oi::line-number line))
-               (oi::maybe-send-line-highlight-to-clcon line)))))
-        (t
-         (oduvan-invisible-kill-open-paren-font-marks)
-         )))))
-
+  ;; Отключаем скобки для Яра (по сути это условие выполняется для Яра и только для него
+    (when (value highlight-open-parens)
+      (multiple-value-bind (start end)
+                           (funcall (value open-paren-finder-function)
+                                    (current-point))
+        (cond
+         ((and start end)
+          (oduvan-invisible-kill-open-paren-font-marks)
+          (set-open-paren-font-marks start end)
+          (let* ((lines (mapcar #'mark-line (list start end)))
+                 (economy-lines (remove nil (remove-duplicates lines))))
+            (when (every 'oi::line-tag-valid-p economy-lines)
+              (dolist (line economy-lines)
+                ;               (format t "~a~%" (oi::line-number line))
+                (oi::maybe-send-line-highlight-to-clcon line)))))
+         (t
+          (oduvan-invisible-kill-open-paren-font-marks)
+          )))))
+  
 (defun augment-with-parens (marks line)
   (if (and odu::*open-paren-font-marks* (eq (mark-line (region-start odu::*open-paren-font-marks*)) line))
       (oi::smart-insert-font-mark 
@@ -292,13 +293,15 @@
   #+oduvan-enable-highlight
   (cond
     ((null line))
-    (t 
+    (t
      (let* ((buffer (line-buffer line))
             (tag (oi:line-tag-no-recalc line))
             (line-number (oi::tag-line-number tag))
             (sy (oi::tag-syntax-info tag)))
        (assert sy)
        (when (bufferp buffer)
+         (assert (not (eq (oi::syntax-highlight-mode buffer)
+                          :send-highlight-after-recomputing-entire-buffer)))
          (let* ((clcon_text (oi::buffer-to-clcon_text buffer))
                 (connection (and clcon_text
                                  ;; if not, this is not clcon_text backend buffer
@@ -345,31 +348,32 @@
 
 (defmethod oi::recompute-tags-up-to (end-line (background (eql t)))
   "В этом методе (в отличие от метода с background nil), we always recompute everything to the end of file. end-line is required to know buffer only. Вызывающая сторона должна была сбросить номер волны раскраски. Родственная функция - oduvanchik::start-background-repaint-after-recomputing-entire-buffer"
-  (assert-we-are-in-oduvanchik-thread)
-  (assert (sb-thread:holding-mutex-p *invoke-modifying-buffer-lock*))
-  (oi::check-something-ok)
-  (let* ((buffer (line-buffer end-line))
-         (dummy1 (assert buffer))
-         (buffer-end (oi::buffer-end-mark buffer))
-         (dummy2 (assert buffer-end))
-         ;(real-end-line (mark-line buffer-end))
-         ;(level (oi::buffer-tag-line-number buffer))
-         (start-line 
-          (ecase (oi::syntax-highlight-mode buffer)
-            (:send-highlight-after-recomputing-entire-buffer
-             (oi::first-line-of-buffer buffer))
-            (:send-highlight-from-recompute-line-tag
-             (oi::НАЙТИ-ПЕРВУЮ-СТРОЧКУ-С-УСТАРЕВШИМ-ТЕГОМ end-line)))))
-    (declare (ignore dummy1 dummy2))
-    (assert start-line () "Упустили случай пустого буфера? Странно, а где тогда живёт end-line?")
-    (let ((new-highlight-wave-id (reset-background-highlight-process buffer)))
-      (oi::check-something-ok)
-      (clco::order-call-oduvanchik-from-itself
-       (list 'recompute-line-tags-starting-from-line-background
-             buffer start-line new-highlight-wave-id))
-      )))
+  (perga-implementation:perga
+   (assert-we-are-in-oduvanchik-thread)
+   (assert (sb-thread:holding-mutex-p *invoke-modifying-buffer-lock*))
+   (oi::check-something-ok)
+   (let buffer (line-buffer end-line))
+   (assert buffer)
+   (let buffer-end (oi::buffer-end-mark buffer))
+   (assert buffer-end)
+   ;(real-end-line (mark-line buffer-end))
+   ;(level (oi::buffer-tag-line-number buffer))
+   (let start-line 
+     (ecase (oi::syntax-highlight-mode buffer)
+       (:send-highlight-after-recomputing-entire-buffer
+        (oi::first-line-of-buffer buffer))
+       (:send-highlight-from-recompute-line-tag
+        (oi::НАЙТИ-ПЕРВУЮ-СТРОЧКУ-С-УСТАРЕВШИМ-ТЕГОМ end-line))))
+   (assert start-line () "Упустили случай пустого буфера? Странно, а где тогда живёт end-line?")
+   (let new-highlight-wave-id (reset-background-highlight-process buffer))
+   (oi::check-something-ok)
+   (clco::order-call-oduvanchik-from-itself
+    (list 'recompute-line-tags-starting-from-line-background
+          buffer start-line new-highlight-wave-id))
+   ))
 
-(defun start-background-repaint-after-recomputing-entire-buffer (buffer)
+#| Эти ф-ии заменены на Отправитель-раскраски
+ (defun start-background-repaint-after-recomputing-entire-buffer (buffer)
   (assert-we-are-in-oduvanchik-thread)
   (assert (sb-thread:holding-mutex-p *invoke-modifying-buffer-lock*))
   (oi::check-something-ok)
@@ -382,8 +386,7 @@
       )))
 
       
-
-(defun background-repaint-after-recomputing-entire-buffer (buffer start-line highlight-wave-id)
+ (defun background-repaint-after-recomputing-entire-buffer (buffer start-line highlight-wave-id)
   "Мы перекрасили буфер целиком. Запустим процесс фоновой раскраски. Примерная копия с recompute-line-tags-starting-from-line-background "
   (assert-we-are-in-oduvanchik-thread)
   (cond
@@ -398,8 +401,9 @@
         (clco::order-call-oduvanchik-from-itself
           (list 'background-repaint-after-recomputing-entire-buffer
               buffer next highlight-wave-id)))))))
+|#
 
-(defun recompute-line-tags-starting-from-line-background (buffer start-line highlight-wave-id)
+ (defun recompute-line-tags-starting-from-line-background (buffer start-line highlight-wave-id)
   "Создаёт подобие фоновой задачи для раскраски строк до конца файла. Фоновость имитируется через цепочку событий, каждое из которых кладёт событие-продолжение. Смысл состоит в том, чтобы, не отвлекаясь от другой работы, не спеша вычислить, а главное, отправить в tcl раскраску всех строк до конца файла. Родственная функция - background-repaint-after-recomputing-entire-buffer"
   (assert-we-are-in-oduvanchik-thread)
   (let ((check-the-buffer (line-buffer start-line)))
@@ -417,16 +421,18 @@
              (assert (oi::line-tag-valid-p prev) () "Ожидалось, что предыдущая строка уже раскрашена")))
          ;; line-tag вызывается ради попбочного эффекта. Поскольку мы уже утвердили, что предыдущая строчка раскрашена (или мы стоим на первой строчке), это не приведёт к большим затратам времени
          (line-tag start-line)
-         (when (eq (oi::syntax-highlight-mode buffer) :send-highlight-after-recomputing-entire-buffer)
-           ;; В этом режиме мы отключили отправку раскраски непосредственно из тега, т.к. при этом забилась бы очередь отправляемых раскрасок. 
-           ;; Поэтому нам приходится отправлять раскраску явно. 
-           (oi::maybe-send-line-highlight-to-clcon start-line))
-         (let ((next (oi::line-next start-line)))
-           (when next
-             (clco::order-call-oduvanchik-from-itself
-              (list 'recompute-line-tags-starting-from-line-background
-                    buffer next highlight-wave-id)))))))))
-
+         (ecase (oi::syntax-highlight-mode buffer)
+           (:send-highlight-after-recomputing-entire-buffer
+            ;; Всё отправляется из line-tag - больше делать нечего
+            )
+           (:send-highlight-from-recompute-line-tag
+            (oi::maybe-send-line-highlight-to-clcon start-line)
+            (let ((next (oi::line-next start-line)))
+              (when next
+                (clco::order-call-oduvanchik-from-itself
+                 (list 'recompute-line-tags-starting-from-line-background
+                       buffer next highlight-wave-id)))))))))))
+    
 (defun cl-boolean-to-tcl (x)
   "Returns 0 or 1 in numeric form"
   (if x "1" "0")
