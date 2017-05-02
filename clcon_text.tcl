@@ -127,10 +127,9 @@ namespace eval ::clcon_text {
 
         method incr_tick_count {} {
             global $self.StatusBarInfo
-            $self configure -tick_count [expr $options(-tick_count) + 1 ]
-            puts $options(-tick_count)
-            # incr $options(-tick_count)
-            set $self.StatusBarInfo(Tick_count) $options(-tick_count)
+            set new_tick_count [expr $options(-tick_count) + 1 ]
+            $self configure -tick_count $new_tick_count
+            set $self.StatusBarInfo(Tick_count) $new_tick_count
         }
         
         # Enable synonyms, so the program can operate on readonly text
@@ -679,7 +678,7 @@ namespace eval ::clcon_text {
             set ContBody [subst -nocommand {$clcon_text Unfreeze}]
         }
         showVarPutd ContBody
-        MaybeSendToLisp $clcon_text CallOduvanchikFunction [$clcon_text cget -tick_count] [list $OduvanchikFunctionNameAndArgs $Options] $ContBody
+        MaybeSendToLisp $clcon_text CallOduvanchikFunction [list $OduvanchikFunctionNameAndArgs $Options] $ContBody
     }
 
     # Send cursor position to oduvanchik. This is for display purposes only, e.g. for
