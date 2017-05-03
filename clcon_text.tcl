@@ -81,6 +81,8 @@ namespace eval ::clcon_text {
         option -opened_file {}
         # PRIVATE. Глобальный счётчик изменений
         option -tick_count 0
+        # Список tick_count-ов, которые мы запрашивали у лиспа, по кодам слоёв
+        option -tick_count-когда-перекрашивали {-1}
         constructor {args} {
             installhull using btext
             $self configure -opened_file [opened_file $self.opened_file]
@@ -139,6 +141,7 @@ namespace eval ::clcon_text {
             $self incr_tick_count
             MaybeSendToLisp $self i $args
             set result [$hull insert {*}$args]
+            after idle [list ::edt::ПопроситьЛиспПрислатьДанныеОРаскраске $self 1]
             return $result
         }
         method RoDelete {args} {
@@ -146,6 +149,7 @@ namespace eval ::clcon_text {
             $self incr_tick_count
             MaybeSendToLisp $self d $args
             set result [$hull delete {*}$args]
+            after idle [list ::edt::ПопроситьЛиспПрислатьДанныеОРаскраске $self 1]
             return $result
         }
         method RoReplace {args} {
@@ -323,9 +327,9 @@ namespace eval ::clcon_text {
             # this can be uncommented for debugging of the editor.
             # only first buffer's command are sent to lisp so that
             # less mess oduvanchik's state
-	    #if {[::edt::Bi2btext "buf1"] ne $clcon_text} {
-            #    return
-            #}
+	    if {[::edt::Bi2btext "buf1"] ne $clcon_text} {
+                return
+            }
 
             $clcon_text configure -send_to_lisp 1
             MaybeSendToLisp $clcon_text ConstructBackendBuffer {}
@@ -408,6 +412,18 @@ namespace eval ::clcon_text {
                 set tick_count [$clcon_text cget -tick_count]
                 set qIndex [::text2odu::CoerceIndex $clcon_text insert]
                 set lispCmd "(clco:ncm $qId $tick_count $qIndex)"
+            }
+            h { 
+                if {![$clcon_text UsesLispP]} {
+                    return
+                }
+                # When unfreezing, we DO NOT send it. ContinueUnfreeze would send it for us
+                if {[$clcon_text cget -private_freezed]} {
+                    return
+                }
+                set tick_count [$clcon_text cget -tick_count]
+                set Слой [lindex $arglist 0]
+                set lispCmd "(clco:nhi $qId $tick_count ${Слой})"
             }
             i {
                 if {![$clcon_text UsesLispP]} {

@@ -10,7 +10,7 @@ namespace eval ::edt {
             return 
         }
         foreach {ВклВыкл Slojj r1 c1 r2 c2 font} $s break
-        puts $s
+        # puts $s
         set i1 [string cat $r1 . $c1]
         set i2 [string cat $r2 . $c2]
         set TagName [::edt::HighlightTagName $font]
