@@ -141,7 +141,7 @@ namespace eval ::clcon_text {
             $self incr_tick_count
             MaybeSendToLisp $self i $args
             set result [$hull insert {*}$args]
-            after idle [list ::edt::ПопроситьЛиспПрислатьДанныеОРаскраске $self 1]
+            after idle [list ::edt::ПопроситьЛиспПрислатьДанныеОРаскраске $self 0]
             return $result
         }
         method RoDelete {args} {
@@ -149,7 +149,7 @@ namespace eval ::clcon_text {
             $self incr_tick_count
             MaybeSendToLisp $self d $args
             set result [$hull delete {*}$args]
-            after idle [list ::edt::ПопроситьЛиспПрислатьДанныеОРаскраске $self 1]
+            after idle [list ::edt::ПопроситьЛиспПрислатьДанныеОРаскраске $self 0]
             return $result
         }
         method RoReplace {args} {

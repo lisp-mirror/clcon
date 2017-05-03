@@ -62,24 +62,41 @@
            (move-mark (current-point) cursor-point)
            ;; this is what it all what done for
            (oduvan-invisible-maybe-highlight-open-parens)
-           (maybe-send-package-to-tcl clcon_text)
-           (maybe-send-readtable-to-tcl clcon_text)
-           (maybe-send-mode-to-tcl clcon_text)
+           (unless (eq ; здесь мы неведомо почему падаем в "another bug", но разбираться не буду, т.к. это всё равно не нужно для Яра.
+               (ODUVANCHIK-INTERNALS::SYNTAX-HIGHLIGHT-MODE buffer)
+               :SEND-HIGHLIGHT-AFTER-RECOMPUTING-ENTIRE-BUFFER)
+             (maybe-send-package-to-tcl clcon_text)
+             (maybe-send-readtable-to-tcl clcon_text)
+             (maybe-send-mode-to-tcl clcon_text))
            (check-something-ok cursor-point)
            )))))
   nil)
 
-(defun |EVAL-NOTIFY-ODUVAN-TCL-Прислать-данные-о-раскраске| (e)
+(defun |EVAL-NOTIFY-ODUVAN-TCL-Лисп-зпт-пришли-раскраску| (e)
   "Одуванчик просит у лиспа запустить раскраску (только в режиме Яра, когда syntax-highlight-mode = :send-highlight-after-recomputing-entire-buffer . См. clco::nhi"
+  (ODUVANCHIK-EXT:ASSERT-WE-ARE-IN-ODUVANCHIK-THREAD)
   (etypecase e
     (clcon-server::text2odu-event
      (let* ((clcon_text (clcon-server::text2odu-event-clcon_text-pathname e))
             (buffer (oi::clcon_text-to-buffer clcon_text))
-            (КодСлоя (clco::|TEXT2ODU-EVENT-КодСлоя| e)))
-       (assert (eql КодСлоя 1)) ; пока что понимаем слои
+            (Код-слоя (clco::|TEXT2ODU-EVENT-Код-слоя| e)))
+       (assert (eql Код-слоя 0)) ; пока что не понимаем слои
        (assert buffer)
-       (update-buffers-tick_count-from-event buffer e)
-       (oi::ПЕРЕРАСКРАСИТЬ-БУФЕР-ЯРО buffer))))
+       (when (eq 
+               (ODUVANCHIK-INTERNALS::SYNTAX-HIGHLIGHT-MODE buffer)
+               :SEND-HIGHLIGHT-AFTER-RECOMPUTING-ENTIRE-BUFFER)
+         (let ((buffer-tick (oi::BUFFER-TCL_TICK_COUNT buffer))
+               (event-tick (clco::text2odu-event-tick_count e)))
+         (cond
+          ((< buffer-tick event-tick)
+           ; слишком рано - в tk случились изменения, но они ещё не дошли до одуванчика
+           ; нам надо подождать до момента, когда изменения произойдут и отправить запрос заново, но подождать в лиспе мы не толком не умеем. 
+           (break "Что же теперь делать?")
+           )
+          ((= buffer-tick event-tick)
+           (oi::ПЕРЕРАСКРАСИТЬ-БУФЕР-ЯРО buffer))
+          (t 
+           (error "Одуванчик считает, что настало будущее, которое ещё не наступило в tk. Я что-то не понял"))))))))
   nil)
 
 
@@ -320,8 +337,8 @@
         (eval-call-oduvanchik-function-with-clcon_text e))
        (clco::call-oduvanchik-from-itself
         (eval-order-call-oduvanchik-from-itself e))
-       (clco::|Прислать-данные-о-раскраске|
-        (|EVAL-NOTIFY-ODUVAN-TCL-Прислать-данные-о-раскраске| e))
+       (clco::|Лисп-зпт-пришли-раскраску|
+        (|EVAL-NOTIFY-ODUVAN-TCL-Лисп-зпт-пришли-раскраску| e))
        )))
   (check-something-ok)
   )

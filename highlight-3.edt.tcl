@@ -65,12 +65,19 @@ namespace eval ::edt {
     # но это будет значить, что буфер tk поменялся, и будет подан новый запрос на раскраску. 
     # В этом случае судьба старого запроса нас не интересует. 
     # Либо она не успеет устарить и завершится успешно. Но тогда и проверять нечего. 
-    proc ПопроситьЛиспПрислатьДанныеОРаскраске {clcon_text КодСлоя} {
+    proc ПопроситьЛиспПрислатьДанныеОРаскраске {clcon_text Код-слоя} {
+        if {![winfo exists $clcon_text]} {
+            return
+        }
         set tick_count [$clcon_text cget -tick_count]
         set tick_count-когда-перекрашивали [$clcon_text cget -tick_count-когда-перекрашивали ]
-        set КогдаПерекрашивалиЭтотСлой [lindex tick_count-когда-перекрашивали ${КодСлоя}]
+        set КогдаПерекрашивалиЭтотСлой [lindex ${tick_count-когда-перекрашивали} ${Код-слоя}]
         if {${КогдаПерекрашивалиЭтотСлой} < $tick_count} {
-            ::clcon_text::MaybeSendToLisp $clcon_text h ${КодСлоя}
+            puts "Просим перекрасить, $tick_count"
+            ::clcon_text::MaybeSendToLisp $clcon_text h ${Код-слоя}
+            set tick_count-когда-перекрашивали \
+               [lreplace ${tick_count-когда-перекрашивали} ${Код-слоя} ${Код-слоя} $tick_count]
+            $clcon_text configure -tick_count-когда-перекрашивали ${tick_count-когда-перекрашивали}
         }
     }
 }
