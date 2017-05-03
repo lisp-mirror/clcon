@@ -1,5 +1,5 @@
 ﻿Clcon 0.3.8 - Руководство пользователя
-===========
+
 
 Аргументы, параметры, ключи, опции командной строки
 --------------------
@@ -19,7 +19,7 @@ You can also change this option in runtime from 'Prefs' menu. Changed value is n
 ```-oduvan-backend 1``` - supposes that oduvanchik runs on SWANK side and enables some lisp-specific editor features (implementation is under construction). You can also change it via Pres menu bar submenu.
 
 Файл инициализации
--------------------
+--------------------
 Windows: %HOME%\clcon.cfg
 
 Linux: ~/.clconrc 
@@ -48,15 +48,14 @@ proc ::AttachSwankHook {} {
 ```
 
 ### Избранное
-
-Добавьте в инициализационный файл данные для построения меню, например: 
+В консоли есть меню "избранное". Чтобы заполнить его, добавьте в инициализационный файл данные для построения меню, например: 
 ```
 set ::tkcon::OPT(Izbrannoe) {
   "1.Привет" {..puts "Hello"} 
   "2.Редактировать мой файл" {.edit "c:/my-file.lisp"}
 }
 ```
-Нечётные элементы - это заголовки (будет подчёркнута первая буква для ускоренного запуска Alt-6 Подчёркнутая-буква ), чётные - это команды, как
+Нечётные элементы - это заголовки (будет подчёркнута первая буква для ускоренного запуска - Alt-6 Подчёркнутая-буква ), чётные - это команды, как
 они вводятся в консоли. 
 
 Автодополнение, продолжение и автоподстановка
@@ -110,9 +109,12 @@ There are also Lisp functions for the search. Example of searching for either of
 
 This is rather lame, as lines are not sorted appropriately when merging two sets.
 
-Example of searching string in files specified by globs (superseded by `.finf`)
-
-`(clco:FIND-STRING-IN-FILES "f4" (clco:FILES-BY-GLOB-LIST "c:/clcon/lp/**/*.lisp" "c:/clcon/lp/**/*.asd"))`
+Где вызывается функция?
+-------------------------
+```
+(mapcar 'car (swank/backend:list-callers 'ODUVANCHIK-INTERNALS::UPDATE-TAG-LINE-NUMBER))
+```
+Имейте в виду, что вызовы через apply символа с большой вероятностью не получится найти таким способом.
 
 
 Подключение к/отключение от SWANK
@@ -180,6 +182,15 @@ Press Ctrl-F3 to complete filename (at least it will work undex *nix).
 
 Редактирование файлов
 -------------
+clcon понимает только кодировку utf-8 и юниксовый стиль завершения строк (знак с кодом 10). 
+Но для правильной работы swank нужно указать в первой строке файла кодировку, например:
+
+;; -*- coding: utf-8; system: my-system;  -*-
+
+Если этого не сделать, поиск определения и отладчик будут "промахиваться" мимо исходного текста, а в отдельных случаях
+отладчик вообще не найдёт исходный текст. 
+
+
 `Ctrl-z` - undo
 
 `Ctrl-y` - redo
@@ -190,10 +201,14 @@ Press Ctrl-F3 to complete filename (at least it will work undex *nix).
 -------------------------
 WARNING! 
 
-As you close the IDE, there is sometimes no warning about unsaved files. Also there is a bug in tab switching code so tab names at some point can mismatch real file name of the file being edited. Also note that as some part of IDE crash, editor might become crashed too. Be careful! 
+There is a bug in tab switching code so tab names at some point can mismatch real file name of the file being edited. Also note that as some part of IDE crash, editor might become crashed too. Be careful! 
 
 If you have crashed swank connection, first of all try to disable "Oduvan-backend" flag at prefs menu in the console. After that, try Secret/Unfreeze command if your editor appears hanged up. With two that measures, you have good chances to save your work. But, again, don't rely upon IDE. 
 Normally, to save files, use "File" menu or Control-s keyboard shortcut. 
+
+Открытие файла сторонним редактором
+-------------------------------------
+Возможности текстового редактора clcon ограничены, поэтому есть пункт меню Файл/Открыть этот файл другим редактором. Он же пригодится, когда нужно видеть два файла рядом. 
 
 Поддержка именованных таблиц чтения (named-readtables)
 -------------------------
