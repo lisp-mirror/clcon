@@ -327,9 +327,9 @@ namespace eval ::clcon_text {
             # this can be uncommented for debugging of the editor.
             # only first buffer's command are sent to lisp so that
             # less mess oduvanchik's state
-	    if {[::edt::Bi2btext "buf1"] ne $clcon_text} {
-                return
-            }
+	    #if {[::edt::Bi2btext "buf1"] ne $clcon_text} {
+            #    return
+            #}
 
             $clcon_text configure -send_to_lisp 1
             MaybeSendToLisp $clcon_text ConstructBackendBuffer {}
