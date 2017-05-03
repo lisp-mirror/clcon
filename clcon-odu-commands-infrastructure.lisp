@@ -361,6 +361,7 @@
    (let start-line 
      (ecase (oi::syntax-highlight-mode buffer)
        (:send-highlight-after-recomputing-entire-buffer
+        (error "МЫ не лоджны были")
         (oi::first-line-of-buffer buffer))
        (:send-highlight-from-recompute-line-tag
         (oi::НАЙТИ-ПЕРВУЮ-СТРОЧКУ-С-УСТАРЕВШИМ-ТЕГОМ end-line))))
@@ -372,37 +373,31 @@
           buffer start-line new-highlight-wave-id))
    ))
 
- (defun recompute-line-tags-starting-from-line-background (buffer start-line highlight-wave-id)
+(defun recompute-line-tags-starting-from-line-background (buffer start-line highlight-wave-id)
   "Создаёт подобие фоновой задачи для раскраски строк до конца файла. Фоновость имитируется через цепочку событий, каждое из которых кладёт событие-продолжение. Смысл состоит в том, чтобы, не отвлекаясь от другой работы, не спеша вычислить, а главное, отправить в tcl раскраску всех строк до конца файла. Родственная функция - background-repaint-after-recomputing-entire-buffer"
   (assert-we-are-in-oduvanchik-thread)
   (let ((check-the-buffer (line-buffer start-line)))
     (cond
-      ((not (= highlight-wave-id (oi::buffer-highlight-wave-id buffer)))
-       ;; We're obsolete. Die.
-       (return-from recompute-line-tags-starting-from-line-background nil))
-      ((not (equal buffer check-the-buffer))
+     ((not (= highlight-wave-id (oi::buffer-highlight-wave-id buffer)))
+      ;; We're obsolete. Die.
+      (return-from recompute-line-tags-starting-from-line-background nil))
+     ((not (equal buffer check-the-buffer))
        (error "Again we are trying to paint deleted line..."))
-      (t 
-       (oi::check-something-ok)
-       (when start-line
-         (let ((prev (line-previous start-line)))
-           (when prev
-             (assert (oi::line-tag-valid-p prev) () "Ожидалось, что предыдущая строка уже раскрашена")))
-         ;; line-tag вызывается ради попбочного эффекта. Поскольку мы уже утвердили, что предыдущая строчка раскрашена (или мы стоим на первой строчке), это не приведёт к большим затратам времени
-         (line-tag start-line)
-         (ecase (oi::syntax-highlight-mode buffer)
-           (:send-highlight-after-recomputing-entire-buffer
-            (bt:with-recursive-lock-held
-             (oi::*INVOKE-MODIFYING-BUFFER-LOCK*)
-             (oi::recompute-syntax-marks start-line nil))
-            )
-           (:send-highlight-from-recompute-line-tag
-            (oi::maybe-send-line-highlight-to-clcon start-line)
-            (let ((next (oi::line-next start-line)))
-              (when next
-                (clco::order-call-oduvanchik-from-itself
-                 (list 'recompute-line-tags-starting-from-line-background
-                       buffer next highlight-wave-id)))))))))))
+     (t 
+      (oi::check-something-ok)
+      (when start-line
+        (let ((prev (line-previous start-line)))
+          (when prev
+            (assert (oi::line-tag-valid-p prev) () "Ожидалось, что предыдущая строка уже раскрашена")))
+        ;; line-tag вызывается ради попбочного эффекта. Поскольку мы уже утвердили, что предыдущая строчка раскрашена (или мы стоим на первой строчке), это не приведёт к большим затратам времени
+        (line-tag start-line)
+        (assert (eq (oi::syntax-highlight-mode buffer) :send-highlight-from-recompute-line-tag))
+        (oi::maybe-send-line-highlight-to-clcon start-line)
+        (let ((next (oi::line-next start-line)))
+          (when next
+            (clco::order-call-oduvanchik-from-itself
+             (list 'recompute-line-tags-starting-from-line-background
+                   buffer next highlight-wave-id)))))))))
     
 (defun cl-boolean-to-tcl (x)
   "Returns 0 or 1 in numeric form"
