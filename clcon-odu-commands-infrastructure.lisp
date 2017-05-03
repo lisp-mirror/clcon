@@ -372,37 +372,6 @@
           buffer start-line new-highlight-wave-id))
    ))
 
-#| Эти ф-ии заменены на Отправитель-раскраски
- (defun start-background-repaint-after-recomputing-entire-buffer (buffer)
-  (assert-we-are-in-oduvanchik-thread)
-  (assert (sb-thread:holding-mutex-p *invoke-modifying-buffer-lock*))
-  (oi::check-something-ok)
-  (let* ((start-line (oi::first-line-of-buffer buffer))
-         (new-highlight-wave-id (reset-background-highlight-process buffer)))
-    (when start-line
-      (clco::order-call-oduvanchik-from-itself
-       (list 'background-repaint-after-recomputing-entire-buffer
-             buffer start-line new-highlight-wave-id))
-      )))
-
-      
- (defun background-repaint-after-recomputing-entire-buffer (buffer start-line highlight-wave-id)
-  "Мы перекрасили буфер целиком. Запустим процесс фоновой раскраски. Примерная копия с recompute-line-tags-starting-from-line-background "
-  (assert-we-are-in-oduvanchik-thread)
-  (cond
-    ((not (= highlight-wave-id (oi::buffer-highlight-wave-id buffer)))
-     ;; We're obsolete. Die.
-     (return-from background-repaint-after-recomputing-entire-buffer nil))
-    (t 
-     (oi::check-something-ok)
-     (oi::maybe-send-line-highlight-to-clcon start-line)
-     (let ((next (oi::line-next start-line)))
-      (when next
-        (clco::order-call-oduvanchik-from-itself
-          (list 'background-repaint-after-recomputing-entire-buffer
-              buffer next highlight-wave-id)))))))
-|#
-
  (defun recompute-line-tags-starting-from-line-background (buffer start-line highlight-wave-id)
   "Создаёт подобие фоновой задачи для раскраски строк до конца файла. Фоновость имитируется через цепочку событий, каждое из которых кладёт событие-продолжение. Смысл состоит в том, чтобы, не отвлекаясь от другой работы, не спеша вычислить, а главное, отправить в tcl раскраску всех строк до конца файла. Родственная функция - background-repaint-after-recomputing-entire-buffer"
   (assert-we-are-in-oduvanchik-thread)
@@ -423,7 +392,9 @@
          (line-tag start-line)
          (ecase (oi::syntax-highlight-mode buffer)
            (:send-highlight-after-recomputing-entire-buffer
-            ;; Всё отправляется из line-tag - больше делать нечего
+            (bt:with-recursive-lock-held
+             (oi::*INVOKE-MODIFYING-BUFFER-LOCK*)
+             (oi::recompute-syntax-marks start-line nil))
             )
            (:send-highlight-from-recompute-line-tag
             (oi::maybe-send-line-highlight-to-clcon start-line)

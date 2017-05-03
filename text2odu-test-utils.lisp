@@ -41,8 +41,8 @@
         (cond
           (winmerge-strings-fn
            (funcall winmerge-strings-fn clcon_text-str odu-str
-                    :lfile "~/.clcon_text-str"
-                    :rfile "~/.odu-str"))
+                    :lfile (cl-user::PUTQ-OTNOSITELQNO-KORNYA-YARA "пляж/.clcon_text-str")
+                    :rfile (cl-user::PUTQ-OTNOSITELQNO-KORNYA-YARA "пляж/.odu-str")))
           (t
            (cerror "Continue" "oduvanchik vs clcon_text buffer contents mismatch" )))))))
             
