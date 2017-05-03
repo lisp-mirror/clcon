@@ -55,6 +55,7 @@
     call-oduvanchik-from-itself
     ;; special message when cursor moved
     cursor-moved 
+    |Прислать-данные-о-раскраске|  ; h <КодСлоя> 
     ))
 
 (defstruct row-col
@@ -73,6 +74,7 @@
   (far_tcl_cont_id nil :type (or null integer)) ; tcl continuation id to eval after event's action is processed
   (swank-connection nil :type (or null swank::multithreaded-connection)) ; can be omitted for several event types
   (tick_count 0 :type integer)
+  (|КодСлоя| nil :type (or null integer))
   )
 
 (defun parse-row-col (tcl-index)
@@ -120,6 +122,17 @@
     :beg (parse-row-col pos)
     :swank-connection swank::*emacs-connection*
     :tick_count tick_count
+    )))
+
+(defun nhi (clcon_text-pathname tick_count |КодСлоя|)
+  " .apr EVAL-NOTIFY-ODUVAN-TCL-Прислать-данные-о-раскраске, ::clcon_text::MaybeSendToLisp"
+  (post-oduvan-event
+   (make-text2odu-event
+    :kind '|Прислать-данные-о-раскраске|
+    :clcon_text-pathname clcon_text-pathname
+    :swank-connection swank::*emacs-connection*
+    :tick_count tick_count
+    :|КодСлоя| |КодСлоя|
     )))
 
 (defun nti  (clcon_text-pathname tick_count index string)

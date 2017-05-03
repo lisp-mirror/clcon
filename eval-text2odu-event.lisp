@@ -69,6 +69,20 @@
            )))))
   nil)
 
+(defun |EVAL-NOTIFY-ODUVAN-TCL-Прислать-данные-о-раскраске| (e)
+  "Одуванчик просит у лиспа запустить раскраску (только в режиме Яра, когда syntax-highlight-mode = :send-highlight-after-recomputing-entire-buffer . См. clco::nhi"
+  (etypecase e
+    (clcon-server::text2odu-event
+     (let* ((clcon_text (clcon-server::text2odu-event-clcon_text-pathname e))
+            (buffer (oi::clcon_text-to-buffer clcon_text))
+            (КодСлоя (clco::|TEXT2ODU-EVENT-КодСлоя| e)))
+       (assert (eql КодСлоя 1)) ; пока что понимаем слои
+       (assert buffer)
+       (update-buffers-tick_count-from-event buffer e)
+       (oi::ПЕРЕРАСКРАСИТЬ-БУФЕР-ЯРО buffer))))
+  nil)
+
+
 (defun update-buffers-tick_count-from-event (buffer e)
   (let ((tick_count (clcon-server::text2odu-event-tick_count e)))
     (when tick_count
@@ -306,6 +320,8 @@
         (eval-call-oduvanchik-function-with-clcon_text e))
        (clco::call-oduvanchik-from-itself
         (eval-order-call-oduvanchik-from-itself e))
+       (clco::|Прислать-данные-о-раскраске|
+        (|EVAL-NOTIFY-ODUVAN-TCL-Прислать-данные-о-раскраске| e))
        )))
   (check-something-ok)
   )

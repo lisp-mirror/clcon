@@ -13,6 +13,7 @@
                                         ; oduvan-backend
            #:notify-oduvan-construct-backend-buffer
            #:ncm
+           #:nhi ; NOTIFY-ODUVAN-TCL-Прислать-данные-о-раскраске
            #:nti ; notify-oduvan-tcl-text-insert
            #:notify-oduvan-tcl-text-delete
            #:notify-oduvan-destroy-backend-buffer
