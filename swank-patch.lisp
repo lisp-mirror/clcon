@@ -316,3 +316,7 @@ WHAT can be:
 (defun otladitq--n--jj-potok-v-chjornojj-konsoli (n)
   (let ((thread (swank::nth-thread n)))
     (break-thread-in-black-console thread)))
+
+
+;#+SBCL
+;(pushnew '(nil "utf-8" "utf-8-unix") swank/sbcl::*external-format-to-coding-system*)
