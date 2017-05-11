@@ -51,6 +51,7 @@ proc ::completions_menu::run {items args} {
         -showlabels 0 \
         -foreground \#000000 \
         -font tkconfixed -borderwidth 1 -highlightthickness 0 \
+        -stripebackground \#F3F3F3 -exportselection 0 \
         -width [expr {$(-width)+2}]
 
     $tbl columnconfigure 0 -wrap true

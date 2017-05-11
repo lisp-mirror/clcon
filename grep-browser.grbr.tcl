@@ -300,7 +300,9 @@ namespace eval ::grbr {
         
         # When you change column order, see also:
         # ::edt::AppendData , ::edt::DefaultSortHeaders
-        tablelist::tablelist $tbl -columns {4 "№" 40 "Line" 4 "Line No" 25 "File"} -spacing 10
+        tablelist::tablelist $tbl -columns {4 "№" 40 "Line" 4 "Line No" 25 "File"} -spacing 10 \
+        -exportselection 0 -stripebackground \#F3F3F3
+
         # $tbl resetsortinfo
 
         $tbl columnconfigure 0 -sortmode integer

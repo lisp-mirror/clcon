@@ -175,7 +175,8 @@ namespace eval ::srchtblst {
         
         toplevel .w
 
-        tablelist::tablelist .w.t -columns {0 "First Column" 0 "Another column"} -stretch all -background white -stretch all -expandcommand ::srchtblst::ExampleExpandCmd
+        tablelist::tablelist .w.t -columns {0 "First Column" 0 "Another column"} -stretch all -background white \
+        -exportselection 0 -stretch all -expandcommand ::srchtblst::ExampleExpandCmd -stripebackground \#F3F3F3
         .w.t resetsortinfo
 
         pack .w.t -fill both -expand yes

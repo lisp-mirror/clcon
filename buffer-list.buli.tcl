@@ -251,12 +251,14 @@ namespace eval ::buli {
         
         tablelist::tablelist $tbl \
             -columns {3 "Mod" 20 "Name" left 3 "Typ" left 30 "Path" left} \
-            -width 40
+            -width 40 \
+            -exportselection 0
         $tbl resetsortinfo 
 
         $tbl configure \
             -foreground \#000000 \
-            -font tkconfixed -borderwidth 1 -highlightthickness 1 
+            -font tkconfixed -borderwidth 1 -highlightthickness 1  \
+            -stripebackground \#F3F3F3
         
 
         $tbl columnconfigure 1 -wrap true  

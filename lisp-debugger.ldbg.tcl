@@ -1177,6 +1177,7 @@ namespace eval ::ldbg {
             -columns {60 "Кадры стека" left} \
             -stretch 0 -spacing 10 \
             -width 62   \
+            -exportselection 0 \
             -expandcommand "::ldbg::FramesTablelistEnsurePopulated"
         
         $tbl resetsortinfo 

@@ -578,7 +578,9 @@ namespace eval ::erbr {
         frame $w.tf
         set tbl $w.tf.tbl
         
-        tablelist::tablelist $tbl -columns {3 "№" 12 "Severity" 20 "Text"} -stretch 2 -spacing 10
+        tablelist::tablelist $tbl -columns {3 "№" 12 "Severity" 20 "Text"} -stretch 2 -spacing 10 \
+        -exportselection 0 -stripebackground \#F3F3F3
+
         # $tbl resetsortinfo
 
         $tbl configure \
