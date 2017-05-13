@@ -73,7 +73,7 @@ namespace eval ::edt {
         set tick_count-когда-перекрашивали [$clcon_text cget -tick_count-когда-перекрашивали ]
         set КогдаПерекрашивалиЭтотСлой [lindex ${tick_count-когда-перекрашивали} ${Код-слоя}]
         if {${КогдаПерекрашивалиЭтотСлой} < $tick_count} {
-            puts "Просим перекрасить, $tick_count"
+            # puts "Просим перекрасить, $tick_count"
             ::clcon_text::MaybeSendToLisp $clcon_text h ${Код-слоя}
             set tick_count-когда-перекрашивали \
                [lreplace ${tick_count-когда-перекрашивали} ${Код-слоя} ${Код-слоя} $tick_count]
