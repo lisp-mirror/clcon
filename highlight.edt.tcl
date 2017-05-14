@@ -12,23 +12,23 @@ namespace eval ::edt {
     # see oi::state-font . To show pallette, call ::edt::DisplayTestTextInColor red
     # No error having two "light coral" - s - one of them has other background
     set ColorTable [ExtractValuesFromNumberedInitializator {
-       0 black
-       1 "dark blue"
-       2 firebrick
-       3 gold
-       4 forestgreen   
-       5 blue 
-       6 orchid        
-       7 rosybrown     
-       8 "saddle brown"
-       9 darkgoldenrod        
-       10 {light coral}
-       11 "cyan"        
-       12 "medium orchid"    
-       13 "medium purple"   
-       14 {light coral}
-       15 purple           
-       16 "dark grey"       
+       0 {black                  white}
+       1 {"dark blue"            white}
+       2 {firebrick              white}
+       3 {gold                   white}
+       4 {forestgreen            white}
+       5 {blue                   white}
+       6 {orchid                 white}
+       7 {rosybrown              white}
+       8 {"saddle brown"         white}
+       9 {darkgoldenrod          white}
+       10 {"light coral"         green}
+       11 {"cyan"                white}
+       12 {"medium orchid"       white}
+       13 {"medium purple"       white}
+       14 {"light coral"         white}
+       15 {purple                forestgreen}
+       16 {"dark grey"           white}
     }
     ]
 
@@ -63,12 +63,14 @@ namespace eval ::edt {
         set i 0
         foreach e $ColorTable {
             set TagName [HighlightTagName $i]
-            $text tag configure $TagName -foreground $e
+            foreach {f b} $e {
+                $text tag configure $TagName -foreground $f -background $b
+            }
             incr i
         }
         # Некоторые шрифты имеют ещё и фон... 
-        $text tag configure [HighlightTagName $OpenParenHighlightFont] -background green
-        $text tag configure [HighlightTagName $SHriftLeksicheskikhOshibok] -background forestgreen
+        #$text tag configure [HighlightTagName $OpenParenHighlightFont] -background green
+        #$text tag configure [HighlightTagName $SHriftLeksicheskikhOshibok] -background forestgreen
     }
 
     proc ApplyHighlightToLineSegment {text OldCharPos CharPos OldFont LineNumber} {
