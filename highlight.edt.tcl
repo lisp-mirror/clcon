@@ -8,9 +8,10 @@ namespace eval ::edt {
     variable OpenParenHighlightFont 10
     variable SHriftLeksicheskikhOshibok 15
 
+    variable *TK-Число-слоёв-раскраски* 6
 
-    # see oi::state-font . To show pallette, call ::edt::DisplayTestTextInColor red
-    # No error having two "light coral" - s - one of them has other background
+
+    # see oi::state-font . To show pallette, call ::edt::DisplayTestTextInColor {red blue}
     set ColorTable [ExtractValuesFromNumberedInitializator {
        0 {black                  white}
        1 {"dark blue"            white}
@@ -29,6 +30,7 @@ namespace eval ::edt {
        14 {"light coral"         white}
        15 {purple                forestgreen}
        16 {"dark grey"           white}
+       17 {white                 black}
     }
     ]
 
@@ -41,42 +43,44 @@ namespace eval ::edt {
         set ct $ColorTable
         lappend ct $auxColor
         puts $ct
-        foreach color [concat $ColorTable [list $auxColor]] {
+        foreach e [concat $ColorTable [list $auxColor]] {
           set txt $tl.text$i
           text $txt
-          $txt configure -foreground $color -height 1 -font $OPT(font)
-          $txt insert 1.0 "$i $color"
+          foreach {f b} $e break
+          $txt configure -foreground $f -background $b -height 1 -font $OPT(font)
+          $txt insert 1.0 "$i $f on $b"
           grid $txt 
           incr i
         }
         focus $tl
     }
 
-    proc HighlightTagName {i} {
-        string cat "hghl" $i
+    proc HighlightTagName {slojj i} {
+        string cat "hghl" $slojj "_" $i
     }
     
     proc CreateHighlightTags {text} {
         variable ColorTable
-        variable OpenParenHighlightFont
-        variable SHriftLeksicheskikhOshibok
-        set i 0
-        foreach e $ColorTable {
-            set TagName [HighlightTagName $i]
-            foreach {f b} $e {
-                $text tag configure $TagName -foreground $f -background $b
+        variable {*TK-Число-слоёв-раскраски*}
+        for {set slojj 0} {$slojj < ${*TK-Число-слоёв-раскраски*}} {incr slojj} {
+            set i 0
+            foreach e $ColorTable {
+                set TagName [HighlightTagName $slojj $i]
+                foreach {f b} $e {
+                    $text tag configure $TagName -foreground $f -background $b
+                    # puts "$text tag configure $TagName -foreground $f -background $b"
+                }
+                incr i
             }
-            incr i
         }
-        # Некоторые шрифты имеют ещё и фон... 
-        #$text tag configure [HighlightTagName $OpenParenHighlightFont] -background green
-        #$text tag configure [HighlightTagName $SHriftLeksicheskikhOshibok] -background forestgreen
+        # Настраиваем отдельные виджеты
+        $text tag bind [HighlightTagName 2 17] <Enter> {puts "Неверный отступ. Отступ должен быть таким, как размер заливки. Если залита только первая позиция строки, отступ должен быть равен нулю (или меньше нуля ввиду ошибок в предыдущих строках)"}
     }
 
     proc ApplyHighlightToLineSegment {text OldCharPos CharPos OldFont LineNumber} {
         set i1 [string cat $LineNumber "." $OldCharPos]
         set i2 [string cat $LineNumber "." $CharPos]
-        set TagName [HighlightTagName $OldFont]
+        set TagName [HighlightTagName 0 $OldFont]
         $text tag add $TagName $i1 $i2
     }
 
@@ -84,7 +88,7 @@ namespace eval ::edt {
         variable ColorTable
         set i 0
         foreach e $ColorTable {
-            set TagName [HighlightTagName $i]
+            set TagName [HighlightTagName 0 $i]
             set i1 [string cat $LineNumber ".0"]
             set i2 [string cat $LineNumber ".end"]
             $text tag remove $TagName $i1 $i2

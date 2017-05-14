@@ -6,6 +6,7 @@ namespace eval ::edt {
     # См. .apr Закодировать-один-мазок
     # {Нарисовать/стереть Строка-начала Колонка-начала Строка-конца Колонка-конца Число}
     proc ПрименитьРаскраскуКРегиону {text tick_count s} {
+        puts "ПрименитьРаскраскуКРегиону $tick_count $s"
         if { $tick_count < [$text cget -tick_count] } {
             return 
         }
@@ -13,7 +14,7 @@ namespace eval ::edt {
         # puts $s
         set i1 [string cat $r1 . $c1]
         set i2 [string cat $r2 . $c2]
-        set TagName [::edt::HighlightTagName $font]
+        set TagName [::edt::HighlightTagName $Slojj $font]
         if {${ВклВыкл} == 2} {
             ::edt::DeleteHighlightInRegion $text $Slojj $i1 $i2
         } elseif {${ВклВыкл} == 1} {
@@ -26,7 +27,8 @@ namespace eval ::edt {
         variable ColorTable
         set i 0
         foreach e $ColorTable {
-            set TagName [HighlightTagName $i]
+            set TagName [HighlightTagName $Slojj $i]
+            puts "$text tag remove $TagName $i1 $i2"
             $text tag remove $TagName $i1 $i2
             incr i
         }

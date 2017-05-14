@@ -229,7 +229,7 @@
 
 (defun encode-marks-for-line (line stream)
   "{linenumber {charpos0 font0} {charpos1 font1} ...} 
-  If we know line-number, we can pass it. line-tag must be ok."
+  If we know line-number, we can pass it. line-tag must be ok. См. также .apr Закодировать-мазки"
   (oi::check-something-ok)
   (let* ((tag (line-tag-no-recalc line))
        ;(syntax-info (oi::tag-syntax-info tag))
