@@ -6,19 +6,23 @@ namespace eval ::edt {
     # См. .apr Закодировать-один-мазок
     # {Нарисовать/стереть Строка-начала Колонка-начала Строка-конца Колонка-конца Число}
     proc ПрименитьРаскраскуКРегиону {text tick_count s} {
-        puts "ПрименитьРаскраскуКРегиону $tick_count $s"
+        #puts "ПрименитьРаскраскуКРегиону $tick_count $s"
         if { $tick_count < [$text cget -tick_count] } {
             return 
         }
-        foreach {ВклВыкл Slojj r1 c1 r2 c2 font} $s break
+        foreach {Команда Slojj r1 c1 r2 c2 font} $s break
         # puts $s
         set i1 [string cat $r1 . $c1]
         set i2 [string cat $r2 . $c2]
         set TagName [::edt::HighlightTagName $Slojj $font]
-        if {${ВклВыкл} == 2} {
+        if {${Команда} == 2} {
             ::edt::DeleteHighlightInRegion $text $Slojj $i1 $i2
-        } elseif {${ВклВыкл} == 1} {
+        } elseif {${Команда} == 1} {
             $text tag add $TagName $i1 $i2
+        } elseif {${Команда} == 3} {
+            ::edt::DeleteHighlightInRegion $text $Slojj 1.0 end
+        } else {
+            error "Неверная команда"
         }
     }
 
@@ -28,7 +32,7 @@ namespace eval ::edt {
         set i 0
         foreach e $ColorTable {
             set TagName [HighlightTagName $Slojj $i]
-            puts "$text tag remove $TagName $i1 $i2"
+            #puts "$text tag remove $TagName $i1 $i2"
             $text tag remove $TagName $i1 $i2
             incr i
         }
