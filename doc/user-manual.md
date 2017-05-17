@@ -117,7 +117,9 @@ proc ::clconcmd::finf_budden_tools {searchString} {
   (clco::filter-many-files (clco::clcon-sources) "WrapEventScriptForFreezedText") :test 'equalp))
 ```
 
-This is rather lame, as lines are not sorted appropriately when merging two sets.
+это довольно криво, т.к. множества при слиянии сортируются как попало. Некоторое утешение состоит в том, что 
+в таблице результатов можно отсортировать по колонке "файл". Правильным подходом было бы сортировать результаты
+в порядке следования исходных файлов в (clcon::clcon-sources), а внутри каждого файла сортировать по строке (дубликаты убираются с помощью union). 
 
 Где вызывается функция?
 -------------------------
