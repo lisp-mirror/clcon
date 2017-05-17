@@ -1189,7 +1189,7 @@ proc ::tkcon::About {} {
 	$w.text tag config title -justify center -font {Courier -18 bold}
 	$w.text insert 1.0 "About clcon v$PRIV(version)" title \
 		"\n\nCopyright 1995-2002 Jeffrey Hobbs \
-		\nCopyright 2015 Denis Budyak \
+		\nCopyright 2015-2017 Денис Будяк, Роман Клочков, Владимир Кутрухин, Станислав Кондратьев \
 		\n\nRelease Info: v$PRIV(version) \
 		\nDocumentation and source available at:\n$PRIV(docs)\
 		\nUsing: Tcl v$tcl_patchLevel / Tk v$tk_patchLevel" center
@@ -1278,7 +1278,7 @@ proc ::tkcon::InitMenus {w title} {
 	$m add separator
 	
 	set cmd ::tkcon::Udatlitq_SystemIndex_txt
-	$m add command -label "Очистить кеш систем asd" -underline 0 \
+	$m add command -label "Очистить кеш asd-систем в quicklisp" -underline 0 \
 	    -command $cmd
 
 

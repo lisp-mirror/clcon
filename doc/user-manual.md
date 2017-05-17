@@ -6,20 +6,21 @@
 Most of [tkcon's command line options](http://tkcon.sourceforge.net/docs/start.html), are kept intact.
 New options: 
 
-```-putd-output-file <filename>``` - file to print debug messages to. We can not print them to console correctly, as this calls update inside. 
+`-putd-output-file <filename>` - file to print debug messages to. We can not print them to console correctly, as this calls update inside. 
 
-```-putd-enabled 1``` - enable printing lots of debug messages. ```-putd-enabled 0``` - to disable (default). putd-enabled can be set to 1 only when putd-output-file is specified.
+`-putd-enabled 1` - enable printing lots of debug messages. `-putd-enabled 0` - to disable (default). putd-enabled can be set to 1 only when putd-output-file is specified.
 
 You can also change this option in runtime from 'Prefs' menu. Changed value is not saved for future sessions. 
 
-```-swank-ip ADDR``` - assign an alternate IP address for swank server (default is 127.0.0.1).
+`-swank-ip ADDR` - assign an alternate IP address for swank server (default is 127.0.0.1).
 
-```-swank-port NNNN``` - assign alternate port for swank connection (default is 4009). Do not connect to the port use use for SLIME/EMACS interaction.
+`-swank-port NNNN` - assign alternate port for swank connection (default is 4009). Do not connect to the port use use for SLIME/EMACS interaction.
 
-```-oduvan-backend 1``` - supposes that oduvanchik runs on SWANK side and enables some lisp-specific editor features (implementation is under construction). You can also change it via Pres menu bar submenu.
+`-oduvan-backend 1` - supposes that oduvanchik runs on SWANK side and enables some lisp-specific editor features (implementation is under construction). You can also change it via Pres menu bar submenu.
 
 Файл инициализации
 --------------------
+
 Windows: %HOME%\clcon.cfg
 
 Linux: ~/.clconrc 
@@ -31,10 +32,11 @@ Linux: ~/.clconrc
 ### Установка шрифта
 Впишите в файл инициализации: 
 
-```tkcon font "Lucida Console" 10```
+    tkcon font "Lucida Console" 10
 
 Можно попробовать фонт, не перегружая программу, если написать в консоли
-```.. tkcon font "Courier New" 10```
+
+    .. tkcon font "Courier New" 10
 
 
 ### Действия при соединении со SWANK
@@ -60,26 +62,25 @@ set ::tkcon::OPT(Izbrannoe) {
 
 Автодополнение, продолжение и автоподстановка
 ---------------------------
-Completion of lisp symbols works in console, use **Ctrl-Space** to complete lisp symbol prefix (may contain package or part of package name).
+Completion of lisp symbols works in console, use `Ctrl-Space` to complete lisp symbol prefix (may contain package or part of package name).
 
-Use **Ctrl-F3** to complete filename (Unix-style, names containing space may not work). 
+Только в консоли, используйте `Ctrl-F3` для автодополнения имени файла (Unix-style, names containing space may not work). 
 
-Use Control-Alt-u to complete tcl name. Be sure to type in a space after ".."  
+Только в консоли, используйте `Tab` для дополнения идентификатора tcl. Чтобы это работало при вводе команд tcl, которые вводятся, начиная с `..`, поставите пробел после `..`. Также рекомендуется всегда ставить префикс пр-ва имён, например, `::edt:: (и далее нажимаем Tab)`
 
 Pressing Control-Return places unix-styled directory of currently selected editor buffer into the command prompt. If you press Control-Return again, file name will be added to directory to form complete file name. 
 
 Команда "Find source" - найти определение
 -------------------
-Find source command works best in console. Common-lisp package is assumed. Type 
-`defun` or, say, `print-object` on the fresh lisp prompt and press Alt-. 
-If there is a single source, you just go to source. 
-If there are many, they are printed at console and you can click on either on them with mouse (no way to do that
-with keyboard now).
-Find source for tcl accepts fully-qualified identifier. Invoke it with Control-F9. 
+Переход к определению работает и в редакторе, и в консоли. 
 
-Искать в файлах, поиск в файлах
+Для нахождения идентификатора лиспа - `Alt-.` . Если лисп знает только одно определение с таким именем, оно сразу открывается. Если несколько - то на консоли печатается несколько зелёных подчёркнутых "гиперссылок", по которым нужно щёлкнуть мышью (извините, клавиатуру для этого нельзя использовать). 
+
+Поиск идентификатора для tcl - `Control-F9`. Нужен идентификатор с пр-вом имён, например, `::edt::cBi`. 
+
+Искать в файлах, поиск в файлах, find in files
 -------------
-There is no GUI for find in files. 
+Искать в файлах можно только через командную строку.  
 
 ## .fics
 Abbrev for "find in clcon sources". Accepts one argument: tcl string.
@@ -99,13 +100,22 @@ Use tcl quoting for all args.
 Good IDEs have "presets" for finding in some places. To imitate this,
 you can create your own commands at initialization file, e.g.
 
-`proc ::clconcmd::finf_budden_tools {searchString} {::clconcmd::finf c:/clcon/lp/budden-tools $searchString}`
+```
+proc ::clconcmd::finf_budden_tools {searchString} {
+  ::clconcmd::finf c:/clcon/lp/budden-tools $searchString
+}
+```
 
-## Lisp functions for the search
+## Функции лиспа для поиска
 
-There are also Lisp functions for the search. Example of searching for either of two strings:
+Есть функции лиспа для поиска. Например, так можно искать одну из двух строк в исходниках 
 
-`(clco::present-text-filtering-results (union (clco::filter-many-files (clco::clcon-sources) "wesppt") (clco::filter-many-files (clco::clcon-sources) "WrapEventScriptForFreezedText") :test 'equalp))`
+```
+(clco::present-text-filtering-results
+ (union
+  (clco::filter-many-files (clco::clcon-sources) "wesppt")
+  (clco::filter-many-files (clco::clcon-sources) "WrapEventScriptForFreezedText") :test 'equalp))
+```
 
 This is rather lame, as lines are not sorted appropriately when merging two sets.
 
@@ -142,24 +152,24 @@ Most of the tools are equipped with "Window" menu which allows to switch between
 
 Place dot (.) in the first position of the command to invoke named IDE command. Currently there are only a few commands:
 
-```.insp*``` call inspector to inspect ```*``` (result of previous REPL evaluation)
+`.insp*` call inspector to inspect `*` (result of previous REPL evaluation)
 
-```.tcsoh filename.tcl``` loads tcl file from directory where clcon.tcl script is located into main IDE tcl interpeter. Also note we
+`.tcsoh filename.tcl` loads tcl file from directory where clcon.tcl script is located into main IDE tcl interpeter. Also note we
 have file/Reload some of IDE sources which reloads all sources excluding clcon.tcl, record_definition.tcl and named_args.tcl. 
 
-```.hist``` shows command history. It accepts an optional string argument. If supplies, it is treated as glob pattern to filter history event. Asteriks are added at the left and right sides of pattern prior to filtering.
+`.hist` shows command history. It accepts an optional string argument. If supplies, it is treated as glob pattern to filter history event. Asteriks are added at the left and right sides of pattern prior to filtering.
 
-```.NNN``` where NNN is a decimal number re-runs command from history with that number
+`.NNN` where NNN is a decimal number re-runs command from history with that number
 
-```.o``` run oduvanchik command in visible editor buffer. Command must be written with dashes and without '-command' suffix, e.g. ```.o indent-new-line```
+`.o` run oduvanchik command in visible editor buffer. Command must be written with dashes and without '-command' suffix, e.g. `.o indent-new-line`
 
-```.fics string``` finds a string in clcon sources (case insensitive)
+`.fics string` finds a string in clcon sources (case insensitive)
 
-```.apr string``` invokes lisp apropos (case insensitive)
+`.apr string` invokes lisp apropos (case insensitive)
 
-```.tapr string``` invokes tcl apropos (case insensitive)
+`.tapr string` invokes tcl apropos (case insensitive)
 
-```.help``` lists available IDE commands (no real help, sorry :) )
+`.help` lists available IDE commands (no real help, sorry :) )
 
 It is recommended to use your initialization file to define new IDE commands. 
 
@@ -177,7 +187,7 @@ Place two dots and a space (`.. `) directly at the IDE prompt to pass arbitrary 
 -------------------------
 Use "File" menu, Control-o keyboard shortcut or
 .edit IDE command: 
-```.edit <filename>```
+`.edit <filename>`
 Press Ctrl-F3 to complete filename (at least it will work undex *nix).
 
 Редактирование файлов
@@ -185,7 +195,9 @@ Press Ctrl-F3 to complete filename (at least it will work undex *nix).
 clcon понимает только кодировку utf-8 и юниксовый стиль завершения строк (знак с кодом 10). 
 Но для правильной работы swank нужно указать в первой строке файла кодировку, например:
 
+```
 ;; -*- coding: utf-8; system: my-system;  -*-
+```
 
 Если этого не сделать, поиск определения и отладчик будут "промахиваться" мимо исходного текста, а в отдельных случаях
 отладчик вообще не найдёт исходный текст. 

@@ -87,9 +87,9 @@
                       (- l 4)))
              (system (ignore-errors (asdf:find-system system-name))))
         (cond
-         ((not system) (format t "Вы пытаетесь загрузить систему ~A (из файла ~S), но asdf не нашёл такой системы. См. руководство clcon.~%" system-name filename))
-         ((not (string= (namestring (asdf:system-definition-pathname system)) filename))
-          (format t "Вы пытаетесь загрузить систему ~A (из файла ~S), но asdf нашёл её в файле ~S" system-name filename (namestring (asdf:system-definition-pathname system))))
+         ((not system) (format t "Вы пытаетесь загрузить систему ~A (из файла ~S), но asdf не нашёл такой системы. Если эта система - новая, попробуйте Консоль/Меню/Файл/Очистить кеш asd-систем в quicklisp. См. также Консоль/Меню/Справка/Руководство clcon. ~%" system-name filename))
+         ((not (string-equal (namestring (asdf:system-definition-pathname system)) filename))
+          (format t "Что-то не так с настройкой ASDF/Quicklisp: вы пытаетесь загрузить систему ~A (из файла ~S), но asdf нашёл её в файле ~S" system-name filename (namestring (asdf:system-definition-pathname system))))
          (t 
           (format t "Вы пытаетесь загрузить систему ~A (из файла ~S)" system-name filename)
           (clco:load-system-for-tcl system))))
