@@ -8,7 +8,7 @@ namespace eval ::edt {
     variable OpenParenHighlightFont 10
     variable SHriftLeksicheskikhOshibok 15
 
-    variable *TK-Число-слоёв-раскраски* 6
+    variable *TK-Число-слоёв-раскраски* 7
 
 
     # see oi::state-font . To show pallette, call ::edt::DisplayTestTextInColor {red blue}
@@ -31,6 +31,7 @@ namespace eval ::edt {
        15 {purple                forestgreen}
        16 {"dark grey"           white}
        17 {white                 black}
+       18 {white                 "light coral"}
     }
     ]
 
