@@ -230,7 +230,7 @@ namespace eval ::grbr {
         }
 
         set cmd [list ::grbr::JumpToCurrentLocation $grbr -close 1]
-        $m add command -label "Закрыть список находок и показать исходный текст и " -accel "<Return>" -command $cmd
+        $m add command -label "Закрыть список находок и показать исходный текст " -accel "<Return>" -command $cmd
         foreach tag [list [$tbl bodytag] $text] {
             bind $tag <Return> [concat $cmd ";" break]
         }
@@ -300,7 +300,7 @@ namespace eval ::grbr {
         
         # When you change column order, see also:
         # ::edt::AppendData , ::edt::DefaultSortHeaders
-        tablelist::tablelist $tbl -columns {4 "№" 40 "Line" 4 "Line No" 25 "File"} -spacing 10 \
+        tablelist::tablelist $tbl -columns {4 "№" 60 "Line" 4 "Line No" 25 "File"} -spacing 10 \
         -exportselection 0 -stripebackground \#F3F3F3
 
         # $tbl resetsortinfo
