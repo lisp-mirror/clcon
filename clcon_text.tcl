@@ -141,6 +141,7 @@ namespace eval ::clcon_text {
             $self incr_tick_count
             MaybeSendToLisp $self i $args
             set result [$hull insert {*}$args]
+            ::clcon_text::Раскрасить_тегами_после_вставки $self $args
             after idle [list ::edt::ПопроситьЛиспПрислатьДанныеОРаскраске $self 0]
             return $result
         }
@@ -436,6 +437,9 @@ namespace eval ::clcon_text {
                 set index [lindex $arglist 0]
                 set qIndex [::text2odu::CoerceIndex $clcon_text $index]
                 set qText [lq [lindex $arglist 1]]
+                if {[lindex $arglist 2] ne ""} {
+                    puts "При вставке текста неожиданный агумент. Все аргументы: $clcon_text $arglist"
+                }
                 set lispCmd "(clco:nti $qId $tick_count $qIndex $qText)"
             }
             d {
@@ -744,8 +748,9 @@ namespace eval ::clcon_text {
         set filename [$opened_file cget -filename]
         return [file dirname $filename]
     }
-    
 
+    proc Раскрасить_тегами_после_вставки {clcon_text Аргументы_вставки} {
+    }
     
     # InitOneBindingOfFreezableText <Key-Return>
     SetCyrBindingsForText
