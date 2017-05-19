@@ -305,6 +305,17 @@ namespace eval ::edt {
         $m add command -label "6.Открыть этот файл другим редактором" \
             -underline 0 -command $cmd
 
+        set cmd [list ::clcon_text::Включить_выключить_раскраску_латиницы $btext ]
+
+        set Имя_переменной_выделения_латиницы [list "::edt::" $btext "_vyd_lat"]
+
+        variable ${Имя_переменной_выделения_латиницы}
+        set ${Имя_переменной_выделения_латиницы} [$btext cget -раскрашивать_ли_латиницу]
+        $m add check -label "7.Выделять латиницу" \
+            -underline 0 -command $cmd \
+            -variable ${Имя_переменной_выделения_латиницы}
+
+
         $m add separator
 
         set CloseFile [wesppt [list ::edt::EditCloseFile $Bi]]

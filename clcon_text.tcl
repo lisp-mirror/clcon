@@ -29,7 +29,7 @@
 # pathName Unfreeze
 #
 #  - makes event to process all delayed event.
-# Denis Budyak 2015
+# Denis Budyak 2015-2017
 # #include <MIT License>
 
 package require Tk
@@ -83,6 +83,8 @@ namespace eval ::clcon_text {
         option -tick_count 0
         # Список tick_count-ов, которые мы запрашивали у лиспа, по кодам слоёв
         option -tick_count-когда-перекрашивали {-1}
+        # Раскрашивать ли латиницу 1 - да, 0 - нет.
+        option -раскрашивать_ли_латиницу 0
         constructor {args} {
             installhull using btext
             $self configure -opened_file [opened_file $self.opened_file]
@@ -99,6 +101,7 @@ namespace eval ::clcon_text {
             bind $win <<UpdateFreezeIndicator>> "$self UpdateFreezeIndicator"
             bind $win <<UpdateFreezeIndicatorLater>> "after 500 event generate $self <<UpdateFreezeIndicator>>"
             ::edt::CreateHighlightTags $self
+            ::clcon_text::Создать_тег_для_раскраски_латиницы $self
             $self tag raise sel
 
             global $self.StatusBarInfo
@@ -140,8 +143,27 @@ namespace eval ::clcon_text {
             # Хороший вопрос - менять счётчик до или после отправки в лисп?
             $self incr_tick_count
             MaybeSendToLisp $self i $args
-            set result [$hull insert {*}$args]
-            ::clcon_text::Раскрасить_тегами_после_вставки $self $args
+            set tags ""
+            set вставляемый_текст [lindex $args 1]
+            set вставляем_одну_букву [expr 1 == [string length ${вставляемый_текст}]]
+            set раскрашивать_ли_латиницу $options(-раскрашивать_ли_латиницу)
+            if {${раскрашивать_ли_латиницу}} {
+                # Здесь некая проблема - у нас много разновидностей команды insert, в т.ч. вставляющей более одной буквы. 
+                # Нам надо вставить теги для латиницы. Непонятно, как определить диапазон, к-рый мы только что вставили. Поэтому
+                # мы рассматриваем частный случай, когда вставляется только одна буква - тут мы можем определить тег. В остальных случаях
+                # мы просто пересоздаём теги для всего буфера
+                set вставляем_одну_латинскую_букву [expr ${вставляем_одну_букву} && [string match {[a-zA-Z]} ${вставляемый_текст}]]
+                putd "${вставляемый_текст} ${вставляем_одну_букву} ${раскрашивать_ли_латиницу} ${вставляем_одну_латинскую_букву}"
+                if {${вставляем_одну_латинскую_букву}} {
+                    set tags "vyd_lat"
+                }
+            }
+            putd "$hull insert {*}$args $tags"
+            set result [$hull insert {*}$args $tags]
+            if {!${вставляем_одну_букву} && ${раскрашивать_ли_латиницу}} {
+              Включить_выключить_раскраску_латиницы $self 1
+            }
+            
             after idle [list ::edt::ПопроситьЛиспПрислатьДанныеОРаскраске $self 0]
             return $result
         }
@@ -749,9 +771,33 @@ namespace eval ::clcon_text {
         return [file dirname $filename]
     }
 
-    proc Раскрасить_тегами_после_вставки {clcon_text Аргументы_вставки} {
+    proc Создать_тег_для_раскраски_латиницы {clcon_text} {
+        $clcon_text tag configure vyd_lat
+        Включить_выключить_раскраску_латиницы $clcon_text [$clcon_text cget -раскрашивать_ли_латиницу]
     }
-    
+
+    # Второй параметр - включить или выключить. Если передать пустое значение 
+    # для вкл_выкл, то оно станет противоположным текущему значению в виджете.
+    proc Включить_выключить_раскраску_латиницы { clcon_text args }  {
+        set вкл_выкл [lindex $args 0]
+        if {${вкл_выкл} eq ""} {
+            set вкл_выкл [expr 1 - [$clcon_text cget -раскрашивать_ли_латиницу]]
+        }
+        $clcon_text configure -раскрашивать_ли_латиницу ${вкл_выкл}
+        # Правьмя наверняка в snit можно сделать остальные действия следствием configure 
+        $clcon_text tag configure vyd_lat -underline ${вкл_выкл}
+        # if {${вкл_выкл}} {
+        #   $clcon_text tag configure vyd_lat -font {{Courier} -20 bold}
+        #} else {
+        #   $clcon_text tag configure vyd_lat -font {{Courier} -20}
+        #}
+        if {${вкл_выкл}} {
+           foreach i [$clcon_text search -regexp -all {[a-zA-Z]} 0.0] { $clcon_text tag add vyd_lat $i }
+        } else {
+           $clcon_text tag remove vyd_lat 1.0 end
+        }
+    }
+
     # InitOneBindingOfFreezableText <Key-Return>
     SetCyrBindingsForText
 
