@@ -30,7 +30,7 @@ namespace eval ::edt {
        14 {"light coral"         white}
        15 {purple                forestgreen}
        16 {"dark grey"           white}
-       17 {white                 black}
+       17 {black                 #E0E0C0}
        18 {white                 "light coral"}
     }
     ]
