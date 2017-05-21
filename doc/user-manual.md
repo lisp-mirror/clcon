@@ -86,21 +86,14 @@ Pressing Control-Return places unix-styled directory of currently selected edito
 
 Искать в файлах, поиск в файлах, find in files
 -------------
-Искать в файлах можно только через командную строку.  
+Искать в файлах можно только через командную строку. Это команды языка tcl, поэтому во избежание недоразумений используйте для вашей стркои поиска [закавычивание из tcl кавычками](c:/yar/doc/книги/tcl-tk/i_gu14.html#5), [или фигурными скобками](c:/yar/doc/книги/tcl-tk/i_gu14.html#6). Если ваш аргумент достаточно невинен, т.е. tcl воспринимает его "как есть", то кавычки и скобки не нужны. Например, если ваше слово состоит из букв, цифр, подчёркиваний, тире, звёздочек и плюсиков, то его не нужно закавычивать. 
 
-## .fics
-Abbrev for "find in clcon sources". Accepts one argument: tcl string.
+## .иия
+Сокращения для "искать в исходниках Яра". Принимает один аргумент - строку поиска, ищет без учёта регистра.
 
-## .finf
-More general find in files command. 
-
-Synopsys ([[]] means optional part)
-
-  `.finf [[ -types list_of_types ]] dirs searchString`
-
-Default list_of_types is {asd lisp} . Dirs is a list of string.
-
-Use tcl quoting for all args.
+## .иф
+`.иф [ -типы имена-типов ] root-dir search-string` или `.иия [ -типы имена-типов ] корневая-директория строка-поиска` ищет в файлах с данными расширенями, находящихся внутри дерева корневой директории заданную строку. По умолчанию расширения - это `{lisp asd}`. Пример:
+`.иф -типы {tcl lisp} c:/yar/lp/clcon swank`
 
 ### presets for .finf
 Good IDEs have "presets" for finding in some places. To imitate this,
@@ -158,24 +151,27 @@ Most of the tools are equipped with "Window" menu which allows to switch between
 Команды среды разработки IDE (ИСР)
 ------------
 
-Place dot (.) in the first position of the command to invoke named IDE command. Currently there are only a few commands:
+Команды среды разработки вводятся в REPL и начинаются с одной точки (.) 
 
-`.insp*` call inspector to inspect `*` (result of previous REPL evaluation)
+`.insp*` (или `.инсп*`) вызывает инспектор для просмотра лисповой [переменной "*"](http://filonenko-mikhail.github.io/cltl2-doc/ru/clmse108.html#dx133-176005), в которой обычно находится результат последнего вычисления REPL. 
 
 `.tcsoh filename.tcl` loads tcl file from directory where clcon.tcl script is located into main IDE tcl interpeter. Also note we
 have file/Reload some of IDE sources which reloads all sources excluding clcon.tcl, record_definition.tcl and named_args.tcl. 
 
-`.hist` shows command history. It accepts an optional string argument. If supplies, it is treated as glob pattern to filter history event. Asteriks are added at the left and right sides of pattern prior to filtering.
+`.hist` или `.ист` shows command history. It accepts an optional string argument. If supplies, it is treated as glob pattern to filter history event. Asteriks are added at the left and right sides of pattern prior to filtering.
 
 `.NNN` where NNN is a decimal number re-runs command from history with that number
 
-`.o` run oduvanchik command in visible editor buffer. Command must be written with dashes and without '-command' suffix, e.g. `.o indent-new-line`
+`.o` (Латинская) или `.о` (Русская)  - run oduvanchik command in visible editor buffer. Command must be written with dashes and without '-command' suffix, e.g. `.o indent-new-line`
 
-`.fics string` finds a string in clcon sources (case insensitive)
+`.fics string` или `.иия` ишёт строку в исходных текстах Яра, регистр букв не имеет значения
 
-`.apr string` invokes lisp apropos (case insensitive)
+`.finf [ -types имена-типов ] root-dir search-string` или `.иия [ -типы имена-типов ] корневая-директория строка-поиска` ищет в файлах с данными расширенями, находящихся внутри дерева корневой директории заданную строку. Например, 
+`.иф -типы {tcl lisp} c:/yar/lp/clcon swank`
 
-`.tapr string` invokes tcl apropos (case insensitive)
+`.apr string` или `.апр` вызывает [лисповый а пропос](http://www.lispworks.com/documentation/HyperSpec/Body/f_apropo.htm), т.е. поиск символов, в имени которых содержится подстрока (регистр не имеет значения)
+
+`.tapr string` или `.тапр строка` вызывает а пропос для tcl (аналогично `.апр`)
 
 `.help` lists available IDE commands (no real help, sorry :) )
 
