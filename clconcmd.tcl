@@ -92,7 +92,7 @@ Currently defined commands are: "
     }
  
     # искать в исходниках яра
-    proc иия { str } { fics $args }
+    proc иия { str } { fics $str }
 
     # 
     proc finf {args} {
