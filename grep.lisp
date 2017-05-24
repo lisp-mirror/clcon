@@ -220,7 +220,7 @@
   (clco::present-text-filtering-results
    (clco::filter-many-files file-list string)
    :title
-   (format nil "Поиск в ~A файле(ах): ~A" (length file-list) string))
+   (format nil "иф: ~S (в ~A файле/ах)" string (length file-list)))
   )
 
 (defun find-current-file-declarations (infile)
