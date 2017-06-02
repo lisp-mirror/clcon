@@ -17,7 +17,7 @@ Apropos, completion, find definition, help
 Keyboard accelerators are shown in "Edit" menu.
 
 ### Lisp
-At the console, enter `.apr -lookup-` to list all symbols containing "-lookup-" substring in their name. 
+At the console, enter `.апр -lookup-` to list all symbols containing "-lookup-" substring in their name. 
 At the console, type in `clco:s-l-d` and press `Ctrl-Space`. Name will expand to clco:server-lookup-definition with the help of compound completion algorithm (swank-c-p-c contrib). Now press `Alt-.` Editor window will pop up and source of function you typed will be seen. You can press Alt-. at
 any lisp definition in the editor and jump to its source. If there are more then one definition (e.g. for PRINT function), list of "hyperlinks"
 will show up at the console. Click on either of them with mouse to open an appropriate source. In the editor, completion works in similar way. 
@@ -26,8 +26,8 @@ Finally set the cursor at the word `defun` and press `f1`. Web browser should op
 
 ### Tcl
 Return to the console with `Control-.`.
-Clean up current command with `Control-u` and enter `.tapr cap` to list all tcl procs, commands and vars containing substring `cap` in their name. Position a keyboard cursor at any of them and press Control-F9 to go to its source. 
-Return to the console with `Control-.` . Type a space and then `snit::Ca`. Then press `Control-Alt-u` . Name will expand to 
+Clean up current command with `Control-u` and enter `.тапр cap` to list all tcl procs, commands and vars containing substring `cap` in their name. Position a keyboard cursor at any of them and press Control-F9 to go to its source. 
+Return to the console with `Control-.` . Type a space and then `snit::Ca`. Then press `Tab` . Name will expand to 
 `::snit::Capitalize`. Press `Control-F9` and jump to a source of tcl proc. Note this is source from the library, not the source of clcon. Rather convenient. We only now support procs, not variables. Note that "find source" for tcl works for fully qualified names only. It only shows proper source if name starts from "::" (this is a bug).
 
 ### File name
@@ -112,8 +112,8 @@ Also we have rather lame tcl indentation. It is invoked with `Control-Return`. T
 Find in files
 --------
 Type at the console: 
-`.fics buf1`
-(Here "fics" is an abbreviation for "find-in-clcon-sources")
+`.иия buf1`
+(Here "иия" is an abbreviation for искать-в-исходниках-Яра, хотя функция называется "find-in-clcon-sources")
 And you'll see some kind of "grep browser". Press <space> or <return> to jump to a source. Difference is that <return> closes grep browser while <space> does not. It can only fine simple strings for now with case ignored. Note this command is processed by tcl interpreter, so use tcl's quoting rules. The most simple way to get more or less predictible results when some funny characters are present is to wrap your search string into `{}`. 
 
 More searching examples are in the [user manual](user-manual.md).

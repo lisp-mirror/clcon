@@ -1,3 +1,4 @@
+; -*- coding: utf-8; -*-
 (in-package :cl-user)
 
 ; for stepper, must be 

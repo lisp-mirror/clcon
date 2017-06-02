@@ -106,7 +106,11 @@
       )))
   
 (defparameter |*поддиректории-яра-не-содержащие-исходников-яра*|
-  '("quicklisp/" "tcl-8.6.6/" "sbcl/" "log/" ".hg/" "пляж/"))
+  '("quicklisp/" "tcl-8.6.6/" "tcl-8.6.6-before-unicode/"
+    "tcl-8.6.6-unicode-fixed/"
+    "tcl-8.6.6-old/"
+    "tcl-8.6.6-tk-8.7-unicode-and-keysym/"
+    "sbcl/" "log/" ".hg/" "пляж/"))
 
 (defparameter |*типы-файлов-исходников-яра*| 
   '("md" "lisp" "asd" "tcl"))
@@ -203,6 +207,8 @@
     grbr
     ))
 
+(defun |иия| (Строка)
+  (find-in-clcon-sources Строка))
 
 (defun find-in-clcon-sources (string)
   "Searches for string, ignores case"

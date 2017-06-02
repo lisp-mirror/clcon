@@ -1,5 +1,6 @@
 package require Tk
 set keysym "Press any key"
+destroy .keytest
 toplevel .keytest
 pack [label .keytest.l -textvariable keysym -padx 2m -pady 1m]
 bind .keytest <Key> {

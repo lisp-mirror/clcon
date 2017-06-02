@@ -392,6 +392,10 @@ namespace eval ::edt {
         $m add command -label "Tcl: перейти к определению" -accel <Control-Key-F9> -command $cmd
         bind SingleMod$w <Control-Key-F9> "$cmd; break"
 
+        $m add separator
+        set cmd [list ::clconcmd::о indent-markdown-table]
+        $m add command -label "Маркдаун: выровнять таблицу" -accel <Control-Shift-Key-F11> -command $cmd
+        bind DoubleMod$w <Control-Shift-Key-F11> "$cmd; break"
        
         ## Window Menu 
 

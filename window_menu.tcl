@@ -53,7 +53,7 @@ namespace eval ::window_menu {
         set cmd ::buli::BufferListBox
         set script [WrapCmdForKeyboard $w ::buli::BufferListBoxWindowName 1 $cmd]
         bind $SingleModBindtag <Control-Key-F12> $script
-        
+
         set cmd ::tkcon::FocusConsole
         set script [WrapCmdForKeyboard $w ::ide_structure::BufferListBoxWindowName 1 $cmd]
         ::clcon_key::b bind $SingleModBindtag <Control-Key-period> $script
@@ -69,7 +69,8 @@ namespace eval ::window_menu {
         set cmd [list ::gui_util::FocusWindowByName $thatWindow]
         set script [WrapCmdForKeyboard $w $thatWindow 0 $cmd]
         ::clcon_key::b bind $DoubleModBindtag <Control-Shift-D> $script
-        ::clcon_key::b bind $DoubleModBindtag <Control-Shift-T> ::inspthrd::ShowThreads
+        ::clcon_key::b bind $DoubleModBindtag <Control-Shift-t> ::inspthrd::ShowThreads
+        # bind $DoubleModBindtag <Control-Shift-е> ::inspthrd::ShowThreads
 
         set thatWindow [::ide_structure::ErrorBrowserToplevelWindowName]
         set cmd [list ::gui_util::FocusWindowByName $thatWindow]
@@ -111,7 +112,7 @@ namespace eval ::window_menu {
         #
         set cmd ::edt::ShowSomeEditor
         CalcEnabledForOneItem [::edt::theTW] 0
-        $m add command -label "Редактор" -accel "Control-Shift-e" \
+        $m add command -label "Редактор" -accel "Control-Shift-Р" \
             -command $cmd -state $state
 
         set thatWindow [::ide_structure::DebuggerToplevelWindowName]
