@@ -672,13 +672,14 @@ namespace eval ::clcon_text {
         ::clcon_key::b bind Text <Control-Key-y> {catch { %W edit redo }}
         # there was something wrong with tk_strictMotif
         ::clcon_key::b bind Text <Control-k> {
-        if {[%W compare end != insert+1c]} {
-          if {[%W compare insert == {insert lineend}]} {
-            %W delete insert
-          } else {
-            %W delete insert {insert lineend}
-          }
-        }}
+            if {[%W compare end != insert+1c]} {
+              if {[%W compare insert == {insert lineend}]} {
+                %W delete insert
+              } else {
+                %W delete insert {insert lineend}
+              }
+            }
+        }
     }
 
     # Fills FreezableText bindtag with wrapped bindings of Text
@@ -797,6 +798,16 @@ namespace eval ::clcon_text {
            $clcon_text tag remove vyd_lat 1.0 end
         }
     }
+
+    proc Показать_экранную_клавиатуру {clcon_text} {
+        destroy .ЭкраннаяКлавиатура 
+        toplevel .ЭкраннаяКлавиатура
+        wm title .ЭкраннаяКлавиатура "Экранная клавиатура для ${clcon_text}"
+        pack [clcon::keyboard .ЭкраннаяКлавиатура.kbd -title "Ввод значков для ${clcon_text}" -keys {0xD7 0xF7 0xD8 0x2116} -receiver ${clcon_text}]
+        # - {0x410-0x44f} - кириллица
+        ::gui_util::FocusWindowByName .ЭкраннаяКлавиатура
+    } 
+
 
     # InitOneBindingOfFreezableText <Key-Return>
     SetCyrBindingsForText

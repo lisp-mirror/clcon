@@ -368,6 +368,12 @@ namespace eval ::edt {
             -command $cmd -accel "F12"
         bind NoMod$w <F12> [concat $cmd ";" break]
 
+        set cmd [list ::clcon_text::Показать_экранную_клавиатуру $btext]
+        $m add command -label "Экранная клавиатура для значков" -command $cmd -accel "F4"
+       
+        bind NoMod$w <Key-F4> $cmd
+
+
         ## Lisp mode Menu
         ##
         MakeLispModeMenu $Bi $w $btext
