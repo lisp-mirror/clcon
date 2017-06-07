@@ -215,7 +215,7 @@
   (clco::present-text-filtering-results
    (clco::filter-many-files (clco::clcon-sources) string)
    :title
-   (format nil ".ия: ~A" string)))
+   (format nil ".иия: ~A" string)))
 
 (defun find-string-in-files (string file-list &key regexp case-sensitive secondary-string)
   "For each string in file-list, calls directory. Then searches string in all of the files. See also clco:files-by-glob-list. Example is in the source"

@@ -212,14 +212,17 @@ namespace eval ::edt {
         set cmd [wesppt [list ::edt::FindPackage $btext]]
         $m add command -label "1.Перейти к определению пакета" -command $cmd -underline 0
 
+        set cmd [wesppt [list ::edt::УстановитьЭтотПакетВКонсоли $btext]]
+        $m add command -label "2.Установить этот пакет в консоли" -command $cmd -underline 0
+
         set cmd [wesppt [list ::edt::FindSystem $btext]]
-        $m add command -label "2.Перейти к определению системы" -command $cmd -underline 0
+        $m add command -label "3.Перейти к определению системы" -command $cmd -underline 0
 
         set cmd [wesppt [list ::edt::CompileSystem $btext]]
-        $m add command -label "3.Скомпилировать и загрузить систему" -command $cmd -underline 0
+        $m add command -label "4.Скомпилировать и загрузить систему" -command $cmd -underline 0
 
         set cmd [wesppt [list ::edt::udalitq-fajjly-rezulqtata-sborki-sistemy $btext]]
-        $m add command -label "4.Удалить файлы результата сборки системы" -command $cmd -underline 0
+        $m add command -label "5.Удалить файлы результата сборки системы" -command $cmd -underline 0
     }
 
     proc EnableDisableMenuItems {} {

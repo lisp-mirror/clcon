@@ -1510,7 +1510,7 @@ proc ::tkcon::HistoryMenu m {
     }
 }
 
-
+## См. также clco:eval-in-tcl
 proc ::tkcon::VstavitqVKonsolqKakBudtoPolzovatelqNapechatalIVypolnitq {command} {
     variable PRIV
     $::tkcon::PRIV(console) delete limit end

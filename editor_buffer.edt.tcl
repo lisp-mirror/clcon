@@ -91,6 +91,12 @@ namespace eval ::edt {
         ::tkcon::SendEventToSwank $form {} 1 t
     }
 
+    proc УстановитьЭтотПакетВКонсоли {text} {
+        ::clcon_text::CallOduvanchikFunction $text "odu::УСТАНОВИТЬ-ЭТОТ-ПАКЕТ-В-КОНСОЛИ-COMMAND nil" {}
+    }
+    
+        
+
     proc CompileSystem {text} {
         set console [::tkcon::CurrentConsole]
         set w [$text RealText]

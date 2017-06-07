@@ -124,6 +124,17 @@
                                  (odu::package-at-point)
                                  (odu::readtable-at-point)))
 
+(defcommand "Установить этот пакет в консоли" (p)
+  "Пакет, установленный в текущей точке редактора, поставить в консоли, с записью в историю команд"
+  "Пакет, установленный в текущей точке редактора, поставить в консоли, с записью в историю команд"
+  (perga-implementation:perga
+   (let ПАКЕТ (odu::package-at-point))
+   (unless ПАКЕТ (error "Нет пакета лиспа по месту расположения курсора"))
+   (let КОМАНДА (format nil "(in-package ~A)" (def-merge-packages:keywordize-package-designator ПАКЕТ)))
+   (let КОМАНДА-ТСЛ (cl-tk:tcl-escape КОМАНДА))
+   (clco:eval-in-tcl
+    (format nil "::tkcon::VstavitqVKonsolqKakBudtoPolzovatelqNapechatalIVypolnitq ~A" КОМАНДА-ТСЛ))))
+
 (defun get-system-from-file-options (buffer)
   "Get system name from first line" ; ПРАВМЯ - не совсем ясно, зачем здесь продублирована реализация odu::process-file-options, 
     ; по идее это buffer-variable или что-то вроде этого
