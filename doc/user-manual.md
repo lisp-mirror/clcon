@@ -153,7 +153,7 @@ Most of the tools are equipped with "Window" menu which allows to switch between
 
 Команды среды разработки вводятся в REPL и начинаются с одной точки (.) 
 
-`.insp*` (или `.инсп*`) вызывает инспектор для просмотра лисповой [переменной "*"](http://filonenko-mikhail.github.io/cltl2-doc/ru/clmse108.html#dx133-176005), в которой обычно находится результат последнего вычисления REPL. 
+`.insp*` (или `.ин`) вызывает инспектор для просмотра лисповой [переменной "*"](http://filonenko-mikhail.github.io/cltl2-doc/ru/clmse108.html#dx133-176005), в которой обычно находится результат последнего вычисления REPL. 
 
 `.tcsoh filename.tcl` loads tcl file from directory where clcon.tcl script is located into main IDE tcl interpeter. Also note we
 have file/Reload some of IDE sources which reloads all sources excluding clcon.tcl, record_definition.tcl and named_args.tcl. 

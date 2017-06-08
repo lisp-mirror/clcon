@@ -51,7 +51,7 @@ Currently defined commands are: "
         tkcon main ::insp::SwankInspect "*"
     }
 
-    proc инсп* {} {
+    proc ин {} {
         insp*
     }
 
