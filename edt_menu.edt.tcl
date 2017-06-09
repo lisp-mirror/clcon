@@ -338,7 +338,8 @@ namespace eval ::edt {
         ::clcon_key::b bind SingleMod$w <Control-Key-x> $cmd 
 
         set cmd [wesppt [list tk_textCopy $btext]]
-        $m add command -label "Копировать" -command $cmd -accel "Control-с"             ::clcon_key::b bind SingleMod$w <Control-Key-c> $cmd 
+        $m add command -label "Копировать" -command $cmd -accel "Control-с"
+        ::clcon_key::b bind SingleMod$w <Control-Key-c> $cmd 
 
         set cmd [wesppt [list tk_textPaste $btext]]
         $m add command -label "Вставить"  -command $cmd -accel "Control-м"
