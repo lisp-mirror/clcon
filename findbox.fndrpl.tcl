@@ -26,8 +26,8 @@ namespace eval ::fndrpl {
         frame $find.l
         frame $find.l.f
         frame $find.l.f.f1
-        label $find.l.f.f1.label -text "1.Find what:" -width 11 -underline 0
-        entry $find.l.f.f1.entry  -textvariable ::fndrpl::SearchString -width 30 
+        label $find.l.f.f1.label -text "1.Найти:" -width 14 -underline 0
+        entry $find.l.f.f1.entry  -textvariable ::fndrpl::SearchString -width 50 
         pack $find.l.f.f1.label $find.l.f.f1.entry -side left
 
         $find.l.f.f1.entry selection range 0 end
@@ -54,8 +54,8 @@ namespace eval ::fndrpl {
 
         if {$FndOrRpl=="replace"} {
             frame $find.l.f.f2
-            label $find.l.f.f2.label2 -text "Replace with:" -width 11
-            entry $find.l.f.f2.entry2 -textvariable ::fndrpl::ReplaceString -width 30
+            label $find.l.f.f2.label2 -text "Заменить на:" -width 14
+            entry $find.l.f.f2.entry2 -textvariable ::fndrpl::ReplaceString -width 50
             pack $find.l.f.f2.label2 $find.l.f.f2.entry2 -side left
 
             pack $find.l.f.f1 $find.l.f.f2 -side top
@@ -68,18 +68,18 @@ namespace eval ::fndrpl {
         }
         
         frame $find.f2
-        button $find.f2.button1 -text "Find Next" -command "$SearchCmd" -width 10 -height 1 
+        button $find.f2.button1 -text "Найти дальше" -command "$SearchCmd" -width 10 -height 1 
         
         # Cancel is disabled due to issue 41
-        button $find.f2.button2 -text "Cancel" -command "::fndrpl::CancelFind $area $find" -width 10 -underline 0 -state disabled
+        button $find.f2.button2 -text "Отмена" -command "::fndrpl::CancelFind $area $find" -width 10 -underline 0 -state disabled
 
         if {$FndOrRpl=="replace"} {
             set cmd "::fndrpl::ReplaceIt $area"
-            button $find.f2.button3 -text "replace" -command $cmd -width 10 -height 1 
+            button $find.f2.button3 -text "Заменить" -command $cmd -width 14 -height 1 
 
             set cmd "::fndrpl::ReplaceAll $area"
-            button $find.f2.button4 -text "replace all" -command $cmd -width 10 -height 1 -underline 8
-            ::clcon_key::b bind $find <Alt-Key-a>  $cmd
+            button $find.f2.button4 -text "6.Заменить все" -command $cmd -width 14 -height 1 -underline 0
+            ::clcon_key::b bind $find <Alt-Key-6>  $cmd
             
             pack $find.f2.button3 $find.f2.button4 $find.f2.button2  -pady 4
         } else {
@@ -90,18 +90,19 @@ namespace eval ::fndrpl {
 
         frame $find.l.f4
         frame $find.l.f4.f3 -borderwidth 2 -relief groove
-        radiobutton $find.l.f4.f3.up -text "2.Up" -underline 0 -variable ::fndrpl::SearchDir -value "backwards" 
-        radiobutton $find.l.f4.f3.down -text "Down"  -variable ::fndrpl::SearchDir -value "forwards" 
-        pack $find.l.f4.f3.up $find.l.f4.f3.down -side left 
+        radiobutton $find.l.f4.f3.down -text "Вперёд (к концу док-та)"  -variable ::fndrpl::SearchDir -value "forwards" 
+        radiobutton $find.l.f4.f3.up -text "2.Назад (к началу)" -underline 0 -variable ::fndrpl::SearchDir -value "backwards" 
+        pack $find.l.f4.f3.up -side top -anchor w
+        pack $find.l.f4.f3.down -side bottom -anchor w
 
 
         frame $find.l.f4.f
-        checkbutton $find.l.f4.f.cbox1 -text "3.Match case" -variable ::fndrpl::findcase -underline 0
+        checkbutton $find.l.f4.f.cbox1 -text "3.Учитывать регистр" -variable ::fndrpl::findcase -underline 0
         pack $find.l.f4.f.cbox1 -side left -padx 0 -fill x
 
         if {$FndOrRpl=="replace"} {
             set rconfirm 1
-            checkbutton $find.l.f4.f.cbox2 -text "Confirm replace"  -variable ::fndrpl::rconfirm -underline 0
+            checkbutton $find.l.f4.f.cbox2 -text "Подтверждать замену"  -variable ::fndrpl::rconfirm -underline 0
             pack $find.l.f4.f.cbox2 -side right -padx 0 -fill x
         }
 
@@ -109,8 +110,8 @@ namespace eval ::fndrpl {
 
         if {$AreaType ne "tablelist"} {
             frame $find.l.f4.policyBox -borderwidth 2 -relief groove
-            radiobutton $find.l.f4.policyBox.any_bounds -text "5.Text" -underline 0 -variable ::fndrpl::BoundaryPolicy -value "any_bounds" 
-            radiobutton $find.l.f4.policyBox.lisp_identifier -text "Lisp identifier" -variable ::fndrpl::BoundaryPolicy -value "lisp_identifier" 
+            radiobutton $find.l.f4.policyBox.any_bounds -text "5.Текст" -underline 0 -variable ::fndrpl::BoundaryPolicy -value "any_bounds" 
+            radiobutton $find.l.f4.policyBox.lisp_identifier -text "Сивмол Лиспа" -variable ::fndrpl::BoundaryPolicy -value "lisp_identifier" 
         
             pack $find.l.f4.policyBox.any_bounds -side top -anchor w
             pack $find.l.f4.policyBox.lisp_identifier -side bottom -anchor w

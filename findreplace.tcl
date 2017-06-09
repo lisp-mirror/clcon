@@ -206,10 +206,10 @@ namespace eval ::fndrpl {
             return
         } elseif {$found==-1} {
             tk_messageBox -parent $widgetWhereSought -title "Find" \
-                -message "Empty search string"
+                -message "Пустая строка поиска"
         } else {
             tk_messageBox -parent $widgetWhereSought -title "Find" \
-                -message "Search string not found"
+                -message "Строка поиска не найдена"
         }
     }
 
@@ -391,9 +391,11 @@ namespace eval ::fndrpl {
 
         $text see $SearchPos
 
+        set СдвинутьсяНа $reng
+
         if {$rconfirm==1} { 
             $text tag add sel $SearchPos  "$SearchPos+$leng char"
-            set reply [YesNoCancel "Replace" "Replace this match?" $text]
+            set reply [YesNoCancel "Замена" "Заменить это вхождение?" $text]
             switch -exact $reply {
                 yes { 
                     $text delete $SearchPos "$SearchPos+$leng char"
@@ -402,6 +404,7 @@ namespace eval ::fndrpl {
                 }
                 no {
                     $text tag remove sel $SearchPos
+                    set СдвинутьсяНа $leng
                 }
                 cancel {
                     $text tag remove sel $SearchPos
@@ -416,7 +419,7 @@ namespace eval ::fndrpl {
             
 
         if {$SearchDir == "forwards"} {
-            tkTextSetCursor $text "$SearchPos+$reng char"        
+            tkTextSetCursor $text "$SearchPos+${СдвинутьсяНа} char"        
         } else {			
             tkTextSetCursor $text $SearchPos 			
         }
@@ -452,13 +455,13 @@ namespace eval ::fndrpl {
         set gow .goto_line
         catch {destroy $gow}
         toplevel $gow
-        wm title $gow "Where ?"
+        wm title $gow "Куда ?"
 
         frame $gow.fr1
         frame $gow.fr2
         pack $gow.fr1 $gow.fr2 -side left
 
-        label $gow.fr1.lab -text "Goto line number:"
+        label $gow.fr1.lab -text "Перейти к номеру строки:"
         entry $gow.fr1.ent 
         pack $gow.fr1.lab $gow.fr1.ent -side left -pady 10 -padx 10
 
