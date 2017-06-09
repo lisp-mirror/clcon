@@ -471,5 +471,9 @@ namespace eval tkcon {
             set ::tkcon::PRIV(StatusCursor) [%W index insert]
         }
 
+        ## Включаем привычные клавиши работы с буфером обмена для Entry
+        ::clcon_key::b bind Entry <Control-Key-v> {event generate %W <<Paste>>}
+        ::clcon_key::b bind Entry <Control-Key-c> {event generate %W <<Copy>>}
+        ::clcon_key::b bind Entry <Control-Key-x> {event generate %W <<Cut>>}
     }
 }

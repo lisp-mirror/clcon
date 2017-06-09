@@ -26,6 +26,7 @@ proc ::clcon_key::FillLetterMapWin32 {} {
         incr i
     }
     dict set LetterMap i {I oslash Ooblique}
+    dict set LetterMap x {X division multiply}
     dict set LetterMap z {Z ydiaeresis ssharp}
 }
 

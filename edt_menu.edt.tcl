@@ -332,18 +332,17 @@ namespace eval ::edt {
         ##
         set m [cMenuBar .edit]
         ::gui_util::ClearMenu $m
+
         set cmd [wesppt [list tk_textCut $btext]]
-        $m add command -label "Вырезать"   -underline 2 \
-            -command $cmd
+        $m add command -label "Вырезать" -command $cmd -accel "Control-ч"
+        ::clcon_key::b bind SingleMod$w <Control-Key-x> $cmd 
+
         set cmd [wesppt [list tk_textCopy $btext]]
-        $m add command -label "Копировать"  -underline 0 \
-            -command $cmd -accel "Control-C"           
-        ::clcon_key::b bind SingleMod$w <Control-Key-C> $cmd 
+        $m add command -label "Копировать" -command $cmd -accel "Control-с"             ::clcon_key::b bind SingleMod$w <Control-Key-c> $cmd 
+
         set cmd [wesppt [list tk_textPaste $btext]]
-        $m add command -label "Вставить" -underline 0 \
-            -command $cmd -accel "Control-V"
-        ::clcon_key::b bind SingleMod$w <Control-Key-igrave> $cmd
-        ::clcon_key::b bind SingleMod$w <Control-Key-Igrave> $cmd
+        $m add command -label "Вставить"  -command $cmd -accel "Control-м"
+        ::clcon_key::b bind SingleMod$w <Control-Key-V> $cmd
            
         ##
         $m add separator
