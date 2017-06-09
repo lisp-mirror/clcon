@@ -348,7 +348,7 @@ namespace eval ::edt {
         ##
         $m add separator
 	set cmd [wesppt [list ::fndrpl::OpenFindBox $btext "text" "find" {}]]
-        $m add command -label "Искать" -underline 0 -command $cmd -accel "Control-F"
+        $m add command -label "Искать" -underline 0 -command $cmd -accel "Control-а"
         ::clcon_key::b bind SingleMod$w <Control-Key-f> $cmd
 
         set cmd [list ::fndrpl::FindIt $btext]
@@ -356,7 +356,7 @@ namespace eval ::edt {
         bind NoMod$w <F3> $cmd
 
 	set cmd [wesppt [list ::fndrpl::OpenFindBox $btext "text" "replace" {}]]
-        $m add command -label "Найти и заменить" -under 0 -command $cmd -accel "Control-h"
+        $m add command -label "Найти и заменить" -under 0 -command $cmd -accel "Control-р"
         ::clcon_key::b bind SingleMod$w <Control-Key-h> "$cmd; break"
 
         $m add separator
