@@ -475,5 +475,9 @@ namespace eval tkcon {
         ::clcon_key::b bind Entry <Control-Key-v> {event generate %W <<Paste>>}
         ::clcon_key::b bind Entry <Control-Key-c> {event generate %W <<Copy>>}
         ::clcon_key::b bind Entry <Control-Key-x> {event generate %W <<Cut>>}
+
+        ## Лепим экранную клавиатуру к любому Entry и к консоли
+        bind Entry <Key-F4> {::clcon_text::Показать_экранную_клавиатуру %W}
+        bind TkConsole <Key-F4> {::clcon_text::Показать_экранную_клавиатуру %W}
     }
 }

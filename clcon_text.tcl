@@ -799,13 +799,17 @@ namespace eval ::clcon_text {
         }
     }
 
-    proc Показать_экранную_клавиатуру {clcon_text} {
-        destroy .ЭкраннаяКлавиатура 
-        toplevel .ЭкраннаяКлавиатура
-        wm title .ЭкраннаяКлавиатура "Экранная клавиатура для ${clcon_text}"
-        pack [clcon::keyboard .ЭкраннаяКлавиатура.kbd -title "Ввод значков для ${clcon_text}" -keys {0xD7 0xF7 0xD8 0x2116} -receiver ${clcon_text}]
+    proc Показать_экранную_клавиатуру {Приёмник} {
+        set w .ЭкраннаяКлавиатура
+        destroy $w 
+        toplevel $w
+        wm title $w "Экранная клавиатура для ${Приёмник}"
+        bind $w <Escape> [list destroy $w]
+        ::clcon_key::b bind $w <Control-Key-W> [list destroy $w]
+        pack [::clcon::keyboard $w.kbd -title "Ввод значков для ${Приёмник}" -keys {0xD7 0xF7 0xD8 0x2116} -receiver ${Приёмник}]
         # - {0x410-0x44f} - кириллица
-        ::gui_util::FocusWindowByName .ЭкраннаяКлавиатура
+        ::gui_util::FocusWindowByName $w
+        grab $w
     } 
 
 
