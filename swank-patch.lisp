@@ -3,6 +3,9 @@
 
 (named-readtables::in-readtable nil)
 
+; disable stepping
+(declaim (optimize (debug 3) (compilation-speed 3) (safety 3)))
+
 (defparameter *log-file* (make-pathname :name "swank-text-log" :type "log" :defaults *default-pathname-defaults*))
 
 (defun log-to-file (format &rest args)

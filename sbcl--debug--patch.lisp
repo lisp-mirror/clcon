@@ -3,6 +3,8 @@
 
 (in-package :sb-debug)
 
+; disable stepping
+(declaim (optimize (debug 3) (compilation-speed 3) (safety 3)))
 
 (sb-ext:without-package-locks
 
