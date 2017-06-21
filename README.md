@@ -91,9 +91,9 @@ clcon распространяется в составе Яра. [Скачива
 
 [Wiki](https://bitbucket.org/budden/clcon/wiki/) - содержит [снимки экрана](https://bitbucket.org/budden/clcon/wiki/Screenshots), но больше в ней ничего полезного нет.  
 
-[ЧАВО](https://bitbucket.org/budden/clcon/src/default/doc/FAQ.md)
+[ЧАВО](https://bitbucket.org/budden/clcon/ит/default/doc/FAQ.md)
 
-[Каталог документации, включающий некоторые из выше перечисленных документов](https://bitbucket.org/budden/clcon/src/default/doc/)
+[Каталог документации, включающий некоторые из выше перечисленных документов](https://bitbucket.org/budden/clcon/ит/default/doc/)
 
 ## Лицензия
 

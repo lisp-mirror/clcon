@@ -168,7 +168,7 @@ text всега добавляет его. Надо его игнорирова�
 Дополнительные источники информации
 --
 Дана ссылка на /s2/oduvanchik2/doc/ps/oduvanchik-cim.ps
-[Он же в репозитории](https://bitbucket.org/budden/oduvanchik/src/default/doc/ps/oduvanchik-cim.ps?at=default)
+[Он же в репозитории](https://bitbucket.org/budden/oduvanchik/ит/default/doc/ps/oduvanchik-cim.ps?at=default)
 
 Особенности
 --

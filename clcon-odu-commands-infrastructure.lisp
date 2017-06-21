@@ -1,7 +1,7 @@
 ;; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server ; -*-
 ;; Infrastructe for oduvanchik-clcon interaction. Patches to oduvanchik
 ;; which are more convenient to keep here to avoid rebuilding of oduvanchik
-;; См. также ../../src/yar/clcon--режим-яр.lisp - там ссылки на остальные связанные файлы. 
+;; См. также ../../ит/yar/clcon--режим-яр.lisp - там ссылки на остальные связанные файлы. 
 
 (in-package :oduvanchik)
 (named-readtables::in-readtable :oduvanchik-ext-readtable)
