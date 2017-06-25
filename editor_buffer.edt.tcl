@@ -295,12 +295,11 @@ namespace eval ::edt {
             scrollbar $w.body.sy -orient v -command [list $w.body.text yview]
 
             set b $w.body.text
-
             set argSwank [ ::mprs::Unleash [ lindex $V1 1 ]]
             set Links [ ::mprs::Unleash [ lindex $V1 2 ]]
             set Describe [ ::mprs::Unleash [ lindex $V1 3 ]]
             set Defuns [ ::mprs::Unleash [ lindex $V1 4 ]]
-            $b RoInsert end "Символ: $text\n"
+            $b RoInsert end "Символ: $text (далее вывод в его пакете)\n"
             $b RoInsert end "Параметры: "
             $b RoInsert end $argSwank
             $b RoInsert end "\n"

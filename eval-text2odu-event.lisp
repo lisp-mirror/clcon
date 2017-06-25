@@ -142,7 +142,7 @@
         buffer
         (oi::invoke-modifying-buffer 
          (alexandria:named-lambda
-          eval-before-tcl-text-insert-synchronized-part
+          eval-before-tcl-text-delete-synchronized-part
           ()
           (with-mark-in-row-col
            (beg ebeg)
