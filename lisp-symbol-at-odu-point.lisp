@@ -70,7 +70,6 @@
         ((not (and (> rest-length 0)
                    (odu::mark> p1 buf-beg))) nil)
       (let prev-char (odu::next-character p1))
-      (budden-tools::show-expr prev-char)
       (setf cur-in-symbol (editor-budden-tools::char-can-be-in-symbol prev-char))
       (unless checked-where-we-must-be-initially
         (let where-we-are (where-is-mark-relative-to-symbol p1))
