@@ -69,7 +69,8 @@
     (do ()
         ((not (and (> rest-length 0)
                    (odu::mark> p1 buf-beg))) nil)
-      (let prev-char (odu::previous-character p1))
+      (let prev-char (odu::next-character p1))
+      (budden-tools::show-expr prev-char)
       (setf cur-in-symbol (editor-budden-tools::char-can-be-in-symbol prev-char))
       (unless checked-where-we-must-be-initially
         (let where-we-are (where-is-mark-relative-to-symbol p1))
@@ -98,6 +99,7 @@
       ; ничего нет
       (return-from function (values "" nil)))
      (t
+      (odu::character-offset symbol-beginning 1)
       (get-symbol-from-current-point-part-2
        symbol-beginning max-length buf-end our-readtable return-symbol-too create-new package-designator readtable point)
       ))))
