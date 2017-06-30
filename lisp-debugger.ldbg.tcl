@@ -598,13 +598,18 @@ namespace eval ::ldbg {
         set m [menu [::tkcon::MenuButton $menu "3.Правка" edit]]
         set tbl [GetFramesTablelist $w ]
         set bodytag [$tbl bodytag]
+
+        set cmd [list ::ldbg::СкопироватьОписаниеОшибкиВБуферОбмена $w]
+	$m add command -label "1.Копировать описание ошибки" -underline 0 \
+            -command $cmd
+
         set cmd "::tablelist_util::CopyCurrentCell $tbl"
-	$m add command -label "Копировать"  -accel "Control-C" \
+	$m add command -label "Копировать тек.ячейку"  -accel "Control-C" \
             -command $cmd
         
         ::clcon_key::b bind $bodytag <Control-Key-c> $cmd
         bind $bodytag <Control-Key-Insert> $cmd
-        
+
         set cmd [list ::fndrpl::OpenFindBox $tbl "tablelist" "find" "::ldbg::FramesTablelistEnsurePopulated"]
 	$m add command -label "Найти"  -accel "Control-f" \
             -command $cmd
@@ -1243,6 +1248,11 @@ namespace eval ::ldbg {
     proc GetTitleTextWidget {w} {
         set f1 $w.title
         return $w.title.text
+    }
+
+    proc СкопироватьОписаниеОшибкиВБуферОбмена {w} {
+        clipboard clear
+        clipboard append [$w.title.text get 1.0 end]
     }
 }
 
