@@ -160,8 +160,9 @@ namespace eval ::buli {
 
     proc TitleListFileMenu {w menu} {
          set m [menu [::tkcon::MenuButton $menu "1.Файл" file]]
-         $m add command -label "1.Закрыть" -underline 0 -accel "Escape" -command [list destroy $w]
+         $m add command -label "1.Закрыть" -underline 0 -accel "Esc,Ctrl-ц" -command [list destroy $w]
         bind $w <Escape>		[list destroy $w]
+        ::clcon_key::b bind $w <Control-Key-w> [list destroy $w]
     }
 
 

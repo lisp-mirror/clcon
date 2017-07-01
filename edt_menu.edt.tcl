@@ -101,7 +101,26 @@ namespace eval ::edt {
 
         set m [cMenuBar .lisp]
         ::gui_util::ClearMenu $m
+
+        # ---------------------------- Работа с пакетом и системой ----------------------
         
+        set cmd [wesppt [list ::edt::FindPackage $btext]]
+        $m add command -label "1.Перейти к определению пакета" -command $cmd -underline 0
+
+        set cmd [wesppt [list ::edt::УстановитьЭтотПакетВКонсоли $btext]]
+        $m add command -label "2.Установить этот пакет в консоли" -command $cmd -underline 0
+
+        set cmd [wesppt [list ::edt::FindSystem $btext]]
+        $m add command -label "3.Перейти к определению системы" -command $cmd -underline 0
+
+        set cmd [wesppt [list ::edt::CompileSystem $btext]]
+        $m add command -label "4.Скомпилировать и загрузить систему" -command $cmd -underline 0
+
+        set cmd [wesppt [list ::edt::udalitq-fajjly-rezulqtata-sborki-sistemy $btext]]
+        $m add command -label "5.Удалить файлы результата сборки системы" -command $cmd -underline 0
+
+        $m add separator
+
         # It is too late hour to start show-mark
         # We have archietectural problems there (rompsite.lisp is too early on the build)
         # set oduCmd "lisp-insert-\)"
@@ -209,20 +228,6 @@ namespace eval ::edt {
         $m add command -label "Скопировать идентф-р в буфер обмена" -accel "F2" -command $cmd
         ::clcon_key::b bind SingleMod$w <Key-F2> $cmd
 
-        set cmd [wesppt [list ::edt::FindPackage $btext]]
-        $m add command -label "1.Перейти к определению пакета" -command $cmd -underline 0
-
-        set cmd [wesppt [list ::edt::УстановитьЭтотПакетВКонсоли $btext]]
-        $m add command -label "2.Установить этот пакет в консоли" -command $cmd -underline 0
-
-        set cmd [wesppt [list ::edt::FindSystem $btext]]
-        $m add command -label "3.Перейти к определению системы" -command $cmd -underline 0
-
-        set cmd [wesppt [list ::edt::CompileSystem $btext]]
-        $m add command -label "4.Скомпилировать и загрузить систему" -command $cmd -underline 0
-
-        set cmd [wesppt [list ::edt::udalitq-fajjly-rezulqtata-sborki-sistemy $btext]]
-        $m add command -label "5.Удалить файлы результата сборки системы" -command $cmd -underline 0
     }
 
     proc EnableDisableMenuItems {} {
