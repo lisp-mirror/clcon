@@ -599,8 +599,8 @@ namespace eval ::ldbg {
         set tbl [GetFramesTablelist $w ]
         set bodytag [$tbl bodytag]
 
-        set cmd [list ::ldbg::СкопироватьОписаниеОшибкиВБуферОбмена $w]
-	$m add command -label "1.Копировать описание ошибки" -underline 0 \
+        set cmd [list ::tk_textCopy $w.title.text]
+	$m add command -label "1.Копировать выделенную часть описания ошибки" -underline 0 \
             -command $cmd
 
         set cmd "::tablelist_util::CopyCurrentCell $tbl"
@@ -1248,11 +1248,6 @@ namespace eval ::ldbg {
     proc GetTitleTextWidget {w} {
         set f1 $w.title
         return $w.title.text
-    }
-
-    proc СкопироватьОписаниеОшибкиВБуферОбмена {w} {
-        clipboard clear
-        clipboard append [$w.title.text get 1.0 end]
     }
 }
 

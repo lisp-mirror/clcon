@@ -2,8 +2,7 @@
 
 namespace eval ::спс {
 
-    variable ОкноСпрПоСимв
-
+    # Правьмя - заменить на шрифт из консоли. 
     catch {font create tkconfixed -family Courier -size -20}
 
     # Creates grbr and returns it
@@ -12,7 +11,7 @@ namespace eval ::спс {
 
         set GrBrId [GenNamedCounter "СпрПоСимв"]
        
-        set w [string cat $PRIV(base) ".спсОву" $GrBrId]
+        set w [string cat $PRIV(base) ".СпрПоСимв" $GrBrId]
 
         if {[winfo exists $w]} {
             error "Окно просмотровщика справки $w уже существует"
@@ -68,14 +67,12 @@ namespace eval ::спс {
         CellCmd [$tbl index active] $Cmd
     }
 
-    proc ОкноСпрПоСимвBufferMenu {w menu} {
-        set m [menu [::tkcon::MenuButton $menu "2.Буфер" buffer]]
+    proc ОкноСпрПоСимвМенюПравка {w menu} {
+        set m [menu [::tkcon::MenuButton $menu "2.Правка" buffer]]
         
-        set ActivateCmd "::спс::CellCmdForActiveCell $w.tf.tbl HideListAndShowBuffer"
-        $m add command -label "Выбрать" -accel "Return" -command $ActivateCmd
-
-        set CloseCmd "::спс::CellCmdForActiveCell $w.tf.tbl CloseBuffer"
-        $m add command -label "Закрыть буфер или файл" -accel "Delete" -command $CloseCmd
+        set команда [list ::tk_textCopy $w.tf.text]
+        $m add command -label "Скопировать выделенное" -accel "Сtrl-С" -command ${команда}
+        ::clcon_key::b bind $w <Control-Key-c> ${команда}
     }
 
     proc ОкноСпрПоСимвWindowMenu {w menu} {
@@ -90,16 +87,13 @@ namespace eval ::спс {
     # Make toplevel widget and its children
     # Returns window
     proc PrepareGui1 {w} {
-        variable ОкноСпрПоСимв
 
         set metrics [font measure tkconfixed "w"]
         toplevel $w -width [expr { 50 * $metrics }]
         wm withdraw $w
         
         # title 
-        wm title $w "Безымянное окно справки по символу $w"
-
-        set ОкноСпрПоСимв $w
+        wm title $w "Заполняемое окно справки по символу $w"
 
         # ----------------------------------- menu -------------------
         
@@ -107,7 +101,7 @@ namespace eval ::спс {
         $w configure -menu $menu
         
         ОкноСпрПоСимвFileMenu $w $menu
-        ОкноСпрПоСимвBufferMenu $w $menu
+        ОкноСпрПоСимвМенюПравка $w $menu
         ОкноСпрПоСимвWindowMenu $w $menu
 
 
@@ -124,4 +118,3 @@ namespace eval ::спс {
     }
 }
 
-# ::спс::DebugStartup

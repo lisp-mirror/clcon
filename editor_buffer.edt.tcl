@@ -254,6 +254,14 @@ namespace eval ::edt {
         ::tkcon::EvalInSwankAsync "(clco::open-url \"$text\")" {} t
     }
 
+    # надо бы обобщить - или clcon_text, или консоль. Проверять по winfo class 
+    # как-то так:
+    #510 CL-USER>..winfo class [ ::tkcon::CurrentConsole ]
+    #Text
+    #513 CL-USER>..winfo class [ ::edt::c_btext ]
+    #Btext
+    # Тогда можно будет привязать эту команду к консоли.
+
     proc LispDescribeAllContinuation {clcon_text EventAsList ОкноСпрПоСимв} {
         set V1 [ ::mprs::ParseReturnOk $EventAsList ]
         set text [ ::mprs::Unleash [ lindex $V1 0 ]]
