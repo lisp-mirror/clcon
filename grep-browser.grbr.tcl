@@ -5,6 +5,9 @@
 
 package require snit
 
+
+variable ::Fonts { {courier 8} {Courier 10 bold} {Courier 12 bold} }
+
 namespace eval ::grbr {
 
     ::snit::widgetadaptor grep_browser {
@@ -12,6 +15,12 @@ namespace eval ::grbr {
         option -data -default [dict create]
         constructor {args} {
             installhull using toplevel
+        }
+        method set_font {size} {
+            variable ::Fonts
+            set font [lindex $::Fonts $size]
+            [HeaderOfGrepBrowser $self] configure -font $font
+            [GetTitleListMenuTbl $self] configure -font $font
         }
         delegate method * to hull
         delegate option * to hull
@@ -27,13 +36,6 @@ namespace eval ::grbr {
     proc HeaderOfGrepBrowser {grbr} {
         return $grbr.header.text 
     }
-
-
-    catch {font create tkconfixed -family Courier -size -20}
-    #	    $con configure -font tkconfixed
-
-    #        -background {} \
-
 
     proc JumpToLocation {tbl dataItem} {
         set ctjl [dict get $dataItem {CodeToJumpToLocation}]
@@ -219,7 +221,7 @@ namespace eval ::grbr {
     #     $m add separator
 
         set cmd [list ::fndrpl::OpenFindBox $tbl "tablelist" "find" {}]
-        $m add command -label "2.Поиск" -under 0 -command $cmd -accel "Control-F" 
+        $m add command -label "Поиск" -under 0 -command $cmd -accel "Control-F" 
         ::clcon_key::b bind $w <Control-Key-f> $cmd
         $m add separator
 
@@ -236,6 +238,17 @@ namespace eval ::grbr {
         }
         
         AddNextAndPreviousMatchCommands $m [list [$tbl bodytag] $text] 0
+
+        $m add separator
+
+        set cmd [list $w set_font 0]
+        $m add command -label "м. Маленький шрифт" -command $cmd -under 0
+
+        set cmd [list $w set_font 1]
+        $m add command -label "с. Средний шрифт" -command $cmd -under 0
+
+        set cmd [list $w set_font 2]
+        $m add command -label "б. Большой шрифт" -command $cmd -under 0
 
         
     }
@@ -313,9 +326,11 @@ namespace eval ::grbr {
 
         ::tablelist_util::BindReSortingToClickingOnColumnLabel $tbl
 
+        # -font tkconfixed
         $tbl configure \
             -foreground \#000000 \
-            -font tkconfixed -borderwidth 1 -highlightthickness 0
+            -font [::tkcon font] \
+            -borderwidth 1 -highlightthickness 0
         
         
         set f1 $w.tf

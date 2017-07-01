@@ -1189,7 +1189,7 @@ namespace eval ::ldbg {
 
         $tbl configure \
             -foreground \#000000 \
-            -font tkconfixed -borderwidth 1 -highlightthickness 1 
+            -font [ ::tkcon font ] -borderwidth 1 -highlightthickness 1 
         
 
         $tbl columnconfigure 0 -wrap true  
