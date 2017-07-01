@@ -68,6 +68,17 @@ search-tablelist.srchtblst.tcl [../search-tablelist.srchtblst.tcl](../search-tab
 Можно было сразу сгенерировать лямбду, но по (неудачно придуманному) соглашению мы
 передаём только её тело.
 
+Ещё один вариант замыкания, специализированный (см. как сделано).
+---------------
+    proc LispDescribeAllCommand {text} {
+        set w [ ::спс::СоздатьОкноСпрПоСимв ]
+        ::clcon_text::CallOduvanchikFunction $text "odu::describe-all-command nil" [subst -nocommands {{
+            ::edt::LispDescribeAllContinuation \$clcon_text \$EventAsList $w
+        }}]
+    }
+clcont_text и EventAsList будут переданы замыканию в качестве параметров, а w выполняется в момент создания замыкания. Заголовок замыкания со списком параметров формируется в LispDescribeAllCommand
+
+
 tkcon
 ---
 

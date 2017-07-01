@@ -3044,6 +3044,7 @@ proc ::tkcon::ReloadSomeIDESources2 {} {
     TkconSourceHere eval.tkcon.tcl
     TkconSourceHere edt_structure.edt.tcl
     TkconSourceHere editor_buffer.edt.tcl
+    TkconSourceHere справка-по-символу.спс.tcl
     TkconSourceHere menu.recent.tcl
     TkconSourceHere экранная-клавиатура.tcl
     TkconSourceHere edt_menu.edt.tcl
