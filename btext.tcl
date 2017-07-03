@@ -376,6 +376,10 @@ proc btext::instanceCmd {self cmd args} {
             return [uplevel 1 [linsert $args 0 $self._t $cmd]]
 	}
 
+        set_font {
+            $self configure -font [lindex $::Fonts [lindex $args 0]]
+        }
+
 	default {
 	    return [uplevel 1 [linsert $args 0 $self._t $cmd]]
 	}

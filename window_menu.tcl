@@ -1,4 +1,4 @@
-## clcon window menu
+## window menu, history menu и другие меню, применяемые более чем в одном месте
 
 namespace eval ::window_menu {
 
@@ -157,4 +157,19 @@ proc ::tkcon::HistoryMenu m {
 	$::tkcon::PRIV(console) see end
 	::tkcon::Eval $::tkcon::PRIV(console)"
     }
+}
+
+
+proc ::tkcon::ВставитьВМенюПунктыПроШрифты { Меню Виджет } {
+    set m ${Меню}
+    set w ${Виджет}
+
+    set cmd [list $w set_font 0]
+    $m add command -label "м. Маленький шрифт" -command $cmd -under 0
+
+    set cmd [list $w set_font 1]
+    $m add command -label "с. Средний шрифт" -command $cmd -under 0
+
+    set cmd [list $w set_font 2]
+    $m add command -label "б. Большой шрифт" -command $cmd -under 0
 }

@@ -333,7 +333,7 @@ namespace eval ::edt {
 
         
         
-        ## Edit Menu
+        # ---------------------------- Меню Правка --------------
         ##
         set m [cMenuBar .edit]
         ::gui_util::ClearMenu $m
@@ -376,17 +376,21 @@ namespace eval ::edt {
             -command $cmd -accel "F12"
         bind NoMod$w <F12> [concat $cmd ";" break]
 
+        $m add separator
+
         set cmd [list ::clcon_text::Показать_экранную_клавиатуру $btext]
         $m add command -label "Экранная клавиатура для значков" -command $cmd -accel "F4"
        
         bind NoMod$w <Key-F4> $cmd
 
+        ::tkcon::ВставитьВМенюПунктыПроШрифты $m $btext
 
-        ## Lisp mode Menu
+        # ---------------------------- Режим Lisp ----------------------
+        ## 
         ##
         MakeLispModeMenu $Bi $w $btext
         
-        ## Tcl mode Menu
+        # ---------------------------- Режим Tcl ----------------------
         ## 
         set m [cMenuBar .tcl]
         ::gui_util::ClearMenu $m
@@ -411,7 +415,7 @@ namespace eval ::edt {
         $m add command -label "Маркдаун: выровнять таблицу" -accel <Control-Shift-Key-F11> -command $cmd
         bind DoubleMod$w <Control-Shift-Key-F11> "$cmd; break"
        
-        ## Window Menu 
+        # ---------------------------- Меню Window --------------------------------------
 
         ## Так же как с меню "недавние", нам нужно удалить данное меню, псокольку 
         ## этот код вызывается много раз
@@ -425,7 +429,7 @@ namespace eval ::edt {
         ::window_menu::WindowMenuKeyBindings $w SingleMod$w DoubleMod$w
 
 
-        ## Secret Menu
+        # ---------------------------- Меню Секрет (обход багов редактора) --------------
         ##
         set m [cMenuBar .secret]
         ::gui_util::ClearMenu $m

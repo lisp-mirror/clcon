@@ -241,16 +241,7 @@ namespace eval ::grbr {
 
         $m add separator
 
-        set cmd [list $w set_font 0]
-        $m add command -label "м. Маленький шрифт" -command $cmd -under 0
-
-        set cmd [list $w set_font 1]
-        $m add command -label "с. Средний шрифт" -command $cmd -under 0
-
-        set cmd [list $w set_font 2]
-        $m add command -label "б. Большой шрифт" -command $cmd -under 0
-
-        
+        ::tkcon::ВставитьВМенюПунктыПроШрифты $m $w        
     }
 
 
