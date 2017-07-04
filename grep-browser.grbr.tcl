@@ -5,9 +5,6 @@
 
 package require snit
 
-
-variable ::Fonts { {courier 8} {Courier 10 bold} {Courier 12 bold} }
-
 namespace eval ::grbr {
 
     ::snit::widgetadaptor grep_browser {
@@ -241,7 +238,10 @@ namespace eval ::grbr {
 
         $m add separator
 
-        ::tkcon::ВставитьВМенюПунктыПроШрифты $m $w        
+        ::tkcon::ВставитьВМенюПунктыПроШрифты $m $w {{Виджет КодРазмера} {
+            variable ::Fonts 
+            ${Виджет} set_font ${КодРазмера}}
+        }
     }
 
 

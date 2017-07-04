@@ -611,17 +611,24 @@ namespace eval ::ldbg {
         bind $bodytag <Control-Key-Insert> $cmd
 
         set cmd [list ::fndrpl::OpenFindBox $tbl "tablelist" "find" "::ldbg::FramesTablelistEnsurePopulated"]
-	$m add command -label "Найти"  -accel "Control-f" \
-            -command $cmd
-        
+	$m add command -label "Найти"  -accel "Control-f" -command $cmd
         ::clcon_key::b bind $bodytag <Control-Key-f>	   $cmd
      
 
         set cmd [list ::fndrpl::FindIt $tbl]
-	$m add command -label "Найти далее"  -underline 0 -accel "F3" -command $cmd -state disabled
+	$m add command -label "Найти далее" -underline 0 -command $cmd -state disabled
         #bind $tbl <F3> $cmd
         
-    
+        $m add separator
+
+        ::tkcon::ВставитьВМенюПунктыПроШрифты $m $w {{Виджет КодРазмера} {
+            variable ::Fonts
+            set Шрифт [lindex $::Fonts ${КодРазмера}]
+            set w [::ldbg::GetFramesTablelist ${Виджет}]
+            $w configure -font ${Шрифт}
+            set w [::ldbg::GetTitleTextWidget ${Виджет}]
+            $w configure -font ${Шрифт}
+        }}        
         # set cmd ::srchtblst::
     }
     
@@ -1150,7 +1157,7 @@ namespace eval ::ldbg {
             return $w
         }
 
-        set metrics [font measure tkconfixed "w"]
+        set metrics [font measure [ tkcon font ] "w"]
         toplevel $w -width [expr { 50 * $metrics }]
         wm withdraw $w
 

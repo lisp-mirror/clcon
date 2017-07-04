@@ -456,6 +456,13 @@ proc ::tkcon::Init {args} {
     }
     catch {tclPkgUnknown dummy-name dummy-version}
 
+    # Вроде здесь уже загрузились пользовательские настройки
+    variable ::Fonts
+    if {![info exists ::Fonts]} {
+        set ::Fonts { {courier 8} {Courier 10 bold} {Courier 12 bold} }
+    }
+
+
     ## Handle rest of command line arguments after sourcing resource file
     ## and slave is created, but before initializing UI or setting packages.
     set slaveargs {}
@@ -1228,7 +1235,7 @@ proc ::tkcon::InitMenus {w title} {
 	eval [list $PRIV(popup).[string tolower $m] entryconfigure $l] $args
     }
 
-    foreach m [list 1.Файл 2.Консоль 3.Правка 4.Настройка 5.История 6.Избранное 7.Окно 8.Справка] {
+    foreach m [list 1.Файл 2.Правка 3.Консоль 4.Настройка 5.История 6.Избранное 7.Окно 8.Справка] {
  	set l [string tolower [string range $m 2 end]]
  	MenuButton $w $m $l
  	$w.pop add cascade -label $m -underline 0 -menu $w.pop.$l
@@ -1292,7 +1299,7 @@ proc ::tkcon::InitMenus {w title} {
 	$m add command -label "6.Выход из клиента" -command "::tkcon::Destroy 0" -underline 0
     }
         
-    ## 2.Консоль
+    ## 3.Консоль
     ##
     foreach m [list [menu $w.консоль -disabledfore $COLOR(disabled)] \
 	    [menu $w.pop.консоль -disabledfore $COLOR(disabled)]] {
@@ -1363,7 +1370,7 @@ proc ::tkcon::InitMenus {w title} {
 	#}
     }
 
-    ## 3.Правка
+    ## 2.Правка
     ##
     set text $PRIV(console)
     foreach m [list [menu $w.правка] [menu $w.pop.правка]] {
@@ -1405,6 +1412,11 @@ proc ::tkcon::InitMenus {w title} {
         set cmd "event generate $text <<TkCon_TclFindDefinition>>; break"
         $m add command -label "Tcl: перейти к определению" -accel "Control-F9" -command $cmd
 
+        $m add separator
+        ::tkcon::ВставитьВМенюПунктыПроШрифты $m $text {{Виджет КодРазмера} {
+            variable ::Fonts 
+            ${Виджет} configure -font [lindex $::Fonts ${КодРазмера}]
+        }}
     }
 
     ## 4. Настройка
