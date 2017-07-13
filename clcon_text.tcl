@@ -799,24 +799,6 @@ namespace eval ::clcon_text {
         }
     }
 
-    # Правьмя. Нужно передавать команду для вставки нажатой кнопки в приёмник. 
-    # Например, с помощью этой клавиатуры можно вставить текст в историю консоли, что, очевидно, 
-    # неверно. Также можно вставить букву в замороженный текст. 
-    # А также нужно, чтобы клавиатура всплывала  не на соседнем мониторе, а вблизи курсора клавиатуры ПРАВЬМЯ
-    proc Показать_экранную_клавиатуру {Приёмник} {
-        set w .ЭкраннаяКлавиатура
-        destroy $w 
-        toplevel $w
-        wm title $w "Экранная клавиатура для ${Приёмник}"
-        bind $w <Escape> [list destroy $w]
-        ::clcon_key::b bind $w <Control-Key-W> [list destroy $w]
-        pack [::clcon::keyboard $w.kbd -title "Ввод значков для ${Приёмник}" -keys {0xD7 0xF7 0xD8 0x2116} -receiver ${Приёмник}]
-        # - {0x410-0x44f} - кириллица
-        ::gui_util::FocusWindowByName $w
-        grab $w
-    } 
-
-
     # InitOneBindingOfFreezableText <Key-Return>
     SetCyrBindingsForText
 

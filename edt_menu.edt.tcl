@@ -378,7 +378,7 @@ namespace eval ::edt {
 
         $m add separator
 
-        set cmd [list ::clcon_text::Показать_экранную_клавиатуру $btext]
+        set cmd [list ::clcon::Показать_экранную_клавиатуру $btext]
         $m add command -label "Экранная клавиатура для значков" -command $cmd -accel "F4"
        
         bind NoMod$w <Key-F4> $cmd
