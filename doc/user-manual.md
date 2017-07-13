@@ -185,6 +185,11 @@ have file/Reload some of IDE sources which reloads all sources excluding clcon.t
 `.иф -типы {tcl lisp} c:/yar/lp/clcon swank`
 
 `.apr string` или `.апр` вызывает [лисповый а пропос](http://www.lispworks.com/documentation/HyperSpec/Body/f_apropo.htm), т.е. поиск символов, в имени которых содержится подстрока (регистр не имеет значения)
+Если нужно подобрать символ в конкретном пакете, пользуйтесь лиспом:
+```
+(apropos "Имя" :Пакет)
+(cl-ppcre:regex-apropos "^Символ-.+" '(П-Я-ГРАМОТЕЙ) :case-insensitive nil)
+```
 
 `.tapr string` или `.тапр строка` вызывает а пропос для tcl (аналогично `.апр`)
 
