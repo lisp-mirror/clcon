@@ -94,6 +94,9 @@ Currently defined commands are: "
     # искать в исходниках яра
     proc иия { str } { fics $str }
 
+    # искать собственно в исходниках яра
+    proc исия { str } { finf [string cat $::tkcon::YarRoot "/ит"] $str }
+
     # 
     proc finf {args} {
         # Find in files. Synopsys ([[]] means optional part)
