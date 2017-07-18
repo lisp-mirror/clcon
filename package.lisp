@@ -36,6 +36,7 @@
            "Выпасть-в-ред"
            #:edit-string-at-row-and-col
            #:order-call-oduvanchik-from-itself
+           #:entire-buffer-string
            )
   (:import-from :budden-tools
                budden-tools:nullable))
