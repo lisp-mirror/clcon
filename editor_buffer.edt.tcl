@@ -421,7 +421,7 @@ namespace eval ::edt {
         menu [::tkcon::MenuButton $menu "3.Лисп" lisp]
         menu [::tkcon::MenuButton $menu "4.Tcl/Md" tcl]
         menu [::tkcon::MenuButton $menu "7.Окно" window]        
-        menu [::tkcon::MenuButton $menu "Секрет" secret]
+        menu [::tkcon::MenuButton $menu "8.Секрет" secret]
         
     }
     

@@ -1432,28 +1432,27 @@ proc ::tkcon::InitMenus {w title} {
 		-underline 0 -variable ::tkcon::OPT(putd-enabled) -state $PutdEnabledState
 	$m add check -label "2.Использовать сервер одуванчика" \
 		-underline 0 -variable ::tkcon::OPT(oduvan-backend)
-	$m add check -label "3.Non-Tcl Attachments (НЕ РАБОТАЕТ)" \
-		-underline 0 -variable ::tkcon::OPT(nontcl)
-	$m add check -label "4.Показывать много найденных вхождений" \
+	$m add check -label "3.Показывать много найденных вхождений" \
 		-underline 0 -variable ::tkcon::OPT(showmultiple)
-	$m add check -label "5.Показать строку состояния (status bar)" \
-	    -underline 5 -variable ::tkcon::OPT(showstatusbar) \
+	$m add check -label "4.Показать строку состояния (status bar)" \
+	    -underline 0 -variable ::tkcon::OPT(showstatusbar) \
 	    -command {
 		if {$::tkcon::OPT(showstatusbar)} {
 		    grid $::tkcon::PRIV(statusbar)
 		} else { grid remove $::tkcon::PRIV(statusbar) }
 	    }
-	$m add cascade -label "6.Полоса прокрутки" -underline 2 -menu $m.scroll
+	$m add cascade -label "5.Полоса прокрутки" -underline 0 -menu $m.scroll
 
 	## Scrollbar Menu
 	##
-	set m [menu $m.scroll]
-	$m add radio -label "Слева" -value left \
+	set mm [menu $m.scroll]
+	$mm add radio -label "Слева" -value left \
 		-variable ::tkcon::OPT(scrollypos) \
 		-command { grid configure $::tkcon::PRIV(scrolly) -column 0 }
-	$m add radio -label "Справа" -value right \
+	$mm add radio -label "Справа" -value right \
 		-variable ::tkcon::OPT(scrollypos) \
 		-command { grid configure $::tkcon::PRIV(scrolly) -column 2 }
+        $m add command -label "6.Редактировать файл инициализации" -command ::clconcmd::редактировать_файл_иницаилизации
     }
 
     ## 5.История
