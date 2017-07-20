@@ -203,6 +203,8 @@
 (defmethod editor-budden-tools:goto-xy (pathname row col)
   (check-type row integer)
   (check-type col integer)
+  ;; переводим в систему координат, понятную tk
+  (incf col -1)
   (let* ((escaped-file (tcl-escape-filename pathname))
          (command (format nil "tkcon::EditFileAtOffset ~A ~A.~A" escaped-file row col)))
     (eval-in-tcl command :nowait nil)))
