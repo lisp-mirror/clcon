@@ -72,6 +72,7 @@
       (setf file newfile offset offset-15)))
   (when |Скакнуть-от-Лиспа-к-Яру|
     (multiple-value-setq (file offset) (|Скакнуть-от-Лиспа-к-Яру| file offset)))
+  (incf offset +Надо-добавить-для-перехода-от-колонки-к-колонке-Tk+)
   (let* ((escaped-file (tcl-escape-filename file))
          (offset-2 (format nil "{1.0+ ~A chars}"
                            offset
@@ -143,11 +144,13 @@
            )))
       ))))
 
+(defconstant +Надо-добавить-для-перехода-от-колонки-к-колонке-Tk+ -1)
+
 (defmethod editor-budden-tools:goto-xy (pathname row col)
   (check-type row integer)
   (check-type col integer)
   ;; переводим в систему координат, понятную tk
-  (incf col -1)
+  (incf col +Надо-добавить-для-перехода-от-колонки-к-колонке-Tk+)
   (let* ((escaped-file (tcl-escape-filename pathname))
          (command (format nil "tkcon::EditFileAtOffset ~A ~A.~A" escaped-file row col)))
     (eval-in-tcl command :nowait nil)))
