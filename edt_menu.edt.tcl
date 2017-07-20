@@ -219,6 +219,8 @@ namespace eval ::edt {
         $m add command -label "Перейти к определению" -accel "Alt-." -command $cmd
         ::clcon_key::b bind SingleMod$w <Alt-period> $cmd
 
+        ::edt::OduFnMenuItem $w $m $btext nayiti-iskhodnik-po-karte -accel <F9> -bindtag NoMod$w 
+
         $m add separator
         set cmd [wesppt [list ::edt::LispDescribeAllCommand $btext]]
         $m add command -label "Справка по идентиф-ру" -accel "F1" -command $cmd
@@ -448,7 +450,6 @@ namespace eval ::edt {
         bind NoMod$w <F8> $cmd
 
         set cmd [wesppt [list ::edt::SyncCursor $btext]]
-        $m add command -label "Синхронизировать курсор одуванчика к tcl/tk" -accel "F9" -command $cmd
-        bind NoMod$w <F9> $cmd
+        $m add command -label "Синхронизировать курсор одуванчика к tcl/tk" -command $cmd
     }
 }
