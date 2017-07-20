@@ -46,99 +46,42 @@
     (parse-namestring (subseq name  0 (- (length name) 5)))))
 ;  (translate-pathname pathname "*.lisp" "*"))
 
-(defun get-yar-proc (file procname)
- (let* ((search (format nil "функция ~a(" procname))
-        (l (length search))
-        (n 0))
-   (with-open-file (in file :direction :input)
-     (loop
-       (let* ((str (read-line in))
-              (ls (length str)))
-         (setf n (+ n ls))
-         (when (and (> ls l)
-                    (string= (subseq str 0 l) search))
-           (return-from get-yar-proc n)))))))
-
-(defun fix-offset-2 (pathname offset)
+(defun fix-offset-2 (pathname offset) ; корректирует и скачет к лиспу. 
   "Имеется числовой offset, к-рый вернул file-position. Давайте попробуем превратить его в 
   row-col-offset. См. также BUDDEN-TOOLS::input-stream-position-in-chars"
-  (warn "Ты уверен, что нужно вызывать clco::fix-offset-2 после того, как мы научились определять encoding?")
-  #|(with-open-file (stream pathname)
-    (let ((map (budden-tools::ensure-file-position-to-char-position-for-stream stream)))
-       (budden-tools::file-position-and-map-to-char-position offset map)))|#
-    (let ((row 1)
-          (col 0)
-          (procname nil)
-          (shift nil)
-          (buf "")
-          (state nil)
-          (b-offset 0)) ; = f-offset
-      (with-open-file (in pathname :direction :input)
-        (loop
-          (let ((char (read-char in nil nil)))
-            (when (>= (file-position in) offset)
-              (return-from fix-offset-2 
-                           (if (and procname shift)
-                               (let ((yarname (yar-name pathname)))
-                                 (values yarname
-                                         (+ (get-yar-proc yarname procname) 
-                                            shift 1)))
-                               (values pathname (1+ b-offset)))))
-            (etypecase char
-              (null
-               (warn "fix-offset-2: approached EOF")
-               (return-from fix-offset-2 0))
-              (character
-               (case char 
-                 (#\Newline
-                  (incf row)
-                  (incf b-offset)
-                  (setf col 0)
-                  (when (eq state 'l-2)
-                    (setf shift (parse-integer buf :junk-allowed t)))
-                  (setf state nil buf ""))
-                 (#\Return
-                  (warn "fix-offset-2: got Return character!"))
-                 (t
-                  (cond
-                   ((and (eq state nil) (char= char #\()) (setf state 'defyarfun-0))
-                   ((and (eq state 'defyarfun-0) (char= char #\d)) (setf state 'defyarfun-1))
-                   ((and (eq state 'defyarfun-1) (char= char #\e)) (setf state 'defyarfun-2))
-                   ((and (eq state 'defyarfun-2) (char= char #\f)) (setf state 'defyarfun-3))
-                   ((and (eq state 'defyarfun-3) (char= char #\y)) (setf state 'defyarfun-4))
-                   ((and (eq state 'defyarfun-4) (char= char #\a)) (setf state 'defyarfun-5))
-                   ((and (eq state 'defyarfun-5) (char= char #\r)) (setf state 'defyarfun-6))
-                   ((and (eq state 'defyarfun-6) (char= char #\f)) (setf state 'defyarfun-7))
-                   ((and (eq state 'defyarfun-7) (char= char #\u)) (setf state 'defyarfun-8))
-                   ((and (eq state 'defyarfun-8) (char= char #\n)) (setf state 'defyarfun-9))
-                   ((and (eq state 'defyarfun-9) (char= char #\space)) (setf state 'defyarfun-10))
-                   ((eq state 'defyarfun-10) (if (char= char #\space)
-                                                 (setf procname buf buf "" state nil)
-                                                 (setf buf (concatenate 'string buf (list char)))))
-                   ((and (eq state nil) (char= char #\;)) (setf state 'l-0))
-                   ((and (eq state 'l-0) (char= char #\l)) (setf state 'l-1))
-                   ((and (eq state 'l-1) (char= char #\space)) (setf state 'l-2))
-                   ((eq state 'l-2) (if (char= char #\space)
-                                        (setf state nil shift (parse-integer buf :junk-allowed t) buf "")
-                                        (setf buf (concatenate 'string buf (list char))))))
-                  (incf b-offset)
-                  (incf col))))))))))
+  (КАРТЫ-ИСХОДНИКОВ-ЛИЦО:fix-offset-2 pathname offset))
+
+(defun |Скакнуть-от-Лиспа-к-Яру| (file offset-in-chars)
+  "Если месту сопоставлен исходник Яра, вернуть файл и значение как множ.знач. Если не сопоставлен, выругаться и вернуть свои аргументы. На данный момент просто ищет в картах модуля :КАРТЫ-ИСХОДНИКОВ-ЛИЦО"
+  (perga-implementation:perga
+   (let targets (budden-tools::l/find-sources-in-file file offset-in-chars :strict t))
+   (cond
+    (targets
+     (let target (car targets))
+     (let target-file (КАРТЫ-ИСХОДНИКОВ-ЛИЦО:SLO-SOURCE-В-ИМЯ-ФАЙЛА (first target))) ; FIXME Записывать позиции единообразно, например, с помощью olm. 
+     (let offset (second target))
+     (values target-file offset))
+    (t
+     (warn "Скакнуть-от-Лиспа-к-Яру: этого места нет в картах исходников ~S ~S"
+           file offset-in-chars)
+     (values file offset-in-chars)))))
   
-(defun edit-file-at-offset-code (file offset fix-offset-p)
+(defun edit-file-at-offset-code (file offset fix-offset-p |Скакнуть-от-Лиспа-к-Яру|)
   (when fix-offset-p
     (multiple-value-bind (newfile offset-15) (fix-offset-2 file offset)
       (setf file newfile offset offset-15)))
+  (when |Скакнуть-от-Лиспа-к-Яру|
+    (multiple-value-setq (file offset) (|Скакнуть-от-Лиспа-к-Яру| file offset)))
   (let* ((escaped-file (tcl-escape-filename file))
-;              (editor-budden-tools::fix-offset-2 file offset)
          (offset-2 (format nil "{1.0+ ~A chars}"
                            offset
                            )))
     (format nil "::tkcon::EditFileAtOffset ~A ~A" escaped-file offset-2)))
 
-(defun print-one-hyperlink-tcl-source (stream text file offset &key (index "output") fix-offset-p)
+(defun print-one-hyperlink-tcl-source (stream text file offset &key (index "output") fix-offset-p (|Скакнуть-от-Лиспа-к-Яру| t))
   "Generates tcl code which prints out one hyperlink"
   (let* ((escaped-text (cl-tk:tcl-escape text))
-         (edit-file-code (edit-file-at-offset-code file offset fix-offset-p)))
+         (edit-file-code (edit-file-at-offset-code file offset fix-offset-p |Скакнуть-от-Лиспа-к-Яру|)))
     (format stream "::tkcon::WriteActiveText $w ~A ~A {~A}; $w insert ~A \\\n; "
             escaped-text
             index
@@ -160,7 +103,7 @@
        (values file position)))
     (t nil)))  
 
-(defun write-one-dspec-and-location (link-text location stream &key (index "output") fix-offset-p)
+(defun write-one-dspec-and-location (link-text location stream &key (index "output") fix-offset-p (|Скакнуть-от-Лиспа-к-Яру| t))
   "It is also used by compilation-error browse, some arbitrary string is passed instead of dspec. Beware! 
   fix-offset-p - magic boolean value, set experimentally
   "
@@ -169,11 +112,11 @@
         (parse-location-into-file-and-pos location)
       (cond
         ((and file position)
-         (print-one-hyperlink-tcl-source stream printed-dspec file position :index index :fix-offset-p fix-offset-p))
+         (print-one-hyperlink-tcl-source stream printed-dspec file position :index index :fix-offset-p fix-offset-p :|Скакнуть-от-Лиспа-к-Яру| |Скакнуть-от-Лиспа-к-Яру|))
         (t ; something wrong with location
          (print-just-line stream printed-dspec :index index))))))
 
-(defun write-code-to-pass-to-loc (stream loc &key (mode :text) fix-offset-p)
+(defun write-code-to-pass-to-loc (stream loc &key (mode :text) fix-offset-p (|Скакнуть-от-Лиспа-к-Яру| t))
   "Writes code which would help to pass to location. 
    If mode = :text we will insert the code into text widget. 
    If mode = :eval we will eval the code in the context where $w contains some widget. 
@@ -185,7 +128,7 @@
     (cond
      ((and file offset)
       (format stream "~A; " 
-              (edit-file-at-offset-code file offset fix-offset-p))
+              (edit-file-at-offset-code file offset fix-offset-p |Скакнуть-от-Лиспа-к-Яру|))
       )
      (t
       (let* ((qLocation (cl-tk:tcl-escape (prin1-to-string loc)))
@@ -253,18 +196,18 @@
            (destructuring-bind (dspec loc) dal
              (cond
                ((= l 1)
-                (write-code-to-pass-to-loc ou loc #| :fix-offset-p t |#))
+                (write-code-to-pass-to-loc ou loc :|Скакнуть-от-Лиспа-к-Яру| t))
                (t
                 (let ((link-text (prin1-to-string dspec)))
-                  (write-one-dspec-and-location link-text loc ou #| :fix-offset-p t |#))))))
+                  (write-one-dspec-and-location link-text loc ou :|Скакнуть-от-Лиспа-к-Яру| t))))))
          (when (> l 1)
            (write-code-to-see-console-end ou))
          )))))
 
-(defun print-one-hyperlink-tcl-source-for-describe (stream text file offset &key (index "output") fix-offset-p)
+(defun print-one-hyperlink-tcl-source-for-describe (stream text file offset &key (index "output") fix-offset-p (|Скакнуть-от-Лиспа-к-Яру| t))
   "Generates tcl code which prints out one hyperlink"
   (let* ((escaped-text (cl-tk:tcl-escape text))
-         (edit-file-code (edit-file-at-offset-code file offset fix-offset-p)))
+         (edit-file-code (edit-file-at-offset-code file offset fix-offset-p |Скакнуть-от-Лиспа-к-Яру|)))
     (format stream "::tkcon::WriteActiveText $b ~A ~A {~A}; $b RoInsert ~A \\\n; "
             escaped-text
             index
@@ -321,7 +264,7 @@
   "location - из EMACS. parent - widget отладчика (см. примеры). Если мы не можем попасть в исходник, мы сообщаем об этом, а видгет является родителем сообщения"
   (assert (listp location))  
   (let ((code (with-output-to-string (ou)
-                (write-code-to-pass-to-loc ou location :mode :eval #| :fix-offset-p t |#))))
+                (write-code-to-pass-to-loc ou location :mode :eval :|Скакнуть-от-Лиспа-к-Яру| t))))
     (eval-in-tcl (format nil "set w ~A; ~A" parent code))
     ))
 
