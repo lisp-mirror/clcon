@@ -655,6 +655,8 @@ namespace eval ::ldbg {
 
         foreach r $restarts {
             set restartName [::mprs::Unleash [::mprs::Car $r]]
+            # есть также ф-я SWANK/BACKEND:SLDB-STEPPER-CONDITION-P в swank,
+            # к-рая делает примерно то же самое
             switch -nocase $restartName {
                 step-continue {
                     set stepperMode 1
@@ -984,7 +986,7 @@ namespace eval ::ldbg {
         if {!$InTheDebugger} {
             tk_messageBox -parent $MainWindow -title "Ходьба" -message "Отладчик не активен"
         } elseif {!$StepperMode} {
-            tk_messageBox -parent $MainWindow -title "Ходьба" -message "Отладчик не активен"
+            tk_messageBox -parent $MainWindow -title "Ходьба" -message "Режим ходьбы не активен"
         } else {
             InvokeSldbRestartByName $name
         }
@@ -1108,7 +1110,7 @@ namespace eval ::ldbg {
         set bodytag [$tbl bodytag]
         set m [menu [::tkcon::MenuButton $menu [StepperMenuTitle] stepper]]
         set StepperMenuPathname $m
-        FillStepperMenu $m [list $tbl $bodytag]
+        FillStepperMenu $m [list $w $tbl [GetTitleTextWidget $w] $bodytag]
     }
         
     proc ClearStackFramesTableList {} {
