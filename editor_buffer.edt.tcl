@@ -193,7 +193,7 @@ namespace eval ::edt {
         ::tkcon::ПоложитьТекущуюПозициюНаPosStack $w
         
         ::clcon_text::CallOduvanchikFunction $text "odu::find-package-command nil" {{
-            ::edt::FindSourceContinuation $clcon_text $EventAsList
+            ::edt::ПоискаСвязейСимволаПродолжение $clcon_text $EventAsList "Перейти к определению текущего пакета"
         }}
     }
 
@@ -204,7 +204,7 @@ namespace eval ::edt {
         ::tkcon::ПоложитьТекущуюПозициюНаPosStack $w
         
         ::clcon_text::CallOduvanchikFunction $text "odu::find-system-command nil" {{
-            ::edt::FindSourceContinuation $clcon_text $EventAsList
+            ::edt::ПоискаСвязейСимволаПродолжение $clcon_text $EventAsList "Перейти к определению текущей системы ASDF"
         }}
     }
 

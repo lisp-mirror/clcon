@@ -145,6 +145,12 @@
                   (and (member (pathname-type p) |*типы-файлов-исходников-яра*| :test 'string=)
                        (not (equal p #p"c:/yar/lp/budden-tools/866.lisp")) ; этот путь всегда выдаёт ошибку, нечего ему быть в поиске
                        )))
+    (budden-tools:map-dir
+     (lambda (x) (push x filelist))
+     (cl-user::putq-otnositelqno-kornya-yara "../yar.my/док/оя-яр-1/")
+     :subdirs :recurse
+     :file-test (lambda (p)
+                  (member (pathname-type p) |*типы-файлов-исходников-яра*| :test 'string=)))
     ; filelist
     (sort filelist '|сравнить-исходные-файлы-яра-для-упорядочивания-при-поиске|)
     ))
