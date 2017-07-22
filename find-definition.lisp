@@ -32,14 +32,13 @@
        (swank::find-definitions-find-symbol-or-package name-or-symbol)))))
   
 
-(defun swank-find-definitions-for-clcon (name-or-symbol &rest keyargs &key package-name (readtable-name nil))
+(defun swank-find-definitions-for-clcon (name-or-symbol |Функция-возвращающая-список-мест| &rest keyargs &key package-name (readtable-name nil))
   "Return a list ((DSPEC LOCATION) ...) of definitions for NAME-OR-SYMBOL. If name-or-symbol is string, we also need package-name and readtable-name. Package-name is a string, readtable-name is a keyword or nil. DSPEC is a string and LOCATION a source location. See also swank:find-definitions-for-emacs"
   (declare (ignorable package-name readtable-name))
   (multiple-value-bind (symbol found)
                        (apply #'parse-name-or-symbol-to-symbol name-or-symbol keyargs)
     (when found
-      (swank::find-definitions symbol))))
-
+      (funcall |Функция-возвращающая-список-мест| symbol))))
 
 (defun yar-name (pathname)
   (let ((name (namestring pathname)))
@@ -62,6 +61,7 @@
      (let offset (second target))
      (values target-file offset))
     (t
+     (let *print-readably* nil)
      (warn "Скакнуть-от-Лиспа-к-Яру: этого места нет в картах исходников ~S ~S"
            file offset-in-chars)
      (values file offset-in-chars)))))
@@ -185,27 +185,32 @@
   (format stream "::$::tkcon::PRIV(console) see end; "))
 
 (defun server-lookup-definition (name-or-symbol &optional (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*)))
-  "name-or-symbol is a name of a lisp object or object itself which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
-  (let* ((dspecs-and-locations
-          (swank-find-definitions-for-clcon name-or-symbol :package-name package-name :readtable-name readtable-name))
-         (l (length dspecs-and-locations)))
-    (with-output-to-string (ou)
-      (case l
-        (0 (print-just-line ou (format nil "No definitions found for ~A" name-or-symbol)))
-        (t
-         (when (> l 1)
-           (write-code-to-show-console ou))
-         (dolist (dal dspecs-and-locations)
-           (destructuring-bind (dspec loc) dal
-             (cond
-               ((= l 1)
-                (write-code-to-pass-to-loc ou loc :|Скакнуть-от-Лиспа-к-Яру| t))
-               (t
-                (let ((link-text (prin1-to-string dspec)))
-                  (write-one-dspec-and-location link-text loc ou :|Скакнуть-от-Лиспа-к-Яру| t))))))
-         (when (> l 1)
-           (write-code-to-see-console-end ou))
-         )))))
+  (|Обслужить-команду-поиска-связей-символа| name-or-symbol #'swank/backend:find-definitions "Определения символа ~S не найдены" package-name readtable-name))
+
+(defun |Обслужить-команду-поиска-связей-символа| (name-or-symbol |Функция-возвращающая-места| |Формат-сообщения-об-отсутствии-находок| &optional (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*)))
+  "По аналогии с server-lookup-definition"
+  (perga-implementation:perga
+   (let dspecs-and-locations
+     (swank-find-definitions-for-clcon
+      name-or-symbol |Функция-возвращающая-места|
+      :package-name package-name :readtable-name readtable-name))
+   (let l (length dspecs-and-locations))
+   (:@ with-output-to-string (ou))
+   (case l
+     (0 (print-just-line ou (format nil |Формат-сообщения-об-отсутствии-находок| name-or-symbol)))
+     (t
+      (when (> l 1)
+        (write-code-to-show-console ou))
+      (dolist (dal dspecs-and-locations)
+        (:@ destructuring-bind (dspec loc) dal)
+        (cond
+         ((= l 1)
+          (write-code-to-pass-to-loc ou loc :|Скакнуть-от-Лиспа-к-Яру| t))
+         (t
+          (let link-text (prin1-to-string dspec))
+          (write-one-dspec-and-location link-text loc ou :|Скакнуть-от-Лиспа-к-Яру| t))))))
+   (when (> l 1)
+     (write-code-to-see-console-end ou))))
 
 (defun print-one-hyperlink-tcl-source-for-describe (stream text file offset &key (index "output") fix-offset-p (|Скакнуть-от-Лиспа-к-Яру| t))
   "Generates tcl code which prints out one hyperlink"
@@ -237,7 +242,7 @@
 (defun server-lookup-definition-as-list (name-or-symbol &optional (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*)))
   "name-or-symbol is a name of a lisp object or object itself which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
   (let* ((dspecs-and-locations
-          (swank-find-definitions-for-clcon name-or-symbol :package-name package-name :readtable-name readtable-name))
+          (swank-find-definitions-for-clcon name-or-symbol #'swank::find-definitions :package-name package-name :readtable-name readtable-name))
          (l (length dspecs-and-locations)))
     (with-output-to-string (ou)
       (case l

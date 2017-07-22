@@ -216,18 +216,21 @@ namespace eval ::edt {
         $m add separator
 
         set cmd [wesppt [list ::edt::FindSourceCommand $btext]]
-        $m add command -label "Перейти к определению" -accel "Alt-." -command $cmd
+        $m add command -label "перейти к определению" -accel "Alt-." -command $cmd
         ::clcon_key::b bind SingleMod$w <Alt-period> $cmd
 
         ::edt::OduFnMenuItem $w $m $btext nayiti-iskhodnik-po-karte -accel <F9> -bindtag NoMod$w 
 
+        set cmd [wesppt [list ::edt::КтоВызываетФункцию $btext]]
+        $m add command -label "кто вызывает функцию" -under 6 -command $cmd 
+
         $m add separator
         set cmd [wesppt [list ::edt::LispDescribeAllCommand $btext]]
-        $m add command -label "Справка по идентиф-ру" -accel "F1" -command $cmd
+        $m add command -label "справка по идентиф-ру" -accel "F1" -command $cmd
         ::clcon_key::b bind SingleMod$w <Key-F1> $cmd
 
         set cmd [wesppt [list ::edt::SkopirovatqIdentVBuferObmena $btext]]
-        $m add command -label "Скопировать идентф-р в буфер обмена" -accel "F2" -command $cmd
+        $m add command -label "скопировать идентф-р в буфер обмена" -accel "F2" -command $cmd
         ::clcon_key::b bind SingleMod$w <Key-F2> $cmd
 
     }

@@ -127,7 +127,7 @@ namespace eval ::edt {
         }
     }
 
-    proc FindSourceContinuation {clcon_text EventAsList} {
+    proc ПоискаСвязейСимволаПродолжение {clcon_text EventAsList ИмяКоманды} {
         set Head [::mprs::Unleash [lindex $EventAsList 0]]
         ::mprs::AssertEq $Head ":return"
         set l2 [::mprs::Unleash [lindex $EventAsList 1]]
@@ -138,7 +138,7 @@ namespace eval ::edt {
             # tk_messageBox -message $proc
             apply $proc [::tkcon::CurrentConsole]
         } else {
-            tk_messageBox -parent $clcon_text -message "Команда FindSource завершилась ненормально"
+            tk_messageBox -parent $clcon_text -message "Команда ${ИмяКоманды} завершилась ненормально"
         }
         $clcon_text Unfreeze
           
@@ -170,9 +170,21 @@ namespace eval ::edt {
         ::tkcon::ПоложитьТекущуюПозициюНаPosStack $w
         
         ::clcon_text::CallOduvanchikFunction $text "odu::find-source-command nil" {{
-            ::edt::FindSourceContinuation $clcon_text $EventAsList
+            ::edt::ПоискаСвязейСимволаПродолжение $clcon_text $EventAsList "FindSource"
         }}
-    }    
+    }
+
+    # Копипаст из FindSourceCommand
+    proc КтоВызываетФункцию {text} {
+        set console [::tkcon::CurrentConsole]
+        set w [$text RealText]
+
+        ::tkcon::ПоложитьТекущуюПозициюНаPosStack $w
+        
+        ::clcon_text::CallOduvanchikFunction $text "odu::kto-vyyzyyvaet-funkciyu-command nil" {{
+            ::edt::ПоискаСвязейСимволаПродолжение $clcon_text $EventAsList "КтоВызываетФункцию"
+        }}
+    }
 
     proc FindPackage {text} {
         set console [::tkcon::CurrentConsole]

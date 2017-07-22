@@ -113,10 +113,23 @@
   (multiple-value-bind (string symbol) (get-symbol-from-current-point)
     (let ((code
            (clco:server-lookup-definition (or symbol string)
-                                           (odu::package-at-point)
-                                           (odu::readtable-at-point))))
+                                          (odu::package-at-point)
+                                          (odu::readtable-at-point))))
       code)))
 
+(defcommand "Kto Vyyzyyvaet Funkciyu" (p) "Кто вызывает функцию. Копия find-source-command"
+  ""
+  (princ "Не все вызовы через apply могут быть найдены командой 'Кто вызывает функцию!'")
+  (multiple-value-bind (string symbol) (get-symbol-from-current-point)
+    (let ((code
+           (clco:|Обслужить-команду-поиска-связей-символа| (or symbol string)
+            #'swank/backend:list-callers
+            "Точки вызова символа ~S не найдены (попробуйте поиск имени в исходниках)"
+            (odu::package-at-point)
+            (odu::readtable-at-point)
+            )))
+      code)))
+  
 (defcommand "Find Package" (p)
     "Find package source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
     ""
@@ -191,7 +204,9 @@
   "name-or-symbol is a name of a lisp object or object itself which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
   (let* ((dspecs-and-locations
           (remove-if-not (lambda (x) (eq (caar x) 'defconstant)) 
-            (clco::swank-find-definitions-for-clcon name-or-symbol :package-name package-name :readtable-name readtable-name)))
+            (clco::swank-find-definitions-for-clcon
+             name-or-symbol 'swank/backend:find-definitions
+             :package-name package-name :readtable-name readtable-name)))
          (l (length dspecs-and-locations)))
     (with-output-to-string (ou)
       (case l
