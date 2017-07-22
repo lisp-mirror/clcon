@@ -137,9 +137,8 @@ proc ::clconcmd::finf_budden_tools {searchString} {
 
 Где вызывается функция?
 -------------------------
-```
-(mapcar 'car (swank/backend:list-callers 'ODUVANCHIK-INTERNALS::UPDATE-TAG-LINE-NUMBER))
-```
+Редактор/Меню/Лисп/кто вы&зывает функцию
+
 Имейте в виду, что вызовы через apply символа с большой вероятностью не получится найти таким способом.
 
 

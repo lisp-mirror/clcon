@@ -96,7 +96,7 @@ Currently defined commands are: "
 
     # искать собственно в исходниках яра
     proc исия { str } {
-        иф [list [string cat $::tkcon::YarRoot "/ит"] [string cat $::tkcon::YarRoot "/../yar.my/док/оя-яр-1"]] $str 
+        иф [list [string cat $::tkcon::YarRoot "/ит"] [string cat $::tkcon::YarRoot "/док"] [string cat $::tkcon::YarRoot "/../yar.my/док/оя-яр-1"]] $str 
     }
 
     # 
