@@ -179,7 +179,7 @@
                 (when (= semi end) (return nil))))))))))
 
 (defun |Найти-имя-системы-из-имени-файла-или-переменных-буфера-либо-сообщение| (buffer)
-  "Находим имя системы из имени файла или из переменных в первой строчке. Если не нашли, выдаём осмысленное сообщение"
+  "Находим имя системы из имени файла или из переменных в первой строчке. Если не нашли, выдаём осмысленное сообщение. Существование системы не проверяем"
   (let* ((pathname (oduvanchik-interface:buffer-pathname buffer))
          (system-name
           (cond
@@ -194,7 +194,7 @@
      ((or (not system-name)
           (string= system-name ""))
       (format *error-output* "~&Имя системы в редакторе определено, если текущий файл редактора имеет расширение .asd или когда система задана в первой строчке текущего файла, например, так: 
-;; -*- Encoding: utf-8; System :decorate-function -*-
+;; -*- coding: utf-8; System :decorate-function -*-
 Сейчас имя не определено~%")
       nil)
      (t
@@ -202,29 +202,40 @@
 
 (defun server-lookup-system-definition (name-or-symbol package-name readtable-name)
   "name-or-symbol is a name of a lisp object or object itself which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
-  (let* ((dspecs-and-locations
-          (remove-if-not (lambda (x) (eq (caar x) 'defconstant)) 
-            (clco::swank-find-definitions-for-clcon
-             name-or-symbol 'swank/backend:find-definitions
-             :package-name package-name :readtable-name readtable-name)))
-         (l (length dspecs-and-locations)))
-    (with-output-to-string (ou)
-      (case l
-        (0 (clco::print-just-line ou (format nil "No definitions found for ~A" name-or-symbol)))
-        (t
-         (when (> l 1)
-           (clco::write-code-to-show-console ou))
-         (dolist (dal dspecs-and-locations)
-           (destructuring-bind (dspec loc) dal
-             (cond
-               ((= l 1)
-                (clco::write-code-to-pass-to-loc ou loc :fix-offset-p t))
-               (t
-                (let ((link-text (prin1-to-string dspec)))
-                  (clco::write-one-dspec-and-location link-text loc ou :fix-offset-p t))))))
-         (when (> l 1)
-           (clco::write-code-to-see-console-end ou))
-         )))))
+  (perga-implementation:perga
+   (let Каноническое-имя (asdf:coerce-name name-or-symbol))
+   (let Система (asdf:find-system Каноническое-имя))
+   (let Показать-консоль t)
+   (:@ with-output-to-string (ou))
+   (cond
+    (Система
+     (let dspecs-and-locations
+       (remove-if-not (lambda (x) (eq (caar x) 'defconstant)) 
+                      (clco::swank-find-definitions-for-clcon
+                       name-or-symbol 'swank/backend:find-definitions
+                       :package-name package-name :readtable-name readtable-name)))
+     (let l (length dspecs-and-locations))
+     (case l
+       (0
+        (clco::print-just-line ou (format nil "Определения для системы ~S не найдены" Каноническое-имя)))
+       (t
+        (when (> l 1)
+          (clco::write-code-to-show-console ou))
+        (dolist (dal dspecs-and-locations)
+          (:@ destructuring-bind (dspec loc) dal)
+          (cond
+           ((= l 1)
+            (setf Показать-консоль nil)
+            (clco::write-code-to-pass-to-loc ou loc :fix-offset-p t))
+           (t
+            (let link-text (prin1-to-string dspec))
+            (clco::write-one-dspec-and-location link-text loc ou :fix-offset-p t)))))))
+    (t ; т.е. нет системы
+     (clco::print-just-line ou (format nil "Система ~S не найдена" Каноническое-имя))
+     ))
+   (when Показать-консоль
+     (clco::write-code-to-show-console ou)
+     (clco::write-code-to-see-console-end ou))))
 
 (defcommand "Find System" (p)
     "Find system (.asd) source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
