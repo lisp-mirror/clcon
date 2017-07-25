@@ -11,8 +11,11 @@ namespace eval ::clcon {
 
  variable УскорителиДляЭкраннойКлавиатуры {1 2 3 4 5 6 7 8 9 0}
 
+ variable Клавиатура {1☼ | 2@ | 3# | 4$ | 5° | 6^ | 7& | qq | ww | }
+
  proc keyboard {w args} {
    variable УскорителиДляЭкраннойКлавиатуры
+   variable Клавиатура
    frame $w
    array set opts {
       -keys {0x21-0x7E} -title "" -keysperline 16 -dir l2r -receiver ""
@@ -24,15 +27,19 @@ namespace eval ::clcon {
                -sticky news -columnspan $opts(-keysperline)
       }
    set j 0
-   foreach i [clist2list $opts(-keys)] {
-      set c [format %c $i]
+   foreach i ${Клавиатура} {
+      if {$i == "|"} continue
+#   foreach i [clist2list $opts(-keys)] 
+      set c [string range $i 1 1]
+      puts $c
       set cmd "$opts(-receiver) insert insert [list $c]"
       if {$opts(-dir)=="r2l"} {
          append cmd ";$opts(-receiver) mark set insert {insert - 1 chars}"
       } ;# crude approach to right-to-left (Arabic, Hebrew) 
       append cmd ";destroy .ЭкраннаяКлавиатура"
       button $w.k$i -text $c -command $cmd  -padx 5 -pady 0
-      set Key [string cat "<Key-" [lindex ${УскорителиДляЭкраннойКлавиатуры} $j] ">"]
+      set Key [string cat "<Key-" [string range $i 0 0] ">"]
+#      set Key [string cat "<Key-" [lindex ${УскорителиДляЭкраннойКлавиатуры} $j] ">"]
       bind .ЭкраннаяКлавиатура $Key $cmd
       lappend klist $w.k$i
       if {[incr n]==$opts(-keysperline)} {
