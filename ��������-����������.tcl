@@ -9,13 +9,12 @@ namespace eval ::clcon {
 #-dir direction: if "r2l", moves cursor one to the left after each keypress. Useful for Arab/Hebrew. Default: l2r.
 #-receiver widgetpath: Name of a text widget to receive the keystrokes at its insert cursor.
 
- variable УскорителиДляЭкраннойКлавиатуры {1 2 3 4 5 6 7 8 9 0}
-
- variable Клавиатура {1☼ | 2@ | 3# | 4$ | 5° | 6^ | 7& | qq | ww | }
+ variable МакетКлавиатуры {1☼ | 2@ | 3# | 4$ | 5° | 6^ | 7& |
+  | qQ | wW |
+ }
 
  proc keyboard {w args} {
-   variable УскорителиДляЭкраннойКлавиатуры
-   variable Клавиатура
+   variable МакетКлавиатуры
    frame $w
    array set opts {
       -keys {0x21-0x7E} -title "" -keysperline 16 -dir l2r -receiver ""
@@ -27,7 +26,7 @@ namespace eval ::clcon {
                -sticky news -columnspan $opts(-keysperline)
       }
    set j 0
-   foreach i ${Клавиатура} {
+   foreach i ${МакетКлавиатуры} {
       if {$i == "|"} continue
 #   foreach i [clist2list $opts(-keys)] 
       set c [string range $i 1 1]
@@ -39,8 +38,7 @@ namespace eval ::clcon {
       append cmd ";destroy .ЭкраннаяКлавиатура"
       button $w.k$i -text $c -command $cmd  -padx 5 -pady 0
       set Key [string cat "<Key-" [string range $i 0 0] ">"]
-#      set Key [string cat "<Key-" [lindex ${УскорителиДляЭкраннойКлавиатуры} $j] ">"]
-      bind .ЭкраннаяКлавиатура $Key $cmd
+      ::clcon_key::b bind .ЭкраннаяКлавиатура $Key $cmd
       lappend klist $w.k$i
       if {[incr n]==$opts(-keysperline)} {
         eval grid $klist -sticky news
