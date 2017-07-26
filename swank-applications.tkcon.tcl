@@ -119,12 +119,12 @@ proc ::tkcon::ReturnPos {} {
     }
 }
 
-# Opens file at that offset (in chars). See also ::tkcon::EditFileAtLine
+# Opens file at that offset, offset - согласно рук-ву по виджету text, подраздел INDICES. See also ::tkcon::EditFileAtLine 
 proc ::tkcon::EditFileAtOffset {filename offset} {
     variable OPT
     $OPT(edit) -type file -wrap char -offset $offset -- $filename
     #see offset - incoroporate it into edit.
-    # $w mark set insert "1.0+ $offset chars"
+    #??? $w mark set insert $offset 
     # focus -force $editor
 }
 
