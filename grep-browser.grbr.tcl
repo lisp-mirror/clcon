@@ -14,8 +14,8 @@ namespace eval ::grbr {
             installhull using toplevel
         }
         method set_font {size} {
-            variable ::Fonts
-            set font [lindex $::Fonts $size]
+            variable ::tkcon::OPT
+            set font [lindex $::tkcon::OPT(шрифты) $size]
             [HeaderOfGrepBrowser $self] configure -font $font
             [GetTitleListMenuTbl $self] configure -font $font
         }
@@ -239,7 +239,6 @@ namespace eval ::grbr {
         $m add separator
 
         ::tkcon::ВставитьВМенюПунктыПроШрифты $m $w {{Виджет КодРазмера} {
-            variable ::Fonts 
             ${Виджет} set_font ${КодРазмера}}
         }
     }

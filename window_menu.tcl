@@ -163,10 +163,6 @@ proc ::tkcon::HistoryMenu m {
 proc ::tkcon::ВставитьВМенюПунктыПроШрифты { m w Опр-функ } {
 # Опр-функ имеет вид {{Виджет КодРазмера} ...Команды для установки размера...}
 
-    #set л {{Виджет КодРазмера} {
-    #    variable ::Fonts 
-    #    ${Виджет} set_font ${КодРазмера}}}
-
     set cmd [list apply ${Опр-функ} $w 0]
     $m add command -label "м. Маленький шрифт" -command $cmd -under 0
 

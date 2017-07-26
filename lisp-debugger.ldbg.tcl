@@ -622,8 +622,8 @@ namespace eval ::ldbg {
         $m add separator
 
         ::tkcon::ВставитьВМенюПунктыПроШрифты $m $w {{Виджет КодРазмера} {
-            variable ::Fonts
-            set Шрифт [lindex $::Fonts ${КодРазмера}]
+            variable ::tkcon::OPT
+            set Шрифт [lindex $::tkcon::OPT(шрифты) ${КодРазмера}]
             set w [::ldbg::GetFramesTablelist ${Виджет}]
             $w configure -font ${Шрифт}
             set w [::ldbg::GetTitleTextWidget ${Виджет}]

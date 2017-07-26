@@ -242,6 +242,7 @@ proc btext::buildArgParseTable win {
 }
 
 proc btext::instanceCmd {self cmd args} {
+    variable ::tkcon::OPT
 
     # We don't need to disable it in the release as it acts on logging only
     #if {[::edt::Bi2btext "buf1"] eq $self} {
@@ -377,7 +378,7 @@ proc btext::instanceCmd {self cmd args} {
 	}
 
         set_font {
-            $self configure -font [lindex $::Fonts [lindex $args 0]]
+            $self configure -font [lindex $::tkcon::OPT(шрифты) [lindex $args 0]]
         }
 
 	default {

@@ -271,6 +271,7 @@ proc ::tkcon::Init {args} {
 	edit		::edt::edit
 	tclexpandorder	{Variable Procname}
 	font		{}
+        шрифты           { {courier 8} {Courier 10 bold} {Courier 12 bold} }
 	history		500
 	hoterrors	1
 	library		{}
@@ -455,13 +456,6 @@ proc ::tkcon::Init {args} {
 	catch {source [file join $dir pkgIndex.tcl]}
     }
     catch {tclPkgUnknown dummy-name dummy-version}
-
-    # Вроде здесь уже загрузились пользовательские настройки
-    variable ::Fonts
-    if {![info exists ::Fonts]} {
-        set ::Fonts { {courier 8} {Courier 10 bold} {Courier 12 bold} }
-    }
-
 
     ## Handle rest of command line arguments after sourcing resource file
     ## and slave is created, but before initializing UI or setting packages.
@@ -1414,8 +1408,8 @@ proc ::tkcon::InitMenus {w title} {
 
         $m add separator
         ::tkcon::ВставитьВМенюПунктыПроШрифты $m $text {{Виджет КодРазмера} {
-            variable ::Fonts 
-            ${Виджет} configure -font [lindex $::Fonts ${КодРазмера}]
+            variable OPT 
+            ${Виджет} configure -font [lindex $::tkcon::OPT(шрифты) ${КодРазмера}]
         }}
     }
 

@@ -389,7 +389,6 @@ namespace eval ::edt {
         bind NoMod$w <Key-F4> $cmd
 
         ::tkcon::ВставитьВМенюПунктыПроШрифты $m $btext {{Виджет КодРазмера} {
-            variable ::Fonts 
             ${Виджет} set_font ${КодРазмера}}
         }
 
