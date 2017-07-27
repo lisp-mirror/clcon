@@ -71,17 +71,18 @@
   
 (defun edit-file-at-offset-code (file offset fix-offset-p |Скакнуть-от-Лиспа-к-Яру|)
   "offset считается от 1. Это не соответствует ни file-position, ни позиции в буквах"
-  (when fix-offset-p
-    ;; fix-offset-2 принимает смещения от 0, а у нас offset от 1, поэтому дважды преобразовываем
-    (multiple-value-bind (newfile offset-15) (fix-offset-2 file (- offset 1))
-      (incf offset-15) 
-      (setf file newfile offset offset-15)))
-  (when |Скакнуть-от-Лиспа-к-Яру|
-    (multiple-value-setq (file offset) (|Скакнуть-от-Лиспа-к-Яру| file offset)))
-  (let* ((escaped-file (tcl-escape-filename file))
-         (offset-2 (format nil "{1.0+ ~A chars}"
-                           (- offset 1)
-                           )))
+  ;; сейчас нам будет более полезен offset, к-рый считается от 0
+  (perga-implementation:perga
+   (let offset-z (- offset 1))
+   (when fix-offset-p
+     (multiple-value-bind (newfile offset-15) (fix-offset-2 file offset-z)
+       (setf file newfile offset-z offset-15)))
+   (when |Скакнуть-от-Лиспа-к-Яру|
+     (multiple-value-setq (file offset-z) (|Скакнуть-от-Лиспа-к-Яру| file offset-z)))
+   (let escaped-file (tcl-escape-filename file))
+   (let offset-2 (format nil "{1.0+ ~A chars}"
+                         offset-z
+                         ))
     (format nil "::tkcon::EditFileAtOffset ~A ~A" escaped-file offset-2)))
 
 (defun print-one-hyperlink-tcl-source (stream text file offset &key (index "output") fix-offset-p (|Скакнуть-от-Лиспа-к-Яру| t))
