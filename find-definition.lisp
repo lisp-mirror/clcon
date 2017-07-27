@@ -50,10 +50,10 @@
   row-col-offset. См. также BUDDEN-TOOLS::input-stream-position-in-chars"
   (КАРТЫ-ИСХОДНИКОВ-ЛИЦО:fix-offset-2 pathname offset))
 
-(defparameter +Магическая-поправка-позиции-в-файле-Яра-при-скачке-от-лиспа-к-Яру+ -1)
+(defparameter |+Нужно-добавить-к-смещению-считаемому-от-0-для-получения-смещения-считаемого-от-1+| -1)
 
 (defun |Скакнуть-от-Лиспа-к-Яру| (file offset-in-chars)
-  "Если месту сопоставлен исходник Яра, вернуть файл и значение как множ.знач. Если не сопоставлен, выругаться и вернуть свои аргументы. На данный момент просто ищет в картах модуля :КАРТЫ-ИСХОДНИКОВ-ЛИЦО"
+  "Если месту сопоставлен исходник Яра, вернуть файл и смещение (считаемое от 1) как множ.знач. Если не сопоставлен, выругаться и вернуть свои аргументы. На данный момент просто ищет в картах модуля :КАРТЫ-ИСХОДНИКОВ-ЛИЦО"
   (perga-implementation:perga
    (let targets (budden-tools::l/find-sources-in-file file offset-in-chars :strict t))
    (cond
@@ -61,12 +61,13 @@
      (let target (car targets))
      (let target-file (КАРТЫ-ИСХОДНИКОВ-ЛИЦО:SLO-SOURCE-В-ИМЯ-ФАЙЛА (first target))) ; FIXME Записывать позиции единообразно, например, с помощью olm. 
      (let offset (second target))
-     (incf offset +Магическая-поправка-позиции-в-файле-Яра-при-скачке-от-лиспа-к-Яру+)
+     (incf offset |+Нужно-добавить-к-смещению-считаемому-от-0-для-получения-смещения-считаемого-от-1+|)
      (values target-file offset))
     (t
-     (let *print-readably* nil)
-     (warn "Скакнуть-от-Лиспа-к-Яру: этого места нет в картах исходников ~S ~S"
-           file offset-in-chars)
+     ;; нижеследующее можно включить при сомнениях насчёт работы скачка от лиспа к Яру
+     ;(let *print-readably* nil)
+     ;(warn "Скакнуть-от-Лиспа-к-Яру: этого места нет в картах исходников ~S ~S"
+     ;      file offset-in-chars)
      (values file offset-in-chars)))))
   
 (defun edit-file-at-offset-code (file offset fix-offset-p |Скакнуть-от-Лиспа-к-Яру|)
@@ -123,10 +124,10 @@
         (t ; something wrong with location
          (print-just-line stream printed-dspec :index index))))))
 
-(defun write-code-to-pass-to-loc (stream loc &key (|Магическое-смещение| 0) (mode :text) fix-offset-p (|Скакнуть-от-Лиспа-к-Яру| t))
+(defun write-code-to-pass-to-loc (stream loc &key (|Поправка-location-position| 0) (mode :text) fix-offset-p (|Скакнуть-от-Лиспа-к-Яру| t))
   "Writes code which would help to pass to location. 
 
-   Магическое смещение нужно, поскольку у нас почему-то location из отладчика, из определения и из поиска ошибки компиляции приходят в разных системах координат: определение и поиск ошибки считают position от 1 (т.е. 1 - это начало файла), а отладчик - от 0. Поскольку я не могу найти, где эта проблема (возможно она из-за старости нашего SLIME, мы прост будем принимать такой параметр. Магическое смещение применяется только в файлах лиспа, при перескоке к файлу ЯРа не применяется. См. также 
+   Поправка-location-position - см. |+Поправка-location-position-для-frame-source-location+|
 
    If mode = :text we will insert the code into text widget. 
    If mode = :eval we will eval the code in the context where $w contains some widget. 
@@ -138,7 +139,7 @@
     (cond
      ((and file offset)
       (format stream "~A; " 
-              (edit-file-at-offset-code file (+ offset |Магическое-смещение|) fix-offset-p |Скакнуть-от-Лиспа-к-Яру|))
+              (edit-file-at-offset-code file (+ offset |Поправка-location-position|) fix-offset-p |Скакнуть-от-Лиспа-к-Яру|))
       (budden-tools:show-expr offset))
      (t
       (let* ((qLocation (cl-tk:tcl-escape (prin1-to-string loc)))
@@ -272,19 +273,22 @@
 ;;     (let ((exp (macroexpand original-exp lexenv)))
 ;;       (handler-bind "))
 
-(defconstant +|Магическое-смещение-для-отладчика|+ 1
+;;+|Поправка-location-position-для-frame-source-location|+
+;;нужно, поскольку у нас почему-то location из отладчика, из определения и из поиска ошибки компиляци;;и приходят в разных системах координат: определение и поиск ошибки считают position от 1 (т.е. 1 - ;;это начало файла), а отладчик - от 0. Поскольку я не могу найти, где эта проблема (возможно она из-;;за старости нашего SLIME), мы просто будем принимать такой параметр там, где надо (см. применения)
+
+(defconstant +|Поправка-location-position-для-frame-source-location|+ 1
   "См. write-code-to-pass-to-loc")
 
 (defun ldbg-edit-frame-source-location (frame-id parent)
   "We have frame id. Make IDE to open that location. Parent is a widget. If we unable to locate to source, we will issue a message with this widget as a parent"
-  (edit-swank-format-location (swank:frame-source-location frame-id) parent :|Магическое-смещение| +|Магическое-смещение-для-отладчика|+))
+  (edit-swank-format-location (swank:frame-source-location frame-id) parent :|Поправка-location-position| +|Поправка-location-position-для-frame-source-location|+))
 
-(defun edit-swank-format-location (location parent &key (|Магическое-смещение| 0))
-  "location - из EMACS. parent - widget отладчика (см. примеры). Если мы не можем попасть в исходник, мы сообщаем об этом, а видгет является родителем сообщения. Магическое-смещение описано в write-code-to-pass-to-loc"
+(defun edit-swank-format-location (location parent &key (|Поправка-location-position| 0))
+  "location - из EMACS. parent - widget отладчика (см. примеры). Если мы не можем попасть в исходник, мы сообщаем об этом, а видгет является родителем сообщения. Поправка-location-position описано в write-code-to-pass-to-loc"
   (assert (listp location))  
   (let ((code (with-output-to-string (ou)
                 (write-code-to-pass-to-loc ou location
-                                           :|Магическое-смещение| |Магическое-смещение|
+                                           :|Поправка-location-position| |Поправка-location-position|
                                            :mode :eval :|Скакнуть-от-Лиспа-к-Яру| t))))
     (eval-in-tcl (format nil "set w ~A; ~A" parent code))
     ))
