@@ -1446,7 +1446,7 @@ proc ::tkcon::InitMenus {w title} {
 	$mm add radio -label "Справа" -value right \
 		-variable ::tkcon::OPT(scrollypos) \
 		-command { grid configure $::tkcon::PRIV(scrolly) -column 2 }
-        $m add command -label "6.Редактировать файл инициализации" -command ::clconcmd::редактировать_файл_иницаилизации
+        $m add command -label "6.Редактировать файл инициализации" -underline 0 -command ::clconcmd::редактировать_файл_иницаилизации
     }
 
     ## 5.История

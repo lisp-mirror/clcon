@@ -9,7 +9,7 @@ namespace eval ::clcon {
 #-dir direction: if "r2l", moves cursor one to the left after each keypress. Useful for Arab/Hebrew. Default: l2r.
 #-receiver widgetpath: Name of a text widget to receive the keystrokes at its insert cursor.
 
- variable МакетКлавиатуры { 1× | 2÷ | 
+ variable МакетКлавиатуры { 1× | 2÷ | 3ₒ | 4ₓ | 5• | 6Ø 
   | qQ | wW |
  }
 
