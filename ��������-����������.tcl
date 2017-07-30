@@ -9,9 +9,13 @@ namespace eval ::clcon {
 #-dir direction: if "r2l", moves cursor one to the left after each keypress. Useful for Arab/Hebrew. Default: l2r.
 #-receiver widgetpath: Name of a text widget to receive the keystrokes at its insert cursor.
 
- variable МакетКлавиатуры { 1× | 2÷ | 3ₒ | 4ₓ | 5• | 6Ø 
-  | qQ | wW |
- }
+ variable МакетКлавиатуры {
+|`~|1×|2÷|3ₒ|4ₓ|5•|6Ø|7&|8*|9(|0)|-N|=+|   |
+| |qQ|wW|ee|rr|tt|yy|uu|ii|oo|pp|[[|]]|
+|  |aa|ss|dd|ff|gg|hh|jj|kk|ll|::|;;|"N|\B|
+|   |zz|xx|cc|vv|bb|nn|mm|,,|..|//|
+}
+
 
  proc keyboard {w args} {
    variable МакетКлавиатуры
@@ -22,27 +26,42 @@ namespace eval ::clcon {
    array set opts $args ;# no errors checked 
    set klist {}; set n 0
    if {$opts(-title)!=""} {
-      grid [label $w.title -text $opts(-title) ] \
-               -sticky news -columnspan $opts(-keysperline)
+      pack [label $w.title -text $opts(-title) ] 
       }
    set j 0
-   foreach i ${МакетКлавиатуры} {
-      if {$i == "|"} continue
-#   foreach i [clist2list $opts(-keys)] 
-      set c [string range $i 1 1]
-      puts $c
+   array set seen {}
+   set r 1
+   frame $w.row$r
+   pack $w.row$r
+   foreach i [split ${МакетКлавиатуры} "|"] {
+      set c [string index [string trim $i] 1]      
+      set key [string index [string trim $i] 0]
+      set empty [expr {$key == ""}]
+      set newline [expr {"\n" eq [string index $i [expr [string length $i]-1]]}]
+      if {$newline} {
+        set i [string range $i 0 [expr [string length $i]-2]]
+      }
+      if {!$empty && [info exists seen($key)]} {
+        error "Кнопка $key уже есть"
+      }
+      set seen($key) 1
       set cmd "$opts(-receiver) insert insert [list $c]"
       if {$opts(-dir)=="r2l"} {
          append cmd ";$opts(-receiver) mark set insert {insert - 1 chars}"
       } ;# crude approach to right-to-left (Arabic, Hebrew) 
       append cmd ";destroy .ЭкраннаяКлавиатура"
-      button $w.k$i -text $c -command $cmd  -padx 5 -pady 0
-      set Key [string cat "<Key-" [string range $i 0 0] ">"]
-      ::clcon_key::b bind .ЭкраннаяКлавиатура $Key $cmd
-      lappend klist $w.k$i
-      if {[incr n]==$opts(-keysperline)} {
+      button $w.row$r.k$j -text $i -command $cmd  -padx 0 -pady 0
+      set Key [string cat "<Key-" $key ">"]
+      if {!$empty} {
+        ::clcon_key::b bind .ЭкраннаяКлавиатура $Key $cmd
+      }
+      lappend klist $w.row$r.k$j
+      if {$newline} {
         eval grid $klist -sticky news
         set n 0; set klist {}
+        set r [expr $r + 1]
+        frame $w.row$r
+        pack $w.row$r
       }
       set j [expr $j + 1]
     }
