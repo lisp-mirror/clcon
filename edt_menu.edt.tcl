@@ -219,7 +219,8 @@ namespace eval ::edt {
         $m add command -label "перейти к определению" -accel "Alt-." -command $cmd
         ::clcon_key::b bind SingleMod$w <Alt-period> $cmd
 
-        ::edt::OduFnMenuItem $w $m $btext nayiti-iskhodnik-po-karte -accel <F9> -bindtag NoMod$w 
+        ::edt::OduFnMenuItem $w $m $btext nayiti-iskhodnik-po-karte -accel <Control-F9> -bindtag SingleMod$w 
+        ::edt::OduFnMenuItem $w $m $btext yar-nayiti-iskhodnik -accel <F9> -bindtag NoMod$w 
 
         set cmd [wesppt [list ::edt::КтоВызываетФункцию $btext]]
         $m add command -label "кто вызывает функцию" -under 6 -command $cmd 
