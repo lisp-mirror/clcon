@@ -47,39 +47,47 @@
 
 (defun fix-offset-2 (pathname offset) ; корректирует и скачет к лиспу. 
   "Имеется числовой offset, к-рый вернул file-position. Давайте попробуем превратить его в 
-  row-col-offset. См. также BUDDEN-TOOLS::input-stream-position-in-chars"
+  row-col-offset. См. также BUDDEN-TOOLS::input-stream-position-in-chars, КАРТЫ-ИСХОДНИКОВ-ЛИЦО:FIX-OFFSET-2, editor-budden-tools::fix-offset-with-no-of-newlines"
   (КАРТЫ-ИСХОДНИКОВ-ЛИЦО:fix-offset-2 pathname offset))
 
-(defparameter |+Нужно-добавить-к-смещению-считаемому-от-0-для-получения-смещения-считаемого-от-1+| -1)
+(defparameter |+Нужно-добавить-к-смещению-считаемому-от-0-для-получения-смещения-считаемого-от-1+| 1)
 
-(defun |Скакнуть-от-Лиспа-к-Яру| (file offset-in-chars)
-  "Если месту сопоставлен исходник Яра, вернуть файл и смещение (считаемое от 1) как множ.знач. Если не сопоставлен, выругаться и вернуть свои аргументы. На данный момент просто ищет в картах модуля :КАРТЫ-ИСХОДНИКОВ-ЛИЦО"
+(defun |Скакнуть-от-Лиспа-к-Яру| (file offset-1-based)
+  "Если месту сопоставлен исходник Яра, вернуть файл и смещение (считаемое в координатах КАРТЫ-ИСХОДНИКОВ-ТЕЛО::|Система-координат| = |сико-ПБу|, т.е. от 1 в литерах) как множ.знач. Если не сопоставлен, выругаться и вернуть свои аргументы. На данный момент просто ищет в картах модуля :КАРТЫ-ИСХОДНИКОВ-ЛИЦО
+   offset-1-based - "
   (perga-implementation:perga
-   (let targets (budden-tools::l/find-sources-in-file file offset-in-chars :strict t))
+   (let targets (budden-tools::l/find-sources-in-file file offset-1-based :strict t))
    (cond
     (targets
      (let target (car targets))
      (let target-file (КАРТЫ-ИСХОДНИКОВ-ЛИЦО:SLO-SOURCE-В-ИМЯ-ФАЙЛА (first target))) ; FIXME Записывать позиции единообразно, например, с помощью olm. 
-     (let offset (second target))
-     (incf offset |+Нужно-добавить-к-смещению-считаемому-от-0-для-получения-смещения-считаемого-от-1+|)
-     (values target-file offset))
+     (let target-offset-1-based (second target))
+     (values target-file target-offset-1-based))
     (t
      ;; нижеследующее можно включить при сомнениях насчёт работы скачка от лиспа к Яру
      ;(let *print-readably* nil)
      ;(warn "Скакнуть-от-Лиспа-к-Яру: этого места нет в картах исходников ~S ~S"
      ;      file offset-in-chars)
-     (values file offset-in-chars)))))
-  
-(defun edit-file-at-offset-code (file offset fix-offset-p |Скакнуть-от-Лиспа-к-Яру|)
-  "offset считается от 1. Это не соответствует ни file-position, ни позиции в буквах"
+     (values file offset-1-based)))))
+
+(defconstant +Надо-добавить-для-перехода-от-колонки-к-колонке-Tk+ -1)
+
+(defun edit-file-at-offset-code (file offset-1-based fix-offset-p |Скакнуть-от-Лиспа-к-Яру|)
+  "offset считается от 1, см. КАРТЫ-ИСХОДНИКОВ-ТЕЛО::|Система-координат| - |сико-ПБу|"
   ;; сейчас нам будет более полезен offset, к-рый считается от 0
   (perga-implementation:perga
-   (let offset-z (- offset 1))
+   (let offset-z (- offset-1-based clco::|+Нужно-добавить-к-смещению-считаемому-от-0-для-получения-смещения-считаемого-от-1+|))
    (when fix-offset-p
+     (break "нахуа?")
      (multiple-value-bind (newfile offset-15) (fix-offset-2 file offset-z)
        (setf file newfile offset-z offset-15)))
    (when |Скакнуть-от-Лиспа-к-Яру|
-     (multiple-value-setq (file offset-z) (|Скакнуть-от-Лиспа-к-Яру| file offset-z)))
+     (let offset-1-again
+       (+ offset-z clco::|+Нужно-добавить-к-смещению-считаемому-от-0-для-получения-смещения-считаемого-от-1+|))
+     (multiple-value-setq (file offset-1-again)
+       (|Скакнуть-от-Лиспа-к-Яру| file offset-1-again))
+     (setf offset-z
+           (- offset-1-again clco::|+Нужно-добавить-к-смещению-считаемому-от-0-для-получения-смещения-считаемого-от-1+|)))
    (let escaped-file (tcl-escape-filename file))
    (let offset-2 (format nil "{1.0+ ~A chars}"
                          offset-z
@@ -154,7 +162,6 @@
            )))
       ))))
 
-(defconstant +Надо-добавить-для-перехода-от-колонки-к-колонке-Tk+ -1)
 
 (defmethod editor-budden-tools:goto-xy (pathname row col)
   (check-type row integer)
