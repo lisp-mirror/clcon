@@ -78,7 +78,8 @@
   (perga-implementation:perga
    (let offset-z (- offset-1-based clco::|+Нужно-добавить-к-смещению-считаемому-от-0-для-получения-смещения-считаемого-от-1+|))
    (when fix-offset-p
-     (break "нахуа?")
+     ;; Используется, когда работаем с файлами лиспа, где смещение иногда указано как
+     ;; КАРТЫ-ИСХОДНИКОВ-ТЕЛО::|Система-координат| - "сико-ПФ"
      (multiple-value-bind (newfile offset-15) (fix-offset-2 file offset-z)
        (setf file newfile offset-z offset-15)))
    (when |Скакнуть-от-Лиспа-к-Яру|
@@ -201,10 +202,10 @@
 (defun write-code-to-see-console-end (stream)
   (format stream "::$::tkcon::PRIV(console) see end; "))
 
-(defun server-lookup-definition (name-or-symbol &optional (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*)))
-  (|Обслужить-команду-поиска-связей-символа| name-or-symbol #'swank/backend:find-definitions "Определения символа ~S не найдены" package-name readtable-name))
+(defun server-lookup-definition (name-or-symbol &key (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*) |В-ошибке-показывать-символ-как|))
+  (|Обслужить-команду-поиска-связей-символа| name-or-symbol #'swank/backend:find-definitions "Определения символа ~S не найдены" name-or-symbol package-name readtable-name))
 
-(defun |Обслужить-команду-поиска-связей-символа| (name-or-symbol |Функция-возвращающая-места| |Формат-сообщения-об-отсутствии-находок| &optional (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*)))
+(defun |Обслужить-команду-поиска-связей-символа| (name-or-symbol |Функция-возвращающая-места| |Формат-сообщения-об-отсутствии-находок| |В-ошибке-показывать-символ-как| package-name readtable-name)
   "По аналогии с server-lookup-definition"
   (perga-implementation:perga
    (let dspecs-and-locations
@@ -256,7 +257,7 @@
         (t ; something wrong with location
          (print-just-line stream printed-dspec :index index))))))
 
-(defun server-lookup-definition-as-list (name-or-symbol &optional (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*)))
+(defun server-lookup-definition-as-list (name-or-symbol &key (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*)))
   "name-or-symbol is a name of a lisp object or object itself which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
   (let* ((dspecs-and-locations
           (swank-find-definitions-for-clcon name-or-symbol #'swank::find-definitions :package-name package-name :readtable-name readtable-name))
@@ -368,8 +369,8 @@
   nil)
 
 ;get-token-prefix
-
-(defun server-hyperdoc-lookup (name-or-symbol &optional (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*)))
+  
+(defun server-hyperdoc-lookup (name-or-symbol &key (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*)))
   "name-or-symbol is a name of a lisp object or object itself which can have definition. Returns a string which must be evaluated in tcl to print hypertext menu of links OR to jump to a location directly"
   (perga-implementation:perga
     (:@ multiple-value-bind (symbol found) 
