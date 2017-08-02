@@ -7,8 +7,8 @@ namespace eval ::clcon {
 #-receiver widgetpath: Name of a text widget to receive the keystrokes at its insert cursor.
 
  variable МакетКлавиатуры {
-|`~|1×|2÷|3ₒ|4ₓ|5•|6Ø|7&|8*|9(|0)|-N|=+|   |
-| |qQ|wW|ee|rr|tt|yy|uu|ii|oo|pp|[[|]]|||
+|`~|1×|2÷|3ₒ|4ₓ|5•|6Ø|7&|8*|9(|0)|-N|=+|
+| |qQ|wW|ee|rr|tt|yy|uu|ii|oo|pp|[откр-фигурная-скобка|]закр-фигурная-скобка|  |
 |  |aa|ss|dd|ff|gg|hh|jj|kk|ll|::|;;|""|\вертикальная-черта|
 |   |zz|xx|cc|vv|bb|nn|mm|,,|..|//|
 }
@@ -30,8 +30,8 @@ namespace eval ::clcon {
    pack $w.row$r
    foreach i [split ${МакетКлавиатуры} "|"] {
       set i [string map {вертикальная-черта "|"} $i]
-      set i [string map {откр-фигурная-скобка "{"} $i]
-      set i [string map {закр-фигурная-скобка "}"} $i]
+      set i [string map {откр-фигурная-скобка "\{"} $i]
+      set i [string map {закр-фигурная-скобка "\}"} $i]
       set c [string index [string trim $i] 1]      
       set key [string index [string trim $i] 0]
       if {$key == "`"} {set key quoteleft}
