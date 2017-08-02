@@ -64,8 +64,8 @@ else
 - document `*READTABLE-ALIST*`
 
 ### Objections
-- some code is already adapted to current state of things and will break from that decision
-- mass update is required, not only for maintained libraries, but for unmaintained also
+- some code is already adapted to current state of things and SLIME will be confused from that decision
+- to keep SLIME working, one have to include IN-READTABLE form into each file, which is hard for 3-d party libs
 
 ## Maybe a better solution
 
