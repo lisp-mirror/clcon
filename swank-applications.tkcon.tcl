@@ -164,7 +164,7 @@ proc ::tkcon::CallLispFunctionOnCurrentConsoleSymbol {text_widget lisp_fn tcl_co
     
     set Quoted [QuoteLispObjToString $str]
     set Package [QuoteLispObjToString $PRIV(CurrentPackageName)]
-    set LispCmd "($lisp_fn $Quoted $Package)"
+    set LispCmd "($lisp_fn $Quoted :package-name $Package)"
    
     ::tkcon::EvalInSwankAsync $LispCmd "[list $tcl_continuation_fn] \$EventAsList" {:repl-thread}
 }

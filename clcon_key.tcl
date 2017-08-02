@@ -1,35 +1,17 @@
-﻿########### Namespace ####################################
+## (С) Денис Будяк 2015-2017 - MIT (X11) лицензия 
+## Хотим знать, на какую кнопку нажал пользователь, независимо от ОС и включённой раскладки (а верхний регистр?)
+## Это знание нужно нам для того, чтобы создавать сочетания типа Ctrl-P, работающие независимо от текущей раскладки
+## Вычислить это нельзя, поэтому мы составили таблицы, какая кнопка чему соответствует, нажимая (вручную) кнопки и записывая
+## результаты. См. комментарии у таблиц.
+## С нестандартными раскладками у вас могут быть проблемы (биндинги не будут работать правильно).
+
+########### Namespace ####################################
    
 namespace eval ::clcon_key {
     variable LetterMap
     }
 
-
-########### Procs ########################################
-
-proc ::clcon_key::FillLetterMapWin32 {} {
-    variable LetterMap
-    set LetterMap [dict create]
-    set originals [aux2]
-    set Russians [aux1win32]
-    set i 0
-    foreach o $originals {
-        set Bucket [list]
-        set isLetter [expr {[string length $o] == 1}]
-        if {$isLetter} {
-            lappend Bucket [string toupper $o]
-        }
-        set Russian [lindex [lindex $Russians $i] 1]
-        set CapitalRussian [string toupper $Russian 0 0]
-        lappend Bucket $Russian $CapitalRussian
-        dict set LetterMap $o $Bucket
-        incr i
-    }
-    dict set LetterMap i {I oslash Ooblique}
-    dict set LetterMap x {X division multiply}
-    dict set LetterMap z {Z ydiaeresis ssharp}
-}
-
+## То, что tk выдаёт в %K при нажатии соответствующей русской буквы на клавиатуре в русской раскладке под Windows
 ## Сочетания получены с помощью 
 ## util/keytest-for-clcon.tcl , к-рый надо открыть и далее Меню/Tcl/Отправить текст в подчинённый интерпретатор
 proc ::clcon_key::aux1win32 {} {return {
@@ -68,11 +50,23 @@ proc ::clcon_key::aux1win32 {} {return {
     } {я ydiaeresis}
 }}
 
+## То, что tk выдаёт в %K при нажатии русской буквы на клавиатуре в английской раскладке под Windows в нижнем регистре
+## Порядок букв - от а до я
 proc clcon_key::aux2 {} {
   return {f comma d u l t quoteleft semicolon p b q r k v y j g h c n e a bracketleft w x i o bracketright s m quoteright period z}
 }
 
+## Вызывается после заполнения словаря для корректировки некоторых особых случаев
+proc ::clcon_key::УстановитьОсобыеПрописныеWin32 {} {
+    variable LetterMap
+    dict set LetterMap i {I oslash Ooblique}
+    dict set LetterMap x {X division multiply}
+    dict set LetterMap z {Z ydiaeresis ssharp}
+    dict set LetterMap quoteleft {asciitilde cedilla diaeresis}
+    dict set LetterMap slash {question period period comma}
+}
 
+## То же, что aux1win32, но для Linux
 proc ::clcon_key::aux1x {} {return {
     Cyrillic_a   
     Cyrillic_be  
@@ -111,6 +105,29 @@ proc ::clcon_key::aux1x {} {return {
 }
 
 
+########### Процедуры ########################################
+
+proc ::clcon_key::FillLetterMapWin32 {} {
+    variable LetterMap
+    set LetterMap [dict create]
+    set originals [aux2]
+    set Russians [aux1win32]
+    set i 0
+    foreach o $originals {
+        set Bucket [list]
+        set isLetter [expr {[string length $o] == 1}]
+        if {$isLetter} {
+            lappend Bucket [string toupper $o]
+        }
+        set Russian [lindex [lindex $Russians $i] 1]
+        set CapitalRussian [string toupper $Russian 0 0]
+        lappend Bucket $Russian $CapitalRussian
+        dict set LetterMap $o $Bucket
+        incr i
+    }
+    УстановитьОсобыеПрописныеWin32
+}
+
 proc ::clcon_key::FillLetterMapX {} {
     variable LetterMap
     set LetterMap [dict create]
@@ -132,7 +149,6 @@ proc ::clcon_key::FillLetterMapX {} {
         incr i
     }
 }
-
 
 proc ::clcon_key::FillLetterMap {} {
     set ws [tk windowingsystem]
@@ -168,8 +184,11 @@ proc ::clcon_key::AlternateKeys {EnglishKey} {
     return $result
 }
         
-    
-# We assume key ends with some key designator
+
+# Это процедуру следует вызывать вместо обычного bind, чтобы
+# Создать обработчик клавиатуры, не зависящий от включённой раскладки и ОС.    
+# Мы предполагаем, что сочетание клавиш завершается обозначением литеры, к-рая находится
+# в этом месте в английской раскладке
 proc ::clcon_key::b {bind_bareword tag EnglishKey command} {
     ::mprs::AssertEq $bind_bareword "bind"
 	set kV "<Control-Key-V>"

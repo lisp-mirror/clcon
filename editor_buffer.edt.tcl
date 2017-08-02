@@ -163,6 +163,7 @@ namespace eval ::edt {
 
 
     # See also ::tkcon::LispFindDefinition
+    # У этой функции есть копипасты
     proc FindSourceCommand {text} {
         set console [::tkcon::CurrentConsole]
         set w [$text RealText]
@@ -185,6 +186,20 @@ namespace eval ::edt {
             ::edt::ПоискаСвязейСимволаПродолжение $clcon_text $EventAsList "КтоВызываетФункцию"
         }}
     }
+
+
+    # Копипаст из FindSourceCommand
+    proc ЯрНайтиИсходникCommand {text} {
+        set console [::tkcon::CurrentConsole]
+        set w [$text RealText]
+
+        ::tkcon::ПоложитьТекущуюПозициюНаPosStack $w
+        
+        ::clcon_text::CallOduvanchikFunction $text "odu::yar-nayiti-iskhodnik-command nil" {{
+            ::edt::ПоискаСвязейСимволаПродолжение $clcon_text $EventAsList "FindSource"
+        }}
+    }
+
 
     proc FindPackage {text} {
         set console [::tkcon::CurrentConsole]

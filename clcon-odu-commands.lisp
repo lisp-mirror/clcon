@@ -1,4 +1,4 @@
-;; -*- coding: utf-8 ; Encoding: utf-8 ; system :clcon-server ; -*-
+;; -*- coding: utf-8 ; system :clcon-server ; -*-
 ;; Our lisp mode and other application-level oduvanchik commands for clcon. 
 (in-package :oduvanchik)
 (named-readtables::in-readtable :oduvanchik-ext-readtable)
@@ -113,29 +113,31 @@
   (multiple-value-bind (string symbol) (get-symbol-from-current-point)
     (let ((code
            (clco:server-lookup-definition (or symbol string)
-                                          (odu::package-at-point)
-                                          (odu::readtable-at-point))))
+                                          :package-name (odu::package-at-point)
+                                          :readtable-name (odu::readtable-at-point))))
       code)))
 
 (defcommand "Kto Vyyzyyvaet Funkciyu" (p) "Кто вызывает функцию. Копия find-source-command"
   ""
   (princ "Не все вызовы через apply могут быть найдены командой 'Кто вызывает функцию!'")
   (multiple-value-bind (string symbol) (get-symbol-from-current-point)
-    (let ((code
-           (clco:|Обслужить-команду-поиска-связей-символа| (or symbol string)
-            #'swank/backend:list-callers
-            "Точки вызова символа ~S не найдены (попробуйте поиск имени в исходниках)"
-            (odu::package-at-point)
-            (odu::readtable-at-point)
-            )))
+    (let* ((name (or symbol string))
+           (code
+            (clco:|Обслужить-команду-поиска-связей-символа| name
+                  #'swank/backend:list-callers
+                  "Точки вызова символа ~S не найдены (попробуйте поиск имени в исходниках)"
+                  name
+                  (odu::package-at-point)
+                  (odu::readtable-at-point)
+                  )))
       code)))
   
 (defcommand "Find Package" (p)
     "Find package source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
     ""
   (clco:server-lookup-definition (odu::package-at-point)
-                                 (odu::package-at-point)
-                                 (odu::readtable-at-point)))
+                                 :package-name :keyword
+                                 :readtable-name (odu::readtable-at-point)))
 
 (defcommand "Установить этот пакет в консоли" (p)
   "Пакет, установленный в текущей точке редактора, поставить в консоли, с записью в историю команд"
@@ -220,7 +222,7 @@
         (clco::print-just-line ou (format nil "Определения для системы ~S не найдены" Каноническое-имя)))
        (t
         (when (> l 1)
-          (clco::write-code-to-show-console ou))
+          (clco:write-code-to-show-console ou))
         (dolist (dal dspecs-and-locations)
           (:@ destructuring-bind (dspec loc) dal)
           (cond
@@ -234,8 +236,8 @@
      (clco::print-just-line ou (format nil "Система ~S не найдена" Каноническое-имя))
      ))
    (when Показать-консоль
-     (clco::write-code-to-show-console ou)
-     (clco::write-code-to-see-console-end ou))))
+     (clco:write-code-to-show-console ou)
+     (clco:write-code-to-see-console-end ou))))
 
 (defcommand "Find System" (p)
     "Find system (.asd) source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
@@ -289,8 +291,8 @@
   (multiple-value-bind (string symbol) (get-symbol-from-current-point)
     (let ((code
            (clco:server-hyperdoc-lookup (or symbol string)
-                                        (odu::package-at-point)
-                                        (odu::readtable-at-point))))
+                                        :package-name (odu::package-at-point)
+                                        :readtable-name (odu::readtable-at-point))))
       code)))
 
 (defcommand "Describe All" (p)

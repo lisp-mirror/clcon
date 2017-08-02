@@ -216,10 +216,15 @@ namespace eval ::edt {
         $m add separator
 
         set cmd [wesppt [list ::edt::FindSourceCommand $btext]]
+
         $m add command -label "перейти к определению" -accel "Alt-." -command $cmd
         ::clcon_key::b bind SingleMod$w <Alt-period> $cmd
 
-        ::edt::OduFnMenuItem $w $m $btext nayiti-iskhodnik-po-karte -accel <F9> -bindtag NoMod$w 
+        ::edt::OduFnMenuItem $w $m $btext nayiti-iskhodnik-po-karte -accel <Control-Shift-F9> -bindtag DoubleMod$w 
+
+        set cmd [wesppt [list ::edt::ЯрНайтиИсходникCommand $btext]]
+        $m add command -label "Ярого объекта найти исходник" -accel "F9" -command $cmd
+        ::clcon_key::b bind SingleMod$w <F9> $cmd
 
         set cmd [wesppt [list ::edt::КтоВызываетФункцию $btext]]
         $m add command -label "кто вызывает функцию" -under 6 -command $cmd 
