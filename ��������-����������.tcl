@@ -8,8 +8,8 @@ namespace eval ::clcon {
 
  variable МакетКлавиатуры {
 |`~|1×|2÷|3ₒ|4ₓ|5•|6Ø|7&|8*|9(|0)|-N|=+|   |
-| |qQ|wW|ee|rr|tt|yy|uu|ii|oo|pp|[\{|]\}|
-|  |aa|ss|dd|ff|gg|hh|jj|kk|ll|::|;;|"N|\B|
+| |qQ|wW|ee|rr|tt|yy|uu|ii|oo|pp|[[|]]|||
+|  |aa|ss|dd|ff|gg|hh|jj|kk|ll|::|;;|""|\вертикальная-черта|
 |   |zz|xx|cc|vv|bb|nn|mm|,,|..|//|
 }
 
@@ -29,6 +29,7 @@ namespace eval ::clcon {
    frame $w.row$r
    pack $w.row$r
    foreach i [split ${МакетКлавиатуры} "|"] {
+      set i [string map {вертикальная-черта "|"} $i]
       set c [string index [string trim $i] 1]      
       set key [string index [string trim $i] 0]
       if {$key == "`"} {set key quoteleft}
@@ -48,18 +49,27 @@ namespace eval ::clcon {
       set seen($key) 1
       set cmd "$opts(-receiver) insert insert [list $c]"
       append cmd ";destroy .ЭкраннаяКлавиатура"
-      button $w.row$r.k$j -text $i -command $cmd  -padx 0 -pady 0
-      set Key [string cat "<Key-" $key ">"]
-      if {!$empty} {
-        ::clcon_key::b bind .ЭкраннаяКлавиатура $Key $cmd
+      if {!([string trim $i] == "")} {
+         button $w.row$r.k$j -text $i -command $cmd  -padx 0 -pady 0 -font $::tkcon::OPT(font)
+         set Key [string cat "<Key-" $key ">"]
+         if {!$empty} {
+           ::clcon_key::b bind .ЭкраннаяКлавиатура $Key $cmd
+         }
+         lappend klist $w.row$r.k$j
+         set Key [string cat "<Key-" $key ">"]
+         if {!$empty} {
+           ::clcon_key::b bind .ЭкраннаяКлавиатура $Key $cmd
+         }
+         lappend klist $w.row$r.k$j
       }
-      lappend klist $w.row$r.k$j
       if {$newline} {
-        eval grid $klist -sticky news
-        set n 0; set klist {}
-        set r [expr $r + 1]
-        frame $w.row$r
-        pack $w.row$r
+        if {!($klist == "")} {
+          eval grid $klist -sticky news
+          set n 0; set klist {}
+          set r [expr $r + 1]
+          frame $w.row$r
+          pack $w.row$r -side left
+        }
       }
       set j [expr $j + 1]
     }
