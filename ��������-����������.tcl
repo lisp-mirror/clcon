@@ -7,10 +7,10 @@ namespace eval ::clcon {
 #-receiver widgetpath: Name of a text widget to receive the keystrokes at its insert cursor.
 
  variable МакетКлавиатуры {
-|`~|1×|2÷|3ₒ|4ₓ|5•|6Ø|7&|8*|9(|0)|-N|=+|
-| |qQ|wW|ee|rr|tt|yy|uu|ii|oo|pp|[откр-фигурная-скобка|]закр-фигурная-скобка|  |
-|  |aa|ss|dd|ff|gg|hh|jj|kk|ll|::|;;|""|\вертикальная-черта|
-|   |zz|xx|cc|vv|bb|nn|mm|,,|..|//|
+|`~|1☼|2@|3#|4$|5°|6^|7&|8₽|9(|0)|-N|=+|
+| |qQ|wW|e×|r†|tt|yy|uu|ii|oo|pp|[откр-фигурная-скобка|]закр-фигурная-скобка|  |
+|  |aa|ss|dₒ|ff|gg|h÷|jj|kλ|ll|::|;;|""|\вертикальная-черта|
+|   |zz|xx|c♥|vₓ|b•|nØ|mm|,,|..|//|
 }
 
 
