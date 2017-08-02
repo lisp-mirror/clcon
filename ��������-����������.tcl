@@ -34,6 +34,9 @@ namespace eval ::clcon {
    frame $w.row$r
    pack $w.row$r
    foreach i [split ${МакетКлавиатуры} "|"] {
+      set i [string map {вертикальная-черта "|"} $i]
+      set i [string map {откр-фигурная-скобка "{"} $i]
+      set i [string map {закр-фигурная-скобка "}"} $i]
       set c [string index [string trim $i] 1]      
       set key [string index [string trim $i] 0]
       set empty [expr {$key == ""}]
@@ -50,18 +53,22 @@ namespace eval ::clcon {
          append cmd ";$opts(-receiver) mark set insert {insert - 1 chars}"
       } ;# crude approach to right-to-left (Arabic, Hebrew) 
       append cmd ";destroy .ЭкраннаяКлавиатура"
-      button $w.row$r.k$j -text $i -command $cmd  -padx 0 -pady 0
-      set Key [string cat "<Key-" $key ">"]
-      if {!$empty} {
-        ::clcon_key::b bind .ЭкраннаяКлавиатура $Key $cmd
+      if {!([string trim $i] == "")} {
+        button $w.row$r.k$j -text $i -command $cmd  -padx 0 -pady 0 -font $::tkcon::OPT(font)
+        set Key [string cat "<Key-" $key ">"]
+        if {!$empty} {
+          ::clcon_key::b bind .ЭкраннаяКлавиатура $Key $cmd
+        }
+        lappend klist $w.row$r.k$j
       }
-      lappend klist $w.row$r.k$j
       if {$newline} {
-        eval grid $klist -sticky news
-        set n 0; set klist {}
-        set r [expr $r + 1]
-        frame $w.row$r
-        pack $w.row$r
+        if {!($klist == "")} {
+          eval grid $klist -sticky news
+          set n 0; set klist {}
+          set r [expr $r + 1]
+          frame $w.row$r
+          pack $w.row$r -side left
+        }
       }
       set j [expr $j + 1]
     }
