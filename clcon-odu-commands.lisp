@@ -222,7 +222,7 @@
         (clco::print-just-line ou (format nil "Определения для системы ~S не найдены" Каноническое-имя)))
        (t
         (when (> l 1)
-          (clco::write-code-to-show-console ou))
+          (clco:write-code-to-show-console ou))
         (dolist (dal dspecs-and-locations)
           (:@ destructuring-bind (dspec loc) dal)
           (cond
@@ -236,8 +236,8 @@
      (clco::print-just-line ou (format nil "Система ~S не найдена" Каноническое-имя))
      ))
    (when Показать-консоль
-     (clco::write-code-to-show-console ou)
-     (clco::write-code-to-see-console-end ou))))
+     (clco:write-code-to-show-console ou)
+     (clco:write-code-to-see-console-end ou))))
 
 (defcommand "Find System" (p)
     "Find system (.asd) source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"

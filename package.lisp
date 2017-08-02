@@ -39,7 +39,16 @@
            clco:|Выпасть-в-ред|
            clco:edit-string-at-row-and-col
            clco:order-call-oduvanchik-from-itself
-           clco:entire-buffer-string"
+           clco:entire-buffer-string
+
+           CLCO:PRINT-JUST-LINE
+           CLCO:WRITE-CODE-TO-SEE-CONSOLE-END
+           clco:write-code-to-show-console
+
+           CLCO::WRITE-ONE-DSPEC-AND-LOCATION
+           clco::write-code-to-pass-to-loc
+           clco::write-one-dspec-and-location-for-describe
+            "
            )
   (:import-from :budden-tools
                budden-tools:nullable))
