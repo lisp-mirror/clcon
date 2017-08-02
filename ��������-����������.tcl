@@ -3,15 +3,12 @@
 # Здесь гвоздями прибито имя .ЭкраннаяКлавиатура, будьте осторожны!
 namespace eval ::clcon {
 
-#-keys range: list of (decimal or hex Unicodes of) characters to display. Consecutive sequences may be written as range, e.g. {0x21-0x7E} gives the printable lower ASCII chars.
-#-keysperline n: number of keys per line, default: 16.
 #-title string: If not "", text of a title label displayed above the keys. Default: "".
-#-dir direction: if "r2l", moves cursor one to the left after each keypress. Useful for Arab/Hebrew. Default: l2r.
 #-receiver widgetpath: Name of a text widget to receive the keystrokes at its insert cursor.
 
  variable МакетКлавиатуры {
 |`~|1×|2÷|3ₒ|4ₓ|5•|6Ø|7&|8*|9(|0)|-N|=+|   |
-| |qQ|wW|ee|rr|tt|yy|uu|ii|oo|pp|[[|]]|
+| |qQ|wW|ee|rr|tt|yy|uu|ii|oo|pp|[\{|]\}|
 |  |aa|ss|dd|ff|gg|hh|jj|kk|ll|::|;;|"N|\B|
 |   |zz|xx|cc|vv|bb|nn|mm|,,|..|//|
 }
@@ -20,9 +17,7 @@ namespace eval ::clcon {
  proc keyboard {w args} {
    variable МакетКлавиатуры
    frame $w
-   array set opts {
-      -keys {0x21-0x7E} -title "" -keysperline 16 -dir l2r -receiver ""
-   }
+   array set opts { -title "" -receiver "" }
    array set opts $args ;# no errors checked 
    set klist {}; set n 0
    if {$opts(-title)!=""} {
@@ -36,6 +31,12 @@ namespace eval ::clcon {
    foreach i [split ${МакетКлавиатуры} "|"] {
       set c [string index [string trim $i] 1]      
       set key [string index [string trim $i] 0]
+      if {$key == "`"} {set key quoteleft}
+      if {$key == "-"} {set key minus}
+      if {$key == "\""} {set key quoteright}
+      if {$key == ","} {set key comma}
+      if {$key == "."} {set key period}
+      if {$key == "/"} {set key slash}
       set empty [expr {$key == ""}]
       set newline [expr {"\n" eq [string index $i [expr [string length $i]-1]]}]
       if {$newline} {
@@ -46,9 +47,6 @@ namespace eval ::clcon {
       }
       set seen($key) 1
       set cmd "$opts(-receiver) insert insert [list $c]"
-      if {$opts(-dir)=="r2l"} {
-         append cmd ";$opts(-receiver) mark set insert {insert - 1 chars}"
-      } ;# crude approach to right-to-left (Arabic, Hebrew) 
       append cmd ";destroy .ЭкраннаяКлавиатура"
       button $w.row$r.k$j -text $i -command $cmd  -padx 0 -pady 0
       set Key [string cat "<Key-" $key ">"]
@@ -92,9 +90,7 @@ namespace eval ::clcon {
      wm title $w "Экранная клавиатура для ${Приёмник}"
      bind $w <Escape> [list destroy $w]
      ::clcon_key::b bind $w <Control-Key-W> [list destroy $w]
-     # экранная клавиатура где-то здесь: ×÷Ø№ₒ
-     pack [::clcon::keyboard $w.kbd -title "Ввод значков для ${Приёмник}" -keys {0xD7 0xF7 0xD8 0x2116 0x2092} -receiver ${Приёмник}]
-     # - {0x410-0x44f} - кириллица
+     pack [::clcon::keyboard $w.kbd -title "Ввод значков для ${Приёмник}" -receiver ${Приёмник}]
      ::gui_util::FocusWindowByName $w
      grab $w
     } 
