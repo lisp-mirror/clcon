@@ -21,13 +21,13 @@ namespace eval ::clcon {
    array set opts $args ;# no errors checked 
    set klist {}; set n 0
    if {$opts(-title)!=""} {
-      pack [label $w.title -text $opts(-title) ] 
+      grid [label $w.title -text $opts(-title) ] 
       }
    set j 0
    array set seen {}
    set r 1
    frame $w.row$r
-   pack $w.row$r
+   grid $w.row$r -sticky w
    foreach i [split ${МакетКлавиатуры} "|"] {
       set i [string map {вертикальная-черта "|"} $i]
       set i [string map {откр-фигурная-скобка "\{"} $i]
@@ -51,27 +51,25 @@ namespace eval ::clcon {
       set seen($key) 1
       set cmd "$opts(-receiver) insert insert [list $c]"
       append cmd ";destroy .ЭкраннаяКлавиатура"
-      if {!([string trim $i] == "")} {
-         button $w.row$r.k$j -text $i -command $cmd  -padx 0 -pady 0 -font $::tkcon::OPT(font)
-         set Key [string cat "<Key-" $key ">"]
-         if {!$empty} {
-           ::clcon_key::b bind .ЭкраннаяКлавиатура $Key $cmd
-         }
-         lappend klist $w.row$r.k$j
-         set Key [string cat "<Key-" $key ">"]
-         if {!$empty} {
-           ::clcon_key::b bind .ЭкраннаяКлавиатура $Key $cmd
-         }
-         lappend klist $w.row$r.k$j
-      }
       if {$newline} {
         if {!($klist == "")} {
           eval grid $klist -sticky news
           set n 0; set klist {}
           set r [expr $r + 1]
           frame $w.row$r
-          pack $w.row$r -side left
+          grid $w.row$r -sticky w
         }
+      } else {
+        if {[string trim $i] == ""} {
+           button $w.row$r.k$j -text $i -padx 0 -pady 0 -font $::tkcon::OPT(font)
+        } else {
+           button $w.row$r.k$j -text $i -command $cmd  -padx 0 -pady 0 -font $::tkcon::OPT(font)
+           set Key [string cat "<Key-" $key ">"]
+           if {!$empty} {
+             ::clcon_key::b bind .ЭкраннаяКлавиатура $Key $cmd
+           }
+        }
+        lappend klist $w.row$r.k$j
       }
       set j [expr $j + 1]
     }
