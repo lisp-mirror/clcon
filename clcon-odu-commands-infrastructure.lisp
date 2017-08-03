@@ -366,15 +366,15 @@
        (:send-highlight-from-recompute-line-tag
         (oi::НАЙТИ-ПЕРВУЮ-СТРОЧКУ-С-УСТАРЕВШИМ-ТЕГОМ end-line))))
    (assert start-line () "Упустили случай пустого буфера? Странно, а где тогда живёт end-line?")
-   (let new-highlight-wave-id (reset-background-highlight-process buffer))
+   (let highlight-wave-id (oi::buffer-highlight-wave-id buffer))
    (oi::check-something-ok)
    (clco::order-call-oduvanchik-from-itself
     (list 'recompute-line-tags-starting-from-line-background
-          buffer start-line new-highlight-wave-id))
+          buffer start-line highlight-wave-id))
    ))
 
 (defun recompute-line-tags-starting-from-line-background (buffer start-line highlight-wave-id)
-  "Создаёт подобие фоновой задачи для раскраски строк до конца файла. Фоновость имитируется через цепочку событий, каждое из которых кладёт событие-продолжение. Смысл состоит в том, чтобы, не отвлекаясь от другой работы, не спеша вычислить, а главное, отправить в tcl раскраску всех строк до конца файла. Родственная функция - background-repaint-after-recomputing-entire-buffer"
+  "Создаёт подобие фоновой задачи для раскраски строк до конца файла. Фоновость имитируется через цепочку событий, каждое из которых кладёт событие-продолжение. Смысл состоит в том, чтобы, не отвлекаясь от другой работы, не спеша вычислить, а главное, отправить в tcl раскраску всех строк до конца файла. Родственная функция - background-repaint-after-recomputing-entire-buffer . Мы не проверяем верность тегов ранее этой строки - если они неверны, об этом мы узнаем через highlight-wave-id, возможно, в следующей итерации"
   (assert-we-are-in-oduvanchik-thread)
   (let ((check-the-buffer (line-buffer start-line)))
     (cond
