@@ -64,6 +64,7 @@ proc ::clcon_key::УстановитьОсобыеПрописныеWin32 {} {
     dict set LetterMap z {Z ydiaeresis ssharp}
     dict set LetterMap quoteleft {asciitilde cedilla diaeresis}
     dict set LetterMap slash {question period comma}
+    dict set LetterMap semicolon {colon ae AE}
 }
 
 ## То же, что aux1win32, но для Linux

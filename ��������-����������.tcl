@@ -7,10 +7,10 @@ namespace eval ::clcon {
 #-receiver widgetpath: Name of a text widget to receive the keystrokes at its insert cursor.
 
  variable МакетКлавиатуры {
-|`~|1☼|2@|3#|4$|5°|6^|7&|8₽|9(|0)|-N|=+|
-| |qQ|wW|e×|r†|tt|yy|uu|ii|oo|pp|[откр-фигурная-скобка|]закр-фигурная-скобка|  |
-|  |aa|ss|dₒ|ff|gg|h÷|jj|kλ|ll|::|;;|""|\вертикальная-черта|
-|   |zz|xx|c♥|vₓ|b•|nØ|mm|,,|..|//|
+|``|1☼|2@|3#|4$|5°|6^|7&|8₽|9откр-фигурная-скобка|0закр-фигурная-скобка|-~|==|
+| |q |w |e×|r†|t |y |u |i |o |p |[[|]]|  |
+|  |a |s |dₒ|f |g |h÷|j |kλ|l |; |" |\вертикальная-черта|
+|   |z |x |c♥|vₓ|b•|nØ|m |, |. |/ |
 }
 
 
@@ -34,12 +34,18 @@ namespace eval ::clcon {
       set i [string map {закр-фигурная-скобка "\}"} $i]
       set c [string index [string trim $i] 1]      
       set key [string index [string trim $i] 0]
-      if {$key == "`"} {set key quoteleft}
-      if {$key == "-"} {set key minus}
-      if {$key == "\""} {set key quoteright}
-      if {$key == ","} {set key comma}
-      if {$key == "."} {set key period}
-      if {$key == "/"} {set key slash}
+
+      if {$key == "`"} {set key quoteleft
+      } elseif {$key == "-"} {set key minus
+      } elseif {$key == "\""} {set key quoteright
+      } elseif {$key == ","} {set key comma
+      } elseif {$key == "."} {set key period
+      } elseif {$key == "/"} {set key slash
+      } elseif {$key == ";"} {set key semicolon
+      } elseif {$key == {[}} {set key bracketleft
+      } elseif {$key == {]}} {set key bracketright
+      }
+
       set empty [expr {$key == ""}]
       set newline [expr {"\n" eq [string index $i [expr [string length $i]-1]]}]
       if {$newline} {
