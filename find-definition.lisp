@@ -149,7 +149,8 @@
      ((and file offset)
       (format stream "~A; " 
               (edit-file-at-offset-code file (+ offset |Поправка-location-position|) fix-offset-p |Скакнуть-от-Лиспа-к-Яру|))
-      (budden-tools:show-expr offset))
+      ;(budden-tools:show-expr offset)
+      )
      (t
       (let* ((qLocation (cl-tk:tcl-escape (prin1-to-string loc)))
              (message (format nil "Не умею перейти к определению ~A" qLocation)))

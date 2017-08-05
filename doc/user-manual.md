@@ -308,12 +308,11 @@ Evals code in the context of the frame selected on the stack and prints result a
 ###Return from frame
 Prompts for lisp expression and returns it from the frame as if it was normal return. Found at "Stack" debugger menu. 
 
-###Stepping, watch expressions
+###Пошаговая отладка, watch expressions
 Stepping is described in [demo tour](demo-tour.md). No watch expressions are available (but there are some other tools, e.g. trace). 
 
 ###Breakpoints
-Just insert [break](http://www.lispworks.com/documentation/lw60/CLHS/Body/f_break.htm) at appropriate place to enter debugger.
-Lisp allows you to recompile separate functions without restarting a program, so this is not too inconvinient.
+Просто вставьте [break](http://www.lispworks.com/documentation/lw60/CLHS/Body/f_break.htm) в нужном месте, перекомпилируйте файл, в к-ром определена ф-я и упадёте в отладчик. Поскольку в Яре можно перекомпилировать файлы лиспа по-модульно, это (почти всегда) не составляет проблемы. Дальше можно перейти в режим пошаговой отладки через меню отладчика Стек/Перейти в режим ходьбы. Есть также функция `cl-user::b2`, к-рая сразу переходит в пошаговую отладку. Также есть trace с break, см. руководство по SBCL.  
 
 ###Tracing (debug messages)
 If you want to print debug messages as your code runs, use [trace](http://www.lispworks.com/documentation/lw60/CLHS/Body/m_tracec.htm).
