@@ -1,10 +1,16 @@
 # -*- coding: utf-8; -*- 
 # по мотивам http://wiki.tcl.tk/560
+# (С) Денис Будяк, Роман Клочков, 2017
 # Здесь гвоздями прибито имя .ЭкраннаяКлавиатура, будьте осторожны!
 namespace eval ::clcon {
 
 #-title string: If not "", text of a title label displayed above the keys. Default: "".
 #-receiver widgetpath: Name of a text widget to receive the keystrokes at its insert cursor.
+
+# В макете клавиатуры используются обозначения:
+# откр-фигурная-скобка = {
+# закр-фигурная-скобка = }
+# вертикальная-черта = |
 
  variable МакетКлавиатуры {
 |``|1☼|2@|3#|4$|5°|6^|7&|8₽|9откр-фигурная-скобка|0закр-фигурная-скобка|-~|==|
@@ -15,7 +21,7 @@ namespace eval ::clcon {
 
 
  proc keyboard {w args} {
-   variable МакетКлавиатуры
+   variable МакетКлавиатуры 
    frame $w
    array set opts { -title "" -receiver "" }
    array set opts $args ;# no errors checked 
