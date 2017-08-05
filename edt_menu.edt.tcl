@@ -386,6 +386,17 @@ namespace eval ::edt {
             -command $cmd -accel "F12"
         bind NoMod$w <F12> [concat $cmd ";" break]
 
+        # а почему в других командах btext, а тут нет?
+        set cmd [list ::ред-закладки::ПоставитьЗакладкуЗдесь]             
+        $m add command -label "Поставить закладку" \
+            -command $cmd -accel <Control-Key-F2>
+        bind SingleMod$w <Control-Key-F2> [concat $cmd ";" break]
+
+        set cmd [list ::ред-закладки::ВыбратьЗакладкуИПерейтиКНей]             
+        $m add command -label "Перейти к закладке..." \
+            -command $cmd -accel <Key-F2>
+        bind NoMod$w <Key-F2> [concat $cmd ";" break]
+
         $m add separator
 
         set cmd [list ::clcon::Показать_экранную_клавиатуру $btext]

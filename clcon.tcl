@@ -3050,6 +3050,7 @@ proc ::tkcon::ReloadSomeIDESources2 {} {
     TkconSourceHere edt_structure.edt.tcl
     TkconSourceHere editor_buffer.edt.tcl
     TkconSourceHere справка-по-символу.спс.tcl
+    TkconSourceHere ред-закладки.tcl
     TkconSourceHere menu.recent.tcl
     TkconSourceHere экранная-клавиатура.tcl
     TkconSourceHere edt_menu.edt.tcl
