@@ -232,11 +232,11 @@ namespace eval ::edt {
         $m add separator
         set cmd [wesppt [list ::edt::LispDescribeAllCommand $btext]]
         $m add command -label "справка по идентиф-ру" -accel "F1" -command $cmd
-        ::clcon_key::b bind SingleMod$w <Key-F1> $cmd
+        ::clcon_key::b bind NoMod$w <Key-F1> $cmd
 
         set cmd [wesppt [list ::edt::SkopirovatqIdentVBuferObmena $btext]]
         $m add command -label "скопировать идентф-р в буфер обмена" -accel "F2" -command $cmd
-        ::clcon_key::b bind SingleMod$w <Key-F2> $cmd
+        ::clcon_key::b bind NoMod$w <Key-F2> $cmd
 
     }
 
@@ -394,8 +394,8 @@ namespace eval ::edt {
 
         set cmd [list ::ред-закладки::ВыбратьЗакладкуИПерейтиКНей]             
         $m add command -label "Перейти к закладке..." \
-            -command $cmd -accel <Key-F2>
-        bind NoMod$w <Key-F2> [concat $cmd ";" break]
+            -command $cmd -accel <Alt-Key-F2>
+        bind SingleMod$w <Alt-Key-F2> [concat $cmd ";" break]
 
         $m add separator
 
