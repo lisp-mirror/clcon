@@ -48,6 +48,7 @@
            CLCO::WRITE-ONE-DSPEC-AND-LOCATION
            clco::write-code-to-pass-to-loc
            clco::write-one-dspec-and-location-for-describe
+           clco:*filter-frames* ; фильтрация кадров в отладчике, см. руководство по clcon
             "
            )
   (:import-from :budden-tools
