@@ -468,6 +468,6 @@ namespace eval ::edt {
         bind NoMod$w <F8> $cmd
 
         set cmd [wesppt [list ::edt::SyncCursor $btext]]
-        $m add command -label "Синхронизировать курсор одуванчика к tcl/tk" -command $cmd
+        $m add command -label "Синхронизировать курсор одуванчика к tcl/tk и показать положение курсора" -command $cmd
     }
 }

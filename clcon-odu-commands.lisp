@@ -377,6 +377,8 @@
      (format nil "puts {Oduvan: ~D.~D}" row col)
      :nowait nil
      )
+    (clco:eval-in-tcl
+     (format nil "puts {Положение буквы под курсором в литерах, от 1, newline = 1 (oduvan): ~D}" (+ (editor-budden-tools:real-point-offset-0-based (current-point)) 1)))
     ))
 
 (defcommand "Complete Symbol With Budden Tools"
