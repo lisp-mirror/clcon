@@ -226,6 +226,8 @@ namespace eval ::edt {
         $m add command -label "Ярого объекта найти исходник" -accel "F9" -command $cmd
         ::clcon_key::b bind SingleMod$w <F9> $cmd
 
+        OduFnMenuItem $w $m $btext yar-avtodopolnenie -accel "<Alt-Key-F11>" -bindtag SingleMod$w
+
         set cmd [wesppt [list ::edt::КтоВызываетФункцию $btext]]
         $m add command -label "кто вызывает функцию" -under 6 -command $cmd 
 

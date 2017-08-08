@@ -391,7 +391,7 @@
     (cond 
      ((= str-len 0)
       (beep)
-      ;(indent-command nil)
+      ;(indent-command nil) 
       ;(beginning-of-line-command nil)
       )
      (t
@@ -399,6 +399,7 @@
       ))))
 
 (defun complete-symbol-with-budden-tools-inner (str str-len)
+  "Родственный код - команда автодополнения для Яра"
   (let* ((package-name (or (package-at-point) :cl-user))
          ;(package (or (find-package package-name) :cl-user))
          (rt-name (readtable-at-point))
@@ -409,21 +410,28 @@
          (completion-list (first completions))
          ; (longest-completion (second completions))
          )
-    (flet ((replace-str-with (res)
-      (oi::modifying-buffer (oi::current-buffer)
-        (delete-previous-character-command str-len)
-        (insert-string (current-point) res))))
-    (cond
-     ((null completion-list)
-      (bell-with-tcl))
-     ((null (second completion-list))
-      (replace-str-with (first completion-list)))
-     (t
-      (let ((choice
-             (simple-listbox-menu completion-list :title "Comletions:")))
-        (unless (string= choice "")
-          (replace-str-with choice)))
-      )))))
+    (|Предложить-пользователю-список-продолжений-и-принять-его-выбор| completion-list str-len)
+    ))
+
+(defun |Предложить-пользователю-список-продолжений-и-принять-его-выбор| (|Список-продолжений| str-len)
+  "str-len - длина исходной строки, к-рую мы будем заменять в случае, если будет выбрано какое-то дополнение"
+  (perga-implementation:perga
+   (flet replace-str-with (res)
+     (oi::modifying-buffer (oi::current-buffer)
+                           (delete-previous-character-command str-len)
+                           (insert-string (current-point) res)))
+   (let |Сп| |Список-продолжений|)
+   (cond
+    ((null |Сп|)
+     (bell-with-tcl))
+    ((null (second |Сп|))
+     (replace-str-with (first |Сп|)))
+    (t
+     (let ((choice
+            (simple-listbox-menu |Сп| :title "Подходящие символы:")))
+       (unless (string= choice "")
+         (replace-str-with choice)))
+     ))))
 
 
 (defcommand "vyzvatq funkciyu zpt opredelyonnuyu ne v pakete oduvanchika" (imya &rest argumenty) "Вызывает функцию,созданную в пакете, отличном от пакета одуванчика, это позволяет избежать создания слишком большого количества команд. Например, это нужно для тестовых сценариев. С другой стороны, это угроза безопасности. imya - обозначение (designator) функции. См. также ::clcon_text::CallOduvanchikFunction, CLCO:ORDER-CALL-ODUVANCHIK-FROM-ITSELF" "ODUVANCHIK::VYZVATQ-FUNKCIYU-ZPT-OPREDELYONNUYU-NE-V-PAKETE-ODUVANCHIKA-COMMAND"
