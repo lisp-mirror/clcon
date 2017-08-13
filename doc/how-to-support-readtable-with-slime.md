@@ -47,43 +47,21 @@ This rule is quite non-obvious.
 ### Conslusion
 To sum up, SLIME + NAMED-READTABLES behavior is currently non-documented and unreliable. 
 
-## Straightforward solution
+## Suggested solution
 
-### Idea
-- insert (IN-READTABLE) into every file where non-standard readtable is used
-- make SLIME to use readtable as follows
-```  
-If there is an IN-READTABLE form above the point
-  use that readtable (closest one if there are many)
-elseIf there is an entry in *READTABLE-ALIST* for the package
-  use that readtable
-else
-  use standard readtable
-```
-- change IN-READTABLE so that it does not modify `*READTABLE-ALIST*`
-- document `*READTABLE-ALIST*`
+- currently `(in-readtable DESIGNATOR)` maps `*PACKAGE*` to `DESIGNATOR` globally every time `in-readtable` form is executed, storing the mapping in `*READTABLE-ALIST*`, see `%frob-swank-readtable-alist`. Let us make a provision to set up named-readtables so that it would NOT touch `*READTABLE-ALIST*` for specific packages and/or readtables. 
 
-### Objections
-- some code is already adapted to current state of things and SLIME will be confused from that decision
-- to keep SLIME working, one have to include IN-READTABLE form into each file, which is hard for 3-d party libs
+- currently for any file operation (e.g. `slime-compile-defun`) SLIME parses the file and finds the closest `(in-package)` form above the point to learn current package. Let us make it look for `(in-readtable)` form also.
 
-## Maybe a better solution
+- currently SLIME sends package designator to SWANK with most requests `(:emacs-rex request)`. Readtable is deduced by SWANK from `*READTABLE-ALIST*`. Let us modify SLIME so that it would send a readtable designator also. Readtable designator is taken from `(in-readtable)` form. For REPL-related requests, `*readtable*` is sent. If there is neither `(in-readtable)` form nor `*readtable*` in the context, SLIME sends some "no readtable specified" marker. When "no readtable specified" is sent, SWANK takes the readtable from `*READTABLE-ALIST*` for a package given. 
 
-### Idea
-Key issue is that generally effect of IN-READTABLE on `*READTABLE-ALIST*` is bad, but sometimes it is necessary. 
+## Use of SLIME with this solution
 
-So the idea is to conditionalize behavior of IN-READTABLE. E.g. one can build the list of projects where IN-READTABLE behavior should be kept as it is. For unmaintained repos, this list can be kept with NAMED-READTABLES source or in some dedicated repository. For maintained, it would be fine to extend asdf with a special clause. 
+### Projects which work well with current behavior
+Nothing is changed
 
-So, IN-READTABLE would set an entry to `*READTABLE-ALIST*` for some list of packages only. If package is not in list, IN-READTABLE does not touch its entry. In this case, the person who maintains the image can can manually add entries to `*READTABLE-ALIST*`. 
-
-### Transition
-
-How to introduce that new behavior? We might want an option for IN-READTABLE to signal an error when it sees that readtable assigned is in contradiction with non-nil readtable from `*READTABLE-ALIST*`. This way we well see all problems when we first try to build our image with the new version of NAMED-READTABLES. This option should be enabled by default. 
-
-### Objections and comments
-Are welcome :)
-
-
-
-
-
+### Projects which want better behavior
+- set packages and readtables of the project to the exclusion list, so that `*READTABLE-ALIST*` is not touched when `(in-readtable)` form is executed for those packages and readtables
+- insert `(in-readtable)` form into each source file
+- issue `(in-readtable)` after `(in-package)` in REPL
+- if one needs a default readtable for package, it can be set in `*READTABLE-ALIST*` manually
