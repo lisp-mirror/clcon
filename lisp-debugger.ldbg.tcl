@@ -19,9 +19,6 @@ namespace eval ::ldbg {
     # We delete MainWindow when reloading source so that it will be refreshed
     # This is appropriate for some tools only. E.g. rebuilding editor is not
     # a good idea.
-
-    # We iconify MainWindow when we "close" it. This way we keep its geometry and zooming state
-    # in this session - especially important in stepping mode.
     variable MainWindow 
     if {[info exists MainWindow] && [winfo exists $MainWindow]} {
         catch { destroy $MainWindow }
@@ -795,9 +792,8 @@ namespace eval ::ldbg {
     # FIXME rename to CloseDebugger
     proc CloseDebuggerWindow {MainWindow} {
         variable InTheDebugger 0
-        # We keep window so that it could recall its size and position. Also we remember position in
-        # PRIV
-        wm iconify $MainWindow
+        # We keep window so that it could recall its size and position.
+        wm withdraw $MainWindow
     }
 
 # Example of successful return from frame:
@@ -1165,7 +1161,7 @@ namespace eval ::ldbg {
 
         set metrics [font measure [ tkcon font ] "w"]
         toplevel $w -width [expr { 50 * $metrics }]
-        wm iconify $w
+        wm withdraw $w
 
      
         # title
