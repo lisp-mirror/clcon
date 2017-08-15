@@ -53,6 +53,9 @@
     ("Отладчик лиспа" "Lisp Debugger")
     ("Список ошибок" "Compilation errors")
     ("Потоки" "Threads")
+    ("Ходьба" "Stepping")
+    ("Отладчик, уровень $level" "Debugger level $level")
+    ("Не могу сохранить файл истории:\n$fid" "Unable to save history file:\n$fid")
     
     ))
 
