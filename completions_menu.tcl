@@ -29,7 +29,11 @@ proc ::completions_menu::do_cancel {tl} {
 
 # Billet only
 # Args: items is a list
+#       -owner is a widget to own the menu
+#       -title is a title
+#       -width is a width
 # Returns: item selected or "" is Esc (Control-w) pressed
+# see also ODUVANCHIK::SIMPLE-LISTBOX-MENU
 proc ::completions_menu::run {items args} {
     named_args $args {-owner {} -title "::completions_menu::run" -width 40}
 
