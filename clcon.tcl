@@ -201,6 +201,7 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
     TkconSourceHere recent.tcl
     TkconSourceHere window_menu.tcl
     TkconSourceHere inspthrd.tcl
+    TkconSourceHere window_layout.tcl
 }    
 
 
@@ -218,6 +219,7 @@ proc ::tkcon::Init {args} {
     variable COLOR
     variable PRIV
     variable ENABLE_UNKNOWN
+    variable WINDOW_LAYOUT
     global tcl_platform env tcl_interactive errorInfo
 
     set tcl_interactive 1
@@ -254,7 +256,7 @@ proc ::tkcon::Init {args} {
             set OPT(font) {{Courier New} 12}
         } 
     }
-    
+
     # tclexpandorder could also include 'Methodname' for XOTcl/NSF methods
     foreach {key default} {
 	autoload	{}
@@ -265,7 +267,6 @@ proc ::tkcon::Init {args} {
         # does not work with SWANK
 	maxlinelen	0
         
-	cols		80
 	debugPrompt	{(level \#$level) debug [history nextid] > }
 	dead		{}
 	edit		::edt::edit
@@ -281,7 +282,6 @@ proc ::tkcon::Init {args} {
 	maxmenu		18
 	nontcl		0
 	prompt1		{ignore this, it's set below}
-	rows		20
 	scrollypos	right
 	showmultiple	1
 	showstatusbar	1
@@ -293,6 +293,7 @@ proc ::tkcon::Init {args} {
 	gets		{congets}
 	overrideexit	1
 	usehistory	1
+
         putd-output-file {}
         putd-enabled    0
         oduvan-backend  1
@@ -405,17 +406,20 @@ proc ::tkcon::Init {args} {
 	    set envHome		PREF_FOLDER
 	    set rcfile		clcon.cfg
 	    set histfile	clcon.hst
+            set desktopfile     clcon-desktop-settings.cfg
 	    catch {console hide}
 	}
 	windows		{
 	    set envHome		HOME
 	    set rcfile		clcon.cfg
 	    set histfile	clcon.hst
+            set desktopfile     clcon-desktop-settings.cfg
 	}
 	unix		{
 	    set envHome		HOME
 	    set rcfile		.clconrc
 	    set histfile	.clcon_history
+            set desktopfile     .clcon-desktop-settings
 	}
     }
     if {[info exists env($envHome)]} {
@@ -429,6 +433,9 @@ proc ::tkcon::Init {args} {
 	}
 	if {![info exists PRIV(histfile)]} {
 	    set PRIV(histfile)	[file join $home $histfile]
+	}
+	if {![info exists PRIV(desktopfile)]} {
+	    set PRIV(desktopfile)	[file join $home $desktopfile]
 	}
     }
 
@@ -570,6 +577,15 @@ proc ::tkcon::Init {args} {
 	    puts "[expr {$PRIV(event)-1}] events added"
 
 	}
+
+	if {!$PRIV(WWW) && [file exists $PRIV(desktopfile)]} {
+            # FIXME - avoid eval here - it is just data
+	    puts -nonewline "loading desktop layout..."
+	    if {[catch {uplevel \#0 [list source $PRIV(desktopfile)]} herr]} {
+		puts stderr "error:\n$herr"
+		append PRIV(errorInfo) $errorInfo\n
+	    }
+        }
     }
 
     ## Autoload specified packages in slave
@@ -790,6 +806,9 @@ proc ::tkcon::InitUI {title} {
     }
     set PRIV(base) $w
 
+    # assigns the default value to ::tkcon::WINDOW_LAYOUT 
+    ::window_layout::SetDefaultWindowLayout
+
     catch {font create tkconfixed -family Courier -size -20}
     catch {font create tkconfixedbold -family Courier -size -20 -weight bold}
 
@@ -819,19 +838,6 @@ proc ::tkcon::InitUI {title} {
     ## Create console tab
     set con [InitTab $w]
     set PRIV(curtab) $con
-
-    # Only apply this for the first console
-    $con configure -setgrid 1 -width $OPT(cols) -height $OPT(rows)
-    bind $PRIV(root) <Configure> {
-	if {"%W" == $::tkcon::PRIV(root)} {
-	    scan [wm geometry [winfo toplevel %W]] "%%dx%%d" \
-		::tkcon::OPT(cols) ::tkcon::OPT(rows)
-	    if {[info exists ::tkcon::EXP(spawn_id)]} {
-		catch {stty rows $::tkcon::OPT(rows) columns \
-			   $::tkcon::OPT(cols) < $::tkcon::EXP(slave,name)}
-	    }
-	}
-    }
 
     # scrollbar
     set sy [scrollbar $w.sy -takefocus 0 -command [list $con yview]]
@@ -950,27 +956,6 @@ proc ::tkcon::InitTab {w} {
     bindtags $con [list TkConsoleTextOverrides $con TkConsole TkConsolePost $PRIV(root) all]
 
     # scrollbar
-    if {!$PRIV(WWW)} {
-	if {$::tcl_platform(os) eq "Windows CE"} {
-	    font configure tkconfixed -family Tahoma -size 8
-	    $con configure -font tkconfixed -borderwidth 0 -padx 0 -pady 0
-	    set cw [font measure tkconfixed "0"]
-	    set ch [font metrics tkconfixed -linespace]
-	    set sw [winfo screenwidth $con]
-	    set sh [winfo screenheight $con]
-	    # We need the magic hard offsets until I find a way to
-	    # correctly assume size
-	    if {$cw*($OPT(cols)+2) > $sw} {
-		set OPT(cols) [expr {($sw / $cw) - 2}]
-	    }
-	    if {$ch*($OPT(rows)+3) > $sh} {
-		set OPT(rows) [expr {($sh / $ch) - 3}]
-	    }
-	    # Place it so that the titlebar underlaps the CE titlebar
-	    wm geometry $PRIV(root) +0+0
-	}
-    }
-    $con configure -height $OPT(rows) -width $OPT(cols)
 
     foreach col {prompt stdout stderr stdin proc debug_string} {
 	$con tag configure $col -foreground $COLOR($col)
@@ -2194,7 +2179,7 @@ proc ::tkcon::MainInit {} {
 		if {[catch {open $::tkcon::PRIV(histfile) w} fid]} {
 		    puts stderr "Не могу сохранить файл истории:\n$fid"
 		    # pause a moment, because we are about to die finally...
-		    after 7000
+		    after 3000
 		} else {
 		    set max [::tkcon::EvalSlave history nextid]
 		    set id [expr {$max - $::tkcon::OPT(history)}]
@@ -2212,6 +2197,13 @@ proc ::tkcon::MainInit {} {
 		    close $fid
 		}
 	    }
+            if {[catch {open $::tkcon::PRIV(desktopfile) w} fid]} {
+                puts stderr "Failed to save desktop file:\n$fid"
+                after 3000
+            } else {
+                puts $fid "::tkcon::EvalSlave [::dump ::tkcon::WINDOW_LAYOUT]"
+            }
+            close $fid
             if {$::tkcon::PRIV(OstanovitqServerSwank) == 1} {            
                 ::tkcon::ПринудительноОстановитьСерверТекущегоПодключенияSwank
             }
@@ -2513,137 +2505,6 @@ proc ::tkcon::HighlightError w {
     }
 }
 
-# term_exit is called if the spawned process exits
-proc ::tkcon::term_exit {w} {
-    variable EXP
-    catch {exp_close -i $EXP(spawn_id)}
-    set EXP(forever) 1
-    unset EXP
-}
-
-# term_chars_changed is called after every change to the displayed chars
-# You can use if you want matches to occur in the background (a la bind)
-# If you want to test synchronously, then just do so - you don't need to
-# redefine this procedure.
-proc ::tkcon::term_chars_changed {w args} {
-}
-
-# term_cursor_changed is called after the cursor is moved
-proc ::tkcon::term_cursor_changed {w args} {
-}
-
-proc ::tkcon::term_update_cursor {w args} {
-    variable OPT
-    variable EXP
-
-    $w mark set insert $EXP(row).$EXP(col)
-    $w see insert
-    term_cursor_changed $w
-}
-
-proc ::tkcon::term_clear {w args} {
-    $w delete 1.0 end
-    term_init $w
-}
-
-proc ::tkcon::term_init {w args} {
-    variable OPT
-    variable EXP
-
-    # initialize it with blanks to make insertions later more easily
-    set blankline [string repeat " " $OPT(cols)]\n
-    for {set i 1} {$i <= $OPT(rows)} {incr i} {
-	$w insert $i.0 $blankline
-    }
-
-    set EXP(row) 1
-    set EXP(col) 0
-
-    $w mark set insert $EXP(row).$EXP(col)
-}
-
-proc ::tkcon::term_down {w args} {
-    variable OPT
-    variable EXP
-
-    if {$EXP(row) < $OPT(rows)} {
-	incr EXP(row)
-    } else {
-	# already at last line of term, so scroll screen up
-	$w delete 1.0 2.0
-
-	# recreate line at end
-	$w insert end [string repeat " " $OPT(cols)]\n
-    }
-}
-
-proc ::tkcon::term_insert {w s} {
-    variable OPT
-    variable EXP
-
-    set chars_rem_to_write [string length $s]
-    set space_rem_on_line  [expr {$OPT(cols) - $EXP(col)}]
-
-    set tag_action [expr {$EXP(standout) ? "add" : "remove"}]
-
-    ##################
-    # write first line
-    ##################
-
-    if {$chars_rem_to_write > $space_rem_on_line} {
-	set chars_to_write $space_rem_on_line
-	set newline 1
-    } else {
-	set chars_to_write $chars_rem_to_write
-	set newline 0
-    }
-
-    $w delete $EXP(row).$EXP(col) \
-	$EXP(row).[expr {$EXP(col) + $chars_to_write}]
-    $w insert $EXP(row).$EXP(col) \
-	[string range $s 0 [expr {$space_rem_on_line-1}]]
-
-    $w tag $tag_action standout $EXP(row).$EXP(col) \
-	$EXP(row).[expr {$EXP(col) + $chars_to_write}]
-
-    # discard first line already written
-    incr chars_rem_to_write -$chars_to_write
-    set s [string range $s $chars_to_write end]
-
-    # update EXP(col)
-    incr EXP(col) $chars_to_write
-    # update EXP(row)
-    if {$newline} { term_down $w }
-
-    ##################
-    # write full lines
-    ##################
-    while {$chars_rem_to_write >= $OPT(cols)} {
-	$w delete $EXP(row).0 $EXP(row).end
-	$w insert $EXP(row).0 [string range $s 0 [expr {$OPT(cols)-1}]]
-	$w tag $tag_action standout $EXP(row).0 $EXP(row).end
-
-	# discard line from buffer
-	set s [string range $s $OPT(cols) end]
-	incr chars_rem_to_write -$OPT(cols)
-
-	set EXP(col) 0
-	term_down $w
-    }
-
-    #################
-    # write last line
-    #################
-
-    if {$chars_rem_to_write} {
-	$w delete $EXP(row).0 $EXP(row).$chars_rem_to_write
-	$w insert $EXP(row).0 $s
-	$w tag $tag_action standout $EXP(row).0 $EXP(row).$chars_rem_to_write
-	set EXP(col) $chars_rem_to_write
-    }
-
-    term_chars_changed $w
-}
 
 ## tkcon - command that allows control over the console
 ## This always exists in the main interpreter, and is aliased into
@@ -3920,9 +3781,11 @@ proc dir {args} {
 	    set i [expr {$i+2+$s(full)}]
 	    set j 80
 	    ## This gets the number of cols in the tkcon console widget
-	    if {[llength [info commands tkcon]]} {
-		set j [expr {[tkcon master set ::tkcon::OPT(cols)]/$i}]
-	    }
+	    # now it is broken because we removed setgrid - we have to find another way
+	    # to measure the width of the console, and we use default of 80 for now FIXME
+	    #if {[llength [info commands tkcon]]} {
+		  #set j [expr {[tkcon master set ::tkcon::OPT(cols)]/$i}]
+	    #}
 	    set k 0
 	    foreach f [lindex $o 1] {
 		set f [file tail $f]
