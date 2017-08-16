@@ -24,12 +24,12 @@ namespace eval ::window_layout {
 proc ::window_layout::SetDefaultWindowLayout {} {
     variable ::tkcon::WINDOW_LAYOUT
     set WINDOW_LAYOUT [list "Default" \
-                        [list [::ide_structure::EditorToplevelWindowName] { 0 0 0.5 0.5 } ] \
-                        [list . { . 0 0.5 0.5 0.5 } ] \
-                        [list [::ide_structure::BufferListBoxWindowName] { 0 0.5 0.5 0.5 } ] \
+                        [list [::ide_structure::EditorToplevelWindowName] { 0.5 0.5 0 0 } ] \
+                        [list . { 0.5 0.5 0 0.5 } ] \
+                        [list [::ide_structure::BufferListBoxWindowName] { 0.5 0.5 0 0.5 } ] \
                         [list [::ide_structure::DebuggerToplevelWindowName] { 0.5 0.5 0.5 0.5 } ] \
-                        [list [::ide_structure::ErrorBrowserToplevelWindowName] { 0 0.5 0.5 0.5 } ] \
-                        [list .grbrTlv { 0 0.5 0.5 0.5 } ] \
+                        [list [::ide_structure::ErrorBrowserToplevelWindowName] { 0.5 0.5 0 0.5 } ] \
+                        [list .grbrTlv { 0.5 0.5 0 0.5 } ] \
                       ]
 }
 
@@ -60,4 +60,14 @@ proc ::window_layout::MeasureScreenPart2 {and_then} {
     apply $and_then
 }
 
-#proc ::window_geometry_by_ 
+# geometry_spec is from WINDOW_LAYOUT description
+proc ::window_layout::TranslateRelativeGeometryToCurrentScreen {geometry_spec} {
+    variable ::window_layout::MEASURED_SCREEN_GEOMETRY
+    foreach { w h l t } $geometry_spec break
+    foreach { ws hs lo to } $MEASURED_SCREEN_GEOMETRY break
+    set w [expr round($w * $ws)]
+    set h [expr round($h * $hs)]
+    set l [expr round($l * $ws) + $lo]
+    set t [expr round($t * $hs) + $to]
+    return "${w}x$h+$l+$t"
+}
