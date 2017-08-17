@@ -1,4 +1,5 @@
 package require Tk
+# See also window_layout.tcl
 
 namespace eval ::gui_util {
 
