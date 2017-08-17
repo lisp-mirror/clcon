@@ -201,7 +201,7 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
     TkconSourceHere recent.tcl
     TkconSourceHere window_menu.tcl
     TkconSourceHere inspthrd.tcl
-    TkconSourceHere window_layout.tcl
+    TkconSourceHere window_layout.win_lay.tcl
 }    
 
 
@@ -807,7 +807,7 @@ proc ::tkcon::InitUI {title} {
     set PRIV(base) $w
 
     # assigns the default value to ::tkcon::WINDOW_LAYOUT 
-    ::window_layout::SetDefaultWindowLayout
+    ::win_lay::SetDefaultWindowLayout
 
     catch {font create tkconfixed -family Courier -size -20}
     catch {font create tkconfixedbold -family Courier -size -20 -weight bold}
