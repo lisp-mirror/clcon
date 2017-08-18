@@ -171,6 +171,15 @@ proc ::win_lay::Make4Windows {} {
     foreach {wLeft wTop wRight wBottom} $::win_lay::MEASURED_BORDER_WIDTHS break
 
     # semi-experimental findings, some of them are quite counter-intuitive
+    # Background: 
+    # In Windows 10, tk creates a transparent frame of width 10 around the window.
+    # also the window has (in my theme) a visible frame of width 1 (so 9 is left transparent)
+    # When a window is maximized, both invisible and visible frames are moved beyond
+    # the screen bounds. When windows are tiled, invisible frames of neighbouring windows overlap,
+    # but visible ones are put side by side. I found no way to programmatically learn the 
+    # actual width of visible frame, but it is wider on other platforms e.g. (Windows Server 2003)
+    # So it is impossible to find out actual window size programmatically w/o calling WinAPI.
+    # So I do what I can and let visible frames overlap. 
 
     set TitleBarHeight [expr $wTop ]
     showVar TitleBarHeight
@@ -182,23 +191,29 @@ proc ::win_lay::Make4Windows {} {
     showVar ScreenHeight
     # unmaximized window X is measured from $maximizedX
     set DeltaX $maximizedX
-    # unmaximized window Y is measured from 0
-    set DeltaY 0
+
+    # unmaximized window Y is measured from 0, but we add empirical
+    # offset because frame is transparent in Win 10
+    set EmpricalOffsetDueToTransparencyOfFrame 1
+
+    set DeltaY [expr -$EmpricalOffsetDueToTransparencyOfFrame ]
     
     set ContentWidth [expr $ScreenWidth/2]
-    set ContentHeight [expr $ScreenHeight/2 - $TitleBarHeight ]
+    
+    set ContentHeight [expr $ScreenHeight/2 - $TitleBarHeight \
+         + 2*$EmpricalOffsetDueToTransparencyOfFrame ]
 
     MakeSampleWindow .tl 
     wm geometry .tl "${ContentWidth}x$ContentHeight+[expr $DeltaX + 0*$ScreenWidth/2]+[expr $DeltaY + 0*$ScreenHeight/2]"
 
     MakeSampleWindow .tr
-    wm geometry .tr "${ContentWidth}x$ContentHeight+[expr $DeltaX + 1*$ScreenWidth/2]+[expr $DeltaY + 0*$ScreenHeight/2]"
+    wm geometry .tr "${ContentWidth}x$ContentHeight+[expr $DeltaX + 1*$ScreenWidth/2]+[expr $DeltaY + 0*$ScreenHeight/2 ]"
 
     MakeSampleWindow .bl
-    wm geometry .bl "${ContentWidth}x$ContentHeight+[expr $DeltaX + 0*$ScreenWidth/2]+[expr $DeltaY + 1*$ScreenHeight/2]"
+    wm geometry .bl "${ContentWidth}x$ContentHeight+[expr $DeltaX + 0*$ScreenWidth/2]+[expr $DeltaY + 1*$ScreenHeight/2 ]"
 
     MakeSampleWindow .br
-    wm geometry .br "${ContentWidth}x$ContentHeight+[expr $DeltaX + 1*$ScreenWidth/2]+[expr $DeltaY + 1*$ScreenHeight/2]"
+    wm geometry .br "${ContentWidth}x$ContentHeight+[expr $DeltaX + 1*$ScreenWidth/2]+[expr $DeltaY + 1*$ScreenHeight/2 ]"
 
 }
 
