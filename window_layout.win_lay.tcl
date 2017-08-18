@@ -107,8 +107,13 @@ proc ::win_lay::MeasureScreenPart2 {and_then} {
 }
 
 proc ::win_lay::MeasureScreenPart3 {and_then} {
-    variable ::win_lay::ZOOMED_WINDOW_GEOMETRY
-    variable ::win_lay::MEASURED_BORDER_WIDTHS
+    variable ZOOMED_WINDOW_GEOMETRY
+    variable MEASURED_BORDER_WIDTHS
+
+    # X and Y position for `wm geometry` to position window at the left-top corner of the screen
+    variable XForLeftCornerOfTheScreen
+    variable YForTopOfTheScreen
+
     set w .measureScreenBig
     set ww .measureScreenSmall
 
@@ -127,7 +132,7 @@ proc ::win_lay::MeasureScreenPart3 {and_then} {
     # we increment both coords to keep single body of MeasureScreenWalkOverFrame, 
     # but increment on one of coordinates is zero. We start end = start+0.5 for this
     # fixed coordinate to emphasize that we're not expecting to ever achieve loop exit
-    # condition
+    # condition through this direction
     set brdrWdthL [lindex [::win_lay::MeasureScreenWalkOverFrame \
                         $wwLeft $wwTop -1 0 [expr $wLeft-1] [expr $wTop+0.5]] 0] 
     set brdrWdthT [lindex [::win_lay::MeasureScreenWalkOverFrame \
@@ -141,56 +146,67 @@ proc ::win_lay::MeasureScreenPart3 {and_then} {
     set maximizedY [ expr $wTop - $brdrWdthR ]
     set maxContentWidth [ expr $wLeft + $wWidth + $brdrWdthR - 1 ]
     set maxContentHeight [ expr $wTop + $wHeight + $brdrWdthB - 1 ]
-    set ::win_lay::ZOOMED_WINDOW_GEOMETRY [list $maximizedX $maximizedY $maxContentWidth $maxContentHeight]
-    set ::win_lay::MEASURED_BORDER_WIDTHS [list $brdrWdthL $brdrWdthT $brdrWdthR $brdrWdthB]
-    puts $::win_lay::ZOOMED_WINDOW_GEOMETRY
-    puts $::win_lay::MEASURED_BORDER_WIDTHS
+    
+    puts [list $maximizedX $maximizedY $maxContentWidth $maxContentHeight]
+
+
+    # semi-experimental findings, some of them are quite counter-intuitive
+
+    variable TitleBarHeight [expr $brdrWdthT ]
+    showVar TitleBarHeight
+
+    #
+    # available width and height of the screen (obtained from measuring a zoomed window)
+    # note that in some multi-monitor setups `winfo ScreenHeight` and `winfo ScreenWidth` give
+    # a total size of a desktop combined from all windows, which is not suitable for tiling
+    # windows because a part of this cumulative desktop is actually invisible
+    # also winfo does not give information about task bar space. So maximizing window and measuring
+    # it is a way to obtain values for at least one (generally speaking, random) display
+    #
+    variable ScreenWidthAvailable [expr $maxContentWidth + $maximizedX - 1]
+    variable ScreenHeightAvailable [expr $maxContentHeight + 2*($maximizedY - 1) + $TitleBarHeight ] 
+
+    variable XForLeftCornerOfTheScreen $maximizedX
+
+    # unmaximized window Y is measured from 0, but we add empirical
+    # offset because frame is transparent in Win 10
+    set EmpricalOffsetDueToTransparencyOfFrame 1
+
+    variable YForTopOfTheScreen [expr -$EmpricalOffsetDueToTransparencyOfFrame ]
+
+    # total width and height of decoration of the frame
+    # we can not calculate it precisely, so we use some empirical apprach, and we allow
+    # windows to overlap. We can't control how far do they overlap
+    variable TotalDecorationWidth 0 
+    variable TotalDecorationHeight [expr $TitleBarHeight - 2*$EmpricalOffsetDueToTransparencyOfFrame]
+
     destroy $ww
     destroy $w
     apply $and_then
 }
 
 proc ::win_lay::Make4Windows {} {
-    variable ::win_lay::ZOOMED_WINDOW_GEOMETRY
-    variable ::win_lay::MEASURED_BORDER_WIDTHS
-    foreach {maximizedX maximizedY maxContentWidth maxContentHeight} $::win_lay::ZOOMED_WINDOW_GEOMETRY break
-    foreach {brdrWdthL brdrWdthT brdrWdthR brdrWdthB} $::win_lay::MEASURED_BORDER_WIDTHS break
+    variable ScreenWidthAvailable
+    variable ScreenHeightAvailable
+    variable TotalDecorationWidth
+    variable TotalDecorationHeight
+    variable XForLeftCornerOfTheScreen
+    variable YForTopOfTheScreen
 
-    # semi-experimental findings, some of them are quite counter-intuitive
-
-    set TitleBarHeight [expr $brdrWdthT ]
-    showVar TitleBarHeight
-
-    set ScreenWidth [expr $maxContentWidth + $maximizedX - 1]
-    set ScreenHeight [expr $maxContentHeight + 2*($maximizedY - 1) + $TitleBarHeight ] 
-
-    showVar ScreenWidth
-    showVar ScreenHeight
-    # unmaximized window X is measured from $maximizedX
-    set DeltaX $maximizedX
-
-    # unmaximized window Y is measured from 0, but we add empirical
-    # offset because frame is transparent in Win 10
-    set EmpricalOffsetDueToTransparencyOfFrame 1
-
-    set DeltaY [expr -$EmpricalOffsetDueToTransparencyOfFrame ]
-    
-    set ContentWidth [expr $ScreenWidth/2]
-    
-    set ContentHeight [expr $ScreenHeight/2 - $TitleBarHeight \
-         + 2*$EmpricalOffsetDueToTransparencyOfFrame ]
+    set ContentWidth [expr $ScreenWidthAvailable/2 - $TotalDecorationWidth ]
+    set ContentHeight [expr $ScreenHeightAvailable/2 - $TotalDecorationHeight ]
 
     MakeSampleWindow .tl 
-    wm geometry .tl "${ContentWidth}x$ContentHeight+[expr $DeltaX + 0*$ScreenWidth/2]+[expr $DeltaY + 0*$ScreenHeight/2]"
+    wm geometry .tl "${ContentWidth}x$ContentHeight+[expr $XForLeftCornerOfTheScreen + 0*$ScreenWidthAvailable/2]+[expr $YForTopOfTheScreen + 0*$ScreenHeightAvailable/2]"
 
     MakeSampleWindow .tr
-    wm geometry .tr "${ContentWidth}x$ContentHeight+[expr $DeltaX + 1*$ScreenWidth/2]+[expr $DeltaY + 0*$ScreenHeight/2 ]"
+    wm geometry .tr "${ContentWidth}x$ContentHeight+[expr $XForLeftCornerOfTheScreen + 1*$ScreenWidthAvailable/2]+[expr $YForTopOfTheScreen + 0*$ScreenHeightAvailable/2 ]"
 
     MakeSampleWindow .bl
-    wm geometry .bl "${ContentWidth}x$ContentHeight+[expr $DeltaX + 0*$ScreenWidth/2]+[expr $DeltaY + 1*$ScreenHeight/2 ]"
+    wm geometry .bl "${ContentWidth}x$ContentHeight+[expr $XForLeftCornerOfTheScreen + 0*$ScreenWidthAvailable/2]+[expr $YForTopOfTheScreen + 1*$ScreenHeightAvailable/2 ]"
 
     MakeSampleWindow .br
-    wm geometry .br "${ContentWidth}x$ContentHeight+[expr $DeltaX + 1*$ScreenWidth/2]+[expr $DeltaY + 1*$ScreenHeight/2 ]"
+    wm geometry .br "${ContentWidth}x$ContentHeight+[expr $XForLeftCornerOfTheScreen + 1*$ScreenWidthAvailable/2]+[expr $YForTopOfTheScreen + 1*$ScreenHeightAvailable/2 ]"
 
 }
 
@@ -227,9 +243,9 @@ proc ::win_lay::MeasureScreenWalkOverFrame {left top hrzIncrement vrtIncrement h
 
 # geometry_spec is from win_lay description
 proc ::win_lay::TranslateRelativeGeometryToCurrentScreen {geometry_spec} {
-    variable ::win_lay::ZOOMED_WINDOW_GEOMETRY
     foreach { w h l t } $geometry_spec break
-    foreach { ws hs lo to } $ZOOMED_WINDOW_GEOMETRY break
+
+
     set w [expr round($w * $ws)]
     set h [expr round($h * $hs)]
     set l [expr round($l * $ws) + $lo - 1]
