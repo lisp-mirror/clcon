@@ -43,9 +43,35 @@ From all that, one rule follows:
 
 This rule is quite non-obvious. 
 
+### REPL
+When `(in-package)` form is sent to SLIME REPL, SLIME looks for that package in READTABLE-ALIST. If package is present, corresponding readtable is set as current in REPL (setting value for `*readtable*` for subsequent requests. Actual value of `*readtable*` is ignored unless it is set by `in-readtable` form. This is a violation of CL standard. Let me give the example (to be executed in SLIME REPL):
+
+```
+>(ql:quickload :named-readtables)
+>(named-readtables:defreadtable :foo (:merge nil))
+>(defpackage :bar (:use :cl :named-readtables))
+>(in-package :bar)
+>(in-readtable :foo) ; readtable foo gets associated to package :bar
+>(set-syntax-from-char #\@ #\') ; now @ imitates quote
+>(in-package :cl-user) 
+>*readtable* 
+#<NAMED-READTABLE :FOO > ; no change because cl-user has no RT binding
+>(named-readtables:in-readtable nil) ; now cl-user is associated to standard readtable (or its copy, I don't remember)
+>*readtable*
+#<NAMED-READTABLE :CURRENT >
+>(in-package :bar)
+>*readtable*
+#<NAMED-READTABLE :FOO > ; readtable changed - violation of the standard
+>(setq *readtable* (find-readtable nil)) ; cheat named-readtables 
+>*readtable*
+#<NAMED-READTABLE :CURRENT >
+>@baz
+baz ; *readtable* is standard, but REPL uses :foo from *READTABLE-ALIST* - very odd
+```
+
 
 ### Conslusion
-To sum up, SLIME + NAMED-READTABLES behavior is currently non-documented and unreliable. 
+To sum up, SLIME + NAMED-READTABLES behavior is currently non-documented, unreliable, odd and deviates from CL standard. 
 
 ## Suggested solution
 
@@ -53,7 +79,13 @@ To sum up, SLIME + NAMED-READTABLES behavior is currently non-documented and unr
 
 - currently for any file operation (e.g. `slime-compile-defun`) SLIME parses the file and finds the closest `(in-package)` form above the point to learn current package. Let us make it look for `(in-readtable)` form also.
 
-- currently SLIME sends package designator to SWANK with most requests `(:emacs-rex request)`. Readtable is deduced by SWANK from `*READTABLE-ALIST*`. Let us modify SLIME so that it would send a readtable designator also. Readtable designator is taken from `(in-readtable)` form. For REPL-related requests, `*readtable*` is sent. If there is neither `(in-readtable)` form nor `*readtable*` in the context, SLIME sends some "no readtable specified" marker. When "no readtable specified" is sent, SWANK takes the readtable from `*READTABLE-ALIST*` for a package given. 
+- currently SLIME sends package designator to SWANK with most requests `(:emacs-rex request)`. Readtable is deduced by SWANK from `*READTABLE-ALIST*`. Let us modify SLIME so that for requests related to buffer contents it would send a readtable designator also. 
+
+- for editor, readtable is deduced from the nearest `(in-readtable)` form above the editor point. If there is no one, fallback to old behavior.
+
+- for REPL, we have to duplicate what happens to package. Namely there is a slime-buffer-package buffer-local variable. We have to clone it to slime-buffer-readtable. Also there is a mechanism to detect changes made while REPL request is running, e.g. when user calls some `set-my-package` function changing `*package*`. We have to clone that mechanism for readtables. 
+
+- there is still a room to choose what to do with `(in-package)` for packages listed in `*readtable-alist*`. IMO it is better to decouple changing package from changing readtable, and have no default readtable for package. But it can break user's setups and habits. Conservative approach is to keep old (odd) behavior for packages not listed on list of exclusions. For packages on an exclusion list, make SLIME obey the standard, so that `(in-package)` does not affect `*readtable*`. In this case, there is no change until user or library vendor puts a package on an exclusion list. 
 
 ## Use of SLIME with this solution
 
@@ -61,7 +93,7 @@ To sum up, SLIME + NAMED-READTABLES behavior is currently non-documented and unr
 Nothing is changed
 
 ### Projects which want better behavior
-- set packages and readtables of the project to the exclusion list, so that `*READTABLE-ALIST*` is not touched when `(in-readtable)` form is executed for those packages and readtables
+- set packages and readtables of the project to the exclusion list, so that `*READTABLE-ALIST*` is not touched when `(in-readtable)` form is executed for those packages and readtables. Appropriate place to do that is asd file
 - insert `(in-readtable)` form into each source file
 - issue `(in-readtable)` after `(in-package)` in REPL
 - if one needs a default readtable for package, it can be set in `*READTABLE-ALIST*` manually
