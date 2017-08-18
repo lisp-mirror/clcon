@@ -9,8 +9,7 @@ package require Tk
 # When a window is maximized, both invisible and visible frames are moved beyond
 # the screen bounds. When windows are tiled, invisible frames of neighbouring windows overlap,
 # but visible ones are put side by side. On other platforms, e.g. Windows Server 2003, 
-# window has a non-transparent frame. I found no way to programmatically learn the 
-# actual width of visible frame. 
+# window has a non-transparent frame. I found no way to obtain the actual width of visible frame. 
 # So it is impossible to find out actual window size programmatically w/o calling WinAPI.
 # So I do what I can and let visible frames overlap (this is good in fact because in Win10 
 # frames are transparent and because active window get a bit greater visually than inactive
@@ -197,17 +196,46 @@ proc ::win_lay::Make4Windows {} {
     set ContentHeight [expr $ScreenHeightAvailable/2 - $TotalDecorationHeight ]
 
     MakeSampleWindow .tl 
-    wm geometry .tl "${ContentWidth}x$ContentHeight+[expr $XForLeftCornerOfTheScreen + 0*$ScreenWidthAvailable/2]+[expr $YForTopOfTheScreen + 0*$ScreenHeightAvailable/2]"
+    wm geometry .tl [::win_lay::ConvertRelativeWindowGeometryToWmGeometryArgumentsOnCurrentScreen {0.4 0.5 0 0 } ]
 
     MakeSampleWindow .tr
-    wm geometry .tr "${ContentWidth}x$ContentHeight+[expr $XForLeftCornerOfTheScreen + 1*$ScreenWidthAvailable/2]+[expr $YForTopOfTheScreen + 0*$ScreenHeightAvailable/2 ]"
+    wm geometry .tr [::win_lay::ConvertRelativeWindowGeometryToWmGeometryArgumentsOnCurrentScreen {0.6 0.5 0.4 0 } ]
 
     MakeSampleWindow .bl
-    wm geometry .bl "${ContentWidth}x$ContentHeight+[expr $XForLeftCornerOfTheScreen + 0*$ScreenWidthAvailable/2]+[expr $YForTopOfTheScreen + 1*$ScreenHeightAvailable/2 ]"
+    wm geometry .bl [::win_lay::ConvertRelativeWindowGeometryToWmGeometryArgumentsOnCurrentScreen {0.4 0.5 0 0.5 } ]
 
     MakeSampleWindow .br
-    wm geometry .br "${ContentWidth}x$ContentHeight+[expr $XForLeftCornerOfTheScreen + 1*$ScreenWidthAvailable/2]+[expr $YForTopOfTheScreen + 1*$ScreenHeightAvailable/2 ]"
+    wm geometry .br [::win_lay::ConvertRelativeWindowGeometryToWmGeometryArgumentsOnCurrentScreen {0.6 0.5 0.4 0.5 } ]
+}
 
+
+# geometry_spec is from win_lay description
+proc ::win_lay::ConvertRelativeWindowGeometryToWmGeometryArgumentsOnCurrentScreen {geometry_spec} {
+    foreach { w h l t } $geometry_spec break
+
+    variable ScreenWidthAvailable
+    variable ScreenHeightAvailable
+    variable TotalDecorationWidth
+    variable TotalDecorationHeight
+    variable XForLeftCornerOfTheScreen
+    variable YForTopOfTheScreen
+
+    # +1 and -1 here is to make ideal windows be non-overlapped and make them cover the
+    # whole screen. So we yield bottom and right row of pixels to the next window on 
+    # bottom or on the right of this window, and add a virtual bottom and right row to the
+    # available screen area. 
+    set IdealW [expr round($w * ($ScreenWidthAvailable)) ]
+    set IdealH [expr round($h * ($ScreenHeightAvailable)) ]
+    # X and Y of left top corner
+    set IdealX [expr round($l * ($ScreenWidthAvailable )) ]
+    set IdealY [expr round($t * ($ScreenHeightAvailable )) ]
+
+    set ContentW [expr $IdealW - $TotalDecorationWidth ] 
+    set ContentH [expr $IdealH - $TotalDecorationHeight ]
+    set Left [expr $IdealX + $XForLeftCornerOfTheScreen ]
+    set Top [expr $IdealY + $YForTopOfTheScreen ]
+
+    return "${ContentW}x${ContentH}+$Left+$Top"
 }
 
 
@@ -240,19 +268,6 @@ proc ::win_lay::MeasureScreenWalkOverFrame {left top hrzIncrement vrtIncrement h
 # some procs are deleted. See window_layout.tcl
 # proc ::win_lay::MeasureScreenWalkWhileAboveWindow {ww hrzIncrement vrtIncrement} {
 # proc ::win_lay::ContentCoordinates {ww} {
-
-# geometry_spec is from win_lay description
-proc ::win_lay::TranslateRelativeGeometryToCurrentScreen {geometry_spec} {
-    foreach { w h l t } $geometry_spec break
-
-
-    set w [expr round($w * $ws)]
-    set h [expr round($h * $hs)]
-    set l [expr round($l * $ws) + $lo - 1]
-    set t [expr round($t * $hs) + $to - 1]
-    return "${w}x$h+$l+$t"
-}
-
 
 proc ::win_lay::MakeSampleWindow { w } {
   catch {destroy $w}
