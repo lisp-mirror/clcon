@@ -221,7 +221,8 @@ proc ::tkcon::Init {args} {
     variable COLOR
     variable PRIV
     variable ENABLE_UNKNOWN
-    variable WINDOW_LAYOUT
+    variable WINDOW_LAYOUTS
+    variable CURRENT_WINDOW_LAYOUT
     global tcl_platform env tcl_interactive errorInfo
 
     set tcl_interactive 1
@@ -808,7 +809,7 @@ proc ::tkcon::InitUI {title} {
     }
     set PRIV(base) $w
 
-    # assigns the default value to ::tkcon::WINDOW_LAYOUT 
+    # assigns the default value to ::tkcon::WINDOW_LAYOUTS and ::tkcon::CURRENT_WINDOW_LAYOUT 
     ::win_lay::SetDefaultWindowLayout
 
     catch {font create tkconfixed -family Courier -size -20}
@@ -2203,7 +2204,8 @@ proc ::tkcon::MainInit {} {
                 puts stderr "Failed to save desktop file:\n$fid"
                 after 3000
             } else {
-                puts $fid "::tkcon::EvalSlave [::dump ::tkcon::WINDOW_LAYOUT]"
+                puts $fid "::tkcon::EvalSlave [::dump ::tkcon::WINDOW_LAYOUTS]"
+                puts $fid "::tkcon::EvalSlave [::dump ::tkcon::CURRENT_WINDOW_LAYOUT]"
             }
             close $fid
             if {$::tkcon::PRIV(OstanovitqServerSwank) == 1} {            

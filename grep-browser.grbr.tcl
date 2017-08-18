@@ -268,7 +268,7 @@ namespace eval ::grbr {
 
         set GrBrId [GenNamedCounter "grep_browser"]
        
-        set w [string cat $PRIV(base) ".grbrTlv" $GrBrId]
+        set w [string cat $PRIV(base) ".grbrTlv_" $GrBrId]
 
         # puts $w
         if {[winfo exists $w]} {

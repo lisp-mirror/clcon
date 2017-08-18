@@ -17,8 +17,9 @@ package require Tk
 ## support layouts
 
 proc ::win_lay::SetDefaultWindowLayout {} {
-    variable ::tkcon::win_lay
-    set win_lay [list "Default" \
+    variable ::tkcon::WINDOW_LAYOUTS
+    variable ::tkcon::CURRENT_WINDOW_LAYOUT
+    set WINDOW_LAYOUTS [list "Default" \
                         [list [::ide_structure::EditorToplevelWindowName] { 0.5 0.5 0 0 } ] \
                         [list . { 0.5 0.5 0 0.5 } ] \
                         [list [::ide_structure::BufferListBoxWindowName] { 0.5 0.5 0 0.5 } ] \
@@ -26,6 +27,7 @@ proc ::win_lay::SetDefaultWindowLayout {} {
                         [list [::ide_structure::ErrorBrowserToplevelWindowName] { 0.5 0.5 0 0.5 } ] \
                         [list .grbrTlv { 0.5 0.5 0 0.5 } ] \
                       ]
+    set CURRENT_WINDOW_LAYOUT "Default"
 }
 
 # geometry_spec is from win_lay description
@@ -52,5 +54,7 @@ proc ::win_lay::ConvertRelativeWindowGeometryToWmGeometryArgumentsOnCurrentScree
 
     return "${ContentW}x${ContentH}+$Left+$Top"
 }
+
+
 
 
