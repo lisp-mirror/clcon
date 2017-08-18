@@ -201,8 +201,9 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
     TkconSourceHere recent.tcl
     TkconSourceHere window_menu.tcl
     TkconSourceHere inspthrd.tcl
+    TkconSourceHere measure_screen.win_lay.tcl
     TkconSourceHere window_layout.win_lay.tcl
-}    
+}
 
 
 ::tkcon::ReloadSomeIDESources1
