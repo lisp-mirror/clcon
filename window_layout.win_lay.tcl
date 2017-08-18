@@ -19,15 +19,42 @@ package require Tk
 proc ::win_lay::SetDefaultWindowLayout {} {
     variable ::tkcon::WINDOW_LAYOUTS
     variable ::tkcon::CURRENT_WINDOW_LAYOUT
-    set WINDOW_LAYOUTS [list "Default" \
-                        [list [::ide_structure::EditorToplevelWindowName] { 0.5 0.5 0 0 } ] \
-                        [list . { 0.5 0.5 0 0.5 } ] \
-                        [list [::ide_structure::BufferListBoxWindowName] { 0.5 0.5 0 0.5 } ] \
-                        [list [::ide_structure::DebuggerToplevelWindowName] { 0.5 0.5 0.5 0.5 } ] \
-                        [list [::ide_structure::ErrorBrowserToplevelWindowName] { 0.5 0.5 0 0.5 } ] \
-                        [list .grbrTlv { 0.5 0.5 0 0.5 } ] \
-                      ]
+    variable WINDOW_LAYOUT_IN_MEMORY
+    set WINDOW_LAYOUTS [dict create "Default" \
+                        [dict create \
+                          [::ide_structure::EditorToplevelWindowName] { 0.5 0.5 0 0 }  \
+                          . { 0.5 0.5 0 0.5 }  \
+                          [::ide_structure::BufferListBoxWindowName] { 0.5 0.5 0 0.5 }  \
+                          [::ide_structure::DebuggerToplevelWindowName] { 0.5 0.5 0.5 0.5 }  \
+                          [::ide_structure::ErrorBrowserToplevelWindowName] { 0.5 0.5 0 0.5 }  \
+                          .grbrTlv { 0.5 0.5 0 0.5 } \
+                        ]
+                       ]
     set CURRENT_WINDOW_LAYOUT "Default"
+    set WINDOW_LAYOUT_IN_MEMORY [dict get $WINDOW_LAYOUTS $CURRENT_WINDOW_LAYOUT]
+}
+
+proc ::win_lay::ExtractToolName {toplevel_name} {
+    set success [ regexp {(^\.[a-zA-Z0-9]+)[\_\.]*} $toplevel_name Ignore1 ToolName ]
+    if {!$success} {
+      error "Unable to extract tool name from $toplevel_name"
+    } 
+    return $ToolName
+}
+
+# Extracts data about this tool from current layout 
+# If there is no position recorded for tools of that kind, does nothing
+proc ::win_lay::PositionATool {toplevel_name} {
+    variable WINDOW_LAYOUT_IN_MEMORY
+    set ToolName [win_lay::ExtractToolName $toplevel_name]
+    puts $ToolName
+    if {![dict exists $WINDOW_LAYOUT_IN_MEMORY $ToolName]} {
+      return
+    }
+    set RelativeGeometry [dict get $WINDOW_LAYOUT_IN_MEMORY $ToolName]
+    set geom [::win_lay::ConvertRelativeWindowGeometryToWmGeometryArgumentsOnCurrentScreen $RelativeGeometry]
+    wm state $toplevel_name normal
+    wm geometry $toplevel_name $geom
 }
 
 # geometry_spec is from win_lay description
