@@ -2,8 +2,31 @@ package require Tk
 
 ## Control over window layouts
 
+# Background: 
+# In Windows 10, tk creates a transparent frame of width 10 around the window.
+# When a window is active, it also has a visible frame of width 1 (in my theme), 
+# so 9 is left transparent
+# When a window is maximized, both invisible and visible frames are moved beyond
+# the screen bounds. When windows are tiled, invisible frames of neighbouring windows overlap,
+# but visible ones are put side by side. On other platforms, e.g. Windows Server 2003, 
+# window has a non-transparent frame. I found no way to programmatically learn the 
+# actual width of visible frame. 
+# So it is impossible to find out actual window size programmatically w/o calling WinAPI.
+# So I do what I can and let visible frames overlap (this is good in fact because in Win10 
+# frames are transparent and because active window get a bit greater visually than inactive
+# windows.
+# See also:
+# "tk centering window" http://wiki.tcl.tk/1254
+# "tk total window geometry" http://wiki.tcl.tk/11291 
+# https://www.linux.org.ru/forum/development/13617877
+# https://stackoverflow.com/questions/33231484/python-tkinter-how-do-i-get-the-window-size-including-borders-on-windows
+
+
 namespace eval ::win_lay {
-  variable MEASURED_SCREEN_GEOMETRY
+  # wm geometry from zoomed window
+  variable ZOOMED_WINDOW_GEOMETRY
+  # we meausure the shadow of a small normal window's border on zoomed window
+  # measured frame 
   variable MEASURED_BORDER_WIDTHS
 } 
 
@@ -20,7 +43,6 @@ namespace eval ::win_lay {
 ## values can be > 1 and negative for multi-monitor setups (at least in windows).
 ## Tools not listed in the layout are opened at some random places. Not all tools currently
 ## support layouts
-
 
 proc ::win_lay::SetDefaultWindowLayout {} {
     variable ::tkcon::win_lay
@@ -40,9 +62,9 @@ proc ::win_lay::ParseGeometry {geometry} {
     list $width $height $Left $Top
 }    
 
-# MeasureScreen starts a chain of events which fills MEASURED_SCREEN_GEOMETRY
+# MeasureScreen starts a chain of events which fills ZOOMED_WINDOW_GEOMETRY
 # and_then is a lambda with no arguments smth.like
-# [list {} [subst -nocommands {puts \$::win_lay::MEASURED_SCREEN_GEOMETRY}]]
+# [list {} [subst -nocommands {puts \$::win_lay::ZOOMED_WINDOW_GEOMETRY}]]
 proc ::win_lay::MeasureScreen {and_then} {
     set w .measureScreenBig
     catch {destroy $w}
@@ -65,7 +87,7 @@ proc ::win_lay::MeasureScreenPart2 {and_then} {
     # or for decorated window, but we use 'wm geometry' because it is settable. 
     foreach {width height Left Top} [::win_lay::ParseGeometry $geom] break
 
-    set ::win_lay::MEASURED_SCREEN_GEOMETRY [list $width $height $Left $Top]
+    # set ::win_lay::ZOOMED_WINDOW_GEOMETRY [list $width $height $Left $Top]
 
     set wwLeft [expr $Left+round($width/2)]
     set wwTop [expr $Top+round($height/2)]
@@ -85,7 +107,7 @@ proc ::win_lay::MeasureScreenPart2 {and_then} {
 }
 
 proc ::win_lay::MeasureScreenPart3 {and_then} {
-    variable ::win_lay::MEASURED_SCREEN_GEOMETRY
+    variable ::win_lay::ZOOMED_WINDOW_GEOMETRY
     variable ::win_lay::MEASURED_BORDER_WIDTHS
     set w .measureScreenBig
     set ww .measureScreenSmall
@@ -106,82 +128,37 @@ proc ::win_lay::MeasureScreenPart3 {and_then} {
     # but increment on one of coordinates is zero. We start end = start+0.5 for this
     # fixed coordinate to emphasize that we're not expecting to ever achieve loop exit
     # condition
-    set lWidth [lindex [::win_lay::MeasureScreenWalkOverFrame \
+    set brdrWdthL [lindex [::win_lay::MeasureScreenWalkOverFrame \
                         $wwLeft $wwTop -1 0 [expr $wLeft-1] [expr $wTop+0.5]] 0] 
-    set tWidth [lindex [::win_lay::MeasureScreenWalkOverFrame \
+    set brdrWdthT [lindex [::win_lay::MeasureScreenWalkOverFrame \
                         $wwLeft $wwTop 0 -1 [expr $wLeft+0.5] [expr $wTop-1]] 1]
-    set rWidth [lindex [::win_lay::MeasureScreenWalkOverFrame \
+    set brdrWdthR [lindex [::win_lay::MeasureScreenWalkOverFrame \
                         $wwLeft $wwTop 1 0 [expr $wRight+1] [expr $wTop+0.5]] 0]
-    set bWidth [lindex [::win_lay::MeasureScreenWalkOverFrame \
+    set brdrWdthB [lindex [::win_lay::MeasureScreenWalkOverFrame \
                         $wwLeft $wwTop 0 1 [expr $wLeft+0.5] [expr $wBottom+1]] 1]
     
-    set sLeft [ expr $wLeft - $lWidth ]
-    set sTop [ expr $wTop - $rWidth ]
-    set sRight [ expr $wLeft + $wWidth + $rWidth - 1 ]
-    set sBottom [ expr $wTop + $wHeight + $bWidth - 1 ]
-    set ::win_lay::MEASURED_SCREEN_GEOMETRY [ list $sLeft $sTop $sRight $sBottom ]
-    set ::win_lay::MEASURED_BORDER_WIDTHS [list $lWidth $tWidth $rWidth $bWidth]
-    puts $::win_lay::MEASURED_SCREEN_GEOMETRY
+    set maximizedX [ expr $wLeft - $brdrWdthL ]
+    set maximizedY [ expr $wTop - $brdrWdthR ]
+    set maxContentWidth [ expr $wLeft + $wWidth + $brdrWdthR - 1 ]
+    set maxContentHeight [ expr $wTop + $wHeight + $brdrWdthB - 1 ]
+    set ::win_lay::ZOOMED_WINDOW_GEOMETRY [list $maximizedX $maximizedY $maxContentWidth $maxContentHeight]
+    set ::win_lay::MEASURED_BORDER_WIDTHS [list $brdrWdthL $brdrWdthT $brdrWdthR $brdrWdthB]
+    puts $::win_lay::ZOOMED_WINDOW_GEOMETRY
     puts $::win_lay::MEASURED_BORDER_WIDTHS
     destroy $ww
     destroy $w
     apply $and_then
 }
 
-# walks from specified point by increments in X and Y directions until it finds that
-# current point is over .measureScreenBig or until it approaches limits
-proc ::win_lay::MeasureScreenWalkOverFrame {left top hrzIncrement vrtIncrement hrzLimit vrtLimit} {
-    set w .measureScreenBig
-    set ww .measureScreenSmall
-    set startx ""
-    set starty ""
-    for { set x $left ; set y $top } { $x != $hrzLimit && $y != $vrtLimit } { incr x $hrzIncrement ; incr y $vrtIncrement } {
-      set win ""
-      set win [ winfo containing $x $y ]
-      # puts $win
-      if { [string compare $win $w ] == 0 } {
-        set res [list [expr (abs($x-$startx))] [expr (abs($y-$starty))]]
-        return $res
-      } elseif { [string compare $win $ww ] == 0} {
-        # note start point
-        set startx $x
-        set starty $y
-        # do nothing
-      } elseif { [string compare $win ""] == 0 } {
-        # we're in border, take a breath...
-      }
-   }
-}
-
-
-# 3 procs are deleted. See window_layout.tcl
-# proc ::win_lay::MeasureScreenWalkWhileAboveWindow {ww hrzIncrement vrtIncrement} {
-# proc ::win_lay::ContentCoordinates {ww} {
-# proc ::win_lay::TranslateRelativeGeometryToCurrentScreen {geometry_spec} {
-
-proc ::win_lay::MakeSampleWindow { w } {
-  catch {destroy $w}
-  toplevel $w ; text $w.t -setgrid 0 ; pack $w.t -padx 5 -pady 5 -fill both
-}
-
 proc ::win_lay::Make4Windows {} {
-    variable ::win_lay::MEASURED_SCREEN_GEOMETRY
+    variable ::win_lay::ZOOMED_WINDOW_GEOMETRY
     variable ::win_lay::MEASURED_BORDER_WIDTHS
-    foreach {maximizedX maximizedY maxContentWidth maxContentHeight} $::win_lay::MEASURED_SCREEN_GEOMETRY break
-    foreach {wLeft wTop wRight wBottom} $::win_lay::MEASURED_BORDER_WIDTHS break
+    foreach {maximizedX maximizedY maxContentWidth maxContentHeight} $::win_lay::ZOOMED_WINDOW_GEOMETRY break
+    foreach {brdrWdthL brdrWdthT brdrWdthR brdrWdthB} $::win_lay::MEASURED_BORDER_WIDTHS break
 
     # semi-experimental findings, some of them are quite counter-intuitive
-    # Background: 
-    # In Windows 10, tk creates a transparent frame of width 10 around the window.
-    # also the window has (in my theme) a visible frame of width 1 (so 9 is left transparent)
-    # When a window is maximized, both invisible and visible frames are moved beyond
-    # the screen bounds. When windows are tiled, invisible frames of neighbouring windows overlap,
-    # but visible ones are put side by side. I found no way to programmatically learn the 
-    # actual width of visible frame, but it is wider on other platforms e.g. (Windows Server 2003)
-    # So it is impossible to find out actual window size programmatically w/o calling WinAPI.
-    # So I do what I can and let visible frames overlap. 
 
-    set TitleBarHeight [expr $wTop ]
+    set TitleBarHeight [expr $brdrWdthT ]
     showVar TitleBarHeight
 
     set ScreenWidth [expr $maxContentWidth + $maximizedX - 1]
@@ -218,3 +195,50 @@ proc ::win_lay::Make4Windows {} {
 }
 
 
+# walks from specified point by increments in X and Y directions until it finds that
+# current point is over .measureScreenBig or until it approaches limits
+proc ::win_lay::MeasureScreenWalkOverFrame {left top hrzIncrement vrtIncrement hrzLimit vrtLimit} {
+    set w .measureScreenBig
+    set ww .measureScreenSmall
+    set startx ""
+    set starty ""
+    for { set x $left ; set y $top } { $x != $hrzLimit && $y != $vrtLimit } { incr x $hrzIncrement ; incr y $vrtIncrement } {
+      set win ""
+      set win [ winfo containing $x $y ]
+      # puts $win
+      if { [string compare $win $w ] == 0 } {
+        set res [list [expr (abs($x-$startx))] [expr (abs($y-$starty))]]
+        return $res
+      } elseif { [string compare $win $ww ] == 0} {
+        # note start point
+        set startx $x
+        set starty $y
+        # do nothing
+      } elseif { [string compare $win ""] == 0 } {
+        # we're in border, take a breath...
+      }
+   }
+}
+
+
+# some procs are deleted. See window_layout.tcl
+# proc ::win_lay::MeasureScreenWalkWhileAboveWindow {ww hrzIncrement vrtIncrement} {
+# proc ::win_lay::ContentCoordinates {ww} {
+
+# geometry_spec is from win_lay description
+proc ::win_lay::TranslateRelativeGeometryToCurrentScreen {geometry_spec} {
+    variable ::win_lay::ZOOMED_WINDOW_GEOMETRY
+    foreach { w h l t } $geometry_spec break
+    foreach { ws hs lo to } $ZOOMED_WINDOW_GEOMETRY break
+    set w [expr round($w * $ws)]
+    set h [expr round($h * $hs)]
+    set l [expr round($l * $ws) + $lo - 1]
+    set t [expr round($t * $hs) + $to - 1]
+    return "${w}x$h+$l+$t"
+}
+
+
+proc ::win_lay::MakeSampleWindow { w } {
+  catch {destroy $w}
+  toplevel $w ; text $w.t -setgrid 0 ; pack $w.t -padx 5 -pady 5 -fill both
+}
