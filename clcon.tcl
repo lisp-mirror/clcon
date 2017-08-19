@@ -810,7 +810,6 @@ proc ::tkcon::InitUI {title} {
     set PRIV(base) $w
 
     # assigns the default value to ::tkcon::WINDOW_LAYOUTS and ::tkcon::CURRENT_WINDOW_LAYOUT 
-    ::win_lay::SetDefaultWindowLayout
 
     catch {font create tkconfixed -family Courier -size -20}
     catch {font create tkconfixedbold -family Courier -size -20 -weight bold}
@@ -884,17 +883,25 @@ proc ::tkcon::InitUI {title} {
         }
     }
 
-    if {!$PRIV(WWW)} {
-	wm title $root "clcon $PRIV(version) $title"
-	if {$PRIV(showOnStartup)} {
-	    # this may throw an error if toplevel is embedded
-	    catch {wm deiconify $root}
-	}
-    }
-    if {$PRIV(showOnStartup)} { focus -force $PRIV(console) }
-    if {$OPT(gc-delay)} {
-	after $OPT(gc-delay) ::tkcon::GarbageCollect
-    }
+    # Prepare to lay out windows
+    ::win_lay::SetDefaultWindowLayout
+
+    ::win_lay::MeasureScreen [list {} [subst -nocommands {
+
+      ::win_lay::PositionATool $root
+
+      if {!$PRIV(WWW)} {
+        wm title $root "clcon $PRIV(version) $title"
+        if {$PRIV(showOnStartup)} {
+           # this may throw an error if toplevel is embedded
+           catch {wm deiconify $root}
+        }
+      }
+      if {$PRIV(showOnStartup)} { focus -force $PRIV(console) }
+      if {$OPT(gc-delay)} {
+         after $OPT(gc-delay) ::tkcon::GarbageCollect
+      }
+   }]]
 }
 
 # Hunt around the XDG defined directories for the icon.
@@ -4544,3 +4551,4 @@ proc ::tkcon::Udatlitq_SystemIndex_txt {} {
 package provide tkcon $::tkcon::VERSION
 
 ::tkcon::OuterNewSwank
+

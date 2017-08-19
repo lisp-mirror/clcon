@@ -136,9 +136,12 @@ namespace eval ::fndrpl {
 
         bind $find <Escape> "destroy $find"
         focus $find.l.f.f1.entry
+
+
         grab $find
 
-        powin $find $area
+        ::win_lay::PositionATool $find
+        # powin $find $area
     }
 
 }        

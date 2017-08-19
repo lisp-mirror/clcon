@@ -160,7 +160,7 @@ namespace eval ::grbr {
         set tbl [GetTitleListMenuTbl $grbr]
 
         DefaultSortHeaders $tbl
-        
+        ::win_lay::PositionATool $grbr
         ::erbr::DoGoToTop $grbr
        
         focus [$tbl bodypath]

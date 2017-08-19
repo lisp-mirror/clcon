@@ -308,6 +308,7 @@ namespace eval ::edt {
         if {![winfo exists $tw]} {
             EnsureToplevelWindowWithPathname $tw
             SetupEditorWindowCommon $tw
+            ::win_lay::PositionATool $tw
         }
     }
 

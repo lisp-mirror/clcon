@@ -15,6 +15,7 @@ package require Tk
 ## values can be > 1 and negative for multi-monitor setups (at least in windows).
 ## Tools not listed in the layout are opened at some random places. Not all tools currently
 ## support layouts
+## Aread name "~" means that the window is free floating (no position is set by clcon)
 
 proc ::win_lay::SetDefaultWindowLayout {} {
     variable ::tkcon::WINDOW_LAYOUTS
@@ -29,17 +30,17 @@ proc ::win_lay::SetDefaultWindowLayout {} {
                              "Error-details-and-help" {0.5 0.3 0 0.5} \
                              "Dialogs" {0.5 0.2 0 0.8} \
                              "Editor-and-inspector" {0.5 0.6 0.5 0} \
-                             "Debugger-and-threads" {0.5 0.4 0.5 0.6}] \
+                             "Debugger" {0.4 0.8 0 0}] \
                           "Default-area" "Debugger-and-threads" \
                           "Mapping-of-tools-to-areas" \
                           [dict create \
                              [::ide_structure::EditorToplevelWindowName] "Editor-and-inspector" \
                              [::ide_structure::BufferListBoxWindowName] "Editor-and-inspector" \
-                             [::ide_structure::DebuggerToplevelWindowName] "Debugger-and-threads" \
+                             [::ide_structure::DebuggerToplevelWindowName] "Debugger" \
                              [::ide_structure::ErrorBrowserToplevelWindowName] "Console-and-location-lists"  \
                             .grbrTlv "Console-and-location-lists"   \
                             . "Console-and-location-lists"          \
-                            .__inspthreads "Debugger-and-threads"   \
+                            .threadList "~"   \
                             .find "Dialogs"  \
                             .completions_menu "Dialogs" \
                             .erbrTv "Error-details-and-help" \
@@ -66,16 +67,19 @@ proc ::win_lay::ExtractToolName {toplevel_name} {
 
 # Extracts data about this tool from current layout 
 # If there is no position recorded for tools of that kind, does nothing
+# see also ::powin
 proc ::win_lay::PositionATool {toplevel_name} {
     variable WINDOW_LAYOUT_IN_MEMORY
     set wl $WINDOW_LAYOUT_IN_MEMORY
-    puts $wl
     set ToolName [win_lay::ExtractToolName $toplevel_name]
     puts $ToolName
     if {[dict exists $wl "Mapping-of-tools-to-areas" $ToolName]} {
       set AreaName [dict get $wl "Mapping-of-tools-to-areas" $ToolName]
     } else {
       set AreaName [dict get $wl "Default-area"]
+    }
+    if {[string compare $AreaName "~"] == 0} {
+      return
     }
     set RelativeGeometry [dict get $wl "Geometry-of-areas" $AreaName]
     set geom [::win_lay::ConvertRelativeWindowGeometryToWmGeometryArgumentsOnCurrentScreen $RelativeGeometry]
@@ -107,6 +111,7 @@ proc ::win_lay::ConvertRelativeWindowGeometryToWmGeometryArgumentsOnCurrentScree
 
     return "${ContentW}x${ContentH}+$Left+$Top"
 }
+
 
 
 

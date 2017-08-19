@@ -160,7 +160,7 @@ proc ::win_lay::MeasureScreenPart3 {} {
     set maxContentWidth [ expr $wLeft + $wWidth + $brdrWdthR - 1 ]
     set maxContentHeight [ expr $wTop + $wHeight + $brdrWdthB - 1 ]
     
-    puts [list $maximizedX $maximizedY $maxContentWidth $maxContentHeight]
+    #puts [list $maximizedX $maximizedY $maxContentWidth $maxContentHeight]
 
 
     # semi-experimental findings, some of them are quite counter-intuitive

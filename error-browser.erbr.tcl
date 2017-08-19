@@ -377,6 +377,7 @@ namespace eval ::erbr {
         
         pack $w.body -fill both -expand 1
 
+        ::win_lay::PositionATool $w
         bind $w <<GoToTop>> [list ::erbr::DoGoToTop $w]
 
         return
@@ -553,10 +554,11 @@ namespace eval ::erbr {
         # ---------------------------- make toplevel window TitleListWindow -----------    
         set w [::ide_structure::ErrorBrowserToplevelWindowName]
         # puts $w
-        if {[winfo exists $w]} {
-            ClearTitleList
-            return $w
-        }
+        #if {[winfo exists $w]} {
+        #    ClearTitleList
+        #    return $w
+        #}
+        catch {destroy $w}
 
         toplevel $w
         wm withdraw $w
@@ -619,6 +621,7 @@ namespace eval ::erbr {
         TitleListWindowMenu $w $menu
         #TitleListInspectMenu $w $menu $w.body.text
 
+        ::win_lay::PositionATool $w
         return $w    
     }
 

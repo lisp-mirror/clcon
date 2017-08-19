@@ -31,8 +31,9 @@ namespace eval ::inspthrd {
 
     proc PrepareGui1 {Reply} {
         variable ::tkcon::PRIV
+        variable ::tkcon::OPT
         # Create unique edit window toplevel
-        set w $PRIV(base).__inspthreads
+        set w $PRIV(base).threadList
         # set i 0
         if {[winfo exists $w]} {
             destroy $w
@@ -53,6 +54,7 @@ namespace eval ::inspthrd {
         ::clcon_text::clcon_text $w.body.text -readonly 1
 
         ::gui_util::ConfigureTextFonts $w.body.text
+        # override with small font for temporary
         $w.body.text configure \
             -xscrollcommand [list $w.body.sx set] \
             -yscrollcommand [list $w.body.sy set] 
@@ -111,6 +113,7 @@ namespace eval ::inspthrd {
         grid columnconfigure $w.body 1 -weight 1
         grid rowconfigure $w.body 0 -weight 1 
         pack $w.body -fill both -expand 1
+        ::win_lay::PositionATool $w
         wm deiconify $w
         focus $w.body.text
         return $w

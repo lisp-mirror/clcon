@@ -135,7 +135,8 @@ namespace eval ::buli {
 
         FillData
         HighlightCurrentlyVisibleBuffer
-        
+
+        ::win_lay::PositionATool $w
         DoGoToTop $w
         
         focus [$tbl bodypath]

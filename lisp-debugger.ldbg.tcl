@@ -481,6 +481,7 @@ namespace eval ::ldbg {
         EnableDisableMenus $w
 
         set InTheDebugger 1
+        ::win_lay::PositionATool $w
         DoGoToTop $w
         
         # if {[info exists LispDebuggerGeometry]} {
@@ -1154,10 +1155,12 @@ namespace eval ::ldbg {
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
         set w [::ide_structure::DebuggerToplevelWindowName]
-        if {[winfo exists $w]} {
-            ClearStackFramesTableList
-            return $w
-        }
+        catch {destroy $w}
+
+        #if {[winfo exists $w]} {
+        #    ClearStackFramesTableList
+        #    return $w
+        #}
 
         set metrics [font measure [ tkcon font ] "w"]
         toplevel $w -width [expr { 50 * $metrics }]
