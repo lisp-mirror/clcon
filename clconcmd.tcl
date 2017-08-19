@@ -99,6 +99,11 @@ Currently defined commands are: "
         иф [list [string cat $::tkcon::YarRoot "/ит"] [string cat $::tkcon::YarRoot "/док"] [string cat $::tkcon::YarRoot "/../yar.my/док/оя-яр-1"]] $str 
     }
 
+    # search in clcon tcl sources
+    proc finct { str } {
+      ::clconcmd::finf -types tcl [string cat $::tkcon::YarRoot "/lp/clcon"] $str
+    }
+
     # 
     proc finf {args} {
         # Find in files. Synopsys ([[]] means optional part)

@@ -11,7 +11,7 @@ namespace eval ::спс {
 
         set GrBrId [GenNamedCounter "СпрПоСимв"]
        
-        set w [string cat $PRIV(base) ".СпрПоСимв" $GrBrId]
+        set w [string cat $PRIV(base) ".СпрПоСимв_" $GrBrId]
 
         if {[winfo exists $w]} {
             error "Окно просмотровщика справки $w уже существует"

@@ -227,7 +227,7 @@ namespace eval ::buli {
         }
 
         set metrics [font measure tkconfixed "w"]
-        toplevel $w -width [expr { 50 * $metrics }]
+        toplevel $w 
         wm withdraw $w
         
         # title 

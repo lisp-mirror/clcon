@@ -239,7 +239,7 @@ proc ::mprs::DoReadString {EventAsList} {
     set Tag [Unleash [lindex $EventAsList 2]]
 
     set _ok ""
-    set t ".inputString$Tag"
+    set t ".inputString_$Tag"
     toplevel $t
     wm title $t "Введите строку"
     wm protocol $t WM_DELETE_WINDOW "set _ok 0"
