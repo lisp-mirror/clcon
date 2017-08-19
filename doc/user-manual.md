@@ -484,8 +484,10 @@ TO DO for window layouts
 - ability to remember position for find tool 
 - menu command to see "tool name" of the window
 - measuring process is fragile. Try to get rid of boundary measuring
-- if measuring process is running and an attempt to start new measuring process is undertaken, 
-enqueue continuation after continuation of current measuring process
+- if measuring process is running and an attempt to start new measuring process is undertaken, enqueue continuation after continuation of current measuring process
+- separate debugger condition from stack trace
+- make sure default location occupises the entire screen
+
 
 
 
