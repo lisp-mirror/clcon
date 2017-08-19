@@ -31,7 +31,7 @@ proc ::win_lay::SetDefaultWindowLayout {} {
                              "Dialogs" {0.5 0.2 0 0.8} \
                              "Editor-and-inspector" {0.5 0.6 0.5 0} \
                              "Debugger" {0.4 0.8 0 0}] \
-                          "Default-area" "Debugger-and-threads" \
+                          "Default-area" "Debugger" \
                           "Mapping-of-tools-to-areas" \
                           [dict create \
                              [::ide_structure::EditorToplevelWindowName] "Editor-and-inspector" \
@@ -48,6 +48,7 @@ proc ::win_lay::SetDefaultWindowLayout {} {
                             .СписокЗакладок "Console-and-location-lists" \
                             .СпрПоСимв "Error-details-and-help" \
                             .ЭкраннаяКлавиатура "Dialogs" \
+                            .inspector "Editor-and-inspector"
                             ]]]
     set CURRENT_WINDOW_LAYOUT "Default"
 }
@@ -72,7 +73,7 @@ proc ::win_lay::ExtractToolName {toplevel_name} {
       return .
     }
     set last_word [lindex [split $toplevel_name "."] end]
-    set success [ regexp {^([a-zA-Z0-9]+)_*} $last_word Ignore1 ToolName ]
+    set success [ regexp {^([a-zA-Z0-9а-яА-Я]+)_*} $last_word Ignore1 ToolName ]
     if {!$success} {
       error "Unable to extract tool name from $toplevel_name"
     } 
@@ -133,7 +134,7 @@ proc ::win_lay::RecordLayout {toplevel_name} {
         # (gets stdin) would be prettier, but I dont know how to remove a prompt
         set answer [lindex [::LameAskForLispExpression .tab1 "1 or 9"] 1]
         if {$answer eq 1} {
-            dict set $wl "Geometry-of-areas" $AreaName $RelativeGeometry
+            dict set WINDOW_LAYOUT_IN_MEMORY "Geometry-of-areas" $AreaName $RelativeGeometry
         } else {
             puts "window location is not saved"
         } 
@@ -144,6 +145,7 @@ proc ::win_lay::RecordLayout {toplevel_name} {
         puts "                   <RETURN>: Cancel"
         set answer [lindex [::LameAskForLispExpression .tab1 "5 or 9"] 1]
         if {$answer eq 5} {
+            dict set WINDOW_LAYOUT_IN_MEMORY "Mapping-of-tools-to-areas" $ToolName $ToolName
             dict set WINDOW_LAYOUT_IN_MEMORY "Geometry-of-areas" $ToolName $RelativeGeometry
         } else {
             puts "window location is not saved" 
@@ -157,6 +159,7 @@ proc ::win_lay::RecordLayout {toplevel_name} {
         if {$answer eq 1} {
             dict set WINDOW_LAYOUT_IN_MEMORY "Geometry-of-areas" $AreaName $RelativeGeometry
         } elseif {$answer eq 5} {
+            dict set WINDOW_LAYOUT_IN_MEMORY "Mapping-of-tools-to-areas" $ToolName $ToolName
             dict set WINDOW_LAYOUT_IN_MEMORY "Geometry-of-areas" $ToolName $RelativeGeometry
         } else {
             puts "window location is not saved" 

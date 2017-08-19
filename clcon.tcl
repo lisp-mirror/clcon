@@ -1482,11 +1482,11 @@ proc ::tkcon::InitMenus {w title} {
     ##
     set m $w.окно
     menu $m -disabledforeground $COLOR(disabled) \
-        -postcommand [list ::window_menu::DynamicWindowMenu $w $m]
+        -postcommand [list ::window_menu::DynamicWindowMenu $w $m -toplevel $PRIV(root)]
 
     set m $w.pop.окно
     menu $m -disabledforeground $COLOR(disabled) \
-        -postcommand [list ::window_menu::DynamicWindowMenu $w $m]
+        -postcommand [list ::window_menu::DynamicWindowMenu $w $m -toplevel $PRIV(root)]
 
     set rr $PRIV(root)
     ::window_menu::WindowMenuKeyBindings $rr $rr $rr

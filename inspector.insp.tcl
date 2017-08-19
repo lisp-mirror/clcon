@@ -223,7 +223,7 @@ namespace eval ::insp {
     proc PrepareGui1 {} {
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
-        set w $PRIV(base).__inspector
+        set w $PRIV(base).inspector_
         set i 0
         while {[winfo exists $w[incr i]]} {}
         append w $i
@@ -290,6 +290,7 @@ namespace eval ::insp {
         pack $w.body -fill both -expand 1
         
         wm deiconify $w
+        ::win_lay::PositionATool $w
         focus $w.body.text
     }
 

@@ -170,7 +170,7 @@ Most of the tools are equipped with "Window" menu which allows to switch between
 `.insp*` (или `.ин`) вызывает инспектор для просмотра лисповой [переменной "*"](http://filonenko-mikhail.github.io/cltl2-doc/ru/clmse108.html#dx133-176005), в которой обычно находится результат последнего вычисления REPL. 
 
 `.tcsoh filename.tcl` loads tcl file from directory where clcon.tcl script is located into main IDE tcl interpeter. Also note we
-have file/Reload some of IDE sources which reloads all sources excluding clcon.tcl, record_definition.tcl and named_args.tcl. 
+have file/Reload some of IDE sources which reloads all sources excluding clcon.tcl, `record_definition.tcl` and `named_args.tcl`. 
 
 `.hist` или `.ист` shows command history. It accepts an optional string argument. If supplies, it is treated as glob pattern to filter history event. Asteriks are added at the left and right sides of pattern prior to filtering.
 
@@ -259,15 +259,15 @@ If
 
   ii) an in-package form is present above this line 
 
-swank:*readtable-alist* variable is used to determine a readtable to use from the latest `in-package` form above the line. This is a caveat as we must have obeyed explicit `(in-readtable nil)`. Hope to fix it later. 
+`swank:*readtable-alist*` variable is used to determine a readtable to use from the latest `in-package` form above the line. This is a caveat as we must have obeyed explicit `(in-readtable nil)`. Hope to fix it later. 
 
-Note that is *readtable-alist* is modified, clcon does not note the change until it occasionally recalculates cached value of readtable for current line. 
+Note that is `*readtable-alist*` is modified, clcon does not note the change until it occasionally recalculates cached value of readtable for current line. 
 To ensure that the change is noted, close and reopen the file. 
 
-Also note that canonical :named-readtables implementation has a cludge that can modify *readtable-alist* very frequently and chaotically. This cludge is removed in forked version of named readtables library installed with clcon. 
+Also note that canonical :named-readtables implementation has a cludge that can modify `*readtable-alist*` very frequently and chaotically. This cludge is removed in forked version of named readtables library installed with clcon. 
 
 Readtable names are upcased regardless of everything when in the editor. When file is being compiled, in-readtable statement parsing 
-depends on actual current *readtable* around compilation. 
+depends on actual current `*readtable*` around compilation. 
 
 Opening files with "in-readtable" forms have side effect - uppercased readtable names are interned into keyword package. 
 
@@ -378,13 +378,13 @@ Ctrl-Shift-T.
 ----------------------------
 Just press F1 on a symbol in the console or in the editor. Some lisp 
 libraries support online help too. To learn which ones do support, try
-`.apr hyperdoc. You'll see `*hyperdoc-base-uri*` and/or `hyperspec-lookup`
+`.apr hyperdoc`. You'll see `*hyperdoc-base-uri*` and/or `hyperspec-lookup`
 symbols in some packages. For theese packages, there is a probability to
 get help via pressing f1. 
 
 Фильтрация кадров при отладке
 -----------------------------
-Если надо видеть не все кадры отладки, можно связать переменную clco:*filter-frames*. Она должна содержать функцию одного аргумента. Аргумент -- фрейм.
+Если надо видеть не все кадры отладки, можно связать переменную `clco:*filter-frames*`. Она должна содержать функцию одного аргумента. Аргумент -- фрейм.
 Результат -- истина, если надо фрейм показывать, иначе ложь.
 
 Например, чтобы скрыть фреймы функции ew::mlt-do-jmp
@@ -421,10 +421,10 @@ clcon+Яр настроен искать системы asdf во всех по�
 
 * вы только что создали файл системы и ещё её не загружали. В этом случае нужно стереть все файлы system-index.txt в `*yar-root*` и поддиректориях.
 * в файле asd имя системы задано с ошибкой.
-* файл не находится внутри *yar-root*. Пример проверки: `(budden-tools:subdir-p "c:/yar/lp/budden-tools/budden-tools.asd" *yar-root*)` Для настройки asdf для этого случая см. руководство asdf или quicklisp.
+* файл не находится внутри `*yar-root*`. Пример проверки: `(budden-tools:subdir-p "c:/yar/lp/budden-tools/budden-tools.asd" *yar-root*)` Для настройки asdf для этого случая см. руководство asdf или quicklisp.
 * уж и не знаю. Можно проверить, видит ли asdf вашу систему: `(ql:where-is-system :my-system)`
 
-Также может оказаться, что вы хотите компилировать систему, вызвав команду "Сохранить, компилировать и загрузить этот файл" в файле *.asd, но Яр видит систему с таким именем где-то в другом файле. В этом случае Яр скажет вам об этом и не станет ничего делать. Т.е., нужно понимать, что не существует команды "загрузить систему из этого файла". Существует только команда "загрузить систему с таким именем", а asdf сам решает, где взять эту систему. Мы всего лишь для удобства передаём asdf имя системы, равное имени файла, и защищаем вас от недоразумений, если asdf находит эту систему на там, где вы хотите. 
+Также может оказаться, что вы хотите компилировать систему, вызвав команду "Сохранить, компилировать и загрузить этот файл" в файле `*.asd`, но Яр видит систему с таким именем где-то в другом файле. В этом случае Яр скажет вам об этом и не станет ничего делать. Т.е., нужно понимать, что не существует команды "загрузить систему из этого файла". Существует только команда "загрузить систему с таким именем", а asdf сам решает, где взять эту систему. Мы всего лишь для удобства передаём asdf имя системы, равное имени файла, и защищаем вас от недоразумений, если asdf находит эту систему на там, где вы хотите. 
 
 К сожалению, asdf - программа довольно низкого качества, и данные простые проверки не спасут вас от проблем. Например, легко можно создать ситуацию, когда есть два файла, видимых asdf и quicklisp. В одном реально определена asd-система x, а другой называется x.asd, но в нём никакой системы нет. При определённых условиях получится, что система определена сразу в двух местах, потому что в разных полях объекта asdf/defsystem:system будут указаны разные пути к файлу). Будьте предельно аккуратны во всём, что касается asdf и да хранит вас Бог!
 
@@ -437,4 +437,60 @@ clcon+Яр настроен искать системы asdf во всех по�
 Файлы markdown, работа-с-документами-md, работа-с-документами-markdown
 ---------------
 При редактировании файлов markdown можно переходить к определениям лиспа и tcl с помощью обычных сочетаний клавиш. Нажатие F7 генерирует файл html и открывает его в вашем браузере. 
+
+Saving windows sizes and positions
+======================
+
+Overall idea
+-------------
+Clcon have no single splitted or docking window. It consists of many independent toplevel windows. For most tools, when the tool is opened and a new window is created, window's size and position is taken from a window layout. You can modify the layout so new windows will be created at new places. 
+
+What you can do to window layouts?
+----------------------------------
+### Move or resize your windows
+Window positions are NOT remembered
+
+### Explicitly save window position
+
+In tools like console, editor, debugger and many others you can choose Window/Save Window Position
+Then subsequent windows in this and following sessions will be created on the place where your window is located now. Note that some tools share window positions in layout. E.g. in default layout Editor and Inspector windows are created at the same area called "Editor-and-Inspector". Areas are a kulprit to imitate missing [docking locations](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/docking-a-window). When saving position of a window of such a tool, you are suggested to optionally remove the sharing between tools and make a separate area for the tool you are saving. That is, you're suggested to either "undoc" specific tool or to move the entire "docking location" to a new place. Follow on-screen hints.
+
+### Resettning to default layout
+Console/settings/Set default window layout. After that, restart clcon. 
+
+### Console/settings/Revert window layout
+All layout changes made in this session are reverted. After that, restart clcon. 
+
+Some caveats/issues
+-------------------
+- you can only modify position of find dialogs via editing desktop file which you find by running `.. puts $::tkcon::PRIV(desktopfile)` in the console. 
+- on a multi-monitor systems, always be sure that at startup time clcon appears on the same monitor. You can place windows at both monitors, but first (console) window should always appear on the same monitor, otherwise layout will be distorted (e.g. windows can appear beyond the screen bounds).
+- when changing screen resolution, either restart clcon or issue `.. ::win_lay::MeasureScreen {{} {puts "ok"}}`. Then subsequently created windows would be places according to a new resolution. Windows that are already on the screen, won't change their position. 
+- there is no "send window to standard position" command - maybe will be added in the future
+- areas are not true docking locations. There are no thumbnails to iterate over windows stacked upon each other at one area. To switch between windows, use hotkeys assigned to tools (you can find them in a Window menu), `Alt-Tab` or system taskbar. 
+
+Two words about desktop file
+-------------------------------
+With a single monitor, each area is specified as {width/screenwidth height/screenheight left/screenwidth top/screenheight}, so that fullscreen window is {1 1 0 0}. 
+
+Things get more complicated with multiple monitors. At the startup, clcon creates the zoomed window. Where is it created? IMO on Windows 10 it is created on the monitor where the mouse pointer is located. This monitors becomes a "base" screen which corresponds to {1 1 0 0} area. Other monitors obtain some other ranges of (x,y) values. 
+
+Area named "~" is for free-floating windows with no specified initial position.
+
+TO DO for window layouts
+-----------------------
+- "send window(s) to standard position" command(s)
+- multiple window layouts
+- ability to remember position for find tool 
+- menu command to see "tool name" of the window
+- measuring process is fragile. Try to get rid of boundary measuring
+- if measuring process is running and an attempt to start new measuring process is undertaken, 
+enqueue continuation after continuation of current measuring process
+
+
+
+
+
+
+
 

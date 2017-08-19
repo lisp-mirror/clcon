@@ -29,6 +29,8 @@ namespace eval ::спс {
 
         set tbl $w.tf.text
 
+        ::win_lay::PositionATool $w
+
         DoGoToTop $w
         
         focus $tbl
