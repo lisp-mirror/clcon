@@ -35,11 +35,14 @@ proc tkTextSetCursor {text index} {
     $text mark set insert $index
 }
 
-
+# places w "pretty" relative to relativeTo's toplevel
 proc powin {w relativeTo} {
-    set y [winfo y $relativeTo]
-    #set x [expr [winfo x .] + ([winfo width .]/2)  - ($wid/2) ]
-    set x [expr [winfo x $relativeTo] + ([winfo width $relativeTo]/2)  - (200) ]
+    set master [winfo toplevel $relativeTo]
+    set x [expr [winfo x $master] + 30]
+    set y [expr [winfo y $master] + 30]
+    #set wid [winfo width $w] - we can't know it w/o update, so put just at the left corner of master + 30 + 30
+    #set x [expr [winfo x $master] + ([winfo width $master]/2)  - ($wid/2) ]
+    #set x [expr [winfo x $relativeTo] + ([winfo width $relativeTo]/2)  - (200) ]
     wm geometry $w "=+$x+$y" 
     c [winfo width $w]
 }
@@ -54,9 +57,9 @@ proc MakeWindowADialogAndGrab {win parent} {
     }
     wm transient $win $parent
 
-    #if {$parent ne {}} {
-    #    powin $win $parent
-    #}
+    if {$parent ne {}} {
+        powin $win $parent
+    }
 
     raise $win
     grab $win

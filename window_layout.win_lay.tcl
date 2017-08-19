@@ -50,7 +50,21 @@ proc ::win_lay::SetDefaultWindowLayout {} {
                             .ЭкраннаяКлавиатура "Dialogs" \
                             ]]]
     set CURRENT_WINDOW_LAYOUT "Default"
-    set WINDOW_LAYOUT_IN_MEMORY [dict get $WINDOW_LAYOUTS $CURRENT_WINDOW_LAYOUT]
+}
+
+# For unnecessary complexity, we don't update layout database directly, but use a buffer
+# named WINDOW_LAYOUT_IN_MEMORY. So we need load/save operations for it. 
+proc ::win_lay::LoadCurrentLayoutFromDatabase {} {
+    variable ::tkcon::WINDOW_LAYOUTS
+    variable ::tkcon::CURRENT_WINDOW_LAYOUT
+    variable WINDOW_LAYOUT_IN_MEMORY [dict get $WINDOW_LAYOUTS $CURRENT_WINDOW_LAYOUT]
+}
+
+proc ::win_lay::SaveCurrentLayoutToDatabase {} {
+    variable ::tkcon::WINDOW_LAYOUTS
+    variable ::tkcon::CURRENT_WINDOW_LAYOUT
+    variable WINDOW_LAYOUT_IN_MEMORY 
+    dict set WINDOW_LAYOUTS $CURRENT_WINDOW_LAYOUT $WINDOW_LAYOUT_IN_MEMORY 
 }
 
 proc ::win_lay::ExtractToolName {toplevel_name} {
@@ -72,47 +86,83 @@ proc ::win_lay::PositionATool {toplevel_name} {
     variable WINDOW_LAYOUT_IN_MEMORY
     set wl $WINDOW_LAYOUT_IN_MEMORY
     set ToolName [win_lay::ExtractToolName $toplevel_name]
-    puts $ToolName
+    #puts $ToolName
     if {[dict exists $wl "Mapping-of-tools-to-areas" $ToolName]} {
       set AreaName [dict get $wl "Mapping-of-tools-to-areas" $ToolName]
     } else {
       set AreaName [dict get $wl "Default-area"]
     }
+    #puts $AreaName
     if {[string compare $AreaName "~"] == 0} {
       return
     }
     set RelativeGeometry [dict get $wl "Geometry-of-areas" $AreaName]
+    ::win_lay::PositionAWindowAtRelativeGeometry $toplevel_name $RelativeGeometry
+}
+
+proc ::win_lay::PositionAWindowAtRelativeGeometry {toplevel_name RelativeGeometry} {
     set geom [::win_lay::ConvertRelativeWindowGeometryToWmGeometryArgumentsOnCurrentScreen $RelativeGeometry]
     wm state $toplevel_name normal
     wm geometry $toplevel_name $geom
 }
 
-# geometry_spec is from win_lay description
-proc ::win_lay::ConvertRelativeWindowGeometryToWmGeometryArgumentsOnCurrentScreen {geometry_spec} {
-    foreach { w h l t } $geometry_spec break
+proc ::win_lay::RecordLayout {toplevel_name} {
+    variable WINDOW_LAYOUT_IN_MEMORY
+    variable ::tkcon::PRIV
+    set wl $WINDOW_LAYOUT_IN_MEMORY
+    set w $toplevel_name
+    set title [wm title $w]
+    set ToolName [::win_lay::ExtractToolName $toplevel_name]
 
-    variable ScreenWidthAvailable
-    variable ScreenHeightAvailable
-    variable TotalDecorationWidth
-    variable TotalDecorationHeight
-    variable XForLeftCornerOfTheScreen
-    variable YForTopOfTheScreen
+    set RelativeGeometry [::win_lay::ConvertWindowGeometryToRelativeWindowGeometry $w]
 
-    set IdealW [expr round($w * ($ScreenWidthAvailable)) ]
-    set IdealH [expr round($h * ($ScreenHeightAvailable)) ]
-    # X and Y of left top corner
-    set IdealX [expr round($l * ($ScreenWidthAvailable )) ]
-    set IdealY [expr round($t * ($ScreenHeightAvailable )) ]
-
-    set ContentW [expr $IdealW - $TotalDecorationWidth ] 
-    set ContentH [expr $IdealH - $TotalDecorationHeight ]
-    set Left [expr $IdealX + $XForLeftCornerOfTheScreen ]
-    set Top [expr $IdealY + $YForTopOfTheScreen ]
-
-    return "${ContentW}x${ContentH}+$Left+$Top"
+    puts "Welcome to location saving wizard. "
+    puts "You could also edit you $PRIV(desktopfile) by thirdparty editor when clcon is down"
+    puts "Сlcon layout manager classifies windows by their tool name (e.g editor, console, debugger, or find dialog have different tool names)"
+    puts "Clcon auto-places windows to one of several places on the screeen, called 'areas'. Areas are similar to dock containers in docking window managers. One or more tool names can be mapped to one area. Windows with that tool names are auto-placed at that 'area's screen coordinates upon creation."
+    puts "Window entitled «$title» has a tool name '$ToolName'"
+    if {![dict exists $wl "Mapping-of-tools-to-areas" $ToolName]} {
+        puts stderr $wl
+        puts "Location saving for tool name '$ToolName' is not implemented (your patch is welcome)"
+        return
+    }
+    set AreaName [dict get $wl "Mapping-of-tools-to-areas" $ToolName]
+    puts "Tool named '$ToolName' is currently mapped to area named '$AreaName'"
+    if {$AreaName eq $ToolName} {
+        puts "Do you want to save current location of «$title» as a location for new windows for that area (type 1=Yes,9=No,<Return>=Cancel)?"
+        # (gets stdin) would be prettier, but I dont know how to remove a prompt
+        set answer [lindex [::LameAskForLispExpression .tab1 "1 or 9"] 1]
+        if {$answer eq 1} {
+            dict set $wl "Geometry-of-areas" $AreaName $RelativeGeometry
+        } else {
+            puts "window location is not saved"
+        } 
+    } elseif {$AreaName eq "~"} {
+        puts "Tool name '$ToolName' is currently bound to area named '~'. That means the window is free-floating and positions itself whenever it wants (at random places)"
+        puts "Enter your choice: 5: Create a new area named '$ToolName' for this tool and save its location"
+        puts "                   9: Don't save location"
+        puts "                   <RETURN>: Cancel"
+        set answer [lindex [::LameAskForLispExpression .tab1 "5 or 9"] 1]
+        if {$answer eq 5} {
+            dict set WINDOW_LAYOUT_IN_MEMORY "Geometry-of-areas" $ToolName $RelativeGeometry
+        } else {
+            puts "window location is not saved" 
+        }
+    } else {
+        puts "Enter your choice: 1: Save location of «$title» as a location for area '$AreaName'"
+        puts "                   5: Create a new area named '$ToolName' for this tool and save its location"
+        puts "                   9: Don't save location"
+        puts "                   <RETURN>: Cancel"
+        set answer [lindex [::LameAskForLispExpression .tab1 "1,5 or 9"] 1]
+        if {$answer eq 1} {
+            dict set WINDOW_LAYOUT_IN_MEMORY "Geometry-of-areas" $AreaName $RelativeGeometry
+        } elseif {$answer eq 5} {
+            dict set WINDOW_LAYOUT_IN_MEMORY "Geometry-of-areas" $ToolName $RelativeGeometry
+        } else {
+            puts "window location is not saved" 
+        }
+    }
 }
-
-
-
+    
 
 

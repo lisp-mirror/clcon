@@ -542,7 +542,7 @@ proc ::tkcon::Init {args} {
 
     ## Attach to the slave, EvalAttached will then be effective
     Attach $PRIV(appname) $PRIV(apptype)
-    InitUI $title
+    ::tkcon::InitUI $title [info exists MainInit]
     if {"" != $OPT(exec)} {
 	# override exit to DeleteTab now that tab has been created
 	$OPT(exec) alias exit ::tkcon::DeleteTab $PRIV(curtab) $OPT(exec)
@@ -563,6 +563,7 @@ proc ::tkcon::Init {args} {
 	}
     }
 
+    
     EvalSlave history keep $OPT(history)
     if {[info exists MainInit]} {
 	# Source history file only for the main console, as all slave
@@ -581,14 +582,6 @@ proc ::tkcon::Init {args} {
 
 	}
 
-	if {!$PRIV(WWW) && [file exists $PRIV(desktopfile)]} {
-            # FIXME - avoid eval here - it is just data
-	    puts -nonewline "loading desktop layout..."
-	    if {[catch {uplevel \#0 [list source $PRIV(desktopfile)]} herr]} {
-		puts stderr "error:\n$herr"
-		append PRIV(errorInfo) $errorInfo\n
-	    }
-        }
     }
 
     ## Autoload specified packages in slave
@@ -796,7 +789,7 @@ proc ::tkcon::InitInterp {name type} {
 #	title	- title for the console root and main (.) windows
 # Calls:	::tkcon::InitMenus, ::tkcon::Prompt
 ##
-proc ::tkcon::InitUI {title} {
+proc ::tkcon::InitUI {title IsMainInit} {
     variable OPT
     variable PRIV
     variable COLOR
@@ -883,8 +876,21 @@ proc ::tkcon::InitUI {title} {
         }
     }
 
-    # Prepare to lay out windows
+    # Prepare to lay out windows (we have alread layout data loaded, 
+    # grep for 'desktopfile' and 'SetDefaultWindowLayout'
+    
     ::win_lay::SetDefaultWindowLayout
+    if {$IsMainInit} {
+        if {!$PRIV(WWW) && [file exists $PRIV(desktopfile)]} {
+            # FIXME - avoid eval here - it is just data
+            puts -nonewline "loading desktop layout..."
+            if {[catch {uplevel \#0 [list source $PRIV(desktopfile)]} herr]} {
+                puts stderr "error:\n$herr"
+                append PRIV(errorInfo) $errorInfo\n
+	    }
+        }
+    }
+    ::win_lay::LoadCurrentLayoutFromDatabase
 
     ::win_lay::MeasureScreen [list {} [subst -nocommands {
 
@@ -1423,14 +1429,14 @@ proc ::tkcon::InitMenus {w title} {
 		-underline 0 -variable ::tkcon::OPT(oduvan-backend)
 	$m add check -label "3.Показывать много найденных вхождений" \
 		-underline 0 -variable ::tkcon::OPT(showmultiple)
-	$m add check -label "4.Показать строку состояния (status bar)" \
+	$m add check -label "Показать строку состояния (status bar)" \
 	    -underline 0 -variable ::tkcon::OPT(showstatusbar) \
 	    -command {
 		if {$::tkcon::OPT(showstatusbar)} {
 		    grid $::tkcon::PRIV(statusbar)
 		} else { grid remove $::tkcon::PRIV(statusbar) }
 	    }
-	$m add cascade -label "5.Полоса прокрутки" -underline 0 -menu $m.scroll
+	$m add cascade -label "Полоса прокрутки" -underline 0 -menu $m.scroll
 
 	## Scrollbar Menu
 	##
@@ -1441,7 +1447,21 @@ proc ::tkcon::InitMenus {w title} {
 	$mm add radio -label "Справа" -value right \
 		-variable ::tkcon::OPT(scrollypos) \
 		-command { grid configure $::tkcon::PRIV(scrolly) -column 2 }
-        $m add command -label "6.Редактировать файл инициализации" -underline 0 -command ::clconcmd::редактировать_файл_иницаилизации
+
+
+        ## Initialization files
+        $m add command -label "4.Редактировать файл инициализации" -underline 0 -command ::clconcmd::редактировать_файл_иницаилизации
+        $m add command -label "5.Revert window layout" -underline 0 -command {
+           ::win_lay::LoadCurrentLayoutFromDatabase
+           puts "Window layout reverted to the value at beginning of this session. Restart clcon to see changes"
+        }
+
+        $m add command -label "5.Set default window layout" -underline 0 -command {
+           ::win_lay::SetDefaultWindowLayout
+           ::win_lay::LoadCurrentLayoutFromDatabase
+           puts "Window layout reverted to default values. Restart clcon to see changes"
+        }
+
     }
 
     ## 5.История
@@ -2207,12 +2227,18 @@ proc ::tkcon::MainInit {} {
 		    close $fid
 		}
 	    }
+
+            ::win_lay::SaveCurrentLayoutToDatabase
+
             if {[catch {open $::tkcon::PRIV(desktopfile) w} fid]} {
                 puts stderr "Failed to save desktop file:\n$fid"
                 after 3000
-            } else {
-                puts $fid "::tkcon::EvalSlave [::dump ::tkcon::WINDOW_LAYOUTS]"
-                puts $fid "::tkcon::EvalSlave [::dump ::tkcon::CURRENT_WINDOW_LAYOUT]"
+            } elseif {[catch {
+                  puts $fid "::tkcon::EvalSlave [::dump ::tkcon::WINDOW_LAYOUTS]"
+                  puts $fid "::tkcon::EvalSlave [::dump ::tkcon::CURRENT_WINDOW_LAYOUT]"
+                }]} {
+                puts stderr "Failed writing into desktop file:\n$fid"
+                after 3000
             }
             close $fid
             if {$::tkcon::PRIV(OstanovitqServerSwank) == 1} {            

@@ -78,7 +78,7 @@ namespace eval ::window_menu {
         ::clcon_key::b bind $DoubleModBindtag <Control-Shift-R> $script    }
 
     # FIXME rename without "Dynamic" word. See recent and history menus for a sample or develop something new. 
-    proc DynamicWindowMenu {w m} {
+    proc DynamicWindowMenu {w m args} {
         ## Window Menu
         ## Creates menu commands only. Keyboard bindings are created in ::window_menu::WindowMenuKeyBindings
         ## Which must be called explicitly when window is created
@@ -88,6 +88,8 @@ namespace eval ::window_menu {
         ## SelfCommand is a command to activate current window. It must
         ## match command calculated by this function and is used to 
         ## identify current window and to disable it
+        ## tl is a toplevel widget for "save window position" command
+        ::named_args $args "-toplevel [winfo toplevel $w]"
 
         variable ::tkcon::PRIV
 
@@ -129,6 +131,11 @@ namespace eval ::window_menu {
 
         $m add command -label "Потоки" -accel "Control-Shift-t" \
             -command ::inspthrd::ShowThreads
+
+        $m add separator
+        $m add command -label "1. save window position" \
+            -under 0  \
+            -command "::win_lay::RecordLayout $(-toplevel)"
     }
     
 }

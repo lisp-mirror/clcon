@@ -96,7 +96,9 @@ proc ::win_lay::MeasureScreenPart2 {} {
     set geom [wm geometry $w]
     # due to platform issues we don't know if 'top' and 'left' are for content
     # or for decorated window, but we use 'wm geometry' because it is settable. 
-    foreach {width height Left Top} [::win_lay::ParseGeometry $geom] break
+    foreach {width height IgnoreLeft IgnoreTop} [::win_lay::ParseGeometry $geom] break
+    set Left [winfo x $w]
+    set Top [winfo y $w]
 
     # set ::win_lay::ZOOMED_WINDOW_GEOMETRY [list $width $height $Left $Top]
 
@@ -220,5 +222,60 @@ proc ::win_lay::MeasureScreenWalkOverFrame {left top hrzIncrement vrtIncrement h
    }
 }
 
-::win_lay::SetDefaultScreenSizes
+# geometry_spec is from win_lay description
+proc ::win_lay::ConvertRelativeWindowGeometryToWmGeometryArgumentsOnCurrentScreen {geometry_spec} {
+    foreach { w h l t } $geometry_spec break
+
+    variable ScreenWidthAvailable
+    variable ScreenHeightAvailable
+    variable TotalDecorationWidth
+    variable TotalDecorationHeight
+    variable XForLeftCornerOfTheScreen
+    variable YForTopOfTheScreen
+
+    set IdealW [expr round($w * ($ScreenWidthAvailable)) ]
+    set IdealH [expr round($h * ($ScreenHeightAvailable)) ]
+    # X and Y of left top corner
+    set IdealX [expr round($l * ($ScreenWidthAvailable )) ]
+    set IdealY [expr round($t * ($ScreenHeightAvailable )) ]
+
+    set ContentW [expr $IdealW - $TotalDecorationWidth ] 
+    set ContentH [expr $IdealH - $TotalDecorationHeight ]
+    set Left [expr $IdealX + $XForLeftCornerOfTheScreen ]
+    set Top [expr $IdealY + $YForTopOfTheScreen ]
+
+    return "${ContentW}x${ContentH}+$Left+$Top"
+}
+
+
+# geometry_spec is from win_lay description
+proc ::win_lay::ConvertWindowGeometryToRelativeWindowGeometry {window} {
+
+    variable ScreenWidthAvailable
+    variable ScreenHeightAvailable
+    variable TotalDecorationWidth
+    variable TotalDecorationHeight
+    variable XForLeftCornerOfTheScreen
+    variable YForTopOfTheScreen
+
+    set geom [wm geometry $window]
+    foreach { ContentW ContentH IgnoreLeft IgnoreTop } [ ::win_lay::ParseGeometry  $geom] break
+    set Left [winfo x $window]
+    set Top [winfo y $window]
+
+    set IdealW [expr $ContentW + $TotalDecorationWidth]
+    set IdealH [expr $ContentH + $TotalDecorationHeight]
+    set IdealX [expr $Left - $XForLeftCornerOfTheScreen]
+    set IdealY [expr $Top - $YForTopOfTheScreen]
+
+    set w [expr 1.0*$IdealW/$ScreenWidthAvailable]
+    set h [expr 1.0*$IdealH/$ScreenHeightAvailable]
+    set l [expr 1.0*$IdealX/$ScreenWidthAvailable]
+    set t [expr 1.0*$IdealY/$ScreenHeightAvailable]
+
+    list $w $h $l $t    
+
+}
+
+
 
