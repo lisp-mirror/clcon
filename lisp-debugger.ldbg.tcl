@@ -612,7 +612,7 @@ namespace eval ::ldbg {
         bind $bodytag <Control-Key-Insert> $cmd
 
         set cmd [list ::fndrpl::OpenFindBox $tbl "tablelist" "find" "::ldbg::FramesTablelistEnsurePopulated"]
-	$m add command -label "Найти"  -accel "Control-f" -command $cmd
+	$m add command -label "Искать"  -accel "Control-f" -command $cmd
         ::clcon_key::b bind $bodytag <Control-Key-f>	   $cmd
      
 
