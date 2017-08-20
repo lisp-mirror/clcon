@@ -525,7 +525,7 @@ namespace eval ::ldbg {
         $m add command -label "2. Редактировать текущую систему ASDF, если она определена" -underline 0 -command $cmd
 
         set cmd "::ldbg::ThrowToTopLevel $w"
-        $m add command -label "3. Закрыть отладчик и выброситься на верхний уровень" -underline 0 -command $cmd
+        $m add command -label "3. Закрыть отладчик и вызвать перезапуск по умолчанию" -underline 0 -command $cmd
     }
         
 
