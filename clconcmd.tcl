@@ -101,7 +101,7 @@ Currently defined commands are: "
 
     # Искать в иСходниках ЦЛкон Тикля
     proc исцлт { str } {
-       finct { str } 
+       finct $str 
     }
 
     # search in clcon tcl sources
