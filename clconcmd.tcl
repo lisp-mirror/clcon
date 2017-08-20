@@ -99,6 +99,11 @@ Currently defined commands are: "
         иф [list [string cat $::tkcon::YarRoot "/ит"] [string cat $::tkcon::YarRoot "/док"] [string cat $::tkcon::YarRoot "/../yar.my/док/оя-яр-1"]] $str 
     }
 
+    # Искать в иСходниках ЦЛкон Тикля
+    proc исцлт { str } {
+       finct { str } 
+    }
+
     # search in clcon tcl sources
     proc finct { str } {
       ::clconcmd::finf -types tcl [string cat $::tkcon::YarRoot "/lp/clcon"] $str
