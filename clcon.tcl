@@ -1464,9 +1464,10 @@ proc ::tkcon::InitMenus {w title} {
 
         $m add command -label "Translate UI to English" -underline 0 -command {
            ::tkcon::SendEventToSwank {
-              (load (compile-file (at-clcon-root "lp/translate-clcon/translate-clcon.lisp")))
-              (do-all "Translate UI to English")
-           }
+              (progn
+                (load (compile-file (at-clcon-root "lp/translate-clcon/translate-clcon.lisp")))
+                (eval `(,(read-from-string "translate-clcon:do-all") "Translate UI to English")))
+           } {} 
         }
     }
 
