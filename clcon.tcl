@@ -1178,7 +1178,7 @@ proc ::tkcon::About {} {
 	wm transient $w $PRIV(root)
 	wm group $w $PRIV(root)
 	catch {wm attributes $w -type dialog}
-	wm title $w "About clcon v$PRIV(version)"
+	wm title $w "О программе clcon v$PRIV(version)"
 	wm resizable $w 0 0
 	button $w.b -text Dismiss -command [list wm withdraw $w]
 	text $w.text -height 9 -width 60 \
@@ -1189,7 +1189,7 @@ proc ::tkcon::About {} {
 	grid $w.b -sticky se -padx 6 -pady 4
 	$w.text tag config center -justify center
 	$w.text tag config title -justify center -font {Courier -18 bold}
-	$w.text insert 1.0 "About clcon v$PRIV(version)" title \
+	$w.text insert 1.0 "О программе clcon v$PRIV(version)" title \
 		"\n\nCopyright 1995-2002 Jeffrey Hobbs \
 		\nCopyright 2015-2017 Денис Будяк, Роман Клочков, Владимир Кутрухин, Станислав Кондратьев \
 		\n\nRelease Info: v$PRIV(version) \
