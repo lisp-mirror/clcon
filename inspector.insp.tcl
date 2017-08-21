@@ -295,7 +295,7 @@ namespace eval ::insp {
     }
 
     proc FileMenu {w menu text} {
-        set m [menu [::tkcon::MenuButton $menu "1.Файл" file]]
+        set m [menu [::tkcon::MenuButton $menu "1.Файл" файл]]
         $m add command -label "Сохранить как..."  -underline 0 \
             -command [list ::tkcon::Save {} widget $text]
         $m add command -label "Добавить к..."  -underline 0 \
@@ -307,7 +307,7 @@ namespace eval ::insp {
     }
 
     proc EditMenu {w menu text} {
-        set m [menu [::tkcon::MenuButton $menu "2.Правка" edit]]
+        set m [menu [::tkcon::MenuButton $menu "2.Правка" правка]]
         $m add command -label "Копировать"  \
             -command [list tk_textCopy $text]
         $m add separator
@@ -342,7 +342,7 @@ namespace eval ::insp {
     # text is ignored
     proc WindowMenu {w menu text} {
         variable ::tkcon::COLOR
-        set m [::tkcon::MenuButton $menu "7.Окно" window]
+        set m [::tkcon::MenuButton $menu "7.Окно" окно]
 
 	menu $m -disabledforeground $COLOR(disabled) \
 		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]
