@@ -255,7 +255,7 @@ namespace eval ::edt {
         } else {
             set FileName [::mprs::Unleash [lindex $V1 1]]
             if {$Priznak == 1} {
-                puts "Файл не существует. Для создания подайте команду .edit $FileName"
+                puts "Файл не существует. Для создания подайте команду .ред-файл $FileName"
             } else {
                 ::edt::edit -type file -- $FileName
             }
