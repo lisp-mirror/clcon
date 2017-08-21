@@ -347,7 +347,7 @@ namespace eval ::edt {
         
         # ---------------------------- Меню Правка --------------
         ##
-        set m [cMenuBar .edit]
+        set m [cMenuBar .правка]
         ::gui_util::ClearMenu $m
 
         set cmd [wesppt [list tk_textCut $btext]]
@@ -444,7 +444,7 @@ namespace eval ::edt {
 
         ## Так же как с меню "недавние", нам нужно удалить данное меню, псокольку 
         ## этот код вызывается много раз
-        set m [cMenuBar .window] 
+        set m [cMenuBar .окно] 
         if {[winfo exists $m]} {
             destroy $m
         }
