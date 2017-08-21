@@ -463,7 +463,7 @@ namespace eval ::erbr {
     proc TitleListEditMenu {w menu} {
         set tbl [GetTitleListMenuTbl $w]
         set text [HeaderOfErrorBrowser $w]
-        set m [menu [::tkcon::MenuButton $menu "2.Edit" edit]]
+        set m [menu [::tkcon::MenuButton $menu "2.Правка" edit]]
         $m add command -label "1.Copy" -under 0 -command [list tk_textCopy $tbl] -state disabled
     #     $m add separator
 
