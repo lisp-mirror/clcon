@@ -517,7 +517,7 @@ namespace eval ::ldbg {
     }
 
     proc MakeMainWindowFileMenu {w menu} {
-        set m [menu [::tkcon::MenuButton $menu "1.Файл" file]]
+        set m [menu [::tkcon::MenuButton $menu "1.Файл" файл]]
         set cmd "::ldbg::EditCurrentAsdfFile" 
         $m add command -label "1. Редактировать текущий файл ASDF, если он определён" -underline 0 -command $cmd
 
@@ -635,7 +635,7 @@ namespace eval ::ldbg {
     
     proc MakeMainWindowWindowMenu {w menu} {
         variable ::tkcon::COLOR
-        set m [::tkcon::MenuButton $menu "7.Окно" window]
+        set m [::tkcon::MenuButton $menu "7.Окно" окно]
 	menu $m -disabledforeground $COLOR(disabled) \
 		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]
         ::window_menu::WindowMenuKeyBindings $w $w $w
