@@ -84,7 +84,7 @@ namespace eval ::window_menu {
         ## Which must be called explicitly when window is created
         ## w is a widget 
         ## m is a window submenu. It must be supplied by caller, e.g.:
-        ## set m [menu [::tkcon::MenuButton $menu "7.Окно" window]]
+        ## set m [menu [::tkcon::MenuButton $menu "7.Окно" окно]]
         ## SelfCommand is a command to activate current window. It must
         ## match command calculated by this function and is used to 
         ## identify current window and to disable it
