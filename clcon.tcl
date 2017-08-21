@@ -1462,6 +1462,12 @@ proc ::tkcon::InitMenus {w title} {
            puts "Window layout reverted to default values. Restart clcon to see changes"
         }
 
+        $m add command -label "Translate UI to English" -underline 0 -command {
+           ::tkcon::SendEventToSwank {
+              (load (compile-file (at-clcon-root "lp/translate-clcon/translate-clcon.lisp")))
+              (do-all "Translate UI to English")
+           }
+        }
     }
 
     ## 5.История
