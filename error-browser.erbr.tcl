@@ -386,7 +386,7 @@ namespace eval ::erbr {
     }
 
     proc FileMenu {w menu text} {
-        set m [menu [::tkcon::MenuButton $menu "1.Файл" file]]
+        set m [menu [::tkcon::MenuButton $menu "1.Файл" файл]]
         $m add command -label "Сохранить как..."  -underline 0 \
             -command [list ::tkcon::Save {} widget $text]
         $m add command -label "Добавить к..."  -underline 0 \
@@ -398,7 +398,7 @@ namespace eval ::erbr {
     }
 
     proc EditMenu {w menu text} {
-        set m [menu [::tkcon::MenuButton $menu "2.Правка" edit]]
+        set m [menu [::tkcon::MenuButton $menu "2.Правка" правка]]
         $m add command -label "Копировать"  \
             -command [list tk_textCopy $text]
         $m add separator
@@ -443,7 +443,7 @@ namespace eval ::erbr {
     }
     
     proc TitleListFileMenu {w menu} {
-        set m [menu [::tkcon::MenuButton $menu "1.Файл" file]]
+        set m [menu [::tkcon::MenuButton $menu "1.Файл" файл]]
         #     $m add command -label "Сохранить как..."  -underline 0 \
             # 	-command [list ::tkcon::Save {} widget $text]
     #     $m add command -label "Добавить к..."  -underline 0 \
@@ -463,7 +463,7 @@ namespace eval ::erbr {
     proc TitleListEditMenu {w menu} {
         set tbl [GetTitleListMenuTbl $w]
         set text [HeaderOfErrorBrowser $w]
-        set m [menu [::tkcon::MenuButton $menu "2.Правка" edit]]
+        set m [menu [::tkcon::MenuButton $menu "2.Правка" правка]]
         $m add command -label "1.Copy" -under 0 -command [list tk_textCopy $tbl] -state disabled
     #     $m add separator
 
@@ -488,7 +488,7 @@ namespace eval ::erbr {
         variable ::tkcon::COLOR
         set tbl [GetTitleListMenuTbl $w]
         set text [HeaderOfErrorBrowser $w]
-        set m [::tkcon::MenuButton $menu "7.Окно" window]
+        set m [::tkcon::MenuButton $menu "7.Окно" окно]
 	menu $m -disabledforeground $COLOR(disabled) \
 		-postcommand [list ::window_menu::DynamicWindowMenu $w $m]
         ::window_menu::WindowMenuKeyBindings $w $w $w
