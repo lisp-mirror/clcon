@@ -1,4 +1,5 @@
 # Compilation error browser.
+# Здесь кодировка utf-8, пойми же это, тупой winmerge!
 # Backend is in swank-compilation-errors.lisp
 #
 # We have a big design problem here: error browser is designed for single file 
