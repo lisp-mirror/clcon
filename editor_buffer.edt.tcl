@@ -443,11 +443,11 @@ namespace eval ::edt {
         $tw configure -menu $menu
 
         # Make menu bar
-        menu [::tkcon::MenuButton $menu "1.Файл" file]
-        menu [::tkcon::MenuButton $menu "2.Правка" edit]
+        menu [::tkcon::MenuButton $menu "1.Файл" файл]
+        menu [::tkcon::MenuButton $menu "2.Правка" правка]
         menu [::tkcon::MenuButton $menu "3.Лисп" lisp]
         menu [::tkcon::MenuButton $menu "4.Tcl/Md" tcl]
-        menu [::tkcon::MenuButton $menu "7.Окно" window]        
+        menu [::tkcon::MenuButton $menu "7.Окно" окно]        
         menu [::tkcon::MenuButton $menu "8.Секрет" secret]
         
     }
