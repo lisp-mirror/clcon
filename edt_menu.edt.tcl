@@ -266,7 +266,7 @@ namespace eval ::edt {
         set tw [theTW]
         set btext [c_btext]
         
-        set m [cMenuBar .file]
+        set m [cMenuBar .файл]
         ::gui_util::ClearMenu $m
 
         set cmd ::edt::EditNewFile 
