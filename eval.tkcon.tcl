@@ -175,7 +175,6 @@ namespace eval ::tkcon {
         set ev [EvalSlave history nextid]
         incr ev -1
         set code [catch {EvalSlave history event $ev} lastCmd]
-        showVar cmd
         if {$code || $cmd ne $lastCmd} {
             EvalSlave history add $cmd
         }
