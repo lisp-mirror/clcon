@@ -1,5 +1,5 @@
 ## Copyright (c) 1995-2011 Jeffrey Hobbs, jeff(a)hobbs(.)org
-## Copyright (c) 2015 Denis Budyak
+## Copyright (c) 2015-2017 Denis Budyak
 ## MIT License
 
 # Command evaluation with tcl escape handling and history substitution
