@@ -21,7 +21,7 @@
 
 
 proc ::tkcon::TclEscapeP { cmd } {
-    if {[string index $cmd 0] eq "."} {
+    if {[lsearch [list { } {.}] [string index $cmd 0]] >= 0} {
         return 1
     } else {
         return 0
@@ -41,15 +41,14 @@ proc ::tkcon::DoAfterCommand {} {
 # Errors: errs if incorrect prefix
 proc ::tkcon::ClassifyTclEscapes { form } {
     if {![TclEscapeP $form]} {
-        return [list 0 $form]
-    } elseif {[string range $form 0 3] eq "...."} {
-        error "Unknown 'dotted' command $form"
+        return [list te0 $form]
+    } elseif {[string range $form 0 0] eq " "} {
+        return [list te3 [string range $form 1 end]]
     } elseif {[string range $form 0 2] eq "..."} {
-        return [list 3 [string range $form 3 end]]
+        error "Unknown 'dotted' command $form"
     } elseif {[string range $form 0 1] eq ".."} {
-        return [list 2 [string range $form 2 end]]
-    } else {
-        # Hence we have one dot only
+        return [list te2 [string range $form 2 end]]
+    } elseif {[string range $form 0 0] eq "."} {
         set FormWoPrefix [string range $form 1 end]
         foreach {number NumLength} [scan $FormWoPrefix "%d%n"] {break}
         if {$NumLength == [string length $FormWoPrefix]} {
@@ -58,8 +57,10 @@ proc ::tkcon::ClassifyTclEscapes { form } {
             set f "history $f"
             return $f
         } else {
-            return [list 1 $FormWoPrefix]
+            return [list te1 $FormWoPrefix]
         }
+    } else {
+        error {Ошибка в алгоритме}
     }
 }
 
@@ -86,7 +87,6 @@ proc ::tkcon::ExpandFormFromHistory {FormWoPrefix form} {
 proc ::tkcon::EvalTclEscape { w TclEscapeKind RealForm form} {
     # Tcl Escape is classified already
     # tcl escape: if lisp command starts from . , we (temporarily?) consider it as tcl escape
-    # ... - tkcon main
     # .. - just eval in main interpreter 
     # . - manage history or add ::clconcmd:: to resolve clcon command
 
