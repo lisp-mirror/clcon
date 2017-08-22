@@ -20,6 +20,10 @@
 # 
 
 
+namespace eval ::tkcon {
+    variable ПрефиксКомандЯра " "
+}
+
 proc ::tkcon::TclEscapeP { cmd } {
     if {[lsearch [list { } {.}] [string index $cmd 0]] >= 0} {
         return 1
@@ -36,9 +40,10 @@ proc ::tkcon::DoAfterCommand {} {
 }
 
 proc ::tkcon::ClassifyTclEscapes { form } {
+    variable ПрефиксКомандЯра
     if {![TclEscapeP $form]} {
         return [list te0 $form]
-    } elseif {[string range $form 0 0] eq " "} {
+    } elseif {[string range $form 0 0] eq ${ПрефиксКомандЯра}} {
         return [list te3 [string range $form 1 end]]
     } elseif {[string range $form 0 2] eq "..."} {
         error "Unknown 'dotted' command $form"
@@ -151,6 +156,7 @@ proc ::tkcon::EndProcessingOfNonLispCommandOrError {w cmd code res} {
 proc ::tkcon::EvalKnownCommand { w cmd } {
     variable OPT
     variable PRIV
+    variable ПрефиксКомандЯра
 
     if {$cmd eq ""} {
         return
@@ -207,7 +213,7 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
             return $res
         } elseif { $TclEscapeKind eq "te3" } {
             set res [SendEventToSwank $RealForm \
-                         "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $RealForm]" 4]
+                         "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list [string cat ${ПрефиксКомандЯра} $RealForm]]" 4]
             return $res
         } elseif { $TclEscapeKind ne "te0" } {
             set res [EvalTclEscape $w $TclEscapeKind $RealForm $cmd]
