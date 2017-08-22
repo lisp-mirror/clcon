@@ -35,10 +35,6 @@ proc ::tkcon::DoAfterCommand {} {
     set PRIV(event) [EvalSlave history nextid]
 }
 
-# returns two values:
-# 1. number of dots afore or "history" if it is a history reference
-# 2. form cleared from dots
-# Errors: errs if incorrect prefix
 proc ::tkcon::ClassifyTclEscapes { form } {
     if {![TclEscapeP $form]} {
         return [list te0 $form]
@@ -54,7 +50,7 @@ proc ::tkcon::ClassifyTclEscapes { form } {
         if {$NumLength == [string length $FormWoPrefix]} {
             # it is a history reference
             set f  [string range $form 1 end]
-            set f "history $f"
+            set f [list history $f]
             return $f
         } else {
             return [list te1 $FormWoPrefix]
@@ -90,11 +86,11 @@ proc ::tkcon::EvalTclEscape { w TclEscapeKind RealForm form} {
     # .. - just eval in main interpreter 
     # . - manage history or add ::clconcmd:: to resolve clcon command
 
-    if {$TclEscapeKind == 3} {
+    if {[string compare $TclEscapeKind "te3"] == 0} {
         set RealForm [string cat "tkcon main {" $RealForm  "}"]
-    } elseif {$TclEscapeKind == 2} {
+    } elseif {[string compare $TclEscapeKind "te2"] == 0} {
         # ok
-    } elseif {$TclEscapeKind == 1} {
+    } elseif {[string compare $TclEscapeKind "te1"] == 0} {
         set RealForm [string cat "::clconcmd::" $RealForm]
     } else {
         error "Internal error 253525"
@@ -209,7 +205,11 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
             $w insert output $ffh\n stdin
             set res [EvalKnownCommand $w $ffh]
             return $res
-        } elseif { $TclEscapeKind ne 0 } {
+        } elseif { $TclEscapeKind eq "te3" } {
+            set res [SendEventToSwank $RealForm \
+                         "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $RealForm]" 1]
+            return $res
+        } elseif { $TclEscapeKind ne "te0" } {
             set res [EvalTclEscape $w $TclEscapeKind $RealForm $cmd]
             return $res
         } else {
@@ -224,7 +224,7 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
     # For lisp, end of processing is executed after returning from a command
     # see EvalInSwankFromConsoleContinuation
 
-    if {$code == 1 || $TclEscapeKind ne 0 && $TclEscapeKind ne {history}} {
+    if {$code == 1 || ([lsearch {te0 {history} te3} $TclEscapeKind] < 0)}  {
         EndProcessingOfNonLispCommandOrError $w $cmd $code $result
     }
     
