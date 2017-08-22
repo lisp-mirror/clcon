@@ -38,7 +38,7 @@ proc ::tkcon::CalculateThreadDesignatorForSwank {MsgFmtKind} {
     variable PRIV
     if {$MsgFmtKind == 0} {
         return $PRIV(SwankThread)
-    } elseif {$MsgFmtKind == 1} {
+    } elseif {[lsearch -integer {1 4} $MsgFmtKind] >= 0} {
         return ":repl-thread"
     } elseif {$MsgFmtKind == 2} {
         error "Thread designator must be supplied"
@@ -96,6 +96,11 @@ proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form MsgFmtKind} {
         # QuoteLispObjToString ?
         set cmd [regsub -all {([\"\\])} $form {\\\0}]
         return "(swank-repl:listener-eval \"$cmd\")"
+    } elseif {$MsgFmtKind == 4} {
+        set cmd [regsub -all {([\"\\])} $form {\\\0}]
+        set cmd "(ТРАНСЛЯТОР-ЯРА-В-ЛИСП::Выполнить-строку-Яра-из-ЦЧВП \"$cmd\")"
+        set cmd [regsub -all {([\"\\])} $cmd {\\\0}]
+        return "(swank-repl:listener-eval \"$cmd\")"
     } else {
         return $form
     }
@@ -117,6 +122,7 @@ proc ::tkcon::EvalInSwankAsync {form continuation {ThreadDesignator {}} {Continu
 #   1 - listener eval (form will be wrapped into (swank-repl:listener-eval ...)
 #   2 - emacs-pong event (passed verbatim, ThreadDesignator and ContinuationCounter unneeded)
 #   3 - emacs-return event (:emacs-return ContinuationCounter result) - form is a result, which is (:ok lisp-value), (:error lisp-kind . lisp-data), or (:abort). All lisp values must be quoted for passing by the caller of SendEventToSwank
+#   4 - Яр
 #
 #   ThreadDesignator - see swank::thread-for-evaluation
 #   ContinuationCounter - required to identify addressee of swank's reply.
@@ -155,7 +161,7 @@ proc ::tkcon::SendEventToSwank {form continuation {MsgFmtKind 1} {ThreadDesignat
     set cmd [SwankMaybeWrapFormIntoListenerEval $cmd $MsgFmtKind]
     set cmd [FormatSwankRexEvalMessage $cmd $MsgFmtKind $ThreadDesignator $ContinuationCounter]
 
-    if { [lsearch -integer {0 1} $MsgFmtKind] >= 0  } {
+    if { [lsearch -integer {0 1 4} $MsgFmtKind] >= 0  } {
       ::mprs::EnqueueContinuation $ContinuationCounter $continuation
     } else {
       if {$continuation ne {}} {
@@ -186,7 +192,6 @@ proc ::tkcon::SendEventToSwank {form continuation {MsgFmtKind 1} {ThreadDesignat
 ##
 ##  Send an S-expression command to Swank to evaluate. The resulting response must
 ##  be read with read-response.
-##  MsgFmtKind must be 1 if form is (swank-repl:listener-eval ...) or 0 otherwise
 proc ::tkcon::SwankEmacsRex {form {MsgFmtKind 0}} {
     ::tkcon::SendEventToSwank $form {} $MsgFmtKind
 }

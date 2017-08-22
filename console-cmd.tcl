@@ -207,7 +207,7 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
             return $res
         } elseif { $TclEscapeKind eq "te3" } {
             set res [SendEventToSwank $RealForm \
-                         "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $RealForm]" 1]
+                         "::tkcon::EvalInSwankFromConsoleContinuation $w \$EventAsList [list $RealForm]" 4]
             return $res
         } elseif { $TclEscapeKind ne "te0" } {
             set res [EvalTclEscape $w $TclEscapeKind $RealForm $cmd]
