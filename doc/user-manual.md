@@ -488,7 +488,13 @@ TO DO for window layouts
 - separate debugger condition from stack trace
 - make sure default location occupises the entire screen
 
-
+Как вывести в чёрную консоль?
+----------------------------
+```
+cl-user::*initial-standard-output*
+cl-user::*initial-standard-input* 
+cl-user::*initial-terminal-io*
+```
 
 
 
