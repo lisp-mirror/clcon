@@ -263,8 +263,23 @@
     ""
   (let* ((system-name (|Найти-имя-системы-из-имени-файла-или-переменных-буфера-либо-сообщение| (current-buffer))))
     (if system-name 
-        (clco:load-system-for-tcl system-name)      
+        (clco:operate-on-system-for-tcl system-name)      
         (format t "Система ~a не найдена~%" system-name))))
+
+(defcommand "Test System" (p)
+    "Выполняет test-op над текущей системой"
+    ""
+  (perga-implementation:perga
+   (let* system-name (|Найти-имя-системы-из-имени-файла-или-переменных-буфера-либо-сообщение| (current-buffer)))
+   (cond
+    (system-name
+     (let С-имя-системы (format nil "~S" system-name))
+     (let З-имя-системы (cl-tk:tcl-escape С-имя-системы))
+     (let cmd (format nil "::tkcon::VstavitqVKonsolqKakBudtoPolzovatelqNapechatalIVypolnitq {(asdf:test-system ~A)}"
+                      З-имя-системы))
+     (clco:eval-in-tcl cmd :nowait t))
+    (t
+     (format t "Система ~a не найдена~%" system-name)))))
 
 (defcommand "Find Symbol" (p)
     "Find symbol with swank machinery."

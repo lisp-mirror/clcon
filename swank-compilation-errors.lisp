@@ -92,7 +92,7 @@
           (format t "Что-то не так с настройкой ASDF/Quicklisp: вы пытаетесь загрузить систему ~A (из файла ~S), но asdf нашёл её в файле ~S" system-name filename (namestring (asdf:system-definition-pathname system))))
          (t 
           (format t "Вы пытаетесь загрузить систему ~A (из файла ~S)" system-name filename)
-          (clco:load-system-for-tcl system))))
+          (clco:operate-on-system-for-tcl system))))
       (return-from compile-file-for-tcl nil)))
   (let* ((buffer (oi::clcon_text-to-buffer clcon_text))
          (mode (first (oi::buffer-modes buffer)))
@@ -100,9 +100,9 @@
     (funcall fn filename t)))
 
 
-(defun load-system-for-tcl (system-name &rest options)
-  ""
-  (let* ((compilation-result (apply #'swank:operate-on-system-for-emacs system-name 'asdf:load-op options))
+(defun operate-on-system-for-tcl (system-name &optional (operation 'asdf:load-op) &rest options)
+  "Выполняет действие над системой ASDF"
+  (let* ((compilation-result (apply #'swank:operate-on-system-for-emacs system-name operation options))
          (success (swank::compilation-result-successp compilation-result))
          (notes (swank::compilation-result-notes compilation-result))
          (serial 0)

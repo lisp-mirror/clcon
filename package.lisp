@@ -24,7 +24,7 @@
            clco:start-oduvanchik ; start oduvanchik in another thread
            clco:restart-with-name-exists-p
            clco:invoke-sldb-restart-by-name
-           clco:load-system-for-tcl ; can be removed at some point
+           clco:operate-on-system-for-tcl ; can be removed at some point
            clco:find-string-in-files ; can be removed
            clco:files-by-glob-list   ; can be removed
  

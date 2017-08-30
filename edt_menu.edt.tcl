@@ -97,6 +97,24 @@ namespace eval ::edt {
         return $cmdBreak
     }
 
+    proc ЗаполнитьПодменюСистема {Bi w btext s} {
+        if {![winfo exists $s]} {
+            menu $s
+        }
+        ::gui_util::ClearMenu $s        
+        set cmd [wesppt [list ::edt::FindSystem $btext]]
+        $s add command -label "1.Перейти к определению системы" -command $cmd -underline 0
+        set cmd [wesppt [list ::edt::CompileSystem $btext]]
+        $s add command -label "2.Скомпилировать и загрузить систему" -command $cmd -underline 0
+
+        set cmd [wesppt [list ::edt::udalitq-fajjly-rezulqtata-sborki-sistemy $btext]]
+        $s add command -label "3.Удалить файлы результата сборки системы" -command $cmd -underline 0
+
+        set cmd [wesppt [list ::edt::ТестироватьСистемуASDF $btext]]
+
+        $s add command -label "4.Тестировать систему" -command $cmd -underline 0
+    }
+
     proc MakeLispModeMenu {Bi w btext} {
 
         set m [cMenuBar .lisp]
@@ -110,16 +128,9 @@ namespace eval ::edt {
         set cmd [wesppt [list ::edt::УстановитьЭтотПакетВКонсоли $btext]]
         $m add command -label "2.Установить этот пакет в консоли" -command $cmd -underline 0
 
-        set cmd [wesppt [list ::edt::FindSystem $btext]]
-        $m add command -label "3.Перейти к определению системы" -command $cmd -underline 0
-
-        set cmd [wesppt [list ::edt::CompileSystem $btext]]
-        $m add command -label "4.Скомпилировать и загрузить систему" -command $cmd -underline 0
-
-        set cmd [wesppt [list ::edt::udalitq-fajjly-rezulqtata-sborki-sistemy $btext]]
-        $m add command -label "5.Удалить файлы результата сборки системы" -command $cmd -underline 0
-
-        $m add separator
+        set s $m.sistema
+        $m add cascade -label "3.Система..." -underline 0 -menu $s
+        edt::ЗаполнитьПодменюСистема $Bi $w $btext $s
 
         # It is too late hour to start show-mark
         # We have archietectural problems there (rompsite.lisp is too early on the build)

@@ -106,6 +106,15 @@ namespace eval ::edt {
         ::clcon_text::CallOduvanchikFunction $text "odu::compile-system-command nil" {}
     }
 
+    proc ТестироватьСистемуASDF {text} {
+        set console [::tkcon::CurrentConsole]
+        set w [$text RealText]
+
+        ::tkcon::ПоложитьТекущуюПозициюНаPosStack $w
+        
+        ::clcon_text::CallOduvanchikFunction $text "odu::test-system-command nil" {}
+    }
+
     # Note we do not save file and 
     proc FindCurrentFileDeclarations {clcon_text} {
         set opened_file [$clcon_text cget -opened_file]
