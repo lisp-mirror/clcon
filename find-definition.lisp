@@ -106,6 +106,7 @@
             index)))
 
 (defun print-just-line (stream text &key (index "output"))
+  "Генерирует код, к-рый нариует серый текст по индексу output для виджета $w"
   (format stream "::tkcon::WritePassiveText $w ~A ~A; $w insert ~A \\\n; " (cl-tk:tcl-escape text) index index))
 
 
