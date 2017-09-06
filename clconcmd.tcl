@@ -109,6 +109,11 @@ Currently defined commands are: "
       ::clconcmd::finf -types tcl [string cat $::tkcon::YarRoot "/lp/clcon"] $str
     }
 
+    # Искать в исходниках СБЦЛ
+    proc исбцл { str } {
+      ::clconcmd::иф -типы lisp [string cat $::tkcon::YarRoot "/sbcl"] $str
+    }
+
     # 
     proc finf {args} {
         # Find in files. Synopsys ([[]] means optional part)
