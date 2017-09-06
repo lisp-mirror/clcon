@@ -181,7 +181,7 @@ namespace eval ::edt {
         
         ::clcon_text::CallOduvanchikFunction $text "odu::find-source-command nil" {{
             ::edt::ПоискаСвязейСимволаПродолжение $clcon_text $EventAsList "FindSource"
-        }}
+        }} {send_selection 1}
     }
 
     # Копипаст из FindSourceCommand
@@ -193,7 +193,7 @@ namespace eval ::edt {
         
         ::clcon_text::CallOduvanchikFunction $text "odu::kto-vyyzyyvaet-funkciyu-command nil" {{
             ::edt::ПоискаСвязейСимволаПродолжение $clcon_text $EventAsList "КтоВызываетФункцию"
-        }}
+        }} {send_selection 1}
     }
 
 
@@ -206,7 +206,7 @@ namespace eval ::edt {
         
         ::clcon_text::CallOduvanchikFunction $text "odu::yar-nayiti-iskhodnik-command nil" {{
             ::edt::ПоискаСвязейСимволаПродолжение $clcon_text $EventAsList "FindSource"
-        }}
+        }} {send_selection 1}
     }
 
 
@@ -245,7 +245,7 @@ namespace eval ::edt {
         set console [::tkcon::CurrentConsole]
         ::clcon_text::CallOduvanchikFunction $text "odu::find-symbol-command nil" {{
             ::edt::SkopirovatqIdentVBuferObmenaProdolzhenie $clcon_text $EventAsList
-        }}
+        }} {send_selection 1}
     }    
 
     proc EditFileNameUnderCursorCommand {btext} {
@@ -276,14 +276,14 @@ namespace eval ::edt {
     # See also ::tkcon::LispHyperdocLookup
     proc LispHyperdocLookupCommand {text} {
         set console [::tkcon::CurrentConsole]
-        ::clcon_text::CallOduvanchikFunction $text "odu::hyperdoc-lookup-command nil" ""
+        ::clcon_text::CallOduvanchikFunction $text "odu::hyperdoc-lookup-command nil" "" {send_selection 1}
     }    
 
     proc LispDescribeAllCommand {text} {
         set w [ ::спс::СоздатьОкноСпрПоСимв ]
         ::clcon_text::CallOduvanchikFunction $text "odu::describe-all-command nil" [subst -nocommands {{
             ::edt::LispDescribeAllContinuation \$clcon_text \$EventAsList $w
-        }}]
+        }}] {send_selection 1}
     }
 
     proc OpenUrl {text} {
