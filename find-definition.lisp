@@ -204,16 +204,17 @@
 (defun write-code-to-see-console-end (stream)
   (format stream "::$::tkcon::PRIV(console) see end; "))
 
-(defun server-lookup-definition (name-or-symbol &key (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*) |В-ошибке-показывать-символ-как|))
-  (|Обслужить-команду-поиска-связей-символа| name-or-symbol #'swank/backend:find-definitions "Определения символа ~S не найдены" name-or-symbol package-name readtable-name))
+(defun server-lookup-definition (name-or-symbol &key (package-name (package-name *package*)) (readtable-name (named-readtables:readtable-name *readtable*) |В-ошибке-показывать-символ-как|) (|Фильтр-определений| (constantly t)))
+  (|Обслужить-команду-поиска-связей-символа| name-or-symbol #'swank/backend:find-definitions "Определения символа ~S не найдены" name-or-symbol package-name readtable-name :|Фильтр-определений| |Фильтр-определений|))
 
-(defun |Обслужить-команду-поиска-связей-символа| (name-or-symbol |Функция-возвращающая-места| |Формат-сообщения-об-отсутствии-находок| |В-ошибке-показывать-символ-как| package-name readtable-name)
-  "По аналогии с server-lookup-definition"
+(defun |Обслужить-команду-поиска-связей-символа| (name-or-symbol |Функция-возвращающая-места| |Формат-сообщения-об-отсутствии-находок| |В-ошибке-показывать-символ-как| package-name readtable-name &key (|Фильтр-определений| (constantly t)))
+  "Общая часть между несколькими командами, напр, найти символ, найти пакет, найти систему. Фильтр-определений позволяет выделить только нужные определения. Он получает один аргумент - определение в том виде, как возвращает его swank (протрассируй и посмотри, что приходит) и, если возвращает истину, то определение попадёт в дальнейшую работу"
   (perga-implementation:perga
    (let dspecs-and-locations
      (swank-find-definitions-for-clcon
       name-or-symbol |Функция-возвращающая-места|
       :package-name package-name :readtable-name readtable-name))
+   (setf dspecs-and-locations (remove-if-not |Фильтр-определений| dspecs-and-locations))
    (let l (length dspecs-and-locations))
    (:@ with-output-to-string (ou))
    (case l
