@@ -15,8 +15,14 @@
   (declare (ignore fn))
   (let* ((new-string (concatenate 'string "odu message: " string))
          (text (apply 'format nil new-string args))
-         (q-text (cl-tk:tcl-escape text)))
-    (clco:eval-in-tcl (format nil "::tkcon::FocusConsole; puts ~A" q-text))))
+         (q-text (cl-tk:tcl-escape text))
+         (code
+          (with-output-to-string (code)
+            (CLCO:WRITE-CODE-TO-SEE-CONSOLE-END code)
+            (clco:write-code-to-show-console code)
+            (format code "::tkcon::WritePassiveText [::tkcon::CurrentConsole] ~A output~%" q-text)
+            (CLCO:WRITE-CODE-TO-SEE-CONSOLE-END code))))
+    (clco:eval-in-tcl code)))
 
 (defun decorate-oduvanchik-message ()
   "To be called when starting oduvanchik from clcon"
