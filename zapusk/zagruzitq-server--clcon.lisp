@@ -92,6 +92,7 @@
 ; from budden-tools
 (asdf:load-system :decorate-function) 
 (load (compile-file (at-clcon-root "lp/budden-tools/asdf-3.1.4-tools.lisp")))
+(load (compile-file (at-clcon-root "lp/budden-tools/sbcl--find-definition-sources-by-name--patch.lisp")))
 
 (asdf:load-system :iterate-keywords)
 (asdf:load-system :alexandria)
