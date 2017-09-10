@@ -218,7 +218,7 @@
    (cond
     (Система
      (let dspecs-and-locations
-       (remove-if-not (lambda (x) (eq (caar x) 'defconstant)) 
+       (remove-if-not (lambda (x) (eq (caar x) 'asdf:defsystem)) 
                       (clco::swank-find-definitions-for-clcon
                        name-or-symbol 'swank/backend:find-definitions
                        :package-name package-name :readtable-name readtable-name)))
