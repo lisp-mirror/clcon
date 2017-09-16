@@ -25,7 +25,7 @@ namespace eval ::tkcon {
 }
 
 proc ::tkcon::TclEscapeP { cmd } {
-    if {[lsearch [list { } {.}] [string index $cmd 0]] >= 0} {
+    if {[lsearch -exact [list { } {.}] [string index $cmd 0]] >= 0} {
         return 1
     } else {
         return 0
@@ -172,7 +172,7 @@ proc ::tkcon::EvalKnownCommand { w cmd } {
 
     # we don't know what command we have
     set result [ClassifyTclEscapes $cmd]
-    set cms [ClassifyTclEscapes $cmd]
+    set cms $result
     set code 0
     set cm [string range $cms 0 6]
     if {$cm eq "history"} {
