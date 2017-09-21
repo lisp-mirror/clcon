@@ -1,0 +1,49 @@
+decode-message ret (:EMACS-REX (SWANK-REPL:LISTENER-EVAL "(/ 0)") "COMMON-LISP-USER" :REPL-THREAD 4)
+
+decode-message
+
+dispatch-event: (:EMACS-REX (SWANK-REPL:LISTENER-EVAL "(/ 0)") "COMMON-LISP-USER" :REPL-THREAD 4)
+
+send-event: #<SB-THREAD:THREAD "new-repl-thread" RUNNING {}> 
+(:EMACS-REX (SWANK-REPL:LISTENER-EVAL "(/ 0)") "COMMON-LISP-USER" 4)
+
+dispatch-event: (:DEBUG 53 1 ("arithmetic error division-by-zero signalled
+Operation was sb-kernel::division, operands (1 0)." "   [Condition of type division-by-zero]" NIL) (("retry" "Retry SLIME REPL evaluation request.") ("*abort" "Return to SLIME's top leRESTARTABLE T)) (17 "(swank::process-requests nil)" (:RESTARTABLE T)) (18 "((lambda nil :in swank::handle-requests))" (:RESTARTABLE T)) (19 "((lambda nil :in swank::handle-requests))" (:RESTARTABLE T))) 
+(4))
+
+encode-message(:DEBUG 53 1 ("arithmetic error division-by-zero signalled
+Operation was sb-kernel::division, operands (1 0)." "   [Condition of type division-by-zero]RESTARTABLE T)) (17 "(swank::process-requests nil)" (:RESTARTABLE T)) (18 "((lambda nil :in swank::handle-requests))" (:RESTARTABLE T)) (19 "((lambda nil :in swank::handle-requests))" (:RESTARTABLE T))) 
+(4))
+
+dispatch-event: (:DEBUG-ACTIVATE 53 1 NIL)
+
+encode-message(:DEBUG-ACTIVATE 53 1 NIL)
+
+wait-for-event: (COMMON-LISP:OR (:EMACS-REX . SWANK::_) (:SLDB-RETURN 2)) NIL
+
+decode-message ret (:EMACS-REX (SWANK:INVOKE-NTH-RESTART-FOR-EMACS 1 1) "COMMON-LISP-USER" 53 5)
+
+decode-message
+
+dispatch-event: (:EMACS-REX (SWANK:INVOKE-NTH-RESTART-FOR-EMACS 1 1) "COMMON-LISP-USER" 53 5)
+
+send-event: #<SB-THREAD:THREAD "new-repl-thread" RUNNING {}> 
+(:EMACS-REX (SWANK:INVOKE-NTH-RESTART-FOR-EMACS 1 1) "COMMON-LISP-USER" 5)
+
+wait-for-event: (:SLDB-RETURN 2) T
+
+wait-for-event: (COMMON-LISP:OR (:EMACS-REX . SWANK::_) (:EMACS-CHANNEL-SEND . SWANK::_)) NIL
+
+dispatch-event: (:RETURN #<SB-THREAD:THREAD "new-repl-thread" RUNNING {D678BB1}>
+ (:ABORT "nil") 5)
+
+encode-message(:RETURN (:ABORT "nil") 5)
+
+dispatch-event: (:DEBUG-RETURN 53 1 NIL)
+
+encode-message(:DEBUG-RETURN 53 1 NIL)
+
+dispatch-event: (:RETURN #<SB-THREAD:THREAD "new-repl-thread" RUNNING {D678BB1}>
+(:ABORT "#<division-by-zero {CBA57D1}>") 4)
+
+encode-message(:RETURN (:ABORT "#<division-by-zero {CBA57D1}>") 4)
