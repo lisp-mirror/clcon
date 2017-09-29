@@ -49,14 +49,19 @@
    (perga
     (let budden-tools:*fn-before-return-symbol-from-reader-hook*
       (lambda (Символ Поток)
-        (declare (ignore Поток))
-        (_f
-         Добавить-в-предложения-импорта
-         Предложения-импорта
-         Символ)
-        Символ))
+        (perga
+         (let Имя-файла (ignore-errors (pathname Поток)))
+         (when
+             (and Имя-файла
+                  (string= (namestring (budden-tools:path-to-a-file Имя-файла))
+                           (namestring (cl-user::putq-otnositelqno-kornya-yara "v/t/"))))
+           (_f
+            Добавить-в-предложения-импорта
+            Предложения-импорта
+            Символ))
+           Символ)))
     (let *readtable* (named-readtables:find-readtable :linkx-readtable))
-    (asdf:load-system :linkx-tests :force t))
+    (asdf:test-system :linkx :force t))
    (let Предл-имп-для-defpackage (Подготовить-предложения-импорта-к-печати Предложения-импорта))
    (:@ with-open-file (П (cl-user::putq-otnositelqno-kornya-yara "v/t/package-linkx-dependencies.lisp")
                          :direction :output
@@ -113,5 +118,6 @@
                    (progn
                      (named-readtables:in-readtable nil)
                      (uiop/package:symbol-call :linkx-loader \"ЗАГРУЗИ-LINKX-И-СГЕНЕРИРУЙ-ИНТЕРФЕЙСНЫЙ-ПАКЕТ-ДЛЯ-ТЕСТОВ\")
-                     (named-readtables:in-readtable :linkx-readtable))} {}
+                     (named-readtables:in-readtable :linkx-readtable)
+                   )} {}
                    ")
