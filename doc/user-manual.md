@@ -70,6 +70,21 @@ proc ::AttachSwankHook {} {
 }
 ```
 
+### Имитация ввода пользователя в консоль
+При вызове из пункта меню:
+```
+.. ::tkcon::VstavitqVKonsolqKakBudtoPolzovatelqNapechatalIVypolnitq "(+ 2 2)"
+```
+Если нужно вызвать команду прямо из консоли, то 
+```
+..after 0 {::tkcon::VstavitqVKonsolqKakBudtoPolzovatelqNapechatalIVypolnitq {(+ 2 2)}}
+```
+Как сделать из функции лиспа, вызываемой из консоли - неясно. Происходит наложение команды на саму себя. Можно попробовать что-то вроде
+```
+(clco:eval-in-tcl "after 1000 {::tkcon::VstavitqVKonsolqKakBudtoPolzovatelqNapechatalIVypolnitq {(+ 2 2)}}")
+```
+Но это ненадёжно. Можно попробовать SendEventToSwank, см. "действия при соединении со SWANK".
+
 ### Избранное
 В консоли есть меню "избранное". Чтобы заполнить его, добавьте в инициализационный файл данные для построения меню, например: 
 ```
