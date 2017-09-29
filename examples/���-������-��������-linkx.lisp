@@ -27,7 +27,8 @@
   ;; это нужно для того, чтобы автоматически получать списки импортируемых символов. В 
   ;; промышленной версии не нужно
   (budden-tools::ENABLE-BUDDENS-READTABLE-EXTENSIONS :linkx-readtable
-                                                     :paren-reader-with-closing-paren-notification nil))
+                                                     ;:paren-reader-with-closing-paren-notification nil
+                                                     ))
 
 (Устрой-Linkx-readtable)
 
@@ -44,6 +45,7 @@
   (perga
    (let Предложения-импорта nil)
    (ql:quickload :linkx)
+   (asdf:find-system :linkx-tests)
    (perga
     (let budden-tools:*fn-before-return-symbol-from-reader-hook*
       (lambda (Символ Поток)
