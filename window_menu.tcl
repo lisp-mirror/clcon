@@ -62,7 +62,7 @@ namespace eval ::window_menu {
         set cmd ::edt::ShowSomeEditor
         set thatWindow [::ide_structure::EditorToplevelWindowName]
         set script [WrapCmdForKeyboard $w $thatWindow 0 $cmd]
-        ::clcon_key::b bind $DoubleModBindtag <Control-Shift-E> $script
+        ::clcon_key::b bind $DoubleModBindtag <Control-Shift-H> $script
         # bind $w <Control-Shift-Key-Cyrillic_U> $script
         
         set thatWindow [::ide_structure::DebuggerToplevelWindowName]
@@ -114,7 +114,7 @@ namespace eval ::window_menu {
         #
         set cmd ::edt::ShowSomeEditor
         CalcEnabledForOneItem [::edt::theTW] 0
-        $m add command -label "Редактор" -accel "Control-Shift-Р" \
+        $m add command -label "Редактор" -accel "Control-Shift-h" \
             -command $cmd -state $state
 
         set thatWindow [::ide_structure::DebuggerToplevelWindowName]

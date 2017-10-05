@@ -289,7 +289,8 @@ namespace eval ::edt {
             -insertbackground grey \
             -font $::tkcon::OPT(font) -borderwidth 1 -highlightthickness 0 \
             -blockcursor 1  \
-            -undo 1
+            -undo 1 \
+            -exportselection 0
         catch {
             # 8.5+ stuff
             set tabsp [expr {$OPT(tabspace) * [font measure $OPT(font) 0]}]
