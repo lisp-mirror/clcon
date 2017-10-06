@@ -30,6 +30,8 @@
     (t
      1))))
 
+
+;; ПРАВЬМЯ перед тем, как тут что-то править, отрефакторь костыль с таблицей чтения!
 (defun get-symbol-from-current-point (&REST keyargs &KEY (PREVIOUS 1) (MAX-LENGTH 100) (MAX-NON-ALPHANUMERIC 15) (return-symbol-too t) (CREATE-NEW nil))
   "See also odu::symbol-string-at-point . Если мы в нашей таблице чтения, читаем символ с помощью ридера, переключённого в спец. режим. Если с пакетом неясность, ищем все символы с таким именем и предлагаем пользователю выбор. Имеем возможность не создавать символ при попытке забрать его из буфера - это аккуратная политика. 
   Выражение a^b рассматриваем как два символа a и b. 
@@ -55,7 +57,19 @@
     (let readtable (or (named-readtables:find-readtable (odu::readtable-at-point))
                        (named-readtables:find-readtable nil)))
     (let package-designator (odu::package-at-point))
-    (let our-readtable (budden-tools::packages-seen-p readtable))
+    (let our-readtable
+      (cond
+       ((budden-tools::packages-seen-p readtable) readtable)
+       (t
+        (perga-implementation:perga
+         (let res (copy-readtable readtable))
+         (BUDDEN-TOOLS:ENABLE-BUDDENS-READTABLE-EXTENSIONS res)
+         res))))
+    
+
+    ;; ПРАВЬМЯ КОСТЫЛЬ - отрефакторить и убрать readtalbe вообще
+    (setf readtable our-readtable)
+
     (let reg (and (region-active-p (current-buffer))
                   (current-region)))
     (cond
