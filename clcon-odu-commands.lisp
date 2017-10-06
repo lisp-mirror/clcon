@@ -344,7 +344,7 @@
   (let ((n 0) res)
     (dolist (x l)
       (incf n)
-      (push (format nil "::tkcon::WriteActiveText $b \"~a \" end \"::edt::OpenUrl http://filonenko-mikhail.github.io/cltl2-doc/ru/~a\";" n x) res))
+      (push (format nil "::tkcon::WriteActiveText $b \"~a \" end \"::edt::OpenUrl http://filonenko-mikhail.github.io/cltl2-doc/ru/~a\" escape;" n x) res))
     (apply #'concatenate 'string (reverse res))))
 
 (defun ensure-table-cltl2 ()

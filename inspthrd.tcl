@@ -86,9 +86,9 @@ namespace eval ::inspthrd {
                 foreach {OpasnoKonsolb OpasnoGPI} [ОпасноеИмяПотока $threadName] {}
                 if {$OpasnoKonsolb} { set ZK "⚠" } else { set ZK " " }
                 if {$OpasnoGPI} { set ZG "⚠" } else { set ZG " " }             
-                ::tkcon::WriteActiveText $b [string cat $ZK "жми"] end [list ::inspthrd::BreakNthThreadInBlackConsole $n]
+                ::tkcon::WriteActiveText $b [string cat $ZK "жми"] end [list ::inspthrd::BreakNthThreadInBlackConsole $n] error
                 $b RoInsert end "\t" 
-                ::tkcon::WriteActiveText $b [string cat $ZG "жми"] end [list ::inspthrd::BreakNthThread $n]
+                ::tkcon::WriteActiveText $b [string cat $ZG "жми"] end [list ::inspthrd::BreakNthThread $n] error
                 $b RoInsert end "\n" 
             }
             set n [expr $n + 1]

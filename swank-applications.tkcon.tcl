@@ -73,17 +73,38 @@ proc ::tkcon::ExpandLispSymbolC1 {w str tmp EventAsList} {
     ::tkcon::ExpandC1 $w $str $tmp $match
 }
 
+proc ::tkcon::ЗакавычитьКодДляBind {код политика} {
+  if {${политика} eq "error"} {
+    if {[regexp "%" ${код}]} {
+      error "Код биндинга не может включать '%' при политике error"
+    }
+    return ${код}
+  } elseif {${политика} eq "escape"} {
+    return [regsub -all "%" ${код} "%%"]
+  } elseif {${политика} eq "ok"} {
+    return ${код}
+  } else {
+    error "Неверная политика ${политика}"
+  }
+}    
+
 
 # Write a hyperlink to a text widget w
 # problem is that we need mouse click to activate the hyperlink
-proc ::tkcon::WriteActiveText {w text index code} {
+# percent_policy - одно из:
+#  -- escape - знак процента удваивается
+#  -- ok -- знак процента допустим (для того, чтобы сослаться на контекст, см. док-ю по bind
+#  -- error - является ошибкой, если код содержит знак процента
+# Надо сказать, что это не единственное место, где нам грозят грабли из-за "%" в bind
+proc ::tkcon::WriteActiveText {w text index code percent_policy} {
     set tag [UniqueTag $w]
     $w tag configure $tag -foreground ForestGreen
     # $w insert output $text [list stdout $tag] \n stdout
+    set code2 [ ::tkcon::ЗакавычитьКодДляBind $code $percent_policy ]
     ::ro_out::I $w $index $text $tag  
     $w tag bind $tag <Enter> [list $w tag configure $tag -underline 1]
     $w tag bind $tag <Leave> [list $w tag configure $tag -underline 0]
-    $w tag bind $tag <ButtonRelease-1> $code
+    $w tag bind $tag <ButtonRelease-1> $code2
 }
 
 

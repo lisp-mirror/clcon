@@ -430,7 +430,7 @@ namespace eval ::ldbg {
         set e1 [::mprs::Unleash [lindex $TitleList 0]]
         set e2 [::mprs::Unleash [lindex $TitleList 1]]
         ::tkcon::WritePassiveText $w "$e1\n" end
-        ::tkcon::WriteActiveText $w $e2 end "::ldbg::InspectCurrentCondition"
+        ::tkcon::WriteActiveText $w $e2 end "::ldbg::InspectCurrentCondition" error
     }
     
     proc ExtractStackFrames { EventAsList } {

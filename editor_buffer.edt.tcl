@@ -323,7 +323,7 @@ namespace eval ::edt {
                     $b RoInsert end "\n"
                 }
             }
-            ::tkcon::WriteActiveText $b "Hyperdoc" end "::edt::LispHyperdocLookupCommand $clcon_text"
+            ::tkcon::WriteActiveText $b "Hyperdoc" end "::edt::LispHyperdocLookupCommand $clcon_text" error
             $b RoInsert end "\n\n"
             $b RoInsert end "Описание: \n"
             $b RoInsert end $Describe 

@@ -99,7 +99,7 @@
   "Generates tcl code which prints out one hyperlink. offset считается от 1"
   (let* ((escaped-text (cl-tk:tcl-escape text))
          (edit-file-code (edit-file-at-offset-code file offset fix-offset-p |Скакнуть-от-Лиспа-к-Яру|)))
-    (format stream "::tkcon::WriteActiveText $w ~A ~A {~A}; $w insert ~A \\\n; "
+    (format stream "::tkcon::WriteActiveText $w ~A ~A {~A} escape; $w insert ~A \\\n; "
             escaped-text
             index
             edit-file-code
@@ -237,7 +237,7 @@
   "Generates tcl code which prints out one hyperlink"
   (let* ((escaped-text (cl-tk:tcl-escape text))
          (edit-file-code (edit-file-at-offset-code file offset fix-offset-p |Скакнуть-от-Лиспа-к-Яру|)))
-    (format stream "::tkcon::WriteActiveText $b ~A ~A {~A}; $b RoInsert ~A \\\n; "
+    (format stream "::tkcon::WriteActiveText $b ~A ~A {~A} escape; $b RoInsert ~A \\\n; "
             escaped-text
             index
             edit-file-code

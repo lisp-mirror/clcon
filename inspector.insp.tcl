@@ -92,7 +92,8 @@ namespace eval ::insp {
                     ::tkcon::WriteActiveText $b \
                         [::mprs::Unleash [lindex $item 1]] \
                         end \
-                        "insp::InspectNthPart $w [::mprs::Unleash [lindex $item 2]]"
+                        "insp::InspectNthPart $w [::mprs::Unleash [lindex $item 2]]" \
+                        error
                 } else {
                     $b RoInsert end "Я не знаю, что такое $s"
                 }
@@ -101,10 +102,11 @@ namespace eval ::insp {
             }
         }
         if { $ObjectTooLarge } {
-             ::tkcon::WriteActiveText $b \
-             "Продолжить загрузку" \
-             end \
-             "insp::NextPart $w [lindex $InspectedMagicNumbers 2] [lindex $InspectedMagicNumbers 0]"
+            ::tkcon::WriteActiveText $b \
+            "Продолжить загрузку" \
+            end \
+            "insp::NextPart $w [lindex $InspectedMagicNumbers 2] [lindex $InspectedMagicNumbers 0]" \
+            error
         }
 
     }
@@ -148,7 +150,8 @@ namespace eval ::insp {
                     ::tkcon::WriteActiveText $b \
                         [::mprs::Unleash [lindex $item 1]] \
                         end \
-                        "insp::InspectNthPart $w [::mprs::Unleash [lindex $item 2]]"
+                        "insp::InspectNthPart $w [::mprs::Unleash [lindex $item 2]]" \
+                        error 
                 } else {
                     $b RoInsert end "Я не знаю, что такое $s"
                 }
@@ -157,10 +160,11 @@ namespace eval ::insp {
             }
         }
         if { $ObjectTooLarge } {
-             ::tkcon::WriteActiveText $b \
-             "Продолжить загрузку" \
-             end \
-             "insp::NextPart $w [lindex $InspectedMagicNumbers 2] [lindex $InspectedMagicNumbers 0]"
+            ::tkcon::WriteActiveText $b \
+            "Продолжить загрузку" \
+            end \
+            "insp::NextPart $w [lindex $InspectedMagicNumbers 2] [lindex $InspectedMagicNumbers 0]" \
+            error 
         }
     }
 
