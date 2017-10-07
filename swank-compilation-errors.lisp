@@ -43,7 +43,7 @@
   
 
 (defun compile-lisp-file-for-tcl (filename load-p &rest options)
-  "Value of oduvanchik::compile-and-load-buffer-file-function for Lisp mode"
+  "Value of oduvanchik::compile-and-load-buffer-file-function for Lisp mode. Клон этой ф-ии - ТРАНСЛЯТОР-ЯРА-В-ЛИСП:Выполни-скрипт-Яра"
   (let* ((pathname (pathname filename))
          (compilation-result (apply #'swank:compile-file-for-emacs pathname load-p options))
          (success (swank::compilation-result-successp compilation-result))
