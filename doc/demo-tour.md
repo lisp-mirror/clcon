@@ -17,18 +17,33 @@ Apropos, completion, find definition, help
 Keyboard accelerators are shown in "Edit" menu.
 
 ### Lisp
-At the console, enter `.апр -lookup-` to list all symbols containing "-lookup-" substring in their name. 
-At the console, type in `clco:s-l-d` and press `Ctrl-Space`. Name will expand to clco:server-lookup-definition with the help of compound completion algorithm (swank-c-p-c contrib). Now press `Alt-.` Editor window will pop up and source of function you typed will be seen. You can press Alt-. at
-any lisp definition in the editor and jump to its source. If there are more then one definition (e.g. for PRINT function), list of "hyperlinks"
-will show up at the console. Click on either of them with mouse to open an appropriate source. In the editor, completion works in similar way. 
+В консоли, напечатайте `.апр -lookup-`, чтобы увидеть все символы, в имени к-рых содержится подстрока "-lookup-" . 
+Далее, в консоли напечатайте `clco:s-l-d` и нажмите `Ctrl-Пробел`. Имя расширится в `clco:server-lookup-definition` с помощью алгоритма 'составного автодополнения', (swank-c-p-c contrib). Теперь нажмите `Alt-.` Откроется редактор и в нём - исходный текст ф-ии, к-рую мы напечатали. Также Alt-. работает внутри редактора. Если определений больше одного (напр., для функции PRINT), в консоли напечатается несколько зелёных гиперссылок, каждая из которых по клику левой кнопкой мыши ведёт в одно из мест, относящихся к определению функции.
 
-Finally set the cursor at the word `defun` and press `f1`. Web browser should open with hyperspec article about `defun`.  
+Наконец, установите курсор на слово `defun` и нажмите `f1`. Откроется окно со справкой по функции (в редакторе окно будет намного более подробным, чем в консоли). 
+
+### Яр
+Вернитесь в консоль с помощью `Control-.`.
+В консоли, если команда начинается с пробела, то она передаётся интерпретатору Яра (на самом деле это транслятор, но не суть). Напечатайте:
+
+```
+> опр функ Плюс-два (ю -- целое)
+тело
+  ю + 2
+кно
+> Плюс-два(1)
+; напечатается 3
+```
 
 ### Tcl
-Return to the console with `Control-.`.
-Clean up current command with `Control-u` and enter `.тапр cap` to list all tcl procs, commands and vars containing substring `cap` in their name. Position a keyboard cursor at any of them and press Control-F9 to go to its source. 
+Если команда начинается с одной точки, то это команда clcon, которую выполняет интерпретатор tcl. 
+В консоли, очистите введённую строчку с помощью `Control-u` и напечатайте `.тапр cap` (cap - латиницей), затем Enter, чтобы перечислить все процедуры, команды и переменные, имя к-рых содержит `cap`. Поставьте курсор на любую из процедур и нажмите `Control-F9`, чтобы попытаться перейти к определению.
+
+Если команда начинается с двух точек, то две точки отрезаются, а остаток передаётся интерпретатору tcl. 
+
 Return to the console with `Control-.` . Type a space and then `snit::Ca`. Then press `Tab` . Name will expand to 
 `::snit::Capitalize`. Press `Control-F9` and jump to a source of tcl proc. Note this is source from the library, not the source of clcon. Rather convenient. We only now support procs, not variables. Note that "find source" for tcl works for fully qualified names only. It only shows proper source if name starts from "::" (this is a bug).
+
 
 ### File name
 Return to the console with `Control-.`. Type a space and then some partial file name in Unix style, e.g. `c:/win` under Windows or `/bi` under Unix
@@ -38,7 +53,7 @@ Pressing `Control-Return` at the console inserts path to the file currently sele
 
 Switching between windows
 -----------
-In the editor, press `Control-.` to switch back to console. In the console, press `Control-Shift-e` to switch to editor. Press `Control-Tab`, `Control-Shift-Tab` to navigate through editor buffers. Press `Control-F12` to see buffer list widget. In the widget, buffers are sorted by MRU.
+In the editor, press `Control-.` to switch back to console. In the console, press `Control-Shift-h` to switch to editor. Press `Control-Tab`, `Control-Shift-Tab` to navigate through editor buffers. Press `Control-F12` to see buffer list widget. In the widget, buffers are sorted by MRU.
 	
 Compiling file from editor
 ------------
@@ -55,9 +70,6 @@ but you can try load generated fasl file if you press "!".
 
 You can browse through notes with arrow keys. As you press <space>, source code for error will be shown in the editor. 
 Once you switched to editor, it is convenient to scroll through messages with Alt-F7/F8. 
-
-Warning! Due to random positioning of windows, some views may be unpleasant to work with, so you might want to 
-resize/reposition them manually. Your feedback and patches to solve this are welcome. 
 
 Компиляция системы с удобной навигацией по предупреждениям описана в руководстве пользователя. 
 
@@ -84,7 +96,7 @@ Now let's try stepper.
 Warning! There are problems in stepper backend when you step out of the frame where you turned stepping mode on. Press "continue" if stepper shows up unexpectedly. Submit bug to SBCL tracker :) 
 
 With `Control-Up` at the console, bring up last command `(f 5)` to the prompt, and press `Return` to call it again. As debugger occurs, position windows so that
-you can see debugger and the editor at the same time. Choose `Stack/Switch to stepping mode` from menu bar. Editor window will pop up and current source will be highlighted. Press "F10" (Step next, or "Step over") watch how execution proceeds. Also note that stack and locals are shown in the debugger window. Press "f10" one more time, watch how execution proceeds. Then press "F5" (Continue, or resume to normal execution) to quit stepper mode. 
+you can see debugger and the editor at the same time. Choose `Cтек/Перейти в режим ходьбы` from menu bar. Editor window will pop up and current source will be highlighted. Press "F10" (Step next, or "Step over") watch how execution proceeds. Also note that stack and locals are shown in the debugger window. Press "f10" one more time, watch how execution proceeds. Then press "F5" (Continue, or resume to normal execution) to quit stepper mode. 
 
 IDE commands. 
 ---------------------
@@ -93,11 +105,11 @@ Type `.help` to see list of those.
 
 Standalone inspector
 ----------
-Eval something, say `'defun`, at the console. And then type in `.insp*` (this is IDE command) to inspect `*`, that is, result of last REPL evaluation. You can see the symbol's properties and follow hyperlinks. 
+Eval something, say `'defun`, at the console. And then type in `.ин` (this is IDE command) to inspect `*`, that is, result of last REPL evaluation. You can see the symbol's properties and follow hyperlinks. 
 
 Invoking tcl
 --------
-When you enter line starting from `.. `, at the IDE prompt, the line will be treated as tcl command. E.g. type in ``.. tk_messageBox -message "Wow!"`` to try. There is also a way to invoke tcl from lisp. Type in `(clcon-server:eval-in-tcl "tk_messageBox -message WOW")` at the console and you'll see message box, which was invoked from the lisp side. 
+When you enter line starting from `.. `, at the IDE prompt, the line will be treated as tcl command. E.g. type in ``.. tk_messageBox -message "Ура!"`` to try. There is also a way to invoke tcl from lisp. Type in `(clcon-server:eval-in-tcl "tk_messageBox -message WOW")` at the console and you'll see message box, which was invoked from the lisp side. 
 
 Editing files
 ---------
@@ -105,7 +117,7 @@ All files are now highlighted according to lisp mode, and you can even edit them
 
 When the file is modified, its tab is marked with asterik. Also asterik is shown in the buffer list (invoked by `Control-F12`).  
 
-Interesting commands while editing lisp are "indent" (`Ctrl-Space` key) and "indent new line"  (`Shift-Return`). Also you can note highlight of opening paren when you stay at closing one. Also we have "Lisp" menu with several lisp mode commands (not currently bound to keyboard, but should work). 
+Interesting commands while editing lisp are "indent" (`Tab` key) and "indent new line"  (`Shift-Return`). Also you can note highlight of opening paren when you stay at closing one. Also we have "Lisp" menu with several lisp mode commands (not currently bound to keyboard, but should work). 
 
 Also we have rather lame tcl indentation. It is invoked with `Control-Return`. Tcl find source in the editor ignores current namespace, so it is of limited use. 
 
