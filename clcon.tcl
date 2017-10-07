@@ -4578,7 +4578,13 @@ proc ::tkcon::ReloadSomeIDESources {} {
 
 
 proc ::tkcon::Udatlitq_SystemIndex_txt {} {
-    ::tkcon::VstavitqVKonsolqKakBudtoPolzovatelqNapechatalIVypolnitq {(delete-file (putq-otnositelqno-kornya-yara "system-index.txt")) ; Меню/Файл/Очистить кеш систем asd}
+    ::tkcon::VstavitqVKonsolqKakBudtoPolzovatelqNapechatalIVypolnitq {
+;; Меню/Файл/Очистить кеш систем asd
+(progn
+  (delete-file (putq-otnositelqno-kornya-yara "system-index.txt"))
+  (when (probe-file "c:/yar.my/док/system-index.txt")
+    (delete-file "c:/yar.my/док/system-index.txt")))
+  }
 }
 
 package provide tkcon $::tkcon::VERSION
