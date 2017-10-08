@@ -59,6 +59,8 @@
    (let targets (budden-tools::l/find-sources-in-file file offset-1-based :strict t))
    (cond
     (targets
+     (when (cdr targets)
+       (warn "Есть и другие места для перехода: ~S" (cdr targets)))
      (let target (car targets))
      (let target-file (КАРТЫ-ИСХОДНИКОВ-ЛИЦО:SLO-SOURCE-В-ИМЯ-ФАЙЛА (first target))) ; FIXME Записывать позиции единообразно, например, с помощью olm. 
      (let target-offset-1-based (second target))
@@ -111,15 +113,31 @@
 
 
 (defun parse-location-into-file-and-pos (location)
-  "returns either values of file and position or nil"
+  "Объект location это:
+   а) БУКВЫ-И-МЕСТА-В-ФАЙЛЕ:Место-в-исходнике
+   б) возвращается swank в виде дерево cons-ов и может выглядить примерно так:
+
+      (:LOCATION (:FILE \"C:/yar/sbcl/1.3.18/source/src/code/defboot.lisp\")
+       (:POSITION 6961)
+       (:SNIPPET
+        \"(sb!xc:defmacro defun (&environment env name lambda-list &body body)
+  \\\"Define a function at top level.\\\"
+  #+sb-xc-host
+  (unless (symbol-package (fun-name-block-name name))
+    (warn \\\"DEFUN of uninterned function name ~S (tricky for GENESIS)\\\" name))
+  (mu\")) . Данная ф-я returns either values of file and position or nil"
   (cond
-    ((and (eq (car location) :location)
-          (eq (car (second location)) :file)
-          (eq (car (third location)) :position))
-     (let ((file (second (second location)))
-           (position (second (third location))))
-       (values file position)))
-    (t nil)))  
+   ((typep location БУКВЫ-И-МЕСТА-В-ФАЙЛЕ:|Место-в-исходнике|)
+    )
+   ((and (eq (car location) :location)
+         (eq (car (second location)) :file)
+         (eq (car (third location)) :position))
+    (let ((file (second (second location)))
+          (position (second (third location))))
+      (values file position)))
+   (t
+    (warn "Что-то невнятное пришло в качестве места в исходнике: ~S" location)
+    nil)))
 
 (defun write-one-dspec-and-location (link-text location stream &key (index "output") fix-offset-p (|Скакнуть-от-Лиспа-к-Яру| t))
   "It is also used by compilation-error browse, some arbitrary string is passed instead of dspec. Beware! 
@@ -143,6 +161,7 @@
    If mode = :eval we will eval the code in the context where $w contains some widget. 
    This widget is required as a parent of tk_messageBox which we show when we unable to locate
    and which is activated after showing message
+
    "
   (multiple-value-bind (file offset)
                        (parse-location-into-file-and-pos loc)
@@ -208,7 +227,12 @@
   (|Обслужить-команду-поиска-связей-символа| name-or-symbol #'swank/backend:find-definitions "Определения символа ~S не найдены" name-or-symbol package-name readtable-name :|Фильтр-определений| |Фильтр-определений|))
 
 (defun |Обслужить-команду-поиска-связей-символа| (name-or-symbol |Функция-возвращающая-места| |Формат-сообщения-об-отсутствии-находок| |В-ошибке-показывать-символ-как| package-name readtable-name &key (|Фильтр-определений| (constantly t)))
-  "Общая часть между несколькими командами, напр, найти символ, найти пакет, найти систему. Фильтр-определений позволяет выделить только нужные определения. Он получает один аргумент - определение в том виде, как возвращает его swank (протрассируй и посмотри, что приходит) и, если возвращает истину, то определение попадёт в дальнейшую работу"
+  "Общая часть между несколькими командами, напр, найти символ, найти пакет, найти систему. Фильтр-определений позволяет выделить только нужные определения. Он получает один аргумент - определение в том виде, как возвращает его swank (протрассируй и посмотри, что приходит) и, если возвращает истину, то определение попадёт в дальнейшую работу. 
+
+Функция вовзращает строку - код tcl, к-рый либо печатает в консоль список мест, куда можно перейти, 
+либо переходит на единственное место, куда можно перейти. 
+
+См. также ODUVANCHIK::|Создать-код-tcl-для-перехода-к-определениям|"
   (perga-implementation:perga
    (let dspecs-and-locations
      (swank-find-definitions-for-clcon

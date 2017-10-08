@@ -210,6 +210,18 @@ namespace eval ::edt {
     }
 
 
+    proc ЯрНайтиСгенерированныйТекстCommand {text} {
+        set console [::tkcon::CurrentConsole]
+        set w [$text RealText]
+
+        ::tkcon::ПоложитьТекущуюПозициюНаPosStack $w
+        
+        ::clcon_text::CallOduvanchikFunction $text "odu::nayiti-iskhodnik-zpt-porozhdyonnyyyi-iz-ehtogo-mesta-command nil" {{
+            ::edt::ПоискаСвязейСимволаПродолжение $clcon_text $EventAsList "::edt::ЯрНайтиСгенерированныйТекстCommand"
+        }} {send_selection 1}
+    }
+
+
     proc FindPackage {text} {
         set console [::tkcon::CurrentConsole]
         set w [$text RealText]
