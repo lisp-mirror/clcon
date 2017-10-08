@@ -126,18 +126,22 @@
   (unless (symbol-package (fun-name-block-name name))
     (warn \\\"DEFUN of uninterned function name ~S (tricky for GENESIS)\\\" name))
   (mu\")) . Данная ф-я returns either values of file and position or nil"
-  (cond
-   ((typep location БУКВЫ-И-МЕСТА-В-ФАЙЛЕ:|Место-в-исходнике|)
-    )
-   ((and (eq (car location) :location)
-         (eq (car (second location)) :file)
-         (eq (car (third location)) :position))
-    (let ((file (second (second location)))
-          (position (second (third location))))
-      (values file position)))
-   (t
-    (warn "Что-то невнятное пришло в качестве места в исходнике: ~S" location)
-    nil)))
+  (perga-implementation:perga
+   (cond
+    ((typep location 'БУКВЫ-И-МЕСТА-В-ФАЙЛЕ-ЛИЦО:|Место-в-исходнике|)
+     (let |Источник|
+       (БУКВЫ-И-МЕСТА-В-ФАЙЛЕ-ЛИЦО:|Место-в-исходнике-Источник| location))
+     (break "Дальше не знаю")
+     )
+    ((and (eq (car location) :location)
+          (eq (car (second location)) :file)
+          (eq (car (third location)) :position))
+     (let ((file (second (second location)))
+           (position (second (third location))))
+       (values file position)))
+    (t
+     (warn "Что-то невнятное пришло в качестве места в исходнике: ~S" location)
+     nil))))
 
 (defun write-one-dspec-and-location (link-text location stream &key (index "output") fix-offset-p (|Скакнуть-от-Лиспа-к-Яру| t))
   "It is also used by compilation-error browse, some arbitrary string is passed instead of dspec. Beware! 

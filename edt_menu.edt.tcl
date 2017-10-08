@@ -234,7 +234,7 @@ namespace eval ::edt {
         ::edt::OduFnMenuItem $w $m $btext nayiti-iskhodnik-po-karte -accel <Control-Shift-F9> -bindtag DoubleMod$w 
 
         set cmd [wesppt [list ::edt::ЯрНайтиСгенерированныйТекстCommand $btext]]
-        $m add command -label "Яр: найти код (лиспа), сгенерированный отсюда" -accel <Control-Alt-F9> 
+        $m add command -label "Яр: найти код (лиспа), сгенерированный отсюда" -accel <Control-Alt-F9> -command $cmd
         ::clcon_key::b bind SingleMod$w <Control-Alt-F9> $cmd
 
         set cmd [wesppt [list ::edt::ЯрНайтиИсходникCommand $btext]]
