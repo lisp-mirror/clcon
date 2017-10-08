@@ -34,7 +34,7 @@ clcon находится в процессе русификации. Часть 
 
 ## Видео
 
-[См. сюда](https://www.youtube.com/watch?v=nMhwvZ56jHU)
+[См. сюда](https://youtu.be/P4SapXQb4Fw)
 
 ## Снимки экрана
 
