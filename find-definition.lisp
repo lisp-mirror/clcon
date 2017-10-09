@@ -141,6 +141,8 @@
      (let ((file (second (second location)))
            (position (second (third location))))
        (values file position)))
+    ((eq (car location) :error)
+     nil)
     (t
      (warn "Что-то невнятное пришло в качестве места в исходнике: ~S" location)
      nil))))

@@ -222,6 +222,9 @@ namespace eval ::edt {
     proc CalcTabText {Bi} {
         set MRUWinListEntry [lindex [SearchBiInMRUWinList [cBi]] 1]
         set tab_name [dict get $MRUWinListEntry name]
+        if {[string length $tab_name] > 30} {
+            set tab_name [string cat [string range $tab_name 0 20] "... (" $Bi ")"]
+        }
         set btext [Bi2btext $Bi]
         set asterik [BooleanToAsterik [$btext edit modified]]
         string cat $asterik $tab_name
