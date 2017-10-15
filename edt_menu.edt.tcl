@@ -97,6 +97,98 @@ namespace eval ::edt {
         return $cmdBreak
     }
 
+    proc ЗаполнитьПодменюНавигацияПоКодуЛиспа {Bi w btext s} {
+        if {![winfo exists $s]} {
+            menu $s
+        }
+        ::gui_util::ClearMenu $s        
+
+        # ------------------------ modified right key ---------------------------
+    
+        #set cmd [wesppt [list event generate $btext <<NextWord>>] -add-break 1] 
+        #::clcon_key::b bind SingleMod$w <Alt-Key-Right> $cmd
+
+        OduFnMenuItem $w $s $btext forward-form-or-word \
+            -ContinueIfNoBackend 1              \
+            -accel <Control-Key-Right> -bindtag SingleMod$w 
+
+        OduFnMenuItem $w $s $btext forward-form-or-word-altering-selection \
+            -ContinueIfNoBackend 1                                 \
+            -accel <Control-Shift-Key-Right> -bindtag DoubleMod$w  \
+            -CallOduvanchikFunctionOptions {send_selection 1}
+
+       
+        # ------------------------ modified left key ---------------------------
+
+        #set cmd [wesppt [list event generate $btext <<PrevWord>>] -add-break 1] 
+        #::clcon_key::b bind SingleMod$w <Alt-Key-Left> $cmd
+
+        OduFnMenuItem $w $s $btext backward-form-or-word \
+            -ContinueIfNoBackend 1              \
+            -accel <Control-Key-Left> -bindtag SingleMod$w 
+
+        OduFnMenuItem $w $s $btext backward-form-or-word-altering-selection \
+            -ContinueIfNoBackend 1                                 \
+            -accel <Control-Shift-Key-Left> -bindtag DoubleMod$w  \
+            -CallOduvanchikFunctionOptions {send_selection 1}
+
+        $s add separator
+
+        
+        OduFnMenuItem $w $s $btext forward-list
+        OduFnMenuItem $w $s $btext backward-list
+        OduFnMenuItem $w $s $btext forward-up-list \
+            -ContinueIfNoBackend 1              \
+            -accel <Alt-Key-Up> -bindtag SingleMod$w 
+
+        OduFnMenuItem $w $s $btext backward-up-list
+        OduFnMenuItem $w $s $btext down-list
+ 
+        OduFnMenuItem $w $s $btext indent-new-line -accel "<Shift-Key-Return>" -bindtag SingleMod$w
+
+        OduFnMenuItem $w $s $btext indent-form
+
+        OduFnMenuItem $w $s $btext indent -accel "<Tab>" -bindtag NoMod$w
+
+        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $btext "odu::indent-region-command nil" {} {send_selection 1}]]
+        
+        $s add command -label "Проставить отступ в выденном фрагменте" -command $cmd 
+       
+        OduFnMenuItem $w $s $btext transpose-forms
+        $s add separator
+        OduFnMenuItem $w $s $btext beginning-of-defun
+        OduFnMenuItem $w $s $btext end-of-defun
+        OduFnMenuItem $w $s $btext mark-defun 
+        $s add separator
+
+   # $m $m $m $m $m $m
+   }
+
+
+    proc ЗаполнитьПодменюСимволЛиспа {Bi w btext s} {
+        if {![winfo exists $s]} {
+            menu $s
+        }
+        ::gui_util::ClearMenu $s        
+        set cmd [wesppt [list ::edt::КтоВызываетФункцию $btext]]
+        $s add command -label "кто вызывает функцию" -under 6 -command $cmd 
+
+        set cmd [wesppt [list ::edt::LispDescribeAllCommand $btext]]
+        $s add command -label "справка по идентиф-ру" -accel "F1" -command $cmd
+        ::clcon_key::b bind NoMod$w <Key-F1> $cmd
+
+        set cmd [wesppt [list ::edt::SkopirovatqIdentVBuferObmena $btext]]
+        $s add command -label "скопировать идентф-р в буфер обмена" -accel "F2" -command $cmd
+        ::clcon_key::b bind NoMod$w <Key-F2> $cmd
+
+        set cmd [wesppt [list ::edt::FindSourceCommand $btext]]
+
+        $s add command -label "перейти к определению" -accel "Alt-." -command $cmd
+        ::clcon_key::b bind SingleMod$w <Alt-period> $cmd
+
+        OduFnMenuItem $w $s $btext complete-symbol-with-budden-tools -accel "<Control-Key-space>" -bindtag SingleMod$w
+    }
+
     proc ЗаполнитьПодменюСистема {Bi w btext s} {
         if {![winfo exists $s]} {
             menu $s
@@ -121,16 +213,20 @@ namespace eval ::edt {
         ::gui_util::ClearMenu $m
 
         # ---------------------------- Работа с пакетом и системой ----------------------
-        
-        set cmd [wesppt [list ::edt::FindPackage $btext]]
-        $m add command -label "1.Перейти к определению пакета" -command $cmd -underline 0
 
-        set cmd [wesppt [list ::edt::УстановитьЭтотПакетВКонсоли $btext]]
-        $m add command -label "2.Установить этот пакет в консоли" -command $cmd -underline 0
+        set s $m.simvol
+        $m add cascade -label "1.Символ лиспа..." -underline 0 -menu $s
+        edt::ЗаполнитьПодменюСимволЛиспа $Bi $w $btext $s
 
         set s $m.sistema
-        $m add cascade -label "3.Система..." -underline 0 -menu $s
+        $m add cascade -label "2.Система..." -underline 0 -menu $s
         edt::ЗаполнитьПодменюСистема $Bi $w $btext $s
+        
+        set cmd [wesppt [list ::edt::FindPackage $btext]]
+        $m add command -label "3.Перейти к определению пакета" -command $cmd -underline 0
+
+        set cmd [wesppt [list ::edt::УстановитьЭтотПакетВКонсоли $btext]]
+        $m add command -label "4.Установить этот пакет в консоли" -command $cmd -underline 0
 
         # It is too late hour to start show-mark
         # We have archietectural problems there (rompsite.lisp is too early on the build)
@@ -154,82 +250,25 @@ namespace eval ::edt {
         # we can reuse that keys.
         ::ldbg::FillStepperMenu $StepperMenu [list NoMod$w] 
         
+
+        set s $m.navigaciya_po_kodu_lispa
+        $m add cascade -label "5.Навигация по коду лиспа..." -underline 0 -menu $s
+        edt::ЗаполнитьПодменюНавигацияПоКодуЛиспа $Bi $w $btext $s
+
         $m add separator
 
-        OduFnMenuItem $w $m $btext indent-new-line -accel "<Shift-Key-Return>" -bindtag SingleMod$w
-
-        OduFnMenuItem $w $m $btext indent-form
-
-        OduFnMenuItem $w $m $btext indent -accel "<Tab>" -bindtag NoMod$w
-
-        OduFnMenuItem $w $m $btext complete-symbol-with-budden-tools -accel "<Control-Key-space>" -bindtag SingleMod$w
-
-        set cmd [wesppt [list clcon_text::CallOduvanchikFunction $btext "odu::indent-region-command nil" {} {send_selection 1}]]
-        
-        $m add command -label "Проставить отступ в выденном фрагменте" -command $cmd 
-       
-        OduFnMenuItem $w $m $btext transpose-forms
-        $m add separator
-        OduFnMenuItem $w $m $btext beginning-of-defun
-        OduFnMenuItem $w $m $btext end-of-defun
-        OduFnMenuItem $w $m $btext mark-defun 
-        $m add separator
-
-        # ------------------------ modified right key ---------------------------
-    
-        #set cmd [wesppt [list event generate $btext <<NextWord>>] -add-break 1] 
-        #::clcon_key::b bind SingleMod$w <Alt-Key-Right> $cmd
-
-        OduFnMenuItem $w $m $btext forward-form-or-word \
-            -ContinueIfNoBackend 1              \
-            -accel <Control-Key-Right> -bindtag SingleMod$w 
-
-        OduFnMenuItem $w $m $btext forward-form-or-word-altering-selection \
-            -ContinueIfNoBackend 1                                 \
-            -accel <Control-Shift-Key-Right> -bindtag DoubleMod$w  \
-            -CallOduvanchikFunctionOptions {send_selection 1}
 
         OduFnMenuItem $w $m $btext forward-character-altering-selection \
             -ContinueIfNoBackend 1                                 \
             -accel <Shift-Key-Right> -bindtag SingleMod$w  \
             -CallOduvanchikFunctionOptions {send_selection 1}
-        
-        # ------------------------ modified left key ---------------------------
-
-        #set cmd [wesppt [list event generate $btext <<PrevWord>>] -add-break 1] 
-        #::clcon_key::b bind SingleMod$w <Alt-Key-Left> $cmd
-
-        OduFnMenuItem $w $m $btext backward-form-or-word \
-            -ContinueIfNoBackend 1              \
-            -accel <Control-Key-Left> -bindtag SingleMod$w 
-
-        OduFnMenuItem $w $m $btext backward-form-or-word-altering-selection \
-            -ContinueIfNoBackend 1                                 \
-            -accel <Control-Shift-Key-Left> -bindtag DoubleMod$w  \
-            -CallOduvanchikFunctionOptions {send_selection 1}
-
 
         OduFnMenuItem $w $m $btext backward-character-altering-selection \
             -ContinueIfNoBackend 1                                 \
             -accel <Shift-Key-Left> -bindtag SingleMod$w  \
             -CallOduvanchikFunctionOptions {send_selection 1}
 
-        
-        OduFnMenuItem $w $m $btext forward-list
-        OduFnMenuItem $w $m $btext backward-list
-        OduFnMenuItem $w $m $btext forward-up-list \
-            -ContinueIfNoBackend 1              \
-            -accel <Alt-Key-Up> -bindtag SingleMod$w 
-
-        OduFnMenuItem $w $m $btext backward-up-list
-        OduFnMenuItem $w $m $btext down-list
-
         $m add separator
-
-        set cmd [wesppt [list ::edt::FindSourceCommand $btext]]
-
-        $m add command -label "перейти к определению" -accel "Alt-." -command $cmd
-        ::clcon_key::b bind SingleMod$w <Alt-period> $cmd
 
         ::edt::OduFnMenuItem $w $m $btext nayiti-iskhodnik-po-karte -accel <Control-Shift-F9> -bindtag DoubleMod$w 
 
@@ -243,17 +282,6 @@ namespace eval ::edt {
 
         OduFnMenuItem $w $m $btext yar-avtodopolnenie -accel "<Alt-Key-F11>" -bindtag SingleMod$w
 
-        set cmd [wesppt [list ::edt::КтоВызываетФункцию $btext]]
-        $m add command -label "кто вызывает функцию" -under 6 -command $cmd 
-
-        $m add separator
-        set cmd [wesppt [list ::edt::LispDescribeAllCommand $btext]]
-        $m add command -label "справка по идентиф-ру" -accel "F1" -command $cmd
-        ::clcon_key::b bind NoMod$w <Key-F1> $cmd
-
-        set cmd [wesppt [list ::edt::SkopirovatqIdentVBuferObmena $btext]]
-        $m add command -label "скопировать идентф-р в буфер обмена" -accel "F2" -command $cmd
-        ::clcon_key::b bind NoMod$w <Key-F2> $cmd
 
     }
 
