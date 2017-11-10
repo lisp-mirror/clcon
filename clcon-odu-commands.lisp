@@ -386,9 +386,6 @@
        (describe symbol s))
     (clco::server-lookup-definition-as-list symbol))))
               
-                
-        
-
 (defcommand "Sync Cursor" (p)
     "Debug-time command to sync cursor. There were no need to make it a command"
     "Does nothing but printing current cursor position. The rely upon the fact that clco::call-oduvanchik-function-with-clcon_text syncs cursor of backend buffer with that of clcon_text"

@@ -6,71 +6,44 @@
 ##
 
 
-# (:emacs-rex
-#  (swank:inspect-nth-part 1)
-#  "COMMON-LISP-USER" t 33)
-# (:return
-#  (:ok
-#   (:title "#<symbol {DAA40AF}>" :id 0 :content
-#           (("Its name is" ": "
-#             (:value "\"A\"" 1)
-#             "\n" "It is unbound." "\n" "It has no function value." "\n" "It is " "internal" " to the package: "
-#             (:value "COMMON-LISP-USER" 2)
-#             " "
-#             (:action "[export]" 0)
-#             " "
-#             (:action "[unintern]" 1)
-#             "\n" "Property list" ": "
-#             (:value "nil" 3)
-#             ...)
-#            21 0 500)))
-
 namespace eval ::insp {
 
-    ## ::insp::InitInspector :
-    # Example of dialog: 
-    # (:emacs-rex
-    #  (swank:init-inspector "*")
-    #  "COMMON-LISP-USER" :repl-thread 32)
-    # (:return
-    #  (:ok
-    #   (:title "#<cons {BD735A3}>" :id 0 :content
-    #           (("A proper list:" "\n" "0" ": "
-    #             (:value "a" 1)
-    #             "\n" "1" ": "
-    #             (:value "2" 2)
-    #             "\n")
-    #            10 0 500)))
-    #  32)
-    # We can't still eval in :repl-thread synchonously, so this is just a demo.
-    # We will run init-inspector asynchronously and 
-    proc InitInspector { LispExpr } {
+    ::snit::widgetadaptor inspector {
+        # dict serial -> item
+        # option -data -default [dict create]
+        option -thread-id 
+        constructor {args} {
+            installhull using toplevel
+            # Apply any options passed at creation time.
+            $self configurelist $args
+        }
+        method set_font {size} {
+            variable ::tkcon::OPT
+            set font [lindex $::tkcon::OPT(шрифты) $size]
+            [TitleOfInspector $self] configure -font $font
+            [BodyTextOfInspector $self] configure -font $font
+        }
+        delegate method * to hull
+        delegate option * to hull
+    }
+
+
+    proc InitInspector { LispExpr ThreadId } {
         putd "Entered InitInspector with $LispExpr"
         set Quoted [::tkcon::QuoteLispObjToString $LispExpr]
         set RealExpr "(swank:init-inspector $Quoted)"
-        ::tkcon::EvalInSwankAsync $RealExpr "::insp::SwankInspect1 \$EventAsList" :repl-thread 
-
-
-        # (clco::convert-object-to-tcl '(:title "#<cons {BD735A3}>" :id 0 :content (("A proper list:" "\n" "0" ": "
-        #              (:value "a" 1)
-        #              "\n" "1" ": "
-        #              (:value "2" 2)
-        #              "\n")
-        #             10 0 500)))
-        
-        #    set result "{l:title s#<cons\\ \\{BD735A3\\}> :id n0 :content {l{lsA\\ proper\\ list: sn s0 s:\\  {l:value sa n1 } sn s1 s:\\  {l:value s2 n2 } sn } n10 n0 n500 } } "
-        #    SwankInspect1 $result             
+        ::tkcon::EvalInSwankAsync $RealExpr "::insp::SwankInspect1 \$EventAsList $ThreadId" $ThreadId
     }
 
     # Initializes inspector with lisp expr. 
     proc SwankInspect { LispExpr } {
         # only passes request to emacs. Initialization is done asyncrhonously
         # by SwankInspect1
-        InitInspector $LispExpr
+        InitInspector $LispExpr :repl-thread
     }
 
     proc NextPart {w begin end} {
-        ::tkcon::EvalInSwankAsync "(swank:inspector-range $begin $end)" "::insp::NextPartCont $w \$EventAsList" :repl-thread     
+        ::tkcon::EvalInSwankAsync "(swank:inspector-range $begin $end)" "::insp::NextPartCont $w \$EventAsList" [$w cget -thread-id]
     }
 
     proc NextPartCont { w EventAsList } {
@@ -168,9 +141,9 @@ namespace eval ::insp {
         }
     }
 
-    # This is a contiuation assigned on reply on initialization request 
-    proc SwankInspect1 { EventAsList } {
-        set w [PrepareGui1]
+    # Продолжение открытия инспектора, см. вызовы.
+    proc SwankInspect1 { EventAsList ThreadId } {
+        set w [PrepareGui1 $ThreadId]
         InsertDataToShowOrBeep $w $EventAsList
         PrepareGui2 $w
     }
@@ -190,32 +163,32 @@ namespace eval ::insp {
     proc InspectNthPart {w id} {
         set ContId [::tkcon::GenContinuationCounter]
         set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
-        ::tkcon::EvalInSwankAsync "(swank:inspect-nth-part $id)" $OnReply t $ContId
+        ::tkcon::EvalInSwankAsync "(swank:inspect-nth-part $id)" $OnReply [$w cget -thread-id] $ContId
     }
 
     proc InspectorPop { w } {
         set ContId [::tkcon::GenContinuationCounter]
         set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
-        ::tkcon::EvalInSwankAsync "(swank:inspector-pop)" $OnReply t $ContId
+        ::tkcon::EvalInSwankAsync "(swank:inspector-pop)" $OnReply [$w cget -thread-id] $ContId
     }
 
     proc InspectorNext { w } {
         set ContId [::tkcon::GenContinuationCounter]
         set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
-        ::tkcon::EvalInSwankAsync "(swank:inspector-next)" $OnReply t $ContId
+        ::tkcon::EvalInSwankAsync "(swank:inspector-next)" $OnReply [$w cget -thread-id] $ContId
     }
 
 
     proc InspectorReinspect { w } {
         set ContId [::tkcon::GenContinuationCounter]
         set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
-        ::tkcon::EvalInSwankAsync "(swank:inspector-reinspect)" $OnReply t $ContId
+        ::tkcon::EvalInSwankAsync "(swank:inspector-reinspect)" $OnReply [$w cget -thread-id] $ContId
     }
 
     proc InspectorGotoSource { w } {
         set wForLisp [::tkcon::QuoteTclStringForLisp $w]
 
-        ::tkcon::EvalInSwankAsync "(clco:inspector-goto-source $wForLisp)" {} t
+        ::tkcon::EvalInSwankAsync "(clco:inspector-goto-source $wForLisp)" {} [$w cget -thread-id]
     }
 
     proc ShowSomethingNewInInspector { w EventAsList } {
@@ -223,24 +196,20 @@ namespace eval ::insp {
     }
 
 
+    proc УстановитьЗаголовок {w} {
+        wm title $w [string cat $w << [$w cget -thread-id] >>]
+    }
+
     # Make toplevel widget and its children 
-    proc PrepareGui1 {} {
+    proc PrepareGui1 {ThreadId} {
         variable ::tkcon::PRIV
         # Create unique edit window toplevel
-        set w $PRIV(base).inspector_
-        set i 0
-        while {[winfo exists $w[incr i]]} {}
-        append w $i
-        toplevel $w
+        set КодОкнаИнспектора [GenNamedCounter "инспектор"]
+        set w [string cat $PRIV(base) ".инспектор_" ${КодОкнаИнспектора}]
+        inspector $w -thread-id $ThreadId
         wm withdraw $w
 
-        # title 
-        set word "Инспектор"
-        if {[string length $word] > 20} {
-            wm title $w "[string range $word 0 16]... - tkcon Edit"
-        } else {
-            wm title $w "$word - tkcon Edit"
-        }
+        УстановитьЗаголовок $w
 
         # --------------------------------- frames-----------------              
         
@@ -363,13 +332,5 @@ namespace eval ::insp {
         return $w.body.text
     }
 
-    proc DebugStartup {} {
-        variable ::tkcon::OPT
-        if { $OPT(putd-enabled) } {
-            ::insp::InitInspector {'defun}
-        }
-    }
-
 }
 
-#::insp::DebugStartup

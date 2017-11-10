@@ -4580,10 +4580,10 @@ proc ::tkcon::ReloadSomeIDESources {} {
 proc ::tkcon::Udatlitq_SystemIndex_txt {} {
     ::tkcon::VstavitqVKonsolqKakBudtoPolzovatelqNapechatalIVypolnitq {
 ;; Меню/Файл/Очистить кеш систем asd
-(progn
-  (delete-file (putq-otnositelqno-kornya-yara "system-index.txt"))
-  (when (probe-file "c:/yar.my/док/system-index.txt")
-    (delete-file "c:/yar.my/док/system-index.txt")))
+(cl:progn
+  (cl:delete-file (cl-user::putq-otnositelqno-kornya-yara "system-index.txt"))
+  (cl:when (cl:probe-file "c:/yar.my/док/system-index.txt")
+    (cl:delete-file "c:/yar.my/док/system-index.txt")))
   }
 }
 
