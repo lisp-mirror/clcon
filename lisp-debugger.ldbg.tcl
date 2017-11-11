@@ -739,7 +739,7 @@ namespace eval ::ldbg {
         #
         ::tkcon::EvalInSwankAsync                           \
             "(swank:inspect-frame-var $FrameNo $LocalNo)"   \
-            "::insp::SwankInspect1 \$EventAsList"           \
+            "::insp::SwankInspect1 \$EventAsList $thread"           \
             $thread
     }
 
@@ -767,7 +767,7 @@ namespace eval ::ldbg {
         set thread [GetDebuggerThreadId]                    
         ::tkcon::EvalInSwankAsync                           \
             " (swank:inspect-current-condition)"            \
-            "::insp::SwankInspect1 \$EventAsList"           \
+            "::insp::SwankInspect1 \$EventAsList $thread"           \
             $thread
     }
 
