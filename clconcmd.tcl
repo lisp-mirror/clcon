@@ -111,7 +111,7 @@ Currently defined commands are: "
 
     # Искать в исходниках СБЦЛ
     proc исбцл { str } {
-      ::clconcmd::иф -типы lisp [string cat $::tkcon::YarRoot "/sbcl"] $str
+      ::clconcmd::иф -типы lisp [string cat $::tkcon::YarRoot "/sbcl/t"] $str
     }
 
     # 

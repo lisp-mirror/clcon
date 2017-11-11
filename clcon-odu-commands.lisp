@@ -124,7 +124,8 @@
     (let* ((name (or symbol string))
            (code
             (clco:|Обслужить-команду-поиска-связей-символа| name
-                  #'swank/backend:list-callers
+                  #+win32 #'swank/backend:list-callers
+                  #-win32 #'swank/backend:who-calls
                   "Точки вызова символа ~S не найдены (попробуйте поиск имени в исходниках)"
                   name
                   (odu::package-at-point)
@@ -386,9 +387,6 @@
        (describe symbol s))
     (clco::server-lookup-definition-as-list symbol))))
               
-                
-        
-
 (defcommand "Sync Cursor" (p)
     "Debug-time command to sync cursor. There were no need to make it a command"
     "Does nothing but printing current cursor position. The rely upon the fact that clco::call-oduvanchik-function-with-clcon_text syncs cursor of backend buffer with that of clcon_text"
