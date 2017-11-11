@@ -684,9 +684,10 @@ namespace eval ::clcon_text {
 
     # Fills FreezableText bindtag with wrapped bindings of Text
     # Tab and Shift-Tab bindings are bypassed - we do not like tabs in program code.
+    # Также пропускаем Paste, т.к. в линуксе оно двоится
     proc InitBindingsOfFreezableText {} {
         foreach ev [bind Text] {
-            if {[lsearch -exact {<Shift-Key-Tab> <Key-Tab>} $ev] != -1} {
+            if {[lsearch -exact {<Shift-Key-Tab> <Key-Tab> <<Paste>>} $ev] != -1} {
                 # Do nothing - these handlers contain "break" and they are not need as Tab will be overrided anyway
             } else {
                 WrapFreezableHandlerScript $ev
