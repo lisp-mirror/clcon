@@ -183,7 +183,7 @@ proc ::tkcon::ReloadSomeIDESources1 {} {
     # as any error in it likely means a spoiled image.
     TkconSourceHere util.tcl
     TkconSourceHere gui_util.tcl
-    TkconSourceHere fix_kp_in_linux.tcl
+    TkconSourceHere fix_kp_in_linux.events.tcl
     TkconSourceHere ide_structure.tcl
     TkconSourceHere ro_outer_synonyms.ro_out.tcl
     TkconSourceHere text2odu.tcl
@@ -4555,6 +4555,7 @@ proc ::tkcon::ReloadSomeIDESources4 {} {
     # it must work after toplevel window creation, or
     # unwanted toplevel windows arises 
     TkconSourceHere tablelist_util.tcl
+    TkconSourceHere fix_kp_in_linux.tablelist.tcl
     TkconSourceHere search-tablelist.srchtblst.tcl
     TkconSourceHere error-browser.erbr.tcl
     TkconSourceHere grep-browser.grbr.tcl

@@ -25,4 +25,20 @@ if {[tk windowingsystem] eq "x11"} {
 	event add <<SelectPrevPara>>	<Control-Shift-KP_Up>
 	event add <<SelectNextPara>>	<Control-Shift-KP_Down>
 
-}
+        if { [bind TablelistBody <Key-Prior>] eq {} } {
+            ::tkcon::myerror "Нужно было загрузить Tablelist до fix_kp_in_linux.tcl"
+        } 
+        foreach pair {
+                      {<Control-Key-KP_Next> <Control-Key-Next>}
+                      {<Control-Key-KP_Prior> <Control-Key-Prior>}
+                      {<Key-KP_Prior> <Key-Prior>} 
+                      {<Key-KP_Next> <Key-Next>}
+                      {<Control-Shift-Key-KP_End> <Control-Shift-Key-End>}
+                      {<Control-Shift-Key-KP_Home> <Control-Shift-Key-Home>}
+                      {<Control-Key-KP_End> <Control-Key-End>}
+                      {<Control-Key-KP_Home> <Control-Key-Home>}
+                      } {
+             foreach {kp_key normal_key} $pair { 
+                 bind TablelistBody $kp_key [bind TablelistBody $normal_key] }
+            }
+    }

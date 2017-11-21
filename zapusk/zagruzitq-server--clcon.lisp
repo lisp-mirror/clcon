@@ -28,7 +28,7 @@
 (proclaim '(optimize (debug 3) (compilation-speed 0) (speed 0) (space 0) (safety 3)))
 
 (sb-ext:RESTRICT-COMPILER-POLICY 'debug 3)
-(sb-ext:RESTRICT-COMPILER-POLICY 'safety 2 3)
+(sb-ext:RESTRICT-COMPILER-POLICY 'safety 2)
 ;; uncomment next two lines protect from further calls to restrict-compiler-policy forever
 ;;(defun ignore-all (&rest args) (declare (ignore args)))
 ;;(setf (symbol-function 'sb-ext:restrict-compiler-policy) #'ignore-all)
@@ -37,6 +37,10 @@
 (map () 'load ;; loading asdf/defsystem is tricky
      (mapcar 'asdf:component-pathname
              (asdf::required-components :asdf/defsystem :keep-component 'asdf:cl-source-file)))
+
+(setf asdf::*asdf-verbose* t)
+
+;(trace asdf::match-any-condition-p)
 
 
 (defun load-from-here (filename)  
