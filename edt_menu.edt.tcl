@@ -439,7 +439,7 @@ namespace eval ::edt {
 
         set cmd [list ::ред-закладки::ВыбратьЗакладкуИПерейтиКНей]             
         $m add command -label "Перейти к закладке..." \
-            -command $cmd -accel <Alt-Key-F2>
+            -command $cmd -accel <Alt-Key-F2> -underline 0
         bind SingleMod$w <Alt-Key-F2> [concat $cmd ";" break]
 
         $m add separator
