@@ -52,7 +52,7 @@ namespace eval ::ред-закладки {
     set w .СписокЗакладок
     set ww .СписокЗакладок.myList
     toplevel $w
-    wm title $w "Заполняемое окно справки по символу $w"
+    wm title $w "$w"
     listbox $ww
     set cmd {::ред-закладки::ПерейтиКЗакладке [.СписокЗакладок.myList get active] ; break}
     bind $ww <Return>  $cmd
