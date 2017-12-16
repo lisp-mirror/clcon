@@ -120,12 +120,7 @@
       (:LOCATION (:FILE \"C:/yar/sbcl/1.3.18/source/src/code/defboot.lisp\")
        (:POSITION 6961)
        (:SNIPPET
-        \"(sb!xc:defmacro defun (&environment env name lambda-list &body body)
-  \\\"Define a function at top level.\\\"
-  #+sb-xc-host
-  (unless (symbol-package (fun-name-block-name name))
-    (warn \\\"DEFUN of uninterned function name ~S (tricky for GENESIS)\\\" name))
-  (mu\")) . Данная ф-я returns either values of file and position or nil"
+        \"(sb!xc:defmacro defun (и далее фрагмент кода)\")) . Данная ф-я returns either values of file and position or nil"
   (perga-implementation:perga
    (cond
     ((typep location 'БУКВЫ-И-МЕСТА-В-ФАЙЛЕ-ЛИЦО:|Место-в-исходнике|)
@@ -140,6 +135,15 @@
           (eq (car (third location)) :position))
      (let ((file (second (second location)))
            (position (second (third location))))
+       (values file position)))
+    ((and (eq (car location) :location)
+          (eq (car (second location)) :buffer-and-file)
+          (eq (car (third location)) :offset))
+     (let ((file (third (second location)))
+           ; неясно, что имелось в виду в EMACS
+           (position
+            (+ CLCO::|+Нужно-добавить-к-смещению-считаемому-от-0-для-получения-смещения-считаемого-от-1+|
+               (second (third location)))))
        (values file position)))
     ((eq (car location) :error)
      nil)
