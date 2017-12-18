@@ -228,6 +228,10 @@ namespace eval ::edt {
         set cmd [wesppt [list ::edt::УстановитьЭтотПакетВКонсоли $btext]]
         $m add command -label "4.Установить этот пакет в консоли" -command $cmd -underline 0
 
+        set cmd [wesppt [list ::edt::КомпилироватьТекущееОпределение $btext]]
+        $m add command -label "5.Компилировать текущее определение" -command $cmd -underline 0
+
+
         # It is too late hour to start show-mark
         # We have archietectural problems there (rompsite.lisp is too early on the build)
         # set oduCmd "lisp-insert-\)"
@@ -252,7 +256,7 @@ namespace eval ::edt {
         
 
         set s $m.navigaciya_po_kodu_lispa
-        $m add cascade -label "5.Навигация по коду лиспа..." -underline 0 -menu $s
+        $m add cascade -label "6.Навигация по коду лиспа..." -underline 0 -menu $s
         edt::ЗаполнитьПодменюНавигацияПоКодуЛиспа $Bi $w $btext $s
 
         $m add separator
@@ -439,8 +443,8 @@ namespace eval ::edt {
 
         set cmd [list ::ред-закладки::ВыбратьЗакладкуИПерейтиКНей]             
         $m add command -label "Перейти к закладке..." \
-            -command $cmd -accel <Alt-Key-F2> -underline 0
-        bind SingleMod$w <Alt-Key-F2> [concat $cmd ";" break]
+            -command $cmd -accel <Shift-F2> -underline 0
+        bind SingleMod$w <Shift-Key-F2> [concat $cmd ";" break]
 
         $m add separator
 

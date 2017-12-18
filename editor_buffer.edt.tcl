@@ -95,7 +95,10 @@ namespace eval ::edt {
         ::clcon_text::CallOduvanchikFunction $text "odu::УСТАНОВИТЬ-ЭТОТ-ПАКЕТ-В-КОНСОЛИ-COMMAND nil" {}
     }
     
-        
+    proc КомпилироватьТекущееОпределение {text} {
+        ::clcon_text::CallOduvanchikFunction $text "odu::compile-current-defun-command nil" {}
+    }
+
 
     proc CompileSystem {text} {
         set console [::tkcon::CurrentConsole]
