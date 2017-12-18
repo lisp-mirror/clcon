@@ -67,3 +67,18 @@ WHAT can be:
              (with-connection ((default-connection))
                (send-oob-to-emacs `(:ed ,target))))
             (t (error "No connection"))))))
+
+
+(defun swank-repl-original-repl-eval (string)
+  (clear-user-input)
+  (with-buffer-syntax ()
+    (with-retry-restart (:msg "Retry SLIME REPL evaluation request.")
+      (swank-repl::track-package
+       (lambda ()
+         (multiple-value-bind (values last-form) (eval-region string)
+           (setq *** **  ** *  * (car values)
+                 /// //  // /  / values
+                 +++ ++  ++ +  + last-form)
+           (funcall swank-repl::*send-repl-results-function* values))))))
+  nil)
+

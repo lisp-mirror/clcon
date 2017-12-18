@@ -183,7 +183,34 @@
        (i index (1- i)))
       ((zerop i) frame)))
 
-(defvar *filter-frames* nil)
+(defvar *filter-frames*
+  (lambda (x) 
+    (let* ((*break-on-signals* nil)(r t))
+      (ignore-errors 
+       (when (eq (sb-di::debug-fun-name (sb-di::frame-debug-fun x)) 
+                 (intern "MY-STUPID-STEP" :sb-c)) 
+         (setf r nil))) 
+      r)))
+
+
+(def-patched-swank-fun swank-repl::repl-eval (string)
+  "См. swank::swank-repl-original-repl-eval"
+  (swank::clear-user-input)
+  (swank::with-buffer-syntax ()
+    (sb-impl::with-stepping-disabled
+    ; зачем это нужно, если можно просто заново выполнить? 
+    ; (swank::with-retry-restart (:msg "Retry SLIME REPL evaluation request.")
+      (swank-repl::track-package
+       (lambda ()
+         (multiple-value-bind (values last-form) (swank-repl::eval-region string)
+           (setq *** **  ** *  * (car values)
+                 /// //  // /  / values
+                 +++ ++  ++ +  + last-form)
+           (funcall swank-repl::*send-repl-results-function* values))))
+      ; закрывающая от swank:with-retry-restart
+      ))
+  nil)
+
 
 (def-patched-swank-fun swank::backtrace (start end)
   "Return a list ((I FRAME PLIST) ...) of frames from START to END.
