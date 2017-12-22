@@ -946,7 +946,8 @@ proc ::tkcon::InitTab {w} {
 
     # ctext -linemap 0 , clcon_text
     text $con -wrap char -foreground $COLOR(stdin) \
-	-insertbackground $COLOR(cursor) -borderwidth 1 -highlightthickness 0
+	-insertbackground $COLOR(cursor) -borderwidth 1 -highlightthickness 0 \
+        -exportselection 0
 
     $con configure -inactiveselectbackground [$con cget -selectbackground]    
     
@@ -1370,11 +1371,11 @@ proc ::tkcon::InitMenus {w title} {
     set text $PRIV(console)
     foreach m [list [menu $w.правка] [menu $w.pop.правка]] {
 	$m add command -label "Вырезать"   -underline 2 -accel $PRIV(ACC)x \
-		-command [list ::tkcon::Cut $text]
+		-command [list tk_textCut $text]
 	$m add command -label "Копировать"  -underline 0 -accel $PRIV(ACC)c \
-		-command [list ::tkcon::Copy $text]
+		-command [list tk_textCopy $text]
 	$m add command -label "Вставить" -underline 0 -accel $PRIV(ACC)v \
-		 -command [list ::tkcon::Paste $text]
+		 -command [list tk_textPaste $text]
         # Клавиши назначаются в bindings.tkcon.tcl
 
         set cmd "event generate $text <<TkCon_PasteAsLinuxFilename>>; break"

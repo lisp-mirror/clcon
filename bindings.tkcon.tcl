@@ -145,14 +145,14 @@ namespace eval tkcon {
         proc ::tkcon::ClipboardKeysyms {} {
             variable PRIV
             set ws [tk windowingsystem]
-            event delete <<Paste>> <$PRIV(CTRL)V>
+            ## event delete <<Paste>> <$PRIV(CTRL)V>
             ## Я так и не смог найти, где определены эти <Copy>, <Cut> и <Paste>
-            bind TkConsole <<Copy>>	{::tkcon::Copy %W}
-            bind TkConsole <<Cut>>	{::tkcon::Cut %W}
-            bind TkConsole <<Paste>>	{::tkcon::Paste %W}
+            bind TkConsole <<Copy>>	{::tk_textCopy %W}
+            bind TkConsole <<Cut>>	{::tk_textCut %W}
+            bind TkConsole <<Paste>>	{::tk_textPaste %W}
             ## Расписываем вручную содержание ClipboardKeysyms для наших кнопок. 
-            ::clcon_key::b bind TkConsole <Control-Key-c> {::tkcon::Copy %W}
-            ::clcon_key::b bind TkConsole <Control-Key-v> {::tkcon::Paste %W}
+            ::clcon_key::b bind TkConsole <Control-Key-c> {::tk_textCopy %W}
+            ::clcon_key::b bind TkConsole <Control-Key-v> {::tk_textPaste %W}
         
             if {$ws eq "win32"} {
                 bind TkConsole <Control-Key-x> {::tkcon::Cut %W}
