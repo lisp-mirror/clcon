@@ -18,6 +18,6 @@
     (record-sources-to-my-locations-hash)))
 
 (decorate-function:portably-without-package-locks
- (decorate-function:decorate-function 'sb-c::find-source-paths 'decorated-find-source-paths))
+ (decorate-function:def-function-decoration sb-c::find-source-paths 'decorated-find-source-paths))
 
   

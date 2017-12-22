@@ -158,6 +158,7 @@
    (let ss (clco::string-between-marks symbol-beginning lookup-end))
    (let package (or
                  (find-package package-designator)
+                 (swank::guess-package package-designator)
                  (progn
                    (message "Не могу понять пакет в ~S. Предполагаю :CL-USER" point)
                    (find-package :cl-user))))
