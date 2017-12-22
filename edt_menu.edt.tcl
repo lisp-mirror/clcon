@@ -33,12 +33,21 @@ namespace eval ::edt {
         clipboard append $FileName
     }
 
-    ## Работает только под Windows, редактор должен быть относительно корня, а он прибит к месту.
+    proc CmdOrShell {} {
+        set ws [tk windowingsystem]
+        if {$ws eq "win32"} {
+          return ".cmd"
+        }  else {
+          return ".sh"
+        }
+    }
+
     proc OtkrytqEhtotFajjlDrugimRedaktorom {} { 
         set clcon_text [c_btext]
         set FileNameUnix [[$clcon_text cget -opened_file] cget -filename]
         set FileName [::UnixFileNameToWindows $FileNameUnix]
-        ::exec -- "c:/yar/bin/util/drugojj-redaktor.cmd" $FileNameUnix &
+        set Extension [CmdOrShell]
+        ::exec -- [string cat $::tkcon::YarRoot "/bin/util/drugojj-redaktor" $Extension] $FileNameUnix &
     }
         
 
