@@ -145,6 +145,21 @@
             (+ CLCO::|+Нужно-добавить-к-смещению-считаемому-от-0-для-получения-смещения-считаемого-от-1+|
                (second (third location)))))
        (values file position)))
+    ;; Вообще странно, почему в определение попадает buffer-and-file, а в отладочную инфу - нет. 
+    ;; Но пусть пока так будет.
+    ((and (eq (car location) :location)
+          (eq (car (second location)) :buffer)
+          (eq (car (third location)) :offset))
+     (let* ((buffer (oduvanchik::find-buffer-by-name (second (second location))))
+            (file (and buffer (odu::buffer-pathname buffer)))
+            (emacs-offset (third location))
+            ; неясно, что имелось в виду в EMACS
+            (position
+             (+ ; CLCO::|+Нужно-добавить-к-смещению-считаемому-от-0-для-получения-смещения-считаемого-от-1+|
+                (second emacs-offset)
+                (third emacs-offset)
+                )))
+       (values file position)))
     ((eq (car location) :error)
      nil)
     (t
