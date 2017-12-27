@@ -10,7 +10,7 @@
 
 (in-package :clco)
 
-(declaim (optimize debug))
+;(declaim (optimize debug))
 
 (defvar *highlight-dispatcher-start-shutdown-lock*
   (bt:make-lock "clcon-server::*highlight-dispatcher-start-shutdown-lock*"))

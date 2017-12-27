@@ -3,7 +3,7 @@
 
 (in-package :clco)
 
-(declaim (optimize debug))
+;(declaim (optimize (debug 3) (speed 2) (compilation-speed 2) (space 2)))
 
 (defun shutdown-text2odu-dispatcher-on-oduvanchik-exit-hook ()
   (shutdown-text2odu-dispatcher))

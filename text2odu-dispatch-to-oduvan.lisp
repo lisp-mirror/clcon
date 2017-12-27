@@ -6,7 +6,7 @@
 
 (in-package :clco)
 
-(declaim (optimize debug))
+; (declaim (optimize debug))
 
 #| Useful functions:
 

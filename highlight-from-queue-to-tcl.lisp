@@ -2,7 +2,7 @@
 
 (in-package :clco)
 
-(declaim (optimize debug))
+;(declaim (optimize debug))
 
 (defun pop-highlight-event-queue ()
   "Made after example pop-text2odu-event-queue"
