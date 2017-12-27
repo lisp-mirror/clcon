@@ -183,12 +183,13 @@
        (i index (1- i)))
       ((zerop i) frame)))
 
-(defvar *filter-frames*
-  (lambda (x) 
+(defparameter *filter-frames*
+  nil
+  #+nil (lambda (x) 
     (let* ((*break-on-signals* nil)(r t))
       (ignore-errors 
        (when (eq (sb-di::debug-fun-name (sb-di::frame-debug-fun x)) 
-                 (intern "MY-STUPID-STEP" :sb-c)) 
+                 (intern "MY-STUPID-STEP" :sb-impl)) 
          (setf r nil))) 
       r)))
 
