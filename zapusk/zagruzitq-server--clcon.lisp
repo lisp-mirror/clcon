@@ -73,28 +73,7 @@
 (pushnew :oduvan-enable-highlight *features*)
 (pushnew :clcon *features*)
 
-;; piece from swank
-#+sbcl 
-(defun file-newer-p (new-file old-file)
-  "Returns true if NEW-FILE is newer than OLD-FILE."
-  (> (file-write-date new-file) (file-write-date old-file)))
-
-#+sbcl 
-(defun requires-compile-p (source-file)
-  (let ((fasl-file (probe-file (compile-file-pathname source-file))))
-    (or (not fasl-file)
-        (file-newer-p source-file fasl-file))))
-
-#+sbcl 
-(defun compile-file-if-needed (filename &key load)
-  (let ((pathname (SWANK/BACKEND:FILENAME-TO-PATHNAME filename)))
-    (cond ((requires-compile-p pathname)
-           (let ((compilation-result (compile-file pathname)))
-             (when load (load compilation-result))))
-          (t
-           (or (not load)
-           (load (compile-file-pathname pathname)))))))
-;; end of piece from swank
+(assert (find-package :swank) () "Nam nuzhnyy funkcii is Swank: swank::file-newer-p, swank::requires-compile-p, swank::compile-file-if-needed")
 
 ; from budden-tools
 (asdf:load-system :decorate-function) 
