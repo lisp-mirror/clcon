@@ -36,10 +36,10 @@
 ;;(defun ignore-all (&rest args) (declare (ignore args)))
 ;;(setf (symbol-function 'sb-ext:restrict-compiler-policy) #'ignore-all)
 
-(asdf:load-system :uiop) ;; loading uiop is simple
-(map () 'load ;; loading asdf/defsystem is tricky
-     (mapcar 'asdf:component-pathname
-             (asdf::required-components :asdf/defsystem :keep-component 'asdf:cl-source-file)))
+;;(asdf:load-system :uiop) ;; loading uiop is simple
+;;(map () 'load ;; loading asdf/defsystem is tricky
+;;     (mapcar 'asdf:component-pathname
+;;             (asdf::required-components :asdf/defsystem :keep-component 'asdf:cl-source-file)))
 
 (setf asdf::*asdf-verbose* t)
 
