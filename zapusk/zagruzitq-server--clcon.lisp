@@ -43,9 +43,6 @@
 
 (setf asdf::*asdf-verbose* t)
 
-;(trace asdf::match-any-condition-p)
-
-
 (defun load-from-here (filename)  
   (let ((*default-pathname-defaults* *clcon-root*))
     (load filename)))
