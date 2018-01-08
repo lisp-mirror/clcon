@@ -73,9 +73,8 @@
 (assert (find-package :swank) () "Nam nuzhnyy funkcii is Swank: swank::file-newer-p, swank::requires-compile-p, swank::compile-file-if-needed")
 
 ; from budden-tools
-(asdf:load-system :decorate-function) 
+(asdf:load-system :cl-advice) 
 (load (compile-file (at-clcon-root "lp/budden-tools/asdf-3.1.4-tools.lisp")))
-(load (compile-file (at-clcon-root "lp/budden-tools/sbcl--find-definition-sources-by-name--patch.lisp")))
 
 (asdf:load-system :iterate-keywords)
 (asdf:load-system :alexandria)
