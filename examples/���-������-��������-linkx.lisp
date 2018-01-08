@@ -16,7 +16,7 @@
 
 (in-package :linkx-loader)
 
-(decorate-function:portably-without-package-locks
+(cl-advice:portably-without-package-locks
  (defun :linkx-readtable () "Помечаем место, где определена таблица чтения :linkx-readtable, для навигации по исходникам" (error "Это не функция")))
 
 (defun Устрой-Linkx-readtable ()

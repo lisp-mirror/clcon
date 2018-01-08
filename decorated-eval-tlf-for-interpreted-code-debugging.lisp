@@ -17,7 +17,7 @@
   (multiple-value-prog1 (funcall original-fn form tlf-num)
     (record-sources-to-my-locations-hash)))
 
-(decorate-function:portably-without-package-locks
- (decorate-function:def-function-decoration sb-c::find-source-paths 'decorated-find-source-paths))
+(cl-advice:portably-without-package-locks
+ (cl-advice:define-advice sb-c::find-source-paths 'decorated-find-source-paths))
 
   

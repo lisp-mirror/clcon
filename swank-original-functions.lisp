@@ -2,7 +2,7 @@
 (in-package :swank)
 
 ;; there are functions we patch. Their copies with swank-original- prefix are given here
-;; we could also use decorate-function
+;; we could also use define-advice
 
 (defun swank-original-wait-for-event/event-loop (connection pattern timeout)
   (assert (or (not timeout) (eq timeout t)))

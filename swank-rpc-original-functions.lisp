@@ -2,7 +2,7 @@
 (in-package :swank/rpc)
 
 ;; there are functions we patch. Their copies with swank-original- prefix are given here
-;; we could also use decorate-function
+;; we could also use define-advice
 
 (defun swank/rpc-original-prin1-to-string-for-emacs (object package)
   (with-standard-io-syntax

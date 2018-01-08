@@ -26,7 +26,7 @@
 
 (defun decorate-oduvanchik-message ()
   "To be called when starting oduvanchik from clcon"
-  (decorate-function:decorate-function 'oi::message 'decorated-message))
+  (cl-advice:define-advice oi::message 'decorated-message))
 
 
 (defun simple-listbox-menu (list &key (owner "") (title "odu::call-scrollable-menu"))

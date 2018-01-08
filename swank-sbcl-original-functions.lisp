@@ -2,7 +2,7 @@
 (in-package :swank/sbcl)
 (named-readtables:in-readtable nil)
 ;; there are functions we patch. Their copies with swank/sbcl-original- prefix are given here
-;; we could also use decorate-function
+;; we could also use define-advice
 
 
 (defun swank/sbcl-original-definition-source-file-location (definition-source)

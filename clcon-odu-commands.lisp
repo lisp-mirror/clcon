@@ -203,7 +203,7 @@
      ((or (not system-name)
           (string= system-name ""))
       (format *error-output* "~&Имя системы в редакторе определено, если текущий файл редактора имеет расширение .asd или когда система задана в первой строчке текущего файла, например, так: 
-;; -*- coding: utf-8; System :decorate-function -*-
+;; -*- coding: utf-8; System :decorate-function; -*-
 Сейчас имя не определено~%")
       nil)
      (t
