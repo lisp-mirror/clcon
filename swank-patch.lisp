@@ -108,28 +108,7 @@
          "{l:return {l:ok s(format\\ destination\\ control-string\\ &rest\\ format-arguments) } n160 } "))
 
 
-#| examples of dcase: (defun sentinel-serve (msg)
-  (dcase msg
-    ((:add-connection conn)
-     (push conn *connections*))
-    ((:close-connection connection condition backtrace)
-     (close-connection% connection condition backtrace)
-     (sentinel-maybe-exit))
-    ((:add-server socket port thread)
-     (push (list socket port thread) *servers*))
-    ((:stop-server key port)
-     (sentinel-stop-server key port)
-     (sentinel-maybe-exit)))) 
-
-
-               (dcase (wait-for-event 
-                                  `(or (:emacs-rex-rt . _)
-                                       (:sldb-return ,(1+ level))))
-                 ((:emacs-rex-rt &rest args) (apply #'eval-for-emacs args))
-                 ((:sldb-return _) (declare (ignore _)) (return nil)))
- 
-|#
-     
+;; examples of dcase see in swank::sentinel-serve
 
 (def-patched-swank-fun swank/rpc::prin1-to-string-for-emacs (object package)
   "Note that some events can be passed to tcl connection before we know it is a tcl connection. There can be a trouble parsing that kind of event on tcl side. Good practive would be to at least warn on tcl side if that kind of event would be received"
@@ -285,8 +264,11 @@ WHAT can be:
    swank::*default-worker-thread-bindings*
    (swank::with-top-level-restart (connection nil)
     (loop
-      (apply #'swank::eval-for-emacs 
-             (cdr (swank::wait-for-event `(:emacs-rex-rt . swank::_))))))))
+      (let ((event (swank::wait-for-event `(cl:or (:emacs-rex-rt . swank::_)
+                                                 (:emacs-rex . swank::_)))))
+        (swank::dcase event
+               ((:emacs-rex &rest args) (apply #'eval-for-emacs args))
+               ((:emacs-rex-rt &rest args) (apply #'eval-for-emacs-rt args))))))))
 
 (defmethod swank::thread-for-evaluation ((connection swank::multithreaded-connection) (id (eql :post-message-thread)))
   (ensure-post-message-thread connection))

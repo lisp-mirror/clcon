@@ -291,7 +291,7 @@
                                       (clco::row-col-col cur-row-col))
         ;; (oi::sync-mark-from-clcon_text clcon_text (current-point) "insert")
         ;; known functions are indent-new-line-command and new-line-command
-        (swank::eval-for-emacs `(call-oduvanchik-fn-internal ',fn-funcall-list ',options ',clcon_text ',buffer) :common-lisp-user nil cont)
+        (swank::eval-for-emacs-rt `(call-oduvanchik-fn-internal ',fn-funcall-list ',options ',clcon_text ',buffer) :common-lisp-user nil cont)
         (check-something-ok)
         nil ; real return is done via continuations machinery
         ))))
