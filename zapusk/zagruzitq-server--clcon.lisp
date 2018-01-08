@@ -25,16 +25,13 @@
 ;;;;;;;;;;;;;;;;;; End of trying to send all tracing to SBCL console ;;;;;;;;;;;;
 
 ;; Enable stepping everywhere else (this code is duplicated in .sbclrc)
-(proclaim '(optimize (debug
+#+sbcl (proclaim '(optimize (debug
                       1 
                       ; 3 ; disable for temp because we're debugging stepper
                       )
                      (compilation-speed 0) (speed 0) (space 0) (safety 3)))
 
-; (sb-ext:RESTRICT-COMPILER-POLICY 'debug 3) ; disable for temp.
-
-
-(sb-ext:RESTRICT-COMPILER-POLICY 'safety 2)
+#+sbcl (sb-ext:RESTRICT-COMPILER-POLICY 'safety 2)
 ;; uncomment next two lines protect from further calls to restrict-compiler-policy forever
 ;;(defun ignore-all (&rest args) (declare (ignore args)))
 ;;(setf (symbol-function 'sb-ext:restrict-compiler-policy) #'ignore-all)
