@@ -195,7 +195,7 @@
      (:@ multiple-value-bind (maybe-potential-symbol maybe-error)
          (ignore-errors
           (perga-implementation:perga 
-           (let sbcl-reader-budden-tools-lispworks:*return-package-and-symbol-name-from-read* t)
+           (let buddens-reader-extensions:*return-package-and-symbol-name-from-read* t)
            (let *package* package)
            (let budden-tools::*inhibit-readmacro* t)
            (read-from-string ss))

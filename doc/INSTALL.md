@@ -18,13 +18,12 @@ clcon больше не устанавливается отдельно - он �
 
 #### Lisp libraries, part 1 and clcon components
 
-    cd /s2/lib/ql.sbcl.l/local-projects
+    cd /y/yar/lp
     hg clone https://bitbucket.org/budden/budden-tools
     git clone https://github.com/budden/slime 
     git clone https://github.com/budden/named-readtables
-    # to download clcon's trunk, remove '-u 0.3.6' 
-    hg clone -u 0.3.6 https://bitbucket.org/budden/oduvanchik
-    hg clone -u 0.3.6 https://bitbucket.org/budden/clcon
+    hg clone https://bitbucket.org/budden/oduvanchik
+    hg clone https://bitbucket.org/budden/clcon
 
 #### Lisp libraries, part 2
 
