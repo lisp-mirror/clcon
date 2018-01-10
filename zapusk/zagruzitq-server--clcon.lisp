@@ -90,8 +90,8 @@
 #+win32 (budden-tools:def-toplevel-progn "load winmerge-strings" ()
   (load (at-clcon-root "lp/clcon/winmerge-strings.lisp")))
 
-(BUDDEN-TOOLS:def-toplevel-progn "load :see-packages system" ()
-  (asdf:load-system :see-packages) 
+(BUDDEN-TOOLS:def-toplevel-progn "load :buddens-reader system" ()
+  (asdf:load-system :buddens-reader)
   (asdf:load-system :russian-budden-tools)
   )
 
