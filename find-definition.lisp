@@ -167,7 +167,7 @@
      (warn "Что-то невнятное пришло в качестве места в исходнике: ~S" location)
      nil))))
 
-(defun write-one-dspec-and-location (link-text location stream &key (index "output") fix-offset-p (|Скакнуть-от-Лиспа-к-Яру| t))
+(defun write-one-dspec-and-location (link-text location stream &key (index "output") (fix-offset-p *fix-offset-p-for-this-lisp*) (|Скакнуть-от-Лиспа-к-Яру| t))
   "It is also used by compilation-error browse, some arbitrary string is passed instead of dspec. Beware! 
   fix-offset-p - magic boolean value, set experimentally
   "
@@ -180,7 +180,9 @@
         (t ; something wrong with location
          (print-just-line stream printed-dspec :index index))))))
 
-(defun write-code-to-pass-to-loc (stream loc &key (|Поправка-location-position| 0) (mode :text) fix-offset-p (|Скакнуть-от-Лиспа-к-Яру| t))
+(defparameter *fix-offset-p-for-this-lisp* #+SBCL nil #+CCL t)
+
+(defun write-code-to-pass-to-loc (stream loc &key (|Поправка-location-position| 0) (mode :text) (fix-offset-p *fix-offset-p-for-this-lisp*) (|Скакнуть-от-Лиспа-к-Яру| t))
   "Writes code which would help to pass to location. 
 
    Поправка-location-position - см. |+Поправка-location-position-для-frame-source-location+|
