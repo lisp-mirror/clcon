@@ -42,11 +42,11 @@
 (defmethod oi::ask-user-about-editor-condition ((condition editor-error))
   "editor-error is normal. If it has message, show it. If not, just beep. Then abort it (that is, ignore)"
   (let* ((message (format nil "~A" condition)))
-    (print `(message ,message) *trace-output*)
     (cond
      ((string= message "")
       (beep))
      (t
+      (print `(message ,message) *trace-output*)
       (let*
           ((qmessage (cl-tk:tcl-escape message))
            (cmd
