@@ -54,8 +54,11 @@ sb-c::STORE-CLOSURE-DEBUG-POINTER - что-то полезное (возможн
   )
 
 (defmacro with-necessary-stepper-handler (&body body)
+  #+SBCL
   `(handler-bind ((step-condition 'sb-impl::invoke-stepper))
-     ,@body))
+     ,@body)
+  #-SBCL ; FIXME-CCL
+  `(progn ,@body))
 
 (defun stepper-session-for-clcon ()
   "For stepping to be possible, it is not sufficient to set compiler policy according to manual. 
@@ -66,6 +69,7 @@ sb-c::STORE-CLOSURE-DEBUG-POINTER - что-то полезное (возможн
    (f 5)))
 
 
+#+SBCL
 (defun stepper-session-for-sbcl-console ()
   "This is demo of using stepper in thread to be started from bare SBCL prompt. Is is invented
  by me, Budden, and I'm not sure if it is ok. 

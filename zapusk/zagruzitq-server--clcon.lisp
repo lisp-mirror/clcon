@@ -144,12 +144,18 @@
   (let* ((util-directory
           (uiop/filesystem:native-namestring
            (putq-otnositelqno-kornya-yara "bin/util")))
+         (lisp-name #+CCL "Кложа" #+#:YSBCL "ЯСБЦЛ" #+(and SBCL (not #:YSBCL)) "СБЦЛ" #-(or SBCL CCL) "Неведомый-лисп")
+         (version (lisp-implementation-version))
+         (version1 (if (eql (mismatch version "Version ") 8) (subseq version 8) version))
+         (version-string (subseq version1 0 (min 20 (length version1))))
+         (lisp-name-and-version (format nil "~A-~A" lisp-name version-string))
          (cmd
           #+win32 
           (format nil "~A\\CallBatFromGuiDetached.exe ~A\\clcon-client.cmd -swank-port ~A" util-directory util-directory *clcon-swank-port*)
           #+linux
-          (format nil "sh ~A/clcon-client.sh -swank-port ~A"
-                  util-directory *clcon-swank-port*)))
+          (format nil "sh ~A/clcon-client.sh -swank-port ~A -lisp-title ~S"
+                  util-directory *clcon-swank-port*
+                  lisp-name-and-version)))
   (uiop/run-program:run-program cmd)))
 
 

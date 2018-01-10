@@ -123,7 +123,8 @@
         \"(sb!xc:defmacro defun (и далее фрагмент кода)\")) . Данная ф-я returns either values of file and position or nil"
   (perga-implementation:perga
    (cond
-    ((typep location 'БУКВЫ-И-МЕСТА-В-ФАЙЛЕ-ЛИЦО:|Место-в-исходнике|)
+    ((and (find-class 'БУКВЫ-И-МЕСТА-В-ФАЙЛЕ-ЛИЦО:|Место-в-исходнике| nil)
+          (typep location 'БУКВЫ-И-МЕСТА-В-ФАЙЛЕ-ЛИЦО:|Место-в-исходнике|))
      (let |Источник|
        (БУКВЫ-И-МЕСТА-В-ФАЙЛЕ-ЛИЦО:|Место-в-исходнике-Источник| location))
      (when (eq (БУКВЫ-И-МЕСТА-В-ФАЙЛЕ-ЛИЦО:|Ссылка-на-источник-Тип| |Источник|)
@@ -363,12 +364,17 @@
   (let ((dsl (get-definition-source-location-of-data data)))
     (edit-definition-source-location-or-err dsl parent)))
 
+#+CCL
+(defun edit-definition-source-location-or-err (dsl parent)
+  (break "Ой, недоделано ~S ~S" dsl parent))
+
+#+SBCL
 (defun edit-definition-source-location-or-err (dsl parent)
   "parent нужен для ошибки"
   (assert (typep dsl '(or null sb-c::definition-source-location)))
   (let (ds swank-location) ; swank-location - то, что понятно swank (в виде s-выражения)
     (when dsl
-      (setq ds (convert-definition-source-location-to-definition-source dsl)
+      (setq ds (sbcl-convert-definition-source-location-to-definition-source dsl)
             swank-location (swank/sbcl::definition-source-file-location ds)))
     (edit-swank-format-location swank-location parent)))
     
@@ -389,7 +395,8 @@
                 ; здесь это ещё не defvar, им станет потом.
                 (symbol-value '*my-locations-hash*))))
 
-(defun convert-definition-source-location-to-definition-source (dsl)
+#+SBCL
+(defun sbcl-convert-definition-source-location-to-definition-source (dsl)
   "Я не смог найти, где в SBCL такое преобразование делается, поэтому попробую написать это руками. В SBCL как-то слегка помоечно - много
   похожих структур, но связь между ними нелегко ищется"
   (sb-introspect::make-definition-source

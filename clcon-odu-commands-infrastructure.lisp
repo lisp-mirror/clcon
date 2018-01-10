@@ -350,7 +350,7 @@
   "В этом методе (в отличие от метода с background nil), we always recompute everything to the end of file. end-line is required to know buffer only. Вызывающая сторона должна была сбросить номер волны раскраски. Родственная функция - oduvanchik::start-background-repaint-after-recomputing-entire-buffer"
   (perga-implementation:perga
    (assert-we-are-in-oduvanchik-thread)
-   (assert (sb-thread:holding-mutex-p *invoke-modifying-buffer-lock*))
+   (assert (beyond-bordeaux-threads:holding-lock-p *invoke-modifying-buffer-lock*))
    (oi::check-something-ok)
    (let buffer (line-buffer end-line))
    (assert buffer)

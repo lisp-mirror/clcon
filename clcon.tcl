@@ -363,7 +363,7 @@ proc ::tkcon::Init {args} {
 	# some main initialization occurs later in this proc,
 	# to go after the UI init
 	set MainInit 1
-	set title Main
+	set title Ъ
     }
 
     ## NOTES FOR STAYING IN PRIMARY INTERPRETER:
@@ -504,6 +504,7 @@ proc ::tkcon::Init {args} {
                 -oduvan-backend { set OPT(oduvan-backend) $val }
                 -swank-ip       { set OPT(swank-ip) $val }
                 -swank-port     { set OPT(swank-port) $val }
+                -lisp-title     { set PRIV(lisp-title) $val }
 		-rcfile	{}
 		default	{ lappend slaveargs $arg; incr i -1 }
 	    }
@@ -897,7 +898,7 @@ proc ::tkcon::InitUI {title IsMainInit} {
       ::win_lay::PositionATool $root
 
       if {!$PRIV(WWW)} {
-        wm title $root "clcon $PRIV(version) $title"
+        wm title $root "Яр $PRIV(lisp-title) $title"
         if {$PRIV(showOnStartup)} {
            # this may throw an error if toplevel is embedded
            catch {wm deiconify $root}
@@ -1179,7 +1180,7 @@ proc ::tkcon::About {} {
 	wm transient $w $PRIV(root)
 	wm group $w $PRIV(root)
 	catch {wm attributes $w -type dialog}
-	wm title $w "О программе clcon v$PRIV(version)"
+	wm title $w "О программе Яр v$PRIV(version)"
 	wm resizable $w 0 0
 	button $w.b -text Dismiss -command [list wm withdraw $w]
 	text $w.text -height 9 -width 60 \

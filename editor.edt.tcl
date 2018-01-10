@@ -348,11 +348,11 @@ namespace eval ::edt {
         set btext [c_btext]
         set textt [c_text]
 
+        set word_for_title $word
         if {[string length $word] > 50} {
-            wm title $tw "Редактор $btext - ...[string range $word end-48 end]"
-        } else {
-            wm title $tw "Редактор $btext - $word"
-        }
+            set word_for_title [string cat "... " [string range $word end-48 end]]
+        } 
+        wm title $tw [string cat "Ред " [string range $PRIV(lisp-title) 0 2] " " $btext " - " $word]]
 
         foreach path [list $tw $w $btext $textt] {
             SetEditorBindtags $path $w

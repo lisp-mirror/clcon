@@ -132,7 +132,8 @@
   (let ((swank::*emacs-connection* connection))
     (swank::swank-original-read-loop connection)))
 
-
+; FIXME-CCL - эта ф-я нужна для корректного поиска определений ф-й, переопределённых из редактора (а не при загрузке всего файла). 
+#+SBCL
 (def-patched-swank-fun swank/sbcl::definition-source-file-location (definition-source)
   (swank/sbcl::with-definition-source (pathname form-path character-offset plist
                            file-write-date) definition-source
@@ -157,6 +158,7 @@
 
 
 
+#+SBCL
 (defun swank/sbcl::nth-frame (index)
   (do ((frame swank/sbcl::*sldb-stack-top* (and frame (sb-di:frame-down frame)))
        (i index (1- i)))
@@ -177,7 +179,8 @@
   "См. swank::swank-repl-original-repl-eval"
   (swank::clear-user-input)
   (swank::with-buffer-syntax ()
-    (sb-impl::with-stepping-disabled
+    (#+SBCL sb-impl::with-stepping-disabled
+     #-SBCL progn ; FIXME-CCL
     ; зачем это нужно, если можно просто заново выполнить? 
     ; (swank::with-retry-restart (:msg "Retry SLIME REPL evaluation request.")
       (swank-repl::track-package
@@ -275,6 +278,7 @@ WHAT can be:
 
 (defvar *globally-disable-sldb* nil "Полностью отключить SLDB и отлаживаться текстом. На самом деле переменная не глобальная и можно связывать её в отдельных потоках")
 
+#+SBCL 
 (defun make-caller-releasing-foreground (fn)
   "Для вызова консольного отладчика"
   (lambda ()
@@ -314,7 +318,7 @@ WHAT can be:
             (SWANK/BACKEND:CALL-WITH-DEBUGGING-ENVIRONMENT
              (LAMBDA () (SWANK::SLDB-LOOP SWANK::*SLDB-LEVEL*))))))
 
-
+#+SBCL
 (defun break-thread-in-black-console (thread)
   (sb-thread:interrupt-thread (sb-thread:main-thread)
                               (lambda ()
@@ -327,9 +331,10 @@ WHAT can be:
                                   (sb-thread:release-foreground)))))
 
 (defun otladitq--n--jj-potok-v-chjornojj-konsoli (n)
+  #+SBCL
   (let ((thread (swank::nth-thread n)))
-    (break-thread-in-black-console thread)))
+    (break-thread-in-black-console thread))
+  #-SBCL ; FIXME-CCL
+  (print "Otladka v chyornoyi konsoli ne realizovana dlya ehtoyi realizacii lispa")
+  )
 
-
-;#+SBCL
-;(pushnew '(nil "utf-8" "utf-8-unix") swank/sbcl::*external-format-to-coding-system*)

@@ -13,7 +13,7 @@
     (when redirect-output
       (setf arglist (append arglist `("-s" ,redirect-output))))
     (setf arglist (append arglist (list bat) args))
-    (apply #'sb-ext:run-program
+    (apply 'uiop:run-program
            "c:/clcon/bin/util/CallBatFromGuiDetached.exe"
            arglist
            :wait wait

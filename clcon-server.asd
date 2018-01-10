@@ -13,13 +13,15 @@
   :serial t
   :components ((:file "package")
                (:file "utils")
+               #+SBCL
                (:file "decorated-eval-tlf-for-interpreted-code-debugging" :description "Меняет процесс загрузки, чтобы сохранять инфу о положении исходников, загружаемых как source") ; правмя это можно перенести намного выше, например, в :budden-tools
                (:file "swank-original-functions")
                (:file "swank-rpc-original-functions")
-               (:file "swank-sbcl-original-functions")
+               #+SBCL (:file "swank-sbcl-original-functions")
                (:file "find-definition")
                (:file "swank-patch")
                (:file "quicklisp-patch")
+               #+SBCL
                (:file "sbcl--debug--patch" :description "Патчим отладчик для лучшей поддержки отладки в my-eval")
                (:file "eval-in-tcl")
                (:file "swank-inspector" :description "inspector backend pieces")

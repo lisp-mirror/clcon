@@ -557,9 +557,9 @@ proc ::tkcon::ПринудительноОстановитьСерверТеку
         }
     } else {
         if {$molcha != 1} {
-            puts "Пытаемся остановить SBCL, обслуживающий подключение Swank, отправив в SBCL вызов (sb-ext:exit :abort t). Удастся ли это? Всё зависит от того, насколько сломан текущий сервер Swank, образ SBCL и связь с сервером"
+            puts "Пытаемся остановить лисп, обслуживающий подключение Swank, отправив в SBCL вызов (sb-ext:exit :abort t). Удастся ли это? Всё зависит от того, насколько сломан текущий сервер Swank, образ SBCL и связь с сервером"
         }
-        ::tkcon::EvalInSwankAsync "(sb-ext:exit :abort t)" {} t 
+        ::tkcon::EvalInSwankAsync "(swank:quit-lisp)" {} t 
     }
 }    
 
