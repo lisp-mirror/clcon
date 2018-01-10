@@ -235,8 +235,8 @@
           (cond
            ((= l 1)
             (setf Показать-консоль nil)
-            ;; FIXME-CCL - во-первых, определения систем не записываются.
-            ;; Во-вторых, у нас и так fix-offset-p == t, а что здесь надо? 
+            ;; Аномалия - почему-то в sbcl здесь стоит fix-offset-p t, 
+            ;; хотя в других случаях оно не используется
             (clco::write-code-to-pass-to-loc ou loc :fix-offset-p t))
            (t
             (let link-text (prin1-to-string dspec))
