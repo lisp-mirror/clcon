@@ -134,13 +134,13 @@
       code)))
   
 (defun |Фильтр-это-место-определения-пакета-ли| (|Место-определения-из-SWANK|)
-  (eq (caar |Место-определения-из-SWANK|) 'defpackage)
+  (member (caar |Место-определения-из-SWANK|) '(package defpackage))
   )
 
 (defcommand "Find Package" (p)
     "Find package source with swank machinery. Note if there are several sources they're printed at the console as hyperlinks, no jumping"
     ""
-  (clco:server-lookup-definition (odu::package-at-point)
+  (clco:server-lookup-definition (defpackage-budden::keywordize-package-designator (odu::package-at-point))
                                  :package-name :keyword
                                  :readtable-name (odu::readtable-at-point)
                                  :|Фильтр-определений| '|Фильтр-это-место-определения-пакета-ли|
