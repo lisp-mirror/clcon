@@ -46,6 +46,32 @@ namespace eval ::insp {
         ::tkcon::EvalInSwankAsync "(swank:inspector-range $begin $end)" "::insp::NextPartCont $w \$EventAsList" [$w cget -thread-id]
     }
 
+
+    proc FormatOneItemForInspectorPresentation { w b s } {
+        if {[::mprs::Consp $s] == 1} {
+            set item [::mprs::Unleash $s]
+            set HeadOfEntry [lindex $item 0]
+            if {$HeadOfEntry eq {:value}} {
+                ::tkcon::WriteActiveText $b \
+                    [::mprs::Unleash [lindex $item 1]] \
+                    end \
+                    "insp::InspectNthPart $w [::mprs::Unleash [lindex $item 2]]" \
+                    error
+            } elseif {$HeadOfEntry eq {:action}} {
+                ::tkcon::WriteActiveText $b \
+                    [::mprs::Unleash [lindex $item 1]] \
+                    end \
+                    "insp::InspectorCallNthAction $w [::mprs::Unleash [lindex $item 2]]" \
+                    error
+            } else {
+                $b RoInsert end "Я не знаю, что такое $s"
+            }
+        } else {
+            $b RoInsert end [::mprs::Unleash $s]
+        }
+    }
+
+
     proc NextPartCont { w EventAsList } {
         set InspectedContentU [::insp::ParseReturnOk $EventAsList]
         set InspectedData [::mprs::Unleash [lindex $InspectedContentU 0]]
@@ -59,20 +85,7 @@ namespace eval ::insp {
         $b RoDelete {end - 20 chars} end 
                 
         foreach s $InspectedData {
-            if {[::mprs::Consp $s] == 1} {
-                set item [::mprs::Unleash $s]
-                if {[lindex $item 0] eq {:value}} {
-                    ::tkcon::WriteActiveText $b \
-                        [::mprs::Unleash [lindex $item 1]] \
-                        end \
-                        "insp::InspectNthPart $w [::mprs::Unleash [lindex $item 2]]" \
-                        error
-                } else {
-                    $b RoInsert end "Я не знаю, что такое $s"
-                }
-            } else {
-                $b RoInsert end [::mprs::Unleash $s]
-            }
+            ::insp::FormatOneItemForInspectorPresentation $w $b $s
         }
         if { $ObjectTooLarge } {
             ::tkcon::WriteActiveText $b \
@@ -117,20 +130,7 @@ namespace eval ::insp {
         [TitleOfInspector $w] RoInsert 1.0 "$InspectedTitle\nВолшебные числа: $InspectedMagicNumbers"
 
         foreach s $InspectedData {
-            if {[::mprs::Consp $s] == 1} {
-                set item [::mprs::Unleash $s]
-                if {[lindex $item 0] eq {:value}} {
-                    ::tkcon::WriteActiveText $b \
-                        [::mprs::Unleash [lindex $item 1]] \
-                        end \
-                        "insp::InspectNthPart $w [::mprs::Unleash [lindex $item 2]]" \
-                        error 
-                } else {
-                    $b RoInsert end "Я не знаю, что такое $s"
-                }
-            } else {
-                $b RoInsert end [::mprs::Unleash $s]
-            }
+            ::insp::FormatOneItemForInspectorPresentation $w $b $s
         }
         if { $ObjectTooLarge } {
             ::tkcon::WriteActiveText $b \
@@ -164,6 +164,12 @@ namespace eval ::insp {
         set ContId [::tkcon::GenContinuationCounter]
         set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
         ::tkcon::EvalInSwankAsync "(swank:inspect-nth-part $id)" $OnReply [$w cget -thread-id] $ContId
+    }
+
+    proc InspectorCallNthAction {w id} {
+        set ContId [::tkcon::GenContinuationCounter]
+        set OnReply "::insp::ShowSomethingNewInInspector $w \$EventAsList"
+        ::tkcon::EvalInSwankAsync "(swank:inspector-call-nth-action $id)" $OnReply [$w cget -thread-id] $ContId
     }
 
     proc InspectorPop { w } {
