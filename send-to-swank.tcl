@@ -76,7 +76,7 @@ proc ::tkcon::EncodeAnySwankMessage {msgNoLen} {
 
 proc ::tkcon::FormatSwankRexEvalMessage {cmd MsgFmtKind {ThreadDesignator {}} {ContinuationCounter {}}} {
     if {$MsgFmtKind == 2} {
-        return [EncodeAnySwankMessage $cmd]
+        return [::tkcon::EncodeAnySwankMessage $cmd]
     } elseif {$MsgFmtKind == 3} {
         return [FormatEmacsReturnMessageInner $cmd $ThreadDesignator $ContinuationCounter]
     }
@@ -88,7 +88,7 @@ proc ::tkcon::FormatSwankRexEvalMessage {cmd MsgFmtKind {ThreadDesignator {}} {C
         set ContinuationCounter [GenContinuationCounter]
     }      
 
-    return [FormatSwankRexEvalMessageInner $cmd $ThreadDesignator $ContinuationCounter]
+    return [::tkcon::FormatSwankRexEvalMessageInner $cmd $ThreadDesignator $ContinuationCounter]
 }
 
 proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form MsgFmtKind} {
@@ -158,8 +158,8 @@ proc ::tkcon::SendEventToSwank {form continuation {MsgFmtKind 1} {ThreadDesignat
     }
    
     set cmd $form
-    set cmd [SwankMaybeWrapFormIntoListenerEval $cmd $MsgFmtKind]
-    set cmd [FormatSwankRexEvalMessage $cmd $MsgFmtKind $ThreadDesignator $ContinuationCounter]
+    set cmd [::tkcon::SwankMaybeWrapFormIntoListenerEval $cmd $MsgFmtKind]
+    set cmd [::tkcon::FormatSwankRexEvalMessage $cmd $MsgFmtKind $ThreadDesignator $ContinuationCounter]
 
     if { [lsearch -integer {0 1 4} $MsgFmtKind] >= 0  } {
       ::mprs::EnqueueContinuation $ContinuationCounter $continuation
