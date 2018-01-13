@@ -116,6 +116,8 @@ namespace eval ::insp {
             set InspectedTitle "<no data>"
             set InspectedData ""
             set InspectedMagicNumbers ""
+            ::showVar ReplyAsDict
+            set ObjectTooLarge 0 
         }
 
         # bind var for convenience

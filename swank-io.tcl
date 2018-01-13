@@ -460,7 +460,7 @@ proc ::tkcon::SwankReadMessageString {} {
 proc ::tkcon::SwankReadMessage {} {
     # with-swank-syntax
     #  read-from-string
-    return [SwankReadMessageString]
+    return [::tkcon::SwankReadMessageString]
 }
 
 

@@ -37,14 +37,15 @@ namespace eval ::edt {
 
         set args [lindex $args 0]
         
-        set opts [dict create -find {} -type {} -attach {} -wrap {char} -offset {}]             
+        set opts [dict create -find {} -type {} -attach {} -wrap {char} ]             
         while {[string match -* [lindex $args 0]]} {
             switch -glob -- [lindex $args 0] {
                 -f*	{ dict set opts -find [lindex $args 1] }
                 -a*	{ dict set opts -attach [lindex $args 1] }
                 -t*	{ dict set opts -type [lindex $args 1] }
                 -w*	{ dict set opts -wrap [lindex $args 1] }
-                -o* { dict set opts -offset [lindex $args 1] }
+                -o*     { dict set opts -offset [lindex $args 1] }
+                -byteoffset { dict set opts -byteoffset [lindex $args 1] }
                 --	{ set args [lreplace $args 0 0]; break }
                 default {return -code error "unknown option \"[lindex $args 0]\""}
             }

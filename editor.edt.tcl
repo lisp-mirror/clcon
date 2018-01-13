@@ -395,7 +395,7 @@ namespace eval ::edt {
     # See docs at the beginning of file
     proc edit {args} {
 
-        set ParsedArgs [EditorParseArgs $args]
+        set ParsedArgs [::edt::EditorParseArgs $args]
 
         foreach {word opts tail} $ParsedArgs break
         
@@ -411,10 +411,17 @@ namespace eval ::edt {
         if {[string compare [dict get $opts -find] {}]} {
             ::fndrpl::OldTkconFind $btext [dict get $opts -find] -case 1
         }
-        if {[dict get $opts -offset] ne {}} {
+
+        if {[dict exists $opts -offset]} {
             $btext mark set insert [dict get $opts -offset]
             $btext see insert
         }
+        if {[dict exists $opts -byteoffset]} {
+            set mark_offset [string cat "1.0+" [dict get $opts -byteoffset] "c"]
+            $btext mark set insert $mark_offset
+            $btext see insert
+        }
+
 
         ::clcon_text::tncm $btext
 
@@ -438,11 +445,35 @@ namespace eval ::edt {
         eval $wcmd
     }   
 
+    # (SWANK::SEND-OOB-TO-EMACS (:ED (:FILENAME "/y/yar/ит/kons/kons-test.lisp" :POSITION 4912 :BYTEP T)))
     proc ProcessEdRequest {EventAsList} {
         set FileNameSpec [::mprs::Unleash [lindex $EventAsList 1]]
-        puts stderr $FileNameSpec
         ::mprs::AssertEq [::mprs::Unleash [lindex $FileNameSpec 0]] {:filename}
-        edit -type file [::mprs::Unleash [lindex $FileNameSpec 1]]
+        set FileName {}
+        set Position 0
+        set ByteP 0
+        set i 0
+        while { $i < [ llength $FileNameSpec ] } {
+            set Key [::mprs::Unleash [lindex $FileNameSpec $i ]]
+            incr i 
+            set Value [lindex $FileNameSpec $i]
+            set ValueU [::mprs::Unleash $Value]
+            incr i
+            if { $Key eq {:filename} } {
+              set FileName $ValueU
+            } elseif { $Key eq {:position} } {
+              set Position $ValueU
+            } elseif { ($Key eq {:bytep}) && ![::mprs::Null $Value]} { 
+              set ByteP 1
+            }
+        }
+        set options {} 
+        if { $ByteP } {
+           lappend options -byteoffset $Position
+        } elseif { $Position ne {}} {
+           lappend options -offset $Position
+        }
+        ::edt::edit -type file {*}$options -- $FileName
     }
 }
 

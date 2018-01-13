@@ -210,12 +210,28 @@ frame."
                  ((t) `((:restartable t)))))))
 
 
+(defun transform-byte-offset-to-tcl-char-offset-in-ed-target (target)
+  (cond
+   ((and (getf target :position)
+         (getf target :bytep))
+    (let* ((result (copy-list target))
+           (new-offset
+            (nth-value
+             1
+             (fix-offset-2 (getf result :filename) (getf result :position)))))
+      (setf (getf result :position)
+            (format nil "1.0+ ~A chars" new-offset)
+            (getf result :bytep)
+            nil)
+      result))
+   (t target)))
+
 (def-patched-swank-fun swank::ed-in-emacs (&optional what (in-which-connection :default))
   "Edit WHAT in Emacs.
 
 WHAT can be:
   A pathname or a string,
-  A list (PATHNAME-OR-STRING &key LINE COLUMN POSITION),
+  A list (PATHNAME-OR-STRING &key LINE COLUMN POSITION BYTE-P),
   A function name (symbol or cons),
   NIL. 
 
@@ -247,6 +263,7 @@ WHAT can be:
                 (first swank::*connections*))
                (t (error "Нет подходящего соединения с клиентом SWANK"))))))
           )
+      (setq target (transform-byte-offset-to-tcl-char-offset-in-ed-target target))
       (cond ((eq connection swank::*emacs-connection*) (swank::send-oob-to-emacs `(:ed ,target)))
             (t
              (swank::with-connection (connection)
