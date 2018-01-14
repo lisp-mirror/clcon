@@ -58,9 +58,8 @@ proc ::tkcon::FormatSwankRexEvalMessageInner {cmd ThreadDesignator ContinuationC
     variable PRIV
     set pkg $PRIV(CurrentPackageName)
     set qPkg [QuoteTclStringForLisp $pkg]
-    # BULKBULK
     set qRt [QuoteTclStringForLisp $PRIV(CurrentReadtableName)]
-    set msgNoLen "(:emacs-rex-rt $cmd $qPkg nil $ThreadDesignator $ContinuationCounter)"
+    set msgNoLen "(:emacs-rex-rt $cmd $qPkg $qRt $ThreadDesignator $ContinuationCounter)"
     # set msgNoLen "(:emacs-rex $cmd $qPkg $ThreadDesignator $ContinuationCounter)"
     EncodeAnySwankMessage $msgNoLen
 }

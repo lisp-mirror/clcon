@@ -377,7 +377,7 @@ WHAT can be:
          (new-name-string
           (with-standard-io-syntax (prin1-to-string new-name-symbol))))
     (when maybe-new-name
-      (named-readtables:rename-readtable rt maybe-new-name))
+      (named-readtables:register-readtable new-name-symbol rt))
     new-name-string))
 
 (def-patched-swank-fun swank-repl::track-package (fun)
@@ -387,10 +387,10 @@ WHAT can be:
     (unwind-protect (funcall fun)
       (unless (and (eq *package* p)
                    (eq *readtable* r))
-        (swank::send-to-emacs (list :new-package ; BULKBULK
+        (swank::send-to-emacs (list :new-package-rt
                                     (package-name *package*)
                                     (swank::package-string-for-prompt *package*)
-                                    #+BULKBULK (rename-readtable-if-current)
+                                    (rename-readtable-if-current)
                                     ))))))
 
 (defun decorated--swank-repl--create-repl (original-fn target &key (coding-system nil coding-system-supplied-p))

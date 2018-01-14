@@ -301,7 +301,7 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
     } elseif { $Head eq ":new-package" } {
         ::tkcon::ChangeCurrentPackageB $EventAsList       
     } elseif { $Head eq ":new-package-rt" } {
-        ::showVar EventAsList
+        # ::showVar EventAsList
         ::tkcon::ChangeCurrentPackageB $EventAsList       
     } elseif { $Head eq ":new-features" } {
         putd "::mprs::ProcessAsyncEvent: ignoring new features event: $EventAsList"
