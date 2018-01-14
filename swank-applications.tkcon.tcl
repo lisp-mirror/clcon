@@ -153,28 +153,53 @@ proc ::tkcon::EditFileAtLine {filename line} {
     EditFileAtOffset $filename [string cat $line ".0"]
 }
 
+## Возвращает список из собственно символа и места, где он начинается
+proc ::tkcon::ExtractCurrentLispSymbolFromConsole {text_widget} {
 
-## ::tkcon::CallLispFunctionOnCurrentConsoleSymbol 
-# Calls lisp_fn with symbol string and current package on current symbol text in concole text_widget, 
-# and shedules tcl_continuation_fn {EventAsList} to be called upon return
-proc ::tkcon::CallLispFunctionOnCurrentConsoleSymbol {text_widget lisp_fn tcl_continuation_fn} {
     variable PRIV
 
     set w $text_widget
 
     set exp [::tkcon::BeginningOfLispSymbolRegexp]
+    set expEnd [::tkcon::EndOfLispSymbolRegexp]
 
     if {[$w compare insert >= limit]} {
-        set SearchStartPos {limit -1c}
+        set SearchStartPos {limit}
     } else {
-        set SearchStartPos {insert linestart -1c}
+        set SearchStartPos {insert linestart}
     }
     
     set tmp [$w search -backwards -regexp $exp insert-1c $SearchStartPos]
-    if {[string compare {} $tmp]} {append tmp +2c} else {set tmp "$SearchStartPos +1c"}
-    set tmp2 [$w search -regexp $exp $tmp]
-    if {[string compare {} $tmp2]} {append tmp2 +1c} else {set tmp2 {insert lineend}}
+    # ::showVar tmp
+    if {[string compare {} $tmp]} { 
+       append tmp +1c
+    } else {
+       #puts "wow"
+       set tmp $SearchStartPos
+    }
+    set EndOfSearch [concat $tmp {lineend}]
+    # ::showVar EndOfSearch
+    #puts stderr "k [$w get $tmp $EndOfSearch] k" 
+    set tmp2 [$w search -regexp $expEnd $tmp $EndOfSearch]
+    #::showVar tmp2
+    if {[string compare {} $tmp2]} {
+    } else {
+       set tmp2 [concat $tmp {lineend}]
+    }
     set str [$w get $tmp $tmp2]
+    list $str $tmp
+}
+
+## ::tkcon::CallLispFunctionOnCurrentConsoleSymbol 
+# Calls lisp_fn with symbol string and current package on current symbol text in concole text_widget, 
+# and shedules tcl_continuation_fn {EventAsList} to be called upon return
+proc ::tkcon::CallLispFunctionOnCurrentConsoleSymbol {text_widget lisp_fn tcl_continuation_fn} {
+
+    variable PRIV
+
+    set w $text_widget
+    foreach {str pos} [::tkcon::ExtractCurrentLispSymbolFromConsole $w] break
+    # pos is ignored 
 
     if {$str eq ""} {
         set con $PRIV(console)
