@@ -473,6 +473,8 @@ namespace eval ::edt {
         } elseif { $Position ne {}} {
            lappend options -offset $Position
         }
+        set ProcessEdRequest_options $options
+        ::showVar ProcessEdRequest_options
         ::edt::edit -type file {*}$options -- $FileName
     }
 }
