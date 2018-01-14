@@ -339,6 +339,7 @@ proc ::tkcon::Init {args} {
 	docs		"https://bitbucket.org/budden/clcon"
 	email		{}
 	root		.
+	lisp-title {Просто Лисп}
 	uid		0
 	tabs		{}
 
@@ -346,6 +347,7 @@ proc ::tkcon::Init {args} {
         SwankReplReady   0  
         CurrentPackageName "COMMON-LISP-USER"
         CurrentPackageDisplayName "CL-USER"
+        CurrentReadtableName "CURRENT" 
     } {
 	if {![info exists PRIV($key)]} { set PRIV($key) $default }
     }

@@ -58,7 +58,6 @@ proc ::tkcon::Expand {w {type ""}} {
     switch -glob $type {
         li* {
             foreach {str tmp} [::tkcon::ExtractCurrentLispSymbolFromConsole $w] break
-            ::showVar str
         }
         default { 
             set exp "\[^\\\\\]\[\[ \t\n\r\\\{\"$\]" 
