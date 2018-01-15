@@ -1,7 +1,7 @@
 
 (defsystem :clcon-server
   :name "clcon-server"
-  :version "0.3.8"
+  :version "0.3.9"
   :author "Denis Budyak"
   :licence "MIT"
   :description "clcon - Common Lisp IDE"

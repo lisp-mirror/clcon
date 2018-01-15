@@ -109,7 +109,7 @@ namespace eval ::clconcmd {
 namespace eval ::tkcon {
     # when modifying this line, make sure that the auto-upgrade check
     # for version still works.
-    variable VERSION "0.3.8"
+    variable VERSION "0.3.9"
     # The OPT variable is an array containing most of the optional
     # info to configure.  COLOR has the color data.
     variable OPT
@@ -796,6 +796,7 @@ proc ::tkcon::InitUI {title IsMainInit} {
     variable OPT
     variable PRIV
     variable COLOR
+    variable VERSION
 
     set root $PRIV(root)
     if {$root eq "."} { set w {} } else { set w [toplevel $root] }
@@ -900,7 +901,7 @@ proc ::tkcon::InitUI {title IsMainInit} {
       ::win_lay::PositionATool $root
 
       if {!$PRIV(WWW)} {
-        wm title $root "Яр $PRIV(lisp-title) $title"
+        wm title $root "Яр $::tkcon::VERSION $PRIV(lisp-title) $title"
         if {$PRIV(showOnStartup)} {
            # this may throw an error if toplevel is embedded
            catch {wm deiconify $root}

@@ -1,20 +1,22 @@
-Clcon 0.3.6 - Установка и запуск
+Clcon 0.3.9 - Установка и запуск
 ==============
 
 ##  Этот документ мало актуален
 
-clcon больше не устанавливается отдельно - он теперь входит в [проект Яр](https://bitbucket.org/budden/yar). Здесь остаётся информация, нужная
+clcon больше не устанавливается отдельно - он теперь входит в [проект Яр](https://bitbucket.org/budden/iar). Здесь остаётся информация, нужная
 для сборки clcon "с нуля". 
 
 ### Версии
 
 #### SBCL
 
-[SBCL](http://www.sbcl.org/platform-table.html) >= 1.2.7. To check your SBCL version, call `sbcl --version` from the shell, or `(lisp-implementation-version)` from SBCL prompt.
+[SBCL](http://www.sbcl.org/platform-table.html) >= 1.4.2. To check your SBCL version, call `sbcl --version` from the shell, or `(lisp-implementation-version)` from SBCL prompt.
 
 #### Tcl/tk
 
 [Tcl/tk](http://tcl.tk) >= 8.6.2. To check your tcl tk version start `wish` from the console and type in in the console: `info patchlevel`. If your distribution have earlier version, try Tombert's tcltk, see http://wiki.tcl.tk/668, or something else.
+
+На самом-то деле мы используем под Windows патченную версию, которая решает проблемы со вводом кириллицы.
 
 #### Lisp libraries, part 1 and clcon components
 

@@ -79,6 +79,36 @@
          (error (c)
                 (format stream "~&   error printing frame source: ~A" c))))))
  
+
+
+ (defun my-step-form (original-fn form args)
+   (declare (ignore original-fn))
+  (restart-case
+      (signal 'step-form-condition
+              :form form
+              :args args)
+    (step-continue ()
+      :report "Беги"
+      (sb-impl::disable-stepping)
+      (setf sb-impl::*step-out* nil))
+    (step-out ()
+      :report "Выбегай к месту, где мы сказали шагнуть внутрь и шагай дальше"
+      (ecase sb-impl::*step-out*
+        ((nil)
+         (cerror "Перешагни" "Нельзя сделать STEP-OUT, т.к. не было сделано STEP-IN")
+         nil)
+        ((t :maybe)
+         (sb-impl::disable-stepping)
+         (setf sb-impl::*step-out* t)))
+      nil)
+    (step-next ()
+      :report "Перешагни"
+      nil)
+    (step-into ()
+      :report "Шагни внутрь"
+      t)))
+
+  (cl-advice:define-advice sb-impl::step-form #'my-step-form)
  
  ) ; sb-ext:without-package-locks
 

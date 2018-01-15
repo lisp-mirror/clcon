@@ -140,16 +140,16 @@
 
 ;;;;;;;;;; функция для запуска клиента ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun zapustitq-klienta--clcon ()
-  #-(or os-windows linux) #.(error "Ne umeyu zapustitq-klienta--clcon na ehtoyi platforme")
+  #-(or os-windows linux) (let "Ne umeyu zapustitq-klienta--clcon na ehtoyi platforme")
+  #-(or CCL SBCL) (let "Ne umeyu zapustitq-klienta--clcon is ehtoyy realizacii lispa")
   (let* ((util-directory
           (uiop/filesystem:native-namestring
            (putq-otnositelqno-kornya-yara "bin/util")))
          #+CCL (util-directory (substitute #\\ #\/ util-directory)) ; Нет, ccl:native-translated-namestring тоже не работает
          (lisp-name #+CCL "Кложа" #+#:YSBCL "ЯСБЦЛ" #+(and SBCL (not #:YSBCL)) "СБЦЛ" #-(or SBCL CCL) "Nevedomyyyi-lisp")
-         (version (lisp-implementation-version))
-         (version1 (if (eql (mismatch version "Version ") 8) (subseq version 8) version))
-         (version-string (subseq version1 0 (min 20 (length version1))))
-         (lisp-name-and-version (format nil "~A-~A" lisp-name version-string))
+         (version #+SBCL (lisp-implementation-version)
+                  #+CCL (format nil "~D.~D-~A" ccl::*openmcl-major-version* ccl::*openmcl-minor-version* ccl::*openmcl-revision*))
+         (lisp-name-and-version (format nil "~A-~A" lisp-name version))
          (cmd
           #+os-windows
           (format nil "~A\\CallBatFromGuiDetached.exe ~A\\clcon-client.cmd -swank-port ~A -lisp-title ~S" util-directory util-directory *clcon-swank-port* lisp-name-and-version)
