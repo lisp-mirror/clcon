@@ -348,6 +348,7 @@ WHAT can be:
                                   (sb-thread:release-foreground)))))
 
 (defun otladitq--n--jj-potok-v-chjornojj-konsoli (n)
+  (declare (ignorable n))
   #+SBCL
   (let ((thread (swank::nth-thread n)))
     (break-thread-in-black-console thread))
@@ -355,3 +356,46 @@ WHAT can be:
   (print "Otladka v chyornoyi konsoli ne realizovana dlya ehtoyi realizacii lispa")
   )
 
+
+(defpackage :current-readtable-renamed (:use)
+  (:documentation "Мы не можем передать в EMACS т.ч. :current, поскольку это не информативно. Т.ч. может придти в другой тред, где она больше не будет :current. Поэтому, если нам нужно передать т.ч. в EMACS, мы переименовываем её"))
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (unless (boundp 'defglobal-current-readtable-renamed-counter)
+    (cl-impl:defglobal defglobal-current-readtable-renamed-counter 0)))
+
+(defun rename-readtable-if-current ()
+  "Если *readtable* имеет имя :current, переименовываем её в уникальное имя. Возвращаем имя"
+  (let* ((rt *readtable*)
+         (name (named-readtables::readtable-name rt))
+         (current-p (eq name :current))
+         (maybe-new-name
+          (and
+           current-p
+           (intern (format nil "CURRENT-~A" (incf defglobal-current-readtable-renamed-counter)) :current-readtable-renamed)))
+         (new-name-symbol (or maybe-new-name name))
+         (new-name-string
+          (with-standard-io-syntax (prin1-to-string new-name-symbol))))
+    (when maybe-new-name
+      (named-readtables:register-readtable new-name-symbol rt))
+    new-name-string))
+
+(def-patched-swank-fun swank-repl::track-package (fun)
+  "в дополнение к отправке пакета, как оригинал делал, отправляет также и т.ч."
+  (let ((p *package*)
+        (r *readtable*))
+    (unwind-protect (funcall fun)
+      (unless (and (eq *package* p)
+                   (eq *readtable* r))
+        (swank::send-to-emacs (list :new-package-rt
+                                    (package-name *package*)
+                                    (swank::package-string-for-prompt *package*)
+                                    (rename-readtable-if-current)
+                                    ))))))
+
+(defun decorated--swank-repl--create-repl (original-fn target &key (coding-system nil coding-system-supplied-p))
+  "Отправим и таблицу чтения при создании REPL"
+  (let* ((original-res (apply original-fn target (budden-tools::dispatch-keyarg-full coding-system))))
+    (append original-res (list (rename-readtable-if-current)))))
+
+(cl-advice:define-advice swank-repl::create-repl 'decorated--swank-repl--create-repl :advice-name send-readtable-too)

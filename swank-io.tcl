@@ -300,6 +300,9 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
         putd "::mprs::ProcessAsyncEvent: impolitely ignoring :indentation-update"
     } elseif { $Head eq ":new-package" } {
         ::tkcon::ChangeCurrentPackageB $EventAsList       
+    } elseif { $Head eq ":new-package-rt" } {
+        # ::showVar EventAsList
+        ::tkcon::ChangeCurrentPackageB $EventAsList       
     } elseif { $Head eq ":new-features" } {
         putd "::mprs::ProcessAsyncEvent: ignoring new features event: $EventAsList"
     } elseif { $Head eq ":ed" } {

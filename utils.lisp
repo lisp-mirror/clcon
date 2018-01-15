@@ -24,14 +24,33 @@
       (t
        (values nil body)))))
 
+
+(defun build-patched-swank-fun-advice-function-definition (swank-fun args body)
+  (multiple-value-bind (docstring real-body)
+                       (extract-function-docstring body)
+    (let* ((function-name-string
+            (with-standard-io-syntax
+             (let ((*package* (find-package :keyword)))
+               (format nil "(~S ~S)" 'def-patched-swank-fun swank-fun))))
+           (function-name
+            (intern function-name-string :clco))
+           (original-fn (gensym "ORIGINAL-FN")))
+      (values
+       function-name
+       `(defun ,function-name (,original-fn ,@args)
+          ,@(when docstring (list docstring))
+          (declare (ignore ,original-fn))
+          ,@real-body)))))
+  
+
 (defmacro def-patched-swank-fun (swank-fun args &body body)
   "Specify that we redefine function from swank. It seems that we can also redefine functions
 defined by swank::defslimefun this way"
-  (multiple-value-bind (docstring real-body)
-      (extract-function-docstring body)
-    (declare (ignore docstring))
-    ; FIXME - save docstring somehow. 
-    `(defun ,swank-fun ,args ,@real-body)))
+  (multiple-value-bind (wrapper-function-name wrapper-function-definition)
+                       (build-patched-swank-fun-advice-function-definition swank-fun args body)
+    `(progn
+       ,wrapper-function-definition
+       (cl-advice:define-advice ,swank-fun ',wrapper-function-name :advice-name def-patched-swank-fun))))
                              
 (defmacro --> (object slot)
   "bubububu"

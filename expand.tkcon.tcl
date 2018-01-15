@@ -4,12 +4,18 @@
 
 proc ::tkcon::BeginningOfLispSymbolRegexp {} {
      # ; return "\[^\\\\\]\[\[ \t\n\r(\",@\\'\]"
-     return {[^\\][[:space:]$(),@'""]}
+     return {[\^ $(),@'""\\>]}
 }
+
+proc ::tkcon::EndOfLispSymbolRegexp {} {
+     # ; return "\[^\\\\\]\[\[ \t\n\r(\",@\\'\]"
+     return {[ $(),@'""\\]}
+}
+
 
 # It will fail in case of escaping
 proc ::tkcon::BoundOfLispSymbolRegexpSimplified {} {
-     return {[[:space:]$(),@'""]}
+     return {[\^ $(),@'"">]}
 }
 
 # for clcon, pass [$clcon_text RealText] here. For editor, pass [::edt::Bi2_text]
@@ -48,16 +54,19 @@ proc ::tkcon::ExpandMatchMagic {str match} {
 # Returns:	number of matches found
 ## 
 proc ::tkcon::Expand {w {type ""}} {
+    # tmp - начало найденного символа
     switch -glob $type {
         li* {
-            # we might also want to pass current line to lisp 
-            set exp [::tkcon::BeginningOfLispSymbolRegexp]
+            foreach {str tmp} [::tkcon::ExtractCurrentLispSymbolFromConsole $w] break
         }
-        default { set exp "\[^\\\\\]\[\[ \t\n\r\\\{\"$\]" }
+        default { 
+            set exp "\[^\\\\\]\[\[ \t\n\r\\\{\"$\]" 
+            set tmp [$w search -backwards -regexp $exp insert-1c limit-1c]
+            if {[string compare {} $tmp]} {append tmp +2c} else {set tmp limit}
+            set str [$w get $tmp insert]
+        }
     }
-    set tmp [$w search -backwards -regexp $exp insert-1c limit-1c]
-    if {[string compare {} $tmp]} {append tmp +2c} else {set tmp limit}
-    set str [$w get $tmp insert]
+
     # Expand procs can return "break" to indicate not to try other ways of compleation
     # or "continue" says "I got nothing, continue on to other kinds of completion"
     # We can ignore return codes when we are looking for specific kind of completion

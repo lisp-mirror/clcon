@@ -454,6 +454,7 @@ namespace eval ::tkcon {
         set x [::mprs::ParseReturnOk $EventAsList]
         set PRIV(CurrentPackageName) [::mprs::Unleash [lindex $x 0]]
         set PRIV(CurrentPackageDisplayName) [::mprs::Unleash [lindex $x 1]]
+        set PRIV(CurrentReadtableName) [::mprs::Unleash [lindex $x 2]]
     }
        
 
@@ -464,7 +465,7 @@ namespace eval ::tkcon {
         variable PRIV
         set PRIV(CurrentPackageName) [::mprs::Unleash [lindex $EventAsList 1]]
         set PRIV(CurrentPackageDisplayName) [::mprs::Unleash [lindex $EventAsList 2]]
-        puts stderr "PRIV(CurrentPackageName) = $PRIV(CurrentPackageName)"
+        # puts stderr "PRIV(CurrentPackageName) = $PRIV(CurrentPackageName)"
+        set PRIV(CurrentReadtableName) [::mprs::Unleash [lindex $EventAsList 3]]
     }
-
 }
