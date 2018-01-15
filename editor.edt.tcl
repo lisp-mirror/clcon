@@ -450,7 +450,7 @@ namespace eval ::edt {
         set FileNameSpec [::mprs::Unleash [lindex $EventAsList 1]]
         ::mprs::AssertEq [::mprs::Unleash [lindex $FileNameSpec 0]] {:filename}
         set FileName {}
-        set Position 0
+        set Position "1.0"
         set ByteP 0
         set i 0
         while { $i < [ llength $FileNameSpec ] } {
