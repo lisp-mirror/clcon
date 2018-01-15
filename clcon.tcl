@@ -347,6 +347,7 @@ proc ::tkcon::Init {args} {
         SwankReplReady   0  
         CurrentPackageName "COMMON-LISP-USER"
         CurrentPackageDisplayName "CL-USER"
+        CurrentReadtableName "CURRENT"
     } {
 	if {![info exists PRIV($key)]} { set PRIV($key) $default }
     }
