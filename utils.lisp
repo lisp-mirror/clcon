@@ -37,3 +37,8 @@ defined by swank::defslimefun this way"
   "bubububu"
   `(slot-value ,object ',slot))
 
+(defun terminate-lisp ()
+  #+(and CCL OS-WINDOWS) (budden0::cmd-c "taskkill /PID ~D /F" (ccl::getpid))
+  #+(and SBCL OS-WINDOWS) (budden0::cmd-c "taskkill /PID ~D /F" (sb-posix:getpid))
+  #-OS-WINDOWS (swank:quit-lisp)
+  )
