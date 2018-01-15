@@ -124,8 +124,8 @@
     (let* ((name (or symbol string))
            (code
             (clco:|Обслужить-команду-поиска-связей-символа| name
-                  #+win32 #'swank/backend:list-callers
-                  #-win32 #'swank/backend:who-calls
+                  #+os-windows #'swank/backend:list-callers
+                  #-os-windows #'swank/backend:who-calls
                   "Точки вызова символа ~S не найдены (попробуйте поиск имени в исходниках)"
                   name
                   (odu::package-at-point)

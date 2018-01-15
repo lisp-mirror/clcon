@@ -424,9 +424,9 @@
   ) |#
 
 (defun open-url (url)
-  #+windows
+  #+os-windows
   (budden0::cmd-c "start ~A" url)
-  #-windows
+  #-os-windows
   (uiop:run-program (format nil "nohup xdg-open ~A > /dev/null &" url))
   ; (warn "Sorry, clco::open-url can not (yet) automatically open~%~A~%Please send me a patch~%" url)
   nil)

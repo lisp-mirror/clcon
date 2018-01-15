@@ -87,7 +87,7 @@
 ;; as a template
 (asdf:load-system :budden-tools)
 
-#+win32 (budden-tools:def-toplevel-progn "load winmerge-strings" ()
+#+os-windows (budden-tools:def-toplevel-progn "load winmerge-strings" ()
   (load (at-clcon-root "lp/clcon/winmerge-strings.lisp")))
 
 (BUDDEN-TOOLS:def-toplevel-progn "load :buddens-reader system" ()
@@ -140,17 +140,18 @@
 
 ;;;;;;;;;; функция для запуска клиента ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun zapustitq-klienta--clcon ()
-  #-(or win32 linux) #.(error "Не умею запустить-клиента--clcon на этой платформе")
+  #-(or os-windows linux) #.(error "Ne umeyu zapustitq-klienta--clcon na ehtoyi platforme")
   (let* ((util-directory
           (uiop/filesystem:native-namestring
            (putq-otnositelqno-kornya-yara "bin/util")))
-         (lisp-name #+CCL "Кложа" #+#:YSBCL "ЯСБЦЛ" #+(and SBCL (not #:YSBCL)) "СБЦЛ" #-(or SBCL CCL) "Неведомый-лисп")
+         #+CCL (util-directory (substitute #\\ #\/ util-directory)) ; Нет, ccl:native-translated-namestring тоже не работает
+         (lisp-name #+CCL "Кложа" #+#:YSBCL "ЯСБЦЛ" #+(and SBCL (not #:YSBCL)) "СБЦЛ" #-(or SBCL CCL) "Nevedomyyyi-lisp")
          (version (lisp-implementation-version))
          (version1 (if (eql (mismatch version "Version ") 8) (subseq version 8) version))
          (version-string (subseq version1 0 (min 20 (length version1))))
          (lisp-name-and-version (format nil "~A-~A" lisp-name version-string))
          (cmd
-          #+win32 
+          #+os-windows
           (format nil "~A\\CallBatFromGuiDetached.exe ~A\\clcon-client.cmd -swank-port ~A -lisp-title ~S" util-directory util-directory *clcon-swank-port* lisp-name-and-version)
           #+linux
           (format nil "sh ~A/clcon-client.sh -swank-port ~A -lisp-title ~S"
