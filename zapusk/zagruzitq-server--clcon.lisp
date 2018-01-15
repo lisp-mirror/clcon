@@ -151,7 +151,7 @@
          (lisp-name-and-version (format nil "~A-~A" lisp-name version-string))
          (cmd
           #+win32 
-          (format nil "~A\\CallBatFromGuiDetached.exe ~A\\clcon-client.cmd -swank-port ~A" util-directory util-directory *clcon-swank-port*)
+          (format nil "~A\\CallBatFromGuiDetached.exe ~A\\clcon-client.cmd -swank-port ~A -lisp-title ~S" util-directory util-directory *clcon-swank-port* lisp-name-and-version)
           #+linux
           (format nil "sh ~A/clcon-client.sh -swank-port ~A -lisp-title ~S"
                   util-directory *clcon-swank-port*

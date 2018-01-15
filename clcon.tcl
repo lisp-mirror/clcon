@@ -339,6 +339,7 @@ proc ::tkcon::Init {args} {
 	docs		"https://bitbucket.org/budden/clcon"
 	email		{}
 	root		.
+        lisp-title      {}
 	uid		0
 	tabs		{}
 
