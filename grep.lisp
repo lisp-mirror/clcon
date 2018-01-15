@@ -110,7 +110,7 @@
     "tcl-8.6.6-unicode-fixed/"
     "tcl-8.6.6-old/"
     "tcl-8.6.6-tk-8.7-unicode-and-keysym/"
-    "sbcl/" "log/" ".hg/" "пляж/"))
+    "sbcl/" "ccl/" "log/" ".hg/" ".git/" "пляж/"))
 
 (defparameter |*типы-файлов-исходников-яра*| 
   '("md" "lisp" "asd" "tcl"))
