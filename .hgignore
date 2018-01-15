@@ -8,3 +8,4 @@ mypipe
 swank-text-log.log
 \#*\#
 defun-to-file/*
+*.wx64fsl
