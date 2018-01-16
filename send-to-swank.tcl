@@ -99,7 +99,7 @@ proc ::tkcon::SwankMaybeWrapFormIntoListenerEval {form MsgFmtKind} {
         return "(swank-repl:listener-eval \"$cmd\")"
     } elseif {$MsgFmtKind == 4} {
         set cmd [regsub -all {([\"\\])} $form {\\\0}]
-        set cmd "(ТРАНСЛЯТОР-ЯРА-В-ЛИСП::Выполнить-строку-Яра-из-ЦЧВП \"$cmd\")"
+        set cmd "(ТРАНСЛЯТОР-ЯРА-В-ЛИСП::|Выполнить-строку-Яра-из-ЦЧВП| \"$cmd\")"
         set cmd [regsub -all {([\"\\])} $cmd {\\\0}]
         return "(swank-repl:listener-eval \"$cmd\")"
     } else {

@@ -8,6 +8,9 @@
 (eval-when (:compile-toplevel)
   (error "Не компилируй ~S, загружай его с помощью LOAD" *compile-file-truename*))
 
+#+SBCL
+(sb-ext::set-sbcl-source-location
+ (merge-pathnames "source/" (sb-posix:getenv "SBCL_HOME")))
 
 ;;;;;;;;;;;;;;;;;; Trying to send all tracing to SBCL console ;;;;;;;;;;;;
 
