@@ -120,7 +120,13 @@
       (:LOCATION (:FILE \"C:/yar/sbcl/1.3.18/source/src/code/defboot.lisp\")
        (:POSITION 6961)
        (:SNIPPET
-        \"(sb!xc:defmacro defun (и далее фрагмент кода)\")) . Данная ф-я returns either values of file and position or nil"
+        \"(sb!xc:defmacro defun (и далее фрагмент кода)\")) . 
+
+     ИЛИ
+
+      (:LOCATION\ (:FILE\ \"/y/yar/lp/budden-tools/asdf-3.1.4-tools.lisp\")\ (:FUNCTION-NAME\ \"*CURRENT-COMPONENT*\")\ NIL)
+
+     Ф-я returns either values of file and position or nil"
   (perga-implementation:perga
    (cond
     ((and (find-class 'БУКВЫ-И-МЕСТА-В-ФАЙЛЕ-ЛИЦО:|Место-в-исходнике| nil)
@@ -137,6 +143,15 @@
      (let ((file (second (second location)))
            (position (second (third location))))
        (values file position)))
+
+    ((and (eq (car location) :location)
+          (eq (car (second location)) :file)
+          (eq (car (third location)) :function-name))
+     (warn "вы хотели увидеть функцию ~S" (second (third location)))
+     (let ((file (second (second location)))
+           (position 1))
+       (values file position)))
+
     ((and (eq (car location) :location)
           (eq (car (second location)) :buffer-and-file)
           (eq (car (third location)) :offset))
