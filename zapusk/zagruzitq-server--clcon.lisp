@@ -145,7 +145,7 @@
   (let* ((util-directory
           (uiop/filesystem:native-namestring
            (putq-otnositelqno-kornya-yara "bin/util")))
-         #+CCL (util-directory (substitute #\\ #\/ util-directory)) ; Нет, ccl:native-translated-namestring тоже не работает
+         #+(and CCL OS-WINDOWS) (util-directory (substitute #\\ #\/ util-directory)) ; Нет, ccl:native-translated-namestring тоже не работает
          (lisp-name #+CCL "Кложа" #+#:YSBCL "ЯСБЦЛ" #+(and SBCL (not #:YSBCL)) "СБЦЛ" #-(or SBCL CCL) "Nevedomyyyi-lisp")
          (version #+SBCL (lisp-implementation-version)
                   #+CCL (format nil "~D.~D-~A" ccl::*openmcl-major-version* ccl::*openmcl-minor-version* ccl::*openmcl-revision*))
