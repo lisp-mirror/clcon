@@ -7,10 +7,21 @@
 
 (eval-when (:compile-toplevel)
   (error "Не компилируй ~S, загружай его с помощью LOAD" *compile-file-truename*))
+  
+;;;;;;;;;;;;;;;;;; SBCL: enabling finding sources ;;;;;;;;;;;;
 
 #+SBCL
-(sb-ext::set-sbcl-source-location
- (merge-pathnames "source/" (sb-posix:getenv "SBCL_HOME")))
+(defun zagruzitq-server--clcon--set-sbcl-home-location () 
+ (let* ((sbcl-home-string (sb-posix:getenv "SBCL_HOME")))
+  ;(break "~S" sbcl-home-string)
+  (unless (member (elt sbcl-home-string (- (length sbcl-home-string) 1)) '(#\\ #\/))
+     (setq sbcl-home-string (concatenate 'string sbcl-home-string "/")))
+  (sb-ext::set-sbcl-source-location
+   ;; run-sbcl.sh changes SBCL_HOME, so this is an empirical fix to approach actual location of sources
+   (merge-pathnames #+linux "../../src/" #-linux "source/" (pathname sbcl-home-string)))))
+   
+#+SBCL
+(zagruzitq-server--clcon--set-sbcl-home-location)
 
 ;;;;;;;;;;;;;;;;;; Trying to send all tracing to SBCL console ;;;;;;;;;;;;
 
