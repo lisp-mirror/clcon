@@ -1,9 +1,8 @@
-Как я апгрейдил asdf.
-1. Стёр asdf.fasl и uiop.fasl из контирбов.
-2. Скачал последний asdf в c:\clcon\sbcl\asdf-3.1.6
-3. Запустил sbcl:
-  - cmd
-  - set SBCL_HOME=c:\clcon\sbcl\1.3.4
-  - sbcl
-3. (load "c:/clcon/sbcl/asdf-3.1.6/tools/install-asdf.lisp")
-4. Установил атрибуты "только для чтения" для c:\clcon\sbcl\1.3.0\contrib\asdf.fasl, uiop.fasl, asdf.lisp. 
+Последние новости про ASDF:
+
+- взят ASDF из CCL-1.12 dev
+- asdf-3.1.4-tools запрещает upgrade-asdf (переопределяет так, что оно ничего не делает и возвращает nil, что значит апгрейдить не нужно). 
+
+Установить более новый ASDF с помощью asdf-tools не удалось (что-то не работало, разбираться не стал). 
+
+Продолжать в том же духе (избегать живого апгрейда SBCL).

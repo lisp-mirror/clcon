@@ -15,6 +15,7 @@ closer-mop-20150709-git
 cl-ppcre-2.0.10
 cl-tk-20150608-git
 cl-utilities-1.2.4
+cl-vectors-20150407-git
 clx-20150407-git
 data-sift-20130128-git
 flexi-streams-1.0.15
@@ -40,5 +41,6 @@ trivial-gray-streams-20140826-git
 usocket-0.6.3.2
 vecto-1.4.10 
 xmls-1.7 
+zpb-ttf-1.0.3
 zpng-1.2.2 
 ```
