@@ -140,27 +140,27 @@ namespace eval tkcon {
         # ::tkcon::ClipboardKeysyms --
         # This procedure is invoked to identify the keys that correspond to
         # the copy, cut, and paste functions for the clipboard.
-        #
+        # ВНИМАНИЕ! Эти биндинги не заменяются на горячую через 1/4. Можете попробовать явно вызвать
+        # ::tkcon::ClipboardKeysyms
 
         proc ::tkcon::ClipboardKeysyms {} {
             variable PRIV
             set ws [tk windowingsystem]
             ## event delete <<Paste>> <$PRIV(CTRL)V>
             ## Я так и не смог найти, где определены эти <Copy>, <Cut> и <Paste>
-            bind TkConsole <<Copy>>	{::tk_textCopy %W}
-            bind TkConsole <<Cut>>	{::tk_textCut %W}
-            bind TkConsole <<Paste>>	{::tk_textPaste %W}
+            bind TkConsole <<Copy>>
+            bind TkConsole <<Cut>>	
+            bind TkConsole <<Paste>>
             ## Расписываем вручную содержание ClipboardKeysyms для наших кнопок. 
             ::clcon_key::b bind TkConsole <Control-Key-c> {::tk_textCopy %W}
             ::clcon_key::b bind TkConsole <Control-Key-v> {::tk_textPaste %W}
+            ::clcon_key::b bind TkConsole <Control-Key-x> {::tk_textCut %W ; break}
         
             if {$ws eq "win32"} {
-                bind TkConsole <Control-Key-x> {::tkcon::Cut %W}
-                bind TkConsole <Control-Key-X> {::tkcon::Cut %W}
+            #    bind TkConsole <Control-Key-x> {::tkcon::Cut %W}
+            #    bind TkConsole <Control-Key-X> {::tkcon::Cut %W}
                 bind TkConsole <Control-Key-division> {::tkcon::Cut %W}
                 bind TkConsole <Control-Key-multiply> {::tkcon::Cut %W}
-            } else {
-                ::clcon_key::b bind TkConsole <Control-Key-x> {::tkcon::Cut %W}
             }
 
         }
