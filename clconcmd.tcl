@@ -116,7 +116,7 @@ Currently defined commands are: "
 
     # Искать в исходниках ЦЦЛ
     proc иццл { str } {
-      ::clconcmd::иф -типы lisp [string cat $::tkcon::YarRoot "/ccl"] $str
+      ::clconcmd::иф -типы lisp [string cat $::tkcon::YarRoot "/ccl/1.12dev"] $str
     }
 
     # 
