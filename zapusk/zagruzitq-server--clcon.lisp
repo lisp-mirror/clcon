@@ -18,7 +18,7 @@
      (setq sbcl-home-string (concatenate 'string sbcl-home-string "/")))
   (sb-ext::set-sbcl-source-location
    ;; run-sbcl.sh changes SBCL_HOME, so this is an empirical fix to approach actual location of sources
-   (merge-pathnames #+linux "../../src/" #-linux "source/" (pathname sbcl-home-string)))))
+   (merge-pathnames #+linux "../../" #-linux "source/" (pathname sbcl-home-string)))))
    
 #+SBCL
 (zagruzitq-server--clcon--set-sbcl-home-location)
