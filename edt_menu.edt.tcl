@@ -255,13 +255,13 @@ namespace eval ::edt {
         # Stepper menu
         set StepperMenu $m.stepper
         catch { destroy $StepperMenu }
-        $m add cascade -label [::ldbg::StepperMenuTitle] -state disabled -menu $StepperMenu
+        $m add cascade -label [::ldbg::StepperMenuTitle] -menu $StepperMenu
         menu $StepperMenu
         # This is not very correct as we have some stepper commands with single mod.
         # But we avoid complification of things this way
         # FIXME if we use special bindtags and reconfigure tags when stepper enabled/disabled,
         # we can reuse that keys.
-        ::ldbg::FillStepperMenu $StepperMenu [list NoMod$w] 
+        ::ldbg::FillStepperMenu $StepperMenu [list NoMod$w] {Редактор}
         
 
         set s $m.navigaciya_po_kodu_lispa
@@ -306,8 +306,8 @@ namespace eval ::edt {
         } else {
             set st disabled
         }
-        set stepperMenu [cMenuBar .lisp]
-        $stepperMenu entryconfigure [::ldbg::StepperMenuTitle] -state $st
+        #set stepperMenu [cMenuBar .lisp]
+        #$stepperMenu entryconfigure [::ldbg::StepperMenuTitle] -state $st
     }
     
     # Empties menu (except menu bar and recent menu) and fills it again

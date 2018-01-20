@@ -2,6 +2,9 @@
 # TkconSourceHere search-tablelist.tcl
 
 # Reloading the sources will crash current debugging session
+# Рестарт по умолчанию при закрытии окна - ищи в исходниках sldb-quit-restart
+# ( swank:*sldb-quit-restart* )
+# Мы хотим расширить семантику:
 
 namespace eval ::ldbg {
 
@@ -30,7 +33,7 @@ namespace eval ::ldbg {
     variable StackFrameHeaders
 
     variable FramesRead
-    set FramesRead 20
+    set FramesRead 30
 
     # dictionary of StackFrameHeaders being filled.
     # dictionary $FrameNo -> [list of continuation bodies to call after filling]
@@ -438,17 +441,17 @@ namespace eval ::ldbg {
     }
 
     proc EnableDisableMenus { DbgToplevelWindow } {
-        variable StepperMode
-        variable StepperMenuPathname
-        if {$StepperMode} {
-            set state normal
-        } else {
-            set state disabled
-        }
+        #variable StepperMode
+        #variable StepperMenuPathname
+        #if {$StepperMode} {
+        #    set state normal
+        #} else {
+        #    set state disabled
+        #}
         # showVar StepperMenuPathname
         
-        set DebuggerMenuBar [string cat $DbgToplevelWindow .mbar]
-        $DebuggerMenuBar entryconfigure [StepperMenuTitle] -state $state
+        # set DebuggerMenuBar [string cat $DbgToplevelWindow .mbar]
+        # $DebuggerMenuBar entryconfigure [StepperMenuTitle] -state $state
     }
     
     # Точка входа в отладчик - продолжение назначенное на ответ на запрос об инициализации
@@ -460,8 +463,9 @@ namespace eval ::ldbg {
         variable InTheDebugger
 
         set DebugEvent $EventAsList
+        # showVar EventAsList
 
-        set rasm [ParseRestarts]
+        set rasm [::ldbg::ParseRestarts]
         set Restarts [lindex $rasm 0]
         set StepperMode [lindex $rasm 1]
         
@@ -555,32 +559,29 @@ namespace eval ::ldbg {
         set cmd "::ldbg::CellCmdForActiveCell $tbl EvalInFramePrettyPrint"
         $m add command -label "5.Выполнить в кадре и лепо вывести..." -underline 0 -command $cmd
 
-        set cmd [list ::ldbg::CellCmdForActiveCell $tbl EnableStepping]
-        $m add command -label "6.Перейти в режим ходьбы" -underline 0 -command $cmd   
-
         set cmd "::ldbg::CellCmdForActiveCell $tbl НапечататьСтекВКонсоли"
-        $m add command -label "7.Напечатать первые 500 кадров стека в консоли" -underline 0 -command $cmd
+        $m add command -label "6.Напечатать первые 500 кадров стека в консоли" -underline 0 -command $cmd
 
-        set cmd "::ldbg::GetNext20"
-        $m add command -label "8.Получить ещё 20 кадров стека" -underline 0 -command $cmd
+        set cmd "::ldbg::GetNext30"
+        $m add command -label "7.Получить ещё 30 кадров стека" -underline 0 -command $cmd
     }
 
-    proc GetNext20 {} {
+    proc GetNext30 {} {
         variable FramesRead
         if { $FramesRead > 0 } {
             set thread [GetDebuggerThreadId]
-            set Last [expr $FramesRead + 19]
+            set Last [expr $FramesRead + 29]
             ::tkcon::EvalInSwankAsync                           \
                 "(swank::debugger-info-for-emacs $FramesRead $Last)" \
-                "::ldbg::GetNext20Cont \$EventAsList"           \
+                "::ldbg::GetNext30Cont \$EventAsList"           \
                 $thread
         }
     }
 
-    proc GetNext20Cont {EventAsList} {
+    proc GetNext30Cont {EventAsList} {
 #        tk_messageBox -message [::mprs::ParseReturnOk $EventAsList]
         variable FramesRead
-        set n [expr $FramesRead + 20]
+        set n [expr $FramesRead + 30]
         set FramesRead 0 
         if { [lindex $EventAsList 0] eq {:return} } {
             set SwankReply [::mprs::Unleash [lindex $EventAsList 1]]
@@ -588,7 +589,7 @@ namespace eval ::ldbg {
             if {$HeadSwankReply eq {:ok}} {
                 set frames [lindex [::mprs::Unleash [lindex $SwankReply 1]] 2]
                 InsertSeveralFramesIntoTree $frames
-                if { [llength $frames] == 21 } {
+                if { [llength $frames] == 31 } {
                     set FramesRead $n
                 }
             }
@@ -779,9 +780,15 @@ namespace eval ::ldbg {
     proc EnableStepping {} {
         set thread [GetDebuggerThreadId]                    
         ::tkcon::EvalInSwankAsync                           \
-            " (swank:sldb-step 0)"                          \
-            {}                                              \
+            " (swank::sldb-step-into)"          \
+            {::ldbg::EnableSteppingC1 $EventAsList}      \
             $thread
+    }
+
+    proc EnableSteppingC1 {EventAsList} {
+       # FIXME а может быть, надо обработать EventAsList? 
+       variable MainWindow
+       ::ldbg::CloseDebuggerWindow $MainWindow
     }
 
     
@@ -988,9 +995,13 @@ namespace eval ::ldbg {
         variable StepperMode
         variable InTheDebugger
         variable MainWindow
+        set SymbolName [lindex [split $name {:}] end]
+        set ItIsContinue [expr { [string tolower $SymbolName] eq "continue" } ]
+        puts [string tolower $name]
+        showVar ItIsContinue
         if {!$InTheDebugger} {
             tk_messageBox -parent $MainWindow -title "Ходьба" -message "Отладчик не активен"
-        } elseif {!$StepperMode} {
+        } elseif {!$StepperMode && !$ItIsContinue} {
             tk_messageBox -parent $MainWindow -title "Ходьба" -message "Режим ходьбы не активен"
         } else {
             InvokeSldbRestartByName $name
@@ -1055,7 +1066,7 @@ namespace eval ::ldbg {
     ##
     # ARGS:	m	- menu widget
     ##
-    proc FillRestartsMenu m {
+    proc FillRestartsMenu {w m} {
         variable DebugEvent
         variable Restarts
         if {![winfo exists $m]} return
@@ -1074,10 +1085,22 @@ namespace eval ::ldbg {
             } else {
                 set underlined ""
             }
+            set accel [list "" ""]
+            if { [string tolower $Short] eq "continue" } {
+               set accel [list <F5> <Key-F5>]
+            }
+            set cmd "::ldbg::InvokeRestart $i" 
             $m add command                     \
                 -label "$i: \[$Short\] $Long"  \
-                -command "::ldbg::InvokeRestart $i" \
+                -command $cmd \
+                -accel [lindex $accel 0] \
                 {*}$underlined
+            set accelKey [lindex $accel 1]
+            if { {} ne $accelKey } {
+                foreach bindtag [DebuggerBindTags $w] {
+                    bind $bindtag $accelKey $cmd
+                }
+            }
             incr i
         }
     }
@@ -1086,14 +1109,18 @@ namespace eval ::ldbg {
         variable ::tkcon::COLOR
         set m [::tkcon::MenuButton $menu "4.Команды перезапуска" restarts]
         menu $m -disabledforeground $::tkcon::COLOR(disabled) \
-            -postcommand [list ::ldbg::FillRestartsMenu $m]
+            -postcommand [list ::ldbg::FillRestartsMenu $w $m]
     }
 
     # For menu m, adds stepper command with label starting named restart and
     # binds it to each of bindtags
-    proc StepperMenuItem {m bindtags name label accel} {
+    proc StepperMenuItem {m bindtags name label accel commandOverride} {
         variable MainWindow
-        set cmd [list ::ldbg::InvokeStepperRestart [string cat "cl-user::" $name]]
+        if {$commandOverride eq {}} {
+          set cmd [list ::ldbg::InvokeStepperRestart [string cat "cl-user::" $name]]
+        } else {
+          set cmd $commandOverride
+        }
         set cmdBreak "$cmd; break"
         $m add command -label $name -command $cmd -accel $accel
         foreach bt $bindtags {
@@ -1102,20 +1129,29 @@ namespace eval ::ldbg {
     }
 
     # m is a menu. It can be in other window!
-    proc FillStepperMenu {m bindtags} {
-        StepperMenuItem $m $bindtags "step-continue" "Беги" <F5>
-        StepperMenuItem $m $bindtags "step-out" "Выбеги" <Shift-F11>
-        StepperMenuItem $m $bindtags "step-next" "Переступи" <F10>
-        StepperMenuItem $m $bindtags "step-into" "Зайди" <F11>
+    # client = {Отладчик} или {Редактор}
+    proc FillStepperMenu {m bindtags client} {
+        variable StepperMode
+        StepperMenuItem $m $bindtags "continue" "Беги" <F5> ""
+        
+        if {$StepperMode} {
+          StepperMenuItem $m $bindtags "step-out" "Выбеги" <Shift-F11> ""
+          StepperMenuItem $m $bindtags "step-next" "Переступи" <F10> ""
+        }
+        StepperMenuItem $m $bindtags "step-into" "Зайди" <F11> "::ldbg::EnableStepping"
     }
     
-    proc MakeMainWindowStepperMenu {w menu} {
-        variable StepperMenuPathname
+    proc DebuggerBindTags {w} {
         set tbl [GetFramesTablelist $w]
         set bodytag [$tbl bodytag]
+        list $w $tbl [GetTitleTextWidget $w] $bodytag
+    }
+
+    proc MakeMainWindowStepperMenu {w menu} {
+        variable StepperMenuPathname
         set m [menu [::tkcon::MenuButton $menu [StepperMenuTitle] stepper]]
         set StepperMenuPathname $m
-        FillStepperMenu $m [list $w $tbl [GetTitleTextWidget $w] $bodytag]
+        FillStepperMenu $m [DebuggerBindTags $w] {Отладчик}
     }
         
     proc ClearStackFramesTableList {} {
