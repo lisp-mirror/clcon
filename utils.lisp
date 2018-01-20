@@ -51,6 +51,13 @@ defined by swank::defslimefun this way"
     `(progn
        ,wrapper-function-definition
        (cl-advice:define-advice ,swank-fun ',wrapper-function-name :advice-name def-patched-swank-fun))))
+
+
+(defun y-or-n-p--decorated (fn format &rest args)
+  (declare (ignore fn))
+  (apply #'y-or-n-p-in-emacs format args))
+
+(cl-advice:define-advice y-or-n-p 'y-or-n-p--decorated)
                              
 (defmacro --> (object slot)
   "bubububu"

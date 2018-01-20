@@ -234,15 +234,70 @@ proc ::mprs::EvalInTclSync {EventAsList} {
     return     
 }
 
+## See also ::mprs::DoReadString
+proc ::mprs::DoYOrNP {EventAsList} {
+    puts $EventAsList
+    set ThreadId [Unleash [lindex $EventAsList 1]]
+    set Tag [Unleash [lindex $EventAsList 2]]
+    set Prompt [Unleash [lindex $EventAsList 3]]
+
+    set t ".tDoYOrNP_$Tag"
+
+    set _yn ::$t._yn
+    variable $_yn
+    set $_yn ""
+
+    toplevel $t
+    wm title $t "y-or-n-p"
+    wm protocol $t WM_DELETE_WINDOW {#} 
+    set f1 [frame $t.f1]
+    set f2 [frame $t.f2]
+    pack $f1 -side top -expand 1 -fill both
+    pack $f2 -side top -expand 1 -fill both
+
+    set f [frame $f1.f]
+    label $f.e -text $Prompt
+    pack $f -side top -expand 1 -fill both
+    pack $f.e -side left -expand 1 -fill both
+
+    button $f2.bOk -text "9=Yes" -command "set $_yn T"
+    button $f2.bCancel -text "4=Cancel=No" -command "set $_yn NIL"
+
+    bind $t <Key-9> "set $_yn T"
+    bind $t <Key-4> "set $_yn NIL"
+
+    pack $f2.bOk $f2.bCancel -side left
+    # Text
+    focus $f1.f.e
+
+    #wait for button
+    vwait ::$_yn
+
+    #get result from the name
+    set res [set $_yn]
+
+    ::tkcon::SendEventToSwank "(:emacs-return $ThreadId $Tag $res)" {} 2 $ThreadId
+    unset $_yn
+
+    if {[winfo exists $t]} {
+        destroy $t
+    }
+}
+
+## See also ::mprs::DoYOrNP
 proc ::mprs::DoReadString {EventAsList} {
+
     set ThreadId [Unleash [lindex $EventAsList 1]]
     set Tag [Unleash [lindex $EventAsList 2]]
 
-    set _ok ""
     set t ".inputString_$Tag"
+
+    set _ok ::$t._ok
+    variable $_ok
+    set $_ok ""
     toplevel $t
     wm title $t "Введите строку"
-    wm protocol $t WM_DELETE_WINDOW "set _ok 0"
+    wm protocol $t WM_DELETE_WINDOW "set $_ok 0"
     set f1 [frame $t.f1]
     set f2 [frame $t.f2]
     pack $f1 -side top -expand 1 -fill both
@@ -253,23 +308,25 @@ proc ::mprs::DoReadString {EventAsList} {
     pack $f -side top -expand 1 -fill both
     pack $f.e -side left -expand 1 -fill both
 
-    button $f2.bOk -text "OK" -command "set _ok 1"
-    button $f2.bCancel -text "Отмена" -command "set _ok 0"
+    button $f2.bOk -text "OK" -command "set $_ok 1"
+    button $f2.bCancel -text "Отмена" -command "set $_ok 0"
 
-    bind $t <Return> "set _ok 1"
+    bind $t <Return> "set $_ok 1"
 
     pack $f2.bOk $f2.bCancel -side left
     focus $f1.f.e
 
     #wait for button
-    vwait _ok
-    if {$_ok==0} {
-        destroy $t
-        set tmp ""
+    vwait $_ok
+    set res ",ekm"
+    if {[set $_ok] == 0} {
+        set res ""
     } else {
-        set tmp [$f1.f.e get]
+        set res [string cat [$f1.f.e get] "\n"]
     }
-    ::tkcon::SendEventToSwank "(:emacs-return-string $ThreadId $Tag \"$tmp\n\")" {} 2
+    set lres [::tkcon::QuoteTclStringForLisp $res]
+    unset $_ok
+    ::tkcon::SendEventToSwank "(:emacs-return-string $ThreadId $Tag $lres)" {} 2 $ThreadId
     if {[winfo exists $t]} {
         destroy $t
     }
@@ -311,6 +368,8 @@ proc ::mprs::ProcessAsyncEvent {EventAsList} {
         ::swcnn::Pong $EventAsList
     } elseif { $Head eq ":read-string" } {
         ::mprs::DoReadString $EventAsList
+    } elseif { $Head eq ":y-or-n-p" } {
+        ::mprs::DoYOrNP $EventAsList
     } elseif { [ContinuationExistsP $ContinuationId ] == 1 && [lsearch -exact [list ":return"] $Head] >= 0 } {
         # we should have generated event which would evaluate continuation later.
         # but what we will do with sync events then?
