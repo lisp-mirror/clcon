@@ -490,10 +490,10 @@ namespace eval ::ldbg {
         # }
 
         if {$StepperMode} {
-            # In a stepper mode, expand locals at topmost stack frame
-            $tbl expand 0
+            # In a stepper mode, expand locals at THIRD stack frame
+            $tbl expand 2
             # In a stepper mode, show source immediately
-            CellCmd 0 RowDblClick
+            CellCmd 2 RowDblClick
         } else {
             focus [$tbl bodypath]
         }
@@ -659,7 +659,11 @@ namespace eval ::ldbg {
             # есть также ф-я SWANK/BACKEND:SLDB-STEPPER-CONDITION-P в swank,
             # к-рая делает примерно то же самое
             switch -nocase $restartName {
-                step-continue {
+                step-into {
+                    set stepperMode 1
+                    break
+                }
+                step-next {
                     set stepperMode 1
                     break
                 }
@@ -993,7 +997,7 @@ namespace eval ::ldbg {
         }
     }
     
-    # Name must be a readable qualified lisp symbol, e.g. sb-ext:step-out
+    # Name must be a readable qualified lisp symbol, e.g. cl-user::step-out
     proc InvokeSldbRestartByName {name} {
         set thread [GetDebuggerThreadId]
         set LispCmd "(clco::restart-with-name-exists-p '$name)"
@@ -1089,7 +1093,7 @@ namespace eval ::ldbg {
     # binds it to each of bindtags
     proc StepperMenuItem {m bindtags name label accel} {
         variable MainWindow
-        set cmd [list ::ldbg::InvokeStepperRestart $name]
+        set cmd [list ::ldbg::InvokeStepperRestart [string cat "cl-user::" $name]]
         set cmdBreak "$cmd; break"
         $m add command -label $name -command $cmd -accel $accel
         foreach bt $bindtags {
@@ -1099,10 +1103,10 @@ namespace eval ::ldbg {
 
     # m is a menu. It can be in other window!
     proc FillStepperMenu {m bindtags} {
-        StepperMenuItem $m $bindtags "sb-ext:step-continue" "Продолжить" <F5>
-        StepperMenuItem $m $bindtags "sb-ext:step-out" "Выйти наружу" <Shift-F11>
-        StepperMenuItem $m $bindtags "sb-ext:step-next" "Шагнуть вдоль" <F10>
-        StepperMenuItem $m $bindtags "sb-ext:step-into" "Зайти внутрь" <F11>
+        StepperMenuItem $m $bindtags "step-continue" "Беги" <F5>
+        StepperMenuItem $m $bindtags "step-out" "Выбеги" <Shift-F11>
+        StepperMenuItem $m $bindtags "step-next" "Переступи" <F10>
+        StepperMenuItem $m $bindtags "step-into" "Зайди" <F11>
     }
     
     proc MakeMainWindowStepperMenu {w menu} {

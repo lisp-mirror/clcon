@@ -9,3 +9,5 @@ swank-text-log.log
 \#*\#
 defun-to-file/*
 *.wx64fsl
+*.*x64fsl
+send-to-swank.tcl.bak
