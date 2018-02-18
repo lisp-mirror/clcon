@@ -80,7 +80,7 @@
 (defun compile-file-for-tcl (clcon_text filename)
   "Backend for ::edt::CompileAndLoadTheFile . Rather untraditional c-s dialog. We normally do such things in tcl. It can be sometimes more convenient to edit though as we're in Lisp"
   (let ((l (length filename)))
-    (when (string= (subseq filename (- l 3) l) "asd")
+    (when (and (> (length filename) 3) (string= (subseq filename (- l 3) l) "asd"))
       (let* ((system-name 
               (subseq filename 
                       (+ 1 (position #\/ filename :from-end t)) 
