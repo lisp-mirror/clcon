@@ -72,7 +72,7 @@
   (beg nil :type (or null row-col)) ; begin index
   (end nil :type (or null row-col))   ; end index
   (far_tcl_cont_id nil :type (or null integer)) ; tcl continuation id to eval after event's action is processed
-  (swank-connection nil :type (or null swank::multithreaded-connection)) ; can be omitted for several event types
+  (swank-connection nil :type (or null swank::connection)) ; can be omitted for several event types
   (tick_count 0 :type integer)
   (|Код-слоя| nil :type (or null integer))
   )

@@ -56,7 +56,7 @@
   (string nil :type (nullable string)) ; encoded-marks
   (change-id 0 :type integer) ; identifies state of the buffer as of odu::buffer-change-id
   (end-line-no 0 :type integer) ; last line no to which this event corresponds. If something is edited at this line or before, event is to be canceled
-  (swank-connection nil :type (nullable swank::multithreaded-connection) ) ; can be omitted for shutdown event
+  (swank-connection nil :type (nullable swank::connection) ) ; can be omitted for shutdown event
   (|Код-слоя-раскраски| 0 :type integer) ; см. :РАСКРАСКА-3
   TICK_COUNT ; см. :РАСКРАСКА-3
   )
