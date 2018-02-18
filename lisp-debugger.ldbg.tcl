@@ -495,9 +495,9 @@ namespace eval ::ldbg {
 
         if {$StepperMode} {
             # In a stepper mode, expand locals at THIRD stack frame
-            $tbl expand 2
+            $tbl expand 1
             # In a stepper mode, show source immediately
-            CellCmd 2 RowDblClick
+            CellCmd 1 RowDblClick
         } else {
             focus [$tbl bodypath]
         }
