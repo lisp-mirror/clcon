@@ -269,29 +269,8 @@ WHAT can be:
              (swank::with-connection (connection)
                (swank::send-oob-to-emacs `(:ed ,target))))))))
 
-(defvar *post-message-thread* nil "Процесс специально для раздачи сообщений в очереди. Некое подобие пула тредов из одного треда. Подразумевается, что будем вызывать из ::tkcon::EvalInSwankAsync c идентификатором треда {:post-message-thread}, и каждое сообщение будет быстренько класть сообщение в ту или иную очередь")
-
-(defun ensure-post-message-thread (connection)
-  "По образцу swank::spawn-worker-thread"
-  (or *post-message-thread*
-      (setf *post-message-thread*
-            (swank::spawn (lambda ()
-                            (post-message-thread-function connection))
-                          :name "post-message-thread"))))
-
-(defun post-message-thread-function (connection)
-  (swank::with-bindings
-   swank::*default-worker-thread-bindings*
-   (swank::with-top-level-restart (connection nil)
-    (loop
-      (let ((event (swank::wait-for-event `(cl:or (:emacs-rex-rt . swank::_)
-                                                 (:emacs-rex . swank::_)))))
-        (swank::dcase event
-               ((:emacs-rex &rest args) (apply #'eval-for-emacs args))
-               ((:emacs-rex-rt &rest args) (apply #'eval-for-emacs-rt args))))))))
-
 (defmethod swank::thread-for-evaluation ((connection swank::multithreaded-connection) (id (eql :post-message-thread)))
-  (ensure-post-message-thread connection))
+  (error "post-message-thread устарел и удалён"))
 
 (defvar *globally-disable-sldb* nil "Полностью отключить SLDB и отлаживаться текстом. На самом деле переменная не глобальная и можно связывать её в отдельных потоках")
 

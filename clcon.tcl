@@ -35,7 +35,7 @@ namespace eval ::tkcon {
     set YarRoot [file normalize "$ScriptDirectory/../.."]
     # it was :find-existing
     variable find-existing 
-    set find-existing :post-message-thread
+    set find-existing t
     # Никогда не будем использовать :find-existing, т.к. он не для того создан. Пока ставим t вместо него.
 }
 
