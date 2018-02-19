@@ -495,9 +495,9 @@ namespace eval ::ldbg {
 
         if {$StepperMode} {
             # In a stepper mode, expand locals at THIRD stack frame
-            $tbl expand 1
+            $tbl expand 0
             # In a stepper mode, show source immediately
-            CellCmd 1 RowDblClick
+            CellCmd 0 RowDblClick
         } else {
             focus [$tbl bodypath]
         }
@@ -780,7 +780,7 @@ namespace eval ::ldbg {
     proc EnableStepping {} {
         set thread [GetDebuggerThreadId]                    
         ::tkcon::EvalInSwankAsync                           \
-            " (swank::sldb-step-into)"          \
+            " (cl:if (cl:find-restart 'cl-user::step-into) (swank::sldb-step-into) (cl:progn (swank/backend:activate-stepping nil) (cl:invoke-restart 'cl:continue)))"          \
             {::ldbg::EnableSteppingC1 $EventAsList}      \
             $thread
     }
@@ -991,43 +991,47 @@ namespace eval ::ldbg {
     }
 
 
-    proc InvokeStepperRestart {name} {
+    proc InvokeStepperRestart {names ItIsContinue} {
         variable StepperMode
         variable InTheDebugger
         variable MainWindow
-        set SymbolName [lindex [split $name {:}] end]
-        set ItIsContinue [expr { [string tolower $SymbolName] eq "continue" } ]
-        puts [string tolower $name]
-        showVar ItIsContinue
         if {!$InTheDebugger} {
             tk_messageBox -parent $MainWindow -title "Ходьба" -message "Отладчик не активен"
         } elseif {!$StepperMode && !$ItIsContinue} {
             tk_messageBox -parent $MainWindow -title "Ходьба" -message "Режим ходьбы не активен"
         } else {
-            InvokeSldbRestartByName $name
+            ::ldbg::ВызватьОдинИзРестартовПоИмени $names
         }
     }
     
     # Name must be a readable qualified lisp symbol, e.g. cl-user::step-out
-    proc InvokeSldbRestartByName {name} {
+    proc ВызватьОдинИзРестартовПоИмени {names} {
         set thread [GetDebuggerThreadId]
-        set LispCmd "(clco::restart-with-name-exists-p '$name)"
+        # showVar names
+        set LispCmd "(clco::restart-with-name-exists-p '$names)"
+        # showVar LispCmd
+         
         ::tkcon::EvalInSwankAsync $LispCmd \
             [subst -nocommands {
-                ::ldbg::InvokeSldbRestartByNameC1 $name \$EventAsList
+                ::ldbg::ВызватьОдинИзРестартовПоИмениПр1 \$EventAsList [list $names]
             }] $thread
     }
 
 
-    proc InvokeSldbRestartByNameC1 {name EventAsList} {
+    proc ВызватьОдинИзРестартовПоИмениПр1 {EventAsList names} {
         variable MainWindow
         set thread [GetDebuggerThreadId]
-        set existsp [::mprs::ParseReturnOk $EventAsList]
-        if {$existsp} {
-            set LispCmd "(clco::invoke-sldb-restart-by-name '$name)"
+        set name [::mprs::ParseReturnOk $EventAsList]
+        if {!($name eq 0)} {
+            # передача символа выглядит довольно гротескно... 
+            set Пакет [::mprs::Unleash [lindex $name 0]]
+            set Имя [::mprs::Unleash [lindex $name 1]]
+            set цПакет [::tkcon::QuoteLispObjToString ${Пакет}]
+            set цИмя [::tkcon::QuoteLispObjToString ${Имя}]
+            set LispCmd "(cl:invoke-restart (cl:find-symbol ${цИмя} ${цПакет}))"
             ::tkcon::EvalInSwankAsync $LispCmd {} $thread
         } else {
-            tk_messageBox -parent $MainWindow -title "Restart" -message "Команда перезапуска $name не найдена"
+            tk_messageBox -parent $MainWindow -title "Restart" -message "Команда(ы) перезапуска $names не найдена(ы)"
         }
         # Note we close the window just now, not after idle, as this can be stepper restart
         ::ldbg::CloseDebuggerWindow $MainWindow
@@ -1112,17 +1116,17 @@ namespace eval ::ldbg {
             -postcommand [list ::ldbg::FillRestartsMenu $w $m]
     }
 
-    # For menu m, adds stepper command with label starting named restart and
+    # For menu m, adds stepper command with label starting named restart (or first existing from list of restarts) and
     # binds it to each of bindtags
-    proc StepperMenuItem {m bindtags name label accel commandOverride} {
+    proc StepperMenuItem {m bindtags names label accel commandOverride IsItContinue} {
         variable MainWindow
         if {$commandOverride eq {}} {
-          set cmd [list ::ldbg::InvokeStepperRestart [string cat "cl-user::" $name]]
+          set cmd [list ::ldbg::InvokeStepperRestart $names $IsItContinue]
         } else {
           set cmd $commandOverride
         }
         set cmdBreak "$cmd; break"
-        $m add command -label $name -command $cmd -accel $accel
+        $m add command -label $label -command $cmd -accel $accel
         foreach bt $bindtags {
             bind $bt $accel $cmdBreak
         }
@@ -1132,13 +1136,13 @@ namespace eval ::ldbg {
     # client = {Отладчик} или {Редактор}
     proc FillStepperMenu {m bindtags client} {
         variable StepperMode
-        StepperMenuItem $m $bindtags "continue" "Беги" <F5> ""
+        StepperMenuItem $m $bindtags "(cl-user::step-continue cl:continue)" "Беги" <F5> "" 1
         
         if {$StepperMode} {
-          StepperMenuItem $m $bindtags "step-out" "Выбеги" <Shift-F11> ""
-          StepperMenuItem $m $bindtags "step-next" "Переступи" <F10> ""
+          StepperMenuItem $m $bindtags "cl-user::step-out" "Выбеги" <Shift-F11> "" 0
+          StepperMenuItem $m $bindtags "cl-user::step-next" "Переступи" <F10> "" 0
         }
-        StepperMenuItem $m $bindtags "step-into" "Зайди" <F11> "::ldbg::EnableStepping"
+        StepperMenuItem $m $bindtags "cl-user::step-into" "Зайди" <F11> "::ldbg::EnableStepping" 0
     }
     
     proc DebuggerBindTags {w} {
