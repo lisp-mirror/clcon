@@ -73,30 +73,32 @@ Once you switched to editor, it is convenient to scroll through messages with Al
 
 Компиляция системы с удобной навигацией по предупреждениям описана в руководстве пользователя. 
 
-Debugger and stepper
+Отладчик и степпер
 ------
-At the console, type in the following:
+Напечатайте в консоли:
 
 ``(load (compile-file (merge-pathnames "test/dbgtest.lisp" clcon-server:*clcon-source-directory*)))``
 
-This would create two functions, `f` and `g`. Run `(f 5)` at the console. Debugger will pop up. This is real sldb, SWANK-based debugger with most of its features implemented. You can browse through the stack. As you press `Right Arrow` at any of the frames, you will see locals. Pressing `Return` on the frame leads you to frame's source, while pressing `Return` on the local opens an inspector. Yes, native SWANK-based inspector.
+Возникнут две функции, f и g, f вызывает g, а в код g вставлено `(break)`. 
+Вызовите в консоли `(f 5)`. Откроется отладчик. Вы можете листать стек. 
+Если нажать стрелку вправо на клавиатуре, покажутся локальные переменные данного кдара стека. Нажатие клавиши `Ввод` на кадре стека ведёт к его исходнику, а нажатие на локальной переменной открывает инспектор для просмотра этой переменной. 
 
-There is also search in the stack list. Tree without a search is a dense forest! Type `Ctrl-F`, type in `)` and press `F3` or `Return` to continue search.
+Также можно нажать `ctrl-f` для поиска в стеке. Для продолжения поиска, нажмите `f3`, не закрывая окна поиска.
 
-You can evaluate values in the context of stack frame. Select topmost stack frame (of function `G`) in the frame list and choose `Stack/Eval in frame` from debugger menu bar. New window titled "eval in frame"
-will pop up. Note package is prompted at window's title. Type `y` in the window and press `Return`. Console will be activated and result of your evaluation 
-will be printed there. Press `Control-Shift-d` to return to the debugger.
+Можно вычислять выражения в контексте выбранного кадра стека. Например, вы можете выделить стрелками верхний кадр стека (для функции `G`) и выбрать в меню `Стек/Выполнить в кадре и лепо вывести` (горячие клавиши - `alt-2 5`). 
 
-Also we have "Restarts" menu at menubar. We could call either of them.
-Or we could just close debugger window with cross or with closing command of your Window Manager (e.g. Alt-F4),
-to call default restart, marked by asterik in restarts menu. Let's invoke "continue" restart and watch result of `f` (20) at the console. 
+Появится окошко с заголовком "выполнить в кадре" - там можно ввести выражение. Текущий пакет указан в заголовке кадра. Введите выражение, нажмите `Ввод`. Если вы не ошиблись, покажется консоль и в ней - результат вашего вычисления. `Control-Shift-d` вернёт в отладчик.
 
-Now let's try stepper. 
+Также есть меню команд перезапуска (рестаров, restarts). Рестарты - это способы продолжения выполнения программы, доступные в данном вызове отладчика. 
+Если просто закрыть окно отладчика, будет вызвана команда перезапуска по умолчанию, отмеченная звёздочкой в меню команд перезапуска. 
 
-Warning! There are problems in stepper backend when you step out of the frame where you turned stepping mode on. Press "continue" if stepper shows up unexpectedly. Submit bug to SBCL tracker :) 
+### Теперь попробуем пошаговый отладчик
 
-With `Control-Up` at the console, bring up last command `(f 5)` to the prompt, and press `Return` to call it again. As debugger occurs, position windows so that
-you can see debugger and the editor at the same time. Choose `Cтек/Перейти в режим ходьбы` from menu bar. Editor window will pop up and current source will be highlighted. Press "F10" (Step next, or "Step over") watch how execution proceeds. Also note that stack and locals are shown in the debugger window. Press "f10" one more time, watch how execution proceeds. Then press "F5" (Continue, or resume to normal execution) to quit stepper mode. 
+Закройте отладчик, верните предыдущую `(f 5)` с помощью `ctrl-стрелка вверх` в консоли и запустите её снова. Когда появится отладчик, нажмите f11 (Ходьба/Зайди). Появится исходник функции g в некоторой точке. Теперь в меню "ходьба" есть пункты "Беги", "Выбегай", "Переступи" и "Зайди". Они аналогичны командам "Continue", "Step out", "Step over" и "Step in". Их поведение напоминает любой пошаговый отладчик, но есть две проблемы:
+
+- шаги делаются иногда слишком редко
+- нельзя "выбежать" из функции, если ранее мы не заходили в неё с помощью команды "зайди". в этом случае отладчик обидится и предложит вместо этого продолжить ходьбу с помощью "Переступи". Это неприятно, но так сделан SBCL. Горячие клавиши для вызова команд ходьбы см. в меню "Ходьба". Эти команды работают также и в редакторе. 
+- окно отладчика не запоминает свою позицию - если вы его подвинете, оно при следующем шаге снова возникнет на старом месте. Используйте пункт меню окно/save window position и далее на предложение ввести 1,5 или 9 нажмите 1. 
 
 IDE commands. 
 ---------------------

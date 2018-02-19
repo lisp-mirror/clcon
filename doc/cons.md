@@ -29,8 +29,7 @@ Source: [cons.tcl](../cons.tcl).
 
 ###::mprs::Null###
 `::mprs::Null $LeashedDataFromLisp` - check if the object is a symbol.
-For now, we can send only two symbols: `t` and `nil`. `t` has leashed form of
-`yCOMMON-LISP:T` while nil have form of `yCOMMON-LISP:NIL`
+на данный момент мы можем отправить из лиспа в tcl только два символа: `t` and `nil`. `t` has leashed form of `yCOMMON-LISP:T` while nil have form of `yCOMMON-LISP:NIL`. Если нужно отправить другие символы, кодируйте их списком из имени пакета (строка) и имени символа (строка). Хотя, наверное, следует добавить поддержку символов. 
 
 ###::mprs::TypeTag###
 Extract type tag of lisp atom. 
@@ -47,7 +46,7 @@ Extracts data from leashed string. Lisp object converted to tcl as follows:
 
 - **string** will turn into a tcl string, which can be safely passed as a single argument to tcl functions (does not disintegrate into list when you use $x)
 - **keyword** - downcased keyword (this is SWANK/SLIME's tradition). If you are sure that your leashed lisp string represents a **keyword**, you can omit call to `Unleash` alltogether - Unleash indeed returns keywords "as is".
-- **symbol** - a string package::name (package is "nil" for symbols without home package, no case transformation); avoid symbols like `|a b|`
+- **symbol** - символы, отличные от t и nil, на данный момент не рекомендуется передавать из лиспа в tcl.
 - **number** - printed lisp representation
 - **list** - tcl list of leashed objects. E.g. `puts [::mprs::Consp [lindex [::mprs::Unleash $LeashedLispList] 2]]` will print 1 if (nth LispList 2) is a cons. 
 - **dotted list** - encoding error
